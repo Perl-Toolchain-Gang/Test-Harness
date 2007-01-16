@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+
+use strict;
+
+sub _print;
+use Getopt::Long;
+use Term::ANSIColor;
+
+GetOptions(
+    'v|verbose' => \my $VERBOSE,
+);
+
+use TAPx::Parser;
+use TAPx::Parser::Aggregator;
+use TAPx::Parser::Source::Perl;
+
+##############################################################################
+
+=head1 NAME
+
+tprove_color - Run tests with color.
+
+=head1 USAGE
+
+ tprove_color [ list of test files ]
+
+=head1 DESCRIPTION
+
+Try running this:
+
+  perl -Ilib examples/tprove_color --verbose examples/t/*.t
+
+Note that the colors are ugly.  Many colors have been tossed in so that you
+can see how flexible things are.
+
+=head1 CAVEATS
+
+This is alpha code.  You've been warned.
+
+=cut
+
+use File::Find;
+my @tests;
+if (@ARGV) {
+    @tests = @ARGV;
+}
+else {
+    find( sub { -f && /\.t$/ && push @tests => $File::Find::name }, 't' );
+}
+
+my $aggregate = TAPx::Parser::Aggregator->new;
+my $source    = TAPx::Parser::Source::Perl->new;
+$source->switches('-Ilib');
+my %callbacks = (
+    test => sub {
+        my $test = shift;
+        if ( $test->passed && not $test->directive ) {
+            print color 'green';
+        }
+        elsif ( !$test->passed ) {    # even if it's TODO
+            print color 'white on_red';
+        }
+        elsif ( $test->has_skip ) {
+            print color 'white on_blue';
+
+        }
+        elsif ( $test->has_todo ) {
+            print color 'white';
+        }
+    },
+    ELSE => sub {
+        print color 'black on_white';
+    },
+    ALL => sub {
+        print shift->as_string;
+        print color 'reset';
+        print "\n";
+    },
+);
+foreach my $test (@tests) {
+    if ( my $stream = $source->filename($test)->get_stream ) {
+        my $parser = TAPx::Parser->new(
+            {   stream    => $stream,
+                callbacks => \%callbacks,
+            }
+        );
+        $parser->run;
+        $aggregate->add( $test, $parser );
+    }
+    else {
+        my $error = $source->error;
+        warn "Could not run ($test): $error";
+        next;
+    }
+}
+
+my ( $total, $passed, $failed, $errors ) = (
+    $aggregate->total,
+    scalar $aggregate->passed,
+    scalar $aggregate->failed,
+    scalar $aggregate->parse_errors,
+);
+
+print <<"END_SUMMARY";
+Tests run:  $total
+Passed:     $passed
+Failed:     $failed
+Errors:     $errors
+END_SUMMARY

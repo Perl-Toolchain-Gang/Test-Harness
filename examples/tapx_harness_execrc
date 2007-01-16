@@ -1,0 +1,5 @@
+
+'/usr/bin/perl -Tw' => '*' # this is also a comment
+# this is a comment
+
+'/usr/bin/perl -w',  "t/010-regression.t"

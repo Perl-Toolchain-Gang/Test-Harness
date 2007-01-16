@@ -1,0 +1,136 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+
+use strict;
+
+sub _print;
+use Getopt::Long;
+use Benchmark;
+
+GetOptions(
+    'v|verbose' => \my $VERBOSE,
+    'lib'       => \my $LIB,
+);
+
+use TAPx::Parser;
+use TAPx::Parser::Aggregator;
+use TAPx::Parser::Source::Perl;
+
+##############################################################################
+
+=head1 NAME
+
+tprove - Simple proof of concept for proving tests
+
+=head1 USAGE
+
+ tprove [ list of test files ]
+
+=head1 DESCRIPTION
+
+C<tprove> is not installed on your system unless you explicitly copy it
+somewhere in your path.  The current incarnation B<must> be run in a directory
+with both C<t/> and C<lib/> (i.e., the standard "root" level directory in
+which CPAN style modules are developed).  This will probably change in the
+future.  As noted, this is a proof of concept.
+
+Note that massive amounts of code have been lifted directly from
+C<Test::Harness::Straps>.
+
+=head1 SWITCHES
+
+Print all test lines:
+
+ --verbose
+
+Include C<lib/>
+
+ --lib
+
+=head1 CAVEATS
+
+This is alpha code.  You've been warned.
+
+=cut
+
+use File::Find;
+my @tests;
+if (@ARGV) {
+    @tests = @ARGV;
+}
+else {
+    find( sub { -f && /\.t$/ && push @tests => $File::Find::name }, 't' );
+}
+
+my $aggregate = TAPx::Parser::Aggregator->new;
+
+my $longest = 0;
+
+foreach my $test (@tests) {
+    $longest = length $test if length $test > $longest;
+}
+
+my $start_time = Benchmark->new;
+
+foreach my $test (@tests) {
+    my $parser = analyze_test( $test, $longest );
+    $aggregate->add( $test, $parser );
+}
+my $runtime = timestr(timediff(Benchmark->new, $start_time));
+
+my ( $total, $passed, $failed, $errors ) = (
+    $aggregate->total,
+    scalar $aggregate->passed,
+    scalar $aggregate->failed,
+    scalar $aggregate->parse_errors,
+);
+
+print <<"END_SUMMARY";
+Tests run:  $total
+Passed:     $passed
+Failed:     $failed
+Errors:     $errors
+$runtime
+END_SUMMARY
+
+sub analyze_test {
+    my ( $test ) = @_;
+
+    my %args = ( source => $test );
+    $args{switches} = '-Ilib' if $LIB;
+    my $parser = TAPx::Parser->new( \%args );
+
+    my $periods = '.' x (($longest + 4) - length $test);
+    my $name = $test;
+    $name =~ s/\.[[:word:]]+$//;
+    print "$name$periods";
+    while ( defined (my $result = $parser->next) ) {
+        if ( $result->is_comment ) {
+            print $result->as_string, $/;
+        }
+        else {
+            _print $result->as_string, $/;
+        }
+    }
+    if ( !$parser->failed && !$parser->parse_errors ) {
+        print "ok\n";
+    }
+    else {
+        print "not ok.\n";
+        local $" = "\n    ";
+        if ( $parser->failed ) {
+             print "Failed: @{[$parser->failed]}\n";
+        }
+        if ( $parser->parse_errors ) {
+             print "Errors: @{[$parser->parse_errors]}\n";
+        }
+    }
+    return $parser;
+}
+
+sub _print {
+    return unless $VERBOSE;
+    print @_;
+}

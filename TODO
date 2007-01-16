@@ -1,0 +1,14 @@
+TODO:
+
+    - Make the color support more intelligent.
+    - Make the wait and exit codes work on Windows.
+    - Have the aggregator return an iterator.
+    - Make sure we get the right harness output with no tests run.
+    - Make the 'colored' test output easier to override.
+    - More tests, particularly IPC::Open3
+    - Unknown callback keys should be fatal.
+    - Run it against Perl's test suite (first prove, then tprove).
+    - The 'result' objects are currently blessing hashrefs.  This is bad.
+      Instead, they should have proper getter/setters to provide future
+      support for subclassing.
+    - Horrible idea:  have Mac's voice synthesis tell you when tests fail :)

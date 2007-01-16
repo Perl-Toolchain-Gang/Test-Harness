@@ -1,0 +1,275 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+
+use strict;
+use Pod::Usage 1.12;
+
+use Getopt::Long;
+
+# Allow cuddling the paths with the -I
+@ARGV = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @ARGV;
+
+Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
+GetOptions(
+    'v|verbose'  => \my $VERBOSE,
+    'f|failures' => \my $FAILURES,
+    'l|lib'      => \my $LIB,
+    'b|blib'     => \my $BLIB,
+    's|shuffle'  => \my $SHUFFLE,
+    'c|color'    => \my $COLOR,
+    'harness=s'  => \my $HARNESS,
+    'r|recurse'  => \my $RECURSE,
+    'p|parse'    => \my $PARSE,
+    'q|quiet'    => \my $QUIET,
+    'Q|QUIET'    => \my $REALLY_QUIET,
+    'e|exec=s'   => \my $EXEC,
+    'execrc=s'   => \my $EXECRC,
+    'I=s@'       => \my @INCLUDES,
+    'h|help|?'   => sub { pod2usage( { -verbose => 1 } ); exit },
+    'H|man'      => sub { pod2usage( { -verbose => 2 } ); exit },
+
+    #'x|xtension=s' => \my $EXTENSION,
+    'T' => \my $TAINT_FAIL,
+    't' => \my $TAINT_WARN,
+    'W' => \my $WARNINGS_FAIL,
+    'w' => \my $WARNINGS_WARN,
+);
+
+# XXX otherwise, diagnostics and failure messages are out of sequence
+# or we can't suppress STDERR on quiet
+#$MERGE = 1 if $FAILURES || $QUIET || $REALLY_QUIET;
+
+use lib 'lib';
+use TAPx::Harness;
+my $harness_class = 'TAPx::Harness';
+if ($COLOR) {
+    require TAPx::Harness::Color;
+    $harness_class = 'TAPx::Harness::Color';
+}
+if ($HARNESS) {
+    eval "use $HARNESS";
+    die "Cannot use harness ($HARNESS): $@" if $@;
+    $harness_class = $HARNESS;
+}
+
+use File::Find;
+use File::Spec;
+
+my @tests = get_tests(@ARGV);
+
+shuffle(@tests) if $SHUFFLE;
+
+if ( $TAINT_FAIL && $TAINT_WARN ) {
+    die "-t and -T are mutually exclusive";
+}
+if ( $WARNINGS_FAIL && $WARNINGS_WARN ) {
+    die "-w and -W are mutually exclusive";
+}
+
+my %args;
+$args{lib}          = get_libs();
+$args{switches}     = get_switches();
+$args{verbose}      = $VERBOSE  if $VERBOSE;
+$args{failures}     = $FAILURES if $FAILURES;
+$args{quiet}        = 1         if $QUIET;
+$args{really_quiet} = 1         if $REALLY_QUIET;
+$args{errors}       = 1         if $PARSE;
+$args{exec}         = $EXEC     if $EXEC;
+$args{execrc}       = $EXECRC   if $EXECRC;
+my $harness = $harness_class->new( \%args );
+$harness->runtests(@tests);
+
+sub get_switches {
+    my @switches;
+
+    # notes that -T or -t must be at the front of the switches!
+    if ($TAINT_FAIL) {
+        push @switches, 'T';
+    }
+    elsif ($TAINT_WARN) {
+        push @switches, 't';
+    }
+    if ($WARNINGS_FAIL) {
+        push @switches, 'W';
+    }
+    elsif ($WARNINGS_WARN) {
+        push @switches, 'w';
+    }
+
+    return @switches ? \@switches : ();
+}
+
+sub get_libs {
+    my @libs;
+    if ($LIB) {
+        push @libs, 'lib';
+    }
+    if ($BLIB) {
+        push @libs, 'blib/lib';
+    }
+    if (@INCLUDES) {
+        push @libs, @INCLUDES;
+    }
+    return @libs ? \@libs : ();
+}
+
+sub get_tests {
+    my @argv = @_;
+    my ( @tests, %tests );
+    @argv = 't' unless @argv;
+    foreach my $arg (@argv) {
+        if ( '-' eq $arg ) {
+            push @argv => <STDIN>;
+            chomp(@argv);
+            next;
+        }
+
+        if ( -d $arg ) {
+            my @files = _get_tests($arg);
+            foreach my $file (@files) {
+                push @tests => $file unless exists $tests{$file};
+            }
+            @tests{@files} = (1) x @files;
+        }
+        else {
+            push @tests => $arg unless exists $tests{$arg};
+            $tests{$arg} = 1;
+        }
+    }
+    return @tests;
+}
+
+sub _get_tests {
+    my $dir = shift;
+    my @tests;
+    if ($RECURSE) {
+        find(
+            sub { -f && /\.t$/ && push @tests => $File::Find::name },
+            $dir
+        );
+    }
+    else {
+        @tests = glob( File::Spec->catfile( $dir, '*.t' ) );
+    }
+    return @tests;
+}
+
+sub shuffle {
+    my $self = shift;
+
+    # Fisher-Yates shuffle
+    my $i = @_;
+    while ($i) {
+        my $j = rand $i--;
+        @_[ $i, $j ] = @_[ $j, $i ];
+    }
+}
+
+__END__
+
+=head1 NAME
+
+runtests - Run tests through a TAPx harness.
+
+=head1 USAGE
+
+ runtests [options] [files or directories]
+
+=head1 OPTIONS
+
+Boolean options
+
+ -v,  --verbose     Print all test lines.
+ -l,  --lib         Add 'lib' to the path for your tests (-Ilib).
+ -b,  --blib        Add 'blib/lib' to the path for your tests (-Iblib/lib).
+ -s,  --shuffle     Run the tests in random order.
+ -c,  --color       Color test output.  See TAPx::Harness::Color.
+ -f,  --failures    Only show failed tests.
+ -r,  --recurse     Recursively descend into directories.
+ -q,  --quiet       Suppress some test output while running tests.
+ -Q,  --QUIET       Only print summary results.
+ -p,  --parse       Show full list of TAP parse errors, if any.
+ -T                 Enable tainting checks.
+ -t                 Enable tainting warnings.
+ -W                 Enable fatal warnings.
+ -w                 Enable warnings.
+ -h,  --help        Display this help
+ -?,                Display this help
+ -H,  --man         Longer manpage for prove
+
+Options which take arguments
+
+ -I                 Library paths to include.
+ -e,  --exec        Program to run the tests with.
+      --harness     Define test harness to use.  See TAPx::Harness.
+      --execrc      Location of 'execrc' file (no short form).
+
+=head2 Reading from C<STDIN>
+
+If you have a list of tests (or URLs, or anything else you want to test) in a
+file, you can add them to your tests by using a '-':
+
+ runtests - < my_list_of_things_to_test.txt
+
+See the C<README> in the C<examples> directory of this distribution.
+
+=head1 NOTES
+
+=head2 Default Test Directory
+
+If no files or directories are supplied, C<runtests> looks for all files
+matching the pattern C<t/*.t>.
+
+=head2 Colored Test Output
+
+Specifying the C<--color> or C<-c> switch is the same as:
+
+ runtests --harness TAPx::Harness::Color
+
+Note that this only has an effect if the C<--verbose> or C<--failures> options
+are set.
+
+=head2 C<--exec>
+
+Normally you can just pass a list of Perl tests and the harness will know how
+to execute them.  However, if your tests are not written in Perl or if you
+want all tests invoked exactly the same way, use the C<-e>, or C<--exec>
+switch:
+
+ runtests --exec '/usr/bin/ruby -w' t/
+ runtests --exec '/usr/bin/perl -Tw -mstrict -Ilib' t/
+
+=head2 C<--execrc>
+
+Location of 'execrc' file.  See L<TAPx::Harness> for more information.
+
+=head1 PERFORMANCE
+
+Because of its design, C<TAPx::Parser> collects more information than
+C<Test::Harness>.  However, the trade-off is performance.  Using C<runtests>
+is often slower than the C<prove> utility which is bundled with
+C<Test::Harness>.  For small tests suites, this is usually not a problem.
+However, enabling the C<--quiet> or C<--QUIET> options can speed up the test
+suite considerably.  In fact, with the C<--QUIET> option, test suites often
+run faster than with C<prove>.
+
+Use of the C<--exec> switch, even with Perl tests, can provide a huge
+performance boost and the tests will almost certainly run faster than
+C<Test::Harness>/C<prove>.  This is because if this switch is not supplied,
+the harness must try to open the file and examine its shebang line, determine
+how it's to be invoked, and with which switches.  Thus, every file is opened
+twice.  With C<--exec>, you only need to open each file once, thus saving a
+lot of I/O.
+
+=head1 SEE ALSO
+
+C<prove>, which comes with L<Test::Harness> and whose code I've nicked in a
+few places (thanks Andy!).
+
+=head1 CAVEATS
+
+This is alpha code.  You've been warned.
+
+=cut

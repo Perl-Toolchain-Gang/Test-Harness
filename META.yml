@@ -1,0 +1,65 @@
+---
+name: TAPx-Parser
+version: 0.50_06
+author:
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
+abstract: Parse L<TAP|Test::Harness::TAP> output
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Pod::Usage: 0
+  Test::More: 0
+provides:
+  TAPx::Harness:
+    file: lib/TAPx/Harness.pm
+    version: 0.50_06
+  TAPx::Harness::Color:
+    file: lib/TAPx/Harness/Color.pm
+    version: 0.50_06
+  TAPx::Parser:
+    file: lib/TAPx/Parser.pm
+    version: 0.50_06
+  TAPx::Parser::Aggregator:
+    file: lib/TAPx/Parser/Aggregator.pm
+    version: 0.50_06
+  TAPx::Parser::Grammar:
+    file: lib/TAPx/Parser/Grammar.pm
+    version: 0.50_06
+  TAPx::Parser::Iterator:
+    file: lib/TAPx/Parser/Iterator.pm
+    version: 0.50_06
+  TAPx::Parser::Iterator::ARRAY:
+    file: lib/TAPx/Parser/Iterator.pm
+    version: 0.50_06
+  TAPx::Parser::Iterator::FH:
+    file: lib/TAPx/Parser/Iterator.pm
+    version: 0.50_06
+  TAPx::Parser::Result:
+    file: lib/TAPx/Parser/Result.pm
+    version: 0.50_06
+  TAPx::Parser::Result::Bailout:
+    file: lib/TAPx/Parser/Result/Bailout.pm
+    version: 0.50_06
+  TAPx::Parser::Result::Comment:
+    file: lib/TAPx/Parser/Result/Comment.pm
+    version: 0.50_06
+  TAPx::Parser::Result::Plan:
+    file: lib/TAPx/Parser/Result/Plan.pm
+    version: 0.50_06
+  TAPx::Parser::Result::Test:
+    file: lib/TAPx/Parser/Result/Test.pm
+    version: 0.50_06
+  TAPx::Parser::Result::Unknown:
+    file: lib/TAPx/Parser/Result/Unknown.pm
+    version: 0.50_06
+  TAPx::Parser::Source:
+    file: lib/TAPx/Parser/Source.pm
+    version: 0.50_06
+  TAPx::Parser::Source::Perl:
+    file: lib/TAPx/Parser/Source/Perl.pm
+    version: 0.50_06
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
