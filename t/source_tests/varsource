@@ -1,0 +1,8 @@
+#!/usr/bin/perl -wT
+
+# Number of lines to output + 0.5 to output newline at end.
+my $lines = shift || 0;
+my @out = ( 1 .. int($lines) );
+print join("\n", @out);
+print "\n" if $lines > int($lines);
+

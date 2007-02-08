@@ -1,0 +1,81 @@
+diff -uNr -X diff-exclude ExtUtils-MakeMaker-6.31.orig/lib/ExtUtils/Command/MM.pm ExtUtils-MakeMaker-6.31/lib/ExtUtils/Command/MM.pm
+--- ExtUtils-MakeMaker-6.31.orig/lib/ExtUtils/Command/MM.pm	2007-01-27 18:27:34.000000000 +0000
++++ ExtUtils-MakeMaker-6.31/lib/ExtUtils/Command/MM.pm	2007-01-27 18:36:29.000000000 +0000
+@@ -38,30 +38,54 @@
+ 
+   test_harness($verbose, @test_libs);
+ 
++Run the tests on @ARGV using either Test::Harness or TAPx::Harness. By
++default Test::Harness is used but if the environment variable
++PERL_EUMM_USE_TAPX is set to a true value and TAPx::Harness is installed
++it will be used instead.
++
++The $verbose flag affects the verbosity of the tests. Libraries named in
++@libs will be placed at the front of the tests' @INC include path.
++
+ Runs the tests on @ARGV via Test::Harness passing through the $verbose
+-flag.  Any @test_libs will be unshifted onto the test's @INC.
++flag. Any @test_libs will be unshifted onto the test's @INC.
+ 
+-@test_libs are run in alphabetical order.
++Tests are run in alphabetical order.
+ 
+ =cut
+ 
+ sub test_harness {
+-    require Test::Harness;
+-    require File::Spec;
+-
+-    $Test::Harness::verbose = shift;
+-
++    my $verbose = shift;
++    my @libs    = @_;
++    
+     # Because Windows doesn't do this for us and listing all the *.t files
+     # out on the command line can blow over its exec limit.
+     require ExtUtils::Command;
+-    my @argv = ExtUtils::Command::expand_wildcards(@ARGV);
++    my @argv = sort { lc $a cmp lc $b } 
++               ExtUtils::Command::expand_wildcards(@ARGV);
+ 
+-    local @INC = @INC;
+-    unshift @INC, map { File::Spec->rel2abs($_) } @_;
+-    Test::Harness::runtests(sort { lc $a cmp lc $b } @argv);
+-}
++    # Consider using TAPx::Harness
++    if ($ENV{PERL_EUMM_USE_TAPX}) {
++        eval "require TAPx::Harness";
++        unless ($@) {
++            my $harness = TAPx::Harness->new( {
++                verbose => $verbose,
++                lib     => \@libs
++            } );
++            
++            $harness->runtests(@argv);
++            return;
++        }
++    }
+ 
++    # Fallback: use Test::Harness
++    require Test::Harness;
++    require File::Spec;
+ 
++    local $Test::Harness::verbose = $verbose;
++    local @INC = @INC;
++    unshift @INC, map { File::Spec->rel2abs($_) } @libs;
++    Test::Harness::runtests(@argv);
++}
+ 
+ =item B<pod2man>
+ 
+diff -uNr -X diff-exclude ExtUtils-MakeMaker-6.31.orig/t/xs.t ExtUtils-MakeMaker-6.31/t/xs.t
+--- ExtUtils-MakeMaker-6.31.orig/t/xs.t	2007-01-27 18:27:34.000000000 +0000
++++ ExtUtils-MakeMaker-6.31/t/xs.t	2007-01-27 18:26:22.000000000 +0000
+@@ -9,7 +9,6 @@
+         unshift @INC, 't/lib/';
+     }
+ }
+-chdir 't';
+ 
+ use Test::More;
+ use MakeMaker::Test::Utils;

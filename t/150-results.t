@@ -1,0 +1,214 @@
+#!/usr/bin/perl -wT
+
+use strict;
+
+use lib 'lib';
+
+use Test::More tests => 148;
+use TAPx::Parser::Result;
+
+use constant RESULT  => 'TAPx::Parser::Result';
+use constant PLAN    => 'TAPx::Parser::Result::Plan';
+use constant TEST    => 'TAPx::Parser::Result::Test';
+use constant COMMENT => 'TAPx::Parser::Result::Comment';
+use constant BAILOUT => 'TAPx::Parser::Result::Bailout';
+use constant UNKNOWN => 'TAPx::Parser::Result::Unknown';
+
+my $warning;
+$SIG{__WARN__} = sub { $warning = shift };
+
+#
+# Note that the are basic unit tests.  More comprehensive path coverage is
+# found in the regression tests.
+#
+
+my %inherited_methods = (
+    is_plan    => '',
+    is_test    => '',
+    is_comment => '',
+    is_bailout => '',
+    is_unknown => '',
+    is_ok      => 1,
+);
+
+my $abstract_class = bless { type => 'no_such_type' },
+  RESULT;    # you didn't see this
+run_method_tests( $abstract_class, {} );    # check the defaults
+
+can_ok $abstract_class, 'type';
+is $abstract_class->type, 'no_such_type',
+  '... and &type should return the correct result';
+
+can_ok $abstract_class, 'passed';
+$warning = '';
+ok $abstract_class->passed, '... and it should default to true';
+like $warning, qr/^\Qpassed() is deprecated.  Please use "is_ok()"/,
+  '... but it should emit a deprecation warning';
+
+can_ok RESULT, 'new';
+eval { RESULT->new( { type => 'no_such_type' } ) };
+ok my $error = $@, '... and calling it with an unknown class should fail';
+like $error, qr/^Could not determine class for.*no_such_type/s,
+  '... with an appropriate error message';
+
+#
+# test unknown tokens
+#
+
+run_tests(
+    {   class => UNKNOWN,
+        data  => {
+            type => 'unknown',
+            raw  => '... this line is junk ... ',
+        },
+    },
+    {   is_unknown => 1,
+        raw        => '... this line is junk ... ',
+        as_string  => '... this line is junk ... ',
+        type       => 'unknown',
+    }
+);
+
+#
+# test comment tokens
+#
+
+run_tests(
+    {   class => COMMENT,
+        data  => {
+            type    => 'comment',
+            raw     => '#   this is a comment',
+            comment => 'this is a comment',
+        },
+    },
+    {   is_comment => 1,
+        raw        => '#   this is a comment',
+        as_string  => '#   this is a comment',
+        comment    => 'this is a comment',
+        type       => 'comment',
+    }
+);
+
+#
+# test bailout tokens
+#
+
+run_tests(
+    {   class => BAILOUT,
+        data  => {
+            type    => 'bailout',
+            raw     => 'Bailout!  This blows!',
+            bailout => 'This blows!',
+        },
+    },
+    {   is_bailout => 1,
+        raw        => 'Bailout!  This blows!',
+        as_string  => 'This blows!',
+        type       => 'bailout',
+    }
+);
+
+#
+# test plan tokens
+#
+
+run_tests(
+    {   class => PLAN,
+        data  => {
+            type          => 'plan',
+            raw           => '1..20',
+            tests_planned => 20,
+            directive     => '',
+            explanation   => '',
+        },
+    },
+    {   is_plan       => 1,
+        raw           => '1..20',
+        tests_planned => 20,
+        directive     => '',
+        explanation   => '',
+    }
+);
+
+#
+# test 'test' tokens
+#
+
+my $test = run_tests(
+    {   class => TEST,
+        data  => {
+            ok          => 'ok',
+            test_num    => 5,
+            description => '... and this test is fine',
+            directive   => '',
+            explanation => '',
+            raw         => 'ok 5 and this test is fine',
+            type        => 'test',
+        },
+    },
+    {   is_test      => 1,
+        type         => 'test',
+        ok           => 'ok',
+        number       => 5,
+        description  => '... and this test is fine',
+        directive    => '',
+        explanation  => '',
+        is_ok        => 1,
+        is_actual_ok => 1,
+        todo_passed  => '',
+        has_skip     => '',
+        has_todo     => '',
+        as_string    => 'ok 5 ... and this test is fine',
+        is_unplanned => '',
+    }
+);
+
+can_ok $test, 'actual_passed';
+$warning = '';
+is $test->actual_passed, $test->is_actual_ok,
+  '... and it should return the correct value';
+like $warning,
+  qr/^\Qactual_passed() is deprecated.  Please use "is_actual_ok()"/,
+  '... but issue a deprecation warning';
+
+can_ok $test, 'todo_failed';
+$warning = '';
+is $test->todo_failed, $test->todo_passed,
+  '... and it should return the correct value';
+like $warning,
+  qr/^\Qtodo_failed() is deprecated.  Please use "todo_passed()"/,
+  '... but issue a deprecation warning';
+
+sub run_tests {
+    my ( $instantiated, $value_for ) = @_;
+    my $result = instantiate($instantiated);
+    run_method_tests( $result, $value_for );
+    return $result;
+}
+
+sub instantiate {
+    my $instantiated = shift;
+    my $class        = $instantiated->{class};
+    ok my $result = RESULT->new( $instantiated->{data} ),
+      'Creating $class results should succeed';
+    isa_ok $result, $class, '.. and the object it returns';
+    return $result;
+}
+
+sub run_method_tests {
+    my ( $result, $value_for ) = @_;
+    while ( my ( $method, $default ) = each %inherited_methods ) {
+        can_ok $result, $method;
+        if ( defined( my $value = delete $value_for->{$method} ) ) {
+            is $result->$method, $value, "... and $method should be correct";
+        }
+        else {
+            is $result->$method, $default,
+              "... and $method default should be correct";
+        }
+    }
+    while ( my ( $method, $value ) = each %$value_for ) {
+        can_ok $result, $method;
+        is $result->$method, $value, "... and $method should be correct";
+    }
+}
