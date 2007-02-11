@@ -171,9 +171,9 @@ sub _set_colors {
 }
 
 sub _process {
-    my ( $self, $result ) = @_;
+    my ( $self, $parser, $result ) = @_;
     $self->_set_colors( 'reset' );
-    return unless $self->_should_display($result);
+    return unless $self->_should_display( $parser, $result );
 
     if ( $result->is_test ) {
         if ( !$result->is_ok ) {    # even if it's TODO

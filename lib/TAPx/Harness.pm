@@ -715,7 +715,7 @@ sub _runtest {
               unless $really_quiet;
             $self->_newline_printed( 0 );
         }
-        $self->_process( $result );
+        $self->_process( $parser, $result );
     }
 
     $self->_close_spool;
@@ -775,9 +775,9 @@ sub _close_spool {
 }
 
 sub _process {
-    my ( $self, $result ) = @_;
+    my ( $self, $parser, $result ) = @_;
     return if $self->really_quiet;
-    if ( $self->_should_display( $result ) ) {
+    if ( $self->_should_display( $parser, $result ) ) {
         unless ( $self->_newline_printed ) {
             $self->output( " \n " ) unless $self->quiet;
             $self->_newline_printed( 1 );
@@ -792,10 +792,10 @@ sub _get_output_method {
 }
 
 sub _should_display {
-    my ( $self, $result ) = @_;
+    my ( $self, $parser, $result ) = @_;
     return if $self->really_quiet;
     return $self->verbose && !$self->failures
-      || ( $result->is_comment && !$self->quiet )
+      || ( $result->is_comment && !$self->quiet && ($result->is_test || !$parser->in_todo) )
       || $self->_should_show_failure( $result );
 }
 

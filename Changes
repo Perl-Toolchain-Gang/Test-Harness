@@ -52,6 +52,10 @@ Revision history for TAP-Parser
     - Setup tapx-dev@hexten.net mailing list.
     - (#24679) TAPx::Harness now reports failure for tests that die
       after completing all subtests.
+    - Added in_todo attribute on TAPx::Parser which is true while the
+      most recently seen test was a TODO.
+    - (#24728) TAPx::Harness now supresses diagnostics from failed
+      TODOs. Not sure if the semantics of this are correct yet.
       
 0.50_06 18 January 2007
     - Fixed doc typo in examples/README [rt.cpan.org #24409]

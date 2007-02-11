@@ -43,6 +43,7 @@ BEGIN {
         tests_planned
         tests_run
         wait
+        in_todo
         >
       )
     {
@@ -232,6 +233,7 @@ sub _next {
     $self->_start_tap( $stream->is_first );   # must be after $stream->next
 
     if ( $result && $result->is_test ) {
+        $self->in_todo( $result->has_todo );
         my $count = $self->tests_planned;
         if ( defined $count && ( $result->number || 0 ) > $count ) {
             $result->is_unplanned(1);
@@ -675,6 +677,14 @@ directive.
 
 Note that TODO tests I<always> pass.  If you need to know whether or not
 they really passed, check the C<is_actual_ok> method.
+
+=head3 C<in_todo>
+
+  if ( $parser->in_todo ) { ... }
+  
+True while the most recent result was a TODO. Becomes true before the
+TODO result is returned and stays true until just before the next non-
+TODO test is returned.
 
 =head1 TOTAL RESULTS
 
