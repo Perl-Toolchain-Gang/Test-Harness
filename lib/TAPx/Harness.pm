@@ -657,22 +657,22 @@ sub output_test_failure {
     else {
         $self->failure_output(" Failed $failed/$total subtests ");
         if ( !$total ) {
-            $self->failure_output(" \nNo tests run !");
+            $self->failure_output("\nNo tests run!");
         }
     }
 
     if ( my $skipped = $parser->skipped ) {
         $passed -= $skipped;
         my $test = 'subtest' . ( $skipped != 1 ? 's' : '' );
-        $self->output(" \n \t( less $skipped skipped $test: $passed okay ) ");
+        $self->output("\n\t(less $skipped skipped $test: $passed okay)");
     }
 
     if ( my $failed = $parser->todo_passed ) {
         my $test = $failed > 1 ? 'tests' : 'test';
-        $self->output(" \n \t( $failed TODO $test unexpectedly succeeded ) ");
+        $self->output("\n\t($failed TODO $test unexpectedly succeeded)");
     }
 
-    $self->output(" \n ");
+    $self->output("\n");
 }
 
 sub _runtest {
@@ -711,16 +711,16 @@ sub _runtest {
         $output = $self->_get_output_method($parser);
         if ( $result->is_bailout ) {
             $self->failure_output(
-                    " Bailout called . Further testing stopped: "
+                    "Bailout called.  Further testing stopped:  "
                   . $result->explanation
-                  . " \n " );
+                  . "\n" );
             exit 1;
         }
         unless ($plan) {
             $plan = '/' . ( $parser->tests_planned || 0 ) . ' ';
         }
         if ( $show_count && $result->is_test ) {
-            $self->$output( " \r $leader" . $result->number . $plan )
+            $self->$output( "\r$leader" . $result->number . $plan )
               unless $really_quiet;
             $self->_newline_printed(0);
         }
@@ -733,7 +733,7 @@ sub _runtest {
         my $spaces = ' ' x (
             1 + length($leader) + length($plan) + length( $parser->tests_run )
         );
-        $self->$output(" \r $spaces\r $leader") unless $really_quiet;
+        $self->$output("\r$spaces\r$leader") unless $really_quiet;
     }
     if ( !$parser->has_problems ) {
         unless ($really_quiet) {
@@ -745,7 +745,7 @@ sub _runtest {
                   : sprintf( ' %8s s', $elapsed || '<1' );
             }
 
-            $self->output(" ok $time_report\n ");
+            $self->output("ok$time_report\n");
         }
     }
     else {
@@ -789,10 +789,10 @@ sub _process {
     return if $self->really_quiet;
     if ( $self->_should_display( $parser, $result ) ) {
         unless ( $self->_newline_printed ) {
-            $self->output(" \n ") unless $self->quiet;
+            $self->output("\n") unless $self->quiet;
             $self->_newline_printed(1);
         }
-        $self->output( $result->as_string . " \n " ) unless $self->quiet;
+        $self->output( $result->as_string . "\n" ) unless $self->quiet;
     }
 }
 
@@ -885,18 +885,14 @@ with:
 
  /usr/bin/ruby -w t/test_is_written_in_ruby.t
 
-If the list of urls contains " http
-            : // www . google . com /", it will be executed as
+If the list of urls contains "http://www.google.com/", it will be executed as
 follows:
 
- / usr / bin / perl test_html . pl http: // www . google . com /
+ /usr/bin/perl test_html.pl http://www.google.com/
 
-              Of course,
-            if C <test_html.pl> outputs anything other than TAP, this will fail
-              .
+Of course, if C<test_html.pl> outputs anything other than TAP, this will fail.
 
-              See the C <README> in the C <examples> directory
-              for a ready-to-run example .
+See the C<README> in the C<examples> directory for a ready-to-run example.
 
 =head1 REPLACING
 

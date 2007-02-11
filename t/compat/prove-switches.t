@@ -82,7 +82,8 @@ PROVE_VERSION: {
     my $thv    = $TAPx::Harness::Compatible::VERSION;
     my @actual = qx/$prove --version/;
     is( scalar @actual, 1, 'Only 1 line returned' );
-    like( $actual[0],
+    like(
+        $actual[0],
         qq{/^\Qprove v$thv, using TAPx::Harness::Compatible v$thv and Perl v5\E/}
     );
 }

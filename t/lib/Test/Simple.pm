@@ -6,19 +6,17 @@ use strict 'vars';
 use vars qw($VERSION);
 $VERSION = '0.42';
 
-
 use Test::Builder;
 my $Test = Test::Builder->new;
 
 sub import {
-    my $self = shift;
+    my $self   = shift;
     my $caller = caller;
-    *{$caller.'::ok'} = \&ok;
+    *{ $caller . '::ok' } = \&ok;
 
     $Test->exported_to($caller);
     $Test->plan(@_);
 }
-
 
 =head1 NAME
 
@@ -86,7 +84,6 @@ will do what you mean (fail if stuff is empty)
 sub ok ($;$) {
     $Test->ok(@_);
 }
-
 
 =back
 

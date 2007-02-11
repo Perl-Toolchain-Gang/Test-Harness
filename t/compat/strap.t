@@ -23,11 +23,13 @@ isa_ok( $strap, 'TAPx::Harness::Compatible::Straps', 'new()' );
 
 my $comment;
 ok( !$strap->_is_diagnostic( "foo", \$comment ),
-    '_is_diagnostic(), not a comment' );
+    '_is_diagnostic(), not a comment'
+);
 ok( !defined $comment, '  no comment set' );
 
 ok( !$strap->_is_diagnostic( "f # oo", \$comment ),
-    '  not a comment with #' );
+    '  not a comment with #'
+);
 ok( !defined $comment, '  no comment set' );
 
 my %comments = (
@@ -145,7 +147,8 @@ for my $line ( sort keys %bails ) {
 
     my $reason;
     ok( $strap->_is_bail_out( $line, \$reason ),
-        "_is_bail_out() spots '$line'" );
+        "_is_bail_out() spots '$line'"
+    );
     is( $reason, $expect, '  with the right reason' );
 }
 

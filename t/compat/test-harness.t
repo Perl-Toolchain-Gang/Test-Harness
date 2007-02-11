@@ -552,8 +552,10 @@ for my $test ( sort keys %samples ) {
 
             my $output
               = TAPx::Harness::Compatible::get_results( $totals, $failed );
-            like( $output, '/All tests successful|List of Failed/',
-                'Got what looks like a valid summary' );
+            like(
+                $output, '/All tests successful|List of Failed/',
+                'Got what looks like a valid summary'
+            );
         }
 
         my $expected_warnings = "";

@@ -531,8 +531,10 @@ for my $test ( sort keys %samples ) {
     isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
     my $results = $strap->analyze_file($test_path);
 
-    is_deeply( $results->details, $expect->{details},
-        qq{details of "$test"} );
+    is_deeply(
+        $results->details, $expect->{details},
+        qq{details of "$test"}
+    );
 
     delete $expect->{details};
 
@@ -558,7 +560,9 @@ NON_EXISTENT_FILE: {
     my $strap = TAPx::Harness::Compatible::Straps->new;
     isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
     ok( !$strap->analyze_file('I_dont_exist'),
-        "Can't analyze a non-existant file" );
+        "Can't analyze a non-existant file"
+    );
     is( $strap->{error}, "I_dont_exist does not exist",
-        "And there should be one error" );
+        "And there should be one error"
+    );
 }

@@ -233,15 +233,19 @@ sub _read_array {
 
                     # Naked indenter
                     push @$array, [];
-                    $self->_read_array( $array->[-1], [ @$indent, $indent2 ],
-                        $lines );
+                    $self->_read_array(
+                        $array->[-1], [ @$indent, $indent2 ],
+                        $lines
+                    );
                 }
 
             }
             elsif ( $lines->[0] =~ /^(\s*)\w/ ) {
                 push @$array, {};
-                $self->_read_hash( $array->[-1], [ @$indent, length("$1") ],
-                    $lines );
+                $self->_read_hash(
+                    $array->[-1], [ @$indent, length("$1") ],
+                    $lines
+                );
 
             }
             else {
@@ -280,9 +284,10 @@ sub _read_hash {
         if ( length $lines->[0] ) {
 
             # Yes
-            $hash->{$key}
-              = $self->_read_scalar( shift(@$lines), [ @$indent, undef ],
-                $lines );
+            $hash->{$key} = $self->_read_scalar(
+                shift(@$lines), [ @$indent, undef ],
+                $lines
+            );
         }
         else {
 
@@ -290,8 +295,10 @@ sub _read_hash {
             shift @$lines;
             if ( $lines->[0] =~ /^(\s*)-/ ) {
                 $hash->{$key} = [];
-                $self->_read_array( $hash->{$key}, [ @$indent, length($1) ],
-                    $lines );
+                $self->_read_array(
+                    $hash->{$key}, [ @$indent, length($1) ],
+                    $lines
+                );
             }
             elsif ( $lines->[0] =~ /^(\s*)./ ) {
                 my $indent2 = length("$1");
@@ -302,8 +309,10 @@ sub _read_hash {
                 }
                 else {
                     $hash->{$key} = {};
-                    $self->_read_hash( $hash->{$key},
-                        [ @$indent, length($1) ], $lines );
+                    $self->_read_hash(
+                        $hash->{$key},
+                        [ @$indent, length($1) ], $lines
+                    );
                 }
             }
         }
@@ -315,12 +324,11 @@ sub _read_hash {
 # Save an object to a file
 sub write {
     my $self = shift;
-    my $file = shift or return $self->_error( 'No file name provided' );
+    my $file = shift or return $self->_error('No file name provided');
 
     # Write it to the file
     open( CFG, '>' . $file )
-      or
-      return $self->_error( "Failed to open file '$file' for writing: $!" );
+      or return $self->_error("Failed to open file '$file' for writing: $!");
     print CFG $self->write_string;
     close CFG;
 }

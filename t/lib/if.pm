@@ -4,11 +4,11 @@ use vars qw($VERSION);
 $VERSION = '0.01';
 
 sub work {
-  my $method = shift() ? 'import' : 'unimport';
-  return unless shift;		# CONDITION
-  my $p = shift;		# PACKAGE
-  eval "require $p" or die;	# Adds .pm etc if needed
-  $p->$method(@_) if $p->can($method);
+    my $method = shift() ? 'import' : 'unimport';
+    return unless shift;    # CONDITION
+    my $p = shift;          # PACKAGE
+    eval "require $p" or die;    # Adds .pm etc if needed
+    $p->$method(@_) if $p->can($method);
 }
 
 sub import   { shift; unshift @_, 1; goto &work }
