@@ -38,6 +38,7 @@ END {
 }
 
 my $TIME_HIRES;
+
 BEGIN {
     eval 'use Time::HiRes qw(time)';
     $TIME_HIRES = !$@;
@@ -71,17 +72,17 @@ BEGIN {
             my ( $self, $libs ) = @_;
             $libs = [$libs] unless 'ARRAY' eq ref $libs;
             my @bad_libs;
-            foreach my $lib (@$libs) {
+            foreach my $lib ( @$libs ) {
                 unless ( -d $lib ) {
                     push @bad_libs, $lib;
                 }
             }
-            if (@bad_libs) {
+            if ( @bad_libs ) {
                 my $dirs = 'lib';
                 $dirs .= 's' if @bad_libs > 1;
-                $self->_error("No such $dirs (@bad_libs)");
+                $self->_error( "No such $dirs (@bad_libs)" );
             }
-            return [ map {"-I$_"} @$libs ];
+            return [ map { "-I$_" } @$libs ];
         },
         switches => sub {
             my ( $self, $switches ) = @_;
@@ -98,10 +99,10 @@ BEGIN {
         quiet        => sub { shift; shift },
         really_quiet => sub { shift; shift },
         exec         => sub { shift; shift },
-        execrc       => sub {
+        execrc => sub {
             my ( $self, $execrc ) = @_;
             unless ( -f $execrc ) {
-                $self->_error("Cannot find execrc ($execrc)");
+                $self->_error( "Cannot find execrc ($execrc)" );
             }
             return $execrc;
         },
@@ -120,12 +121,11 @@ BEGIN {
         if ( $method eq 'lib' || $method eq 'switches' ) {
             *$method = sub {
                 my $self = shift;
-                unless (@_) {
+                unless ( @_ ) {
                     $self->{$method} ||= [];
-                    return
-                      wantarray ? @{ $self->{$method} } : $self->{$method};
+                    return wantarray ? @{ $self->{$method} } : $self->{$method};
                 }
-                $self->_croak("Too many arguments to &\$method")
+                $self->_croak( "Too many arguments to &\$method" )
                   if @_ > 1;
                 my $args = shift;
                 $args = [$args] unless ref $args;
@@ -222,7 +222,7 @@ true:
 
 {
     my @legal_callback = qw(
-        made_parser
+      made_parser
     );
 
     sub _initialize {
@@ -230,25 +230,25 @@ true:
         $arg_for ||= {};
         $self->SUPER::_initialize( $arg_for, \@legal_callback );
         my %arg_for = %$arg_for;    # force a shallow copy
-    
+
         foreach my $name ( keys %VALIDATION_FOR ) {
             my $property = delete $arg_for{$name};
             if ( defined $property ) {
                 my $validate = $VALIDATION_FOR{$name};
 
-                my $value = $self->$validate($property);
+                my $value = $self->$validate( $property );
                 if ( $self->_error ) {
                     $self->_croak;
                 }
-                $self->$name($value);
+                $self->$name( $value );
             }
         }
         if ( my @props = keys %arg_for ) {
-            $self->_croak("Unknown arguments to TAPx::Harness::new (@props)");
+            $self->_croak( "Unknown arguments to TAPx::Harness::new (@props)" );
         }
         $self->_read_execrc;
-        $self->quiet(0)        unless $self->quiet;       # suppress unit warnings
-        $self->really_quiet(0) unless $self->really_quiet;
+        $self->quiet( 0 ) unless $self->quiet;    # suppress unit warnings
+        $self->really_quiet( 0 ) unless $self->really_quiet;
         return $self;
     }
 }
@@ -257,19 +257,19 @@ sub _read_execrc {
     my $self = shift;
     $self->_execrc( {} );
     my $execrc = $self->execrc or return;
-    my $data   = TAPx::Parser::YAML->read($execrc);
+    my $data   = TAPx::Parser::YAML->read( $execrc );
     my $tests  = $data->[0]{tests};
 
     my %exec_for;
-    foreach my $exec (@$tests) {
+    foreach my $exec ( @$tests ) {
         if ( '*' eq $exec->[-1] ) {
             pop @$exec;
 
             # don't override command line
-            $self->exec($exec) unless $self->exec;
+            $self->exec( $exec ) unless $self->exec;
         }
         else {
-            $exec_for{$exec->[-1]} = $exec
+            $exec_for{ $exec->[-1] } = $exec;
         }
     }
     $self->_execrc( \%exec_for );
@@ -322,20 +322,20 @@ sub aggregate_tests {
     my $longest = 0;
 
     my $tests_without_extensions = 0;
-    foreach my $test (@tests) {
+    foreach my $test ( @tests ) {
         $longest = length $test if length $test > $longest;
         if ( $test !~ /\.\w+$/ ) {
             $tests_without_extensions = 1;
         }
     }
-    $self->_longest($longest);
+    $self->_longest( $longest );
 
     my $start_time = Benchmark->new;
 
     my $really_quiet = $self->really_quiet;
-    foreach my $test (@tests) {
+    foreach my $test ( @tests ) {
         my $extra = 0;
-        my $name = $test;
+        my $name  = $test;
         unless ( $tests_without_extensions ) {
             if ( $name =~ s/(\.\w+)$// ) {    # strip the .t or .pm
                 $extra = length $1;
@@ -418,47 +418,51 @@ sub summary {
     my $total  = $aggregate->total;
     my $passed = $aggregate->passed;
 
-    if ( $total && $total == $passed ) {
-        $self->output("All tests successful.\n");
+    # TODO: Check this condition still works when all subtests pass but
+    # the exit status is nonzero
+
+    if ( $total && $total == $passed && !$aggregate->has_problems ) {
+        $self->output( "All tests successful.\n" );
     }
     if (   $total != $passed
         or $aggregate->has_problems
-        or $aggregate->skipped )
-    {
-        $self->output("\nTest Summary Report");
-        $self->output("\n-------------------\n");
-        foreach my $test (@$tests) {
-            $self->_printed_summary_header(0);
-            my ($parser) = $aggregate->parsers($test);
-            $self->_curr_test($test);
-            $self->_curr_parser($parser);
+        or $aggregate->skipped ) {
+        $self->output( "\nTest Summary Report" );
+        $self->output( "\n-------------------\n" );
+        foreach my $test ( @$tests ) {
+            $self->_printed_summary_header( 0 );
+            my ( $parser ) = $aggregate->parsers( $test );
+            $self->_curr_test( $test );
+            $self->_curr_parser( $parser );
             $self->_output_summary_failure( 'failed', "  Failed tests:  " );
-            $self->_output_summary_failure(
-                'todo_passed',
-                "  TODO passed:   "
-            );
+            $self->_output_summary_failure( 'todo_passed',
+                "  TODO passed:   " );
             $self->_output_summary_failure( 'skipped', "  Tests skipped: " );
+
+            if ( my $exit = $parser->exit ) {
+                $self->_summary_test_header( $test, $parser );
+                $self->failure_output( "  Non-zero exit status: $exit\n" );
+            }
+        
             if ( my @errors = $parser->parse_errors ) {
                 $self->_summary_test_header( $test, $parser );
                 if ( $self->errors || 1 == @errors ) {
-                    $self->failure_output(
-                        sprintf "  Parse errors: %s\n",
-                        shift @errors
-                    );
-                    foreach my $error (@errors) {
+                    $self->failure_output( sprintf "  Parse errors: %s\n",
+                        shift @errors );
+                    foreach my $error ( @errors ) {
                         my $spaces = ' ' x 16;
-                        $self->failure_output("$spaces$error\n");
+                        $self->failure_output( "$spaces$error\n" );
                     }
                 }
                 else {
                     $self->failure_output(
-                        "  Errors encountered while parsing tap\n");
+                        "  Errors encountered while parsing tap\n" );
                 }
             }
         }
     }
     my $files = @$tests;
-    $self->output("Files=$files, Tests=$total, $runtime\n");
+    $self->output( "Files=$files, Tests=$total, $runtime\n" );
 }
 
 sub _output_summary_failure {
@@ -470,11 +474,11 @@ sub _output_summary_failure {
     my $parser = $self->_curr_parser;
     if ( $parser->$method ) {
         $self->_summary_test_header( $test, $parser );
-        $self->$output($name);
+        $self->$output( $name );
         my @results = $self->balanced_range( 40, $parser->$method );
         $self->$output( sprintf "%s\n" => shift @results );
         my $spaces = ' ' x 16;
-        while (@results) {
+        while ( @results ) {
             $self->$output( sprintf "$spaces%s\n" => shift @results );
         }
     }
@@ -485,14 +489,10 @@ sub _summary_test_header {
     return if $self->_printed_summary_header;
     my $spaces = ' ' x ( $self->_longest - length $test );
     $spaces = ' ' unless $spaces;
-    my $output = $self->_get_output_method($parser);
-    $self->$output(
-        sprintf "$test$spaces(Wstat: %d Tests: %d Failed: %d)\n",
-        $parser->wait,
-        $parser->tests_run,
-        scalar $parser->failed
-    );
-    $self->_printed_summary_header(1);
+    my $output = $self->_get_output_method( $parser );
+    $self->$output( sprintf "$test$spaces(Wstat: %d Tests: %d Failed: %d)\n",
+        $parser->wait, $parser->tests_run, scalar $parser->failed );
+    $self->_printed_summary_header( 1 );
 }
 
 ##############################################################################
@@ -523,7 +523,7 @@ a failure.
 =cut
 
 sub failure_output {
-    shift->output(@_);
+    shift->output( @_ );
 }
 
 ##############################################################################
@@ -541,24 +541,24 @@ array of strings.
 
 sub balanced_range {
     my ( $self, $limit, @range ) = @_;
-    @range = $self->range(@range);
+    @range = $self->range( @range );
     my $line = "";
     my @lines;
     my $curr = 0;
-    while (@range) {
+    while ( @range ) {
         if ( $curr < $limit ) {
             my $range = ( shift @range ) . ", ";
             $line .= $range;
             $curr += length $range;
         }
-        elsif (@range) {
+        elsif ( @range ) {
             $line =~ s/, $//;
             push @lines => $line;
             $line = '';
             $curr = 0;
         }
     }
-    if ($line) {
+    if ( $line ) {
         $line =~ s/, $//;
         push @lines => $line;
     }
@@ -618,25 +618,53 @@ called to spit out the list of failed tests.
 sub output_test_failure {
     my ( $self, $parser ) = @_;
     return if $self->really_quiet;
-    my $total  = $parser->tests_run;
+
+    my $tests_run     = $parser->tests_run;
+    my $tests_planned = $parser->tests_planned;
+
+    my $total =
+      defined $tests_planned
+      ? $tests_planned
+      : $tests_run;
+
     my $passed = $parser->passed;
-    my $failed = $parser->failed;
-    my $flist  = join ", " => $self->range( $parser->failed );
-    $self->failure_output("Failed $failed/$total tests");
-    if ( !$total ) {
-        $self->failure_output("\nNo tests run!");
+
+    # The total number of fails includes any tests that were planned but
+    # didn't run
+    my $failed = $parser->failed + $total - $tests_run;
+    my $exit   = $parser->exit;
+
+    # TODO: $flist isn't used anywhere
+    # my $flist  = join ", " => $self->range( $parser->failed );
+
+    if ( my $exit = $parser->exit ) {
+        my $wstat = $parser->wait;
+        my $status = sprintf( "%d (wstat %d, 0x%x)", $exit, $wstat, $wstat );
+        $self->failure_output( " Dubious, test returned $status\n" );
+    }
+
+    if ( $failed == 0 ) {
+        $self->failure_output( " All $total subtests passed " );
+    }
+    else {
+        $self->failure_output( " Failed $failed/$total subtests " );
+        if ( !$total ) {
+            $self->failure_output( " \nNo tests run !" );
+        }
     }
 
     if ( my $skipped = $parser->skipped ) {
         $passed -= $skipped;
-        my $test = $skipped > 1 ? 'tests' : 'test';
-        $self->output("\n\t(less $skipped skipped $test: $passed okay)");
+        my $test = 'subtest' . ($skipped != 1 ? 's' : '');
+        $self->output( " \n \t( less $skipped skipped $test: $passed okay ) " );
     }
+
     if ( my $failed = $parser->todo_passed ) {
         my $test = $failed > 1 ? 'tests' : 'test';
-        $self->output("\n\t($failed TODO $test unexpectedly succeeded)");
+        $self->output( " \n \t( $failed TODO $test unexpectedly succeeded ) " );
     }
-    $self->output("\n");
+
+    $self->output( " \n " );
 }
 
 sub _runtest {
@@ -645,7 +673,7 @@ sub _runtest {
     my $execrc       = $self->_execrc;
     my $really_quiet = $self->really_quiet;
     my $show_count   = $self->_should_show_count;
-    $self->output($leader) unless $really_quiet;
+    $self->output( $leader ) unless $really_quiet;
 
     my %args = ( source => $test );
     my @switches = $self->lib if $self->lib;
@@ -662,7 +690,65 @@ sub _runtest {
         delete $args{source};
     }
 
-    my $spool_handle;
+    $args{spool} = $self->_open_spool( $test );
+
+    my $parser = TAPx::Parser->new( \%args );
+
+    $self->_make_callback( 'made_parser', $parser );
+
+    my $plan = '';
+    $self->_newline_printed( 0 );
+    my $start_time = time();
+    my $output     = 'output';
+    while ( defined( my $result = $parser->next ) ) {
+        $output = $self->_get_output_method( $parser );
+        if ( $result->is_bailout ) {
+            $self->failure_output( " Bailout called . Further testing stopped: "
+                  . $result->explanation
+                  . " \n " );
+            exit 1;
+        }
+        unless ( $plan ) {
+            $plan = '/' . ( $parser->tests_planned || 0 ) . ' ';
+        }
+        if ( $show_count && $result->is_test ) {
+            $self->$output( " \r $leader" . $result->number . $plan )
+              unless $really_quiet;
+            $self->_newline_printed( 0 );
+        }
+        $self->_process( $result );
+    }
+
+    $self->_close_spool;
+
+    if ( $show_count ) {
+        my $spaces = ' ' x ( 1 + length( $leader ) + length( $plan ) +
+              length( $parser->tests_run ) );
+        $self->$output( " \r $spaces\r $leader" ) unless $really_quiet;
+    }
+    if ( !$parser->has_problems ) {
+        unless ( $really_quiet ) {
+            my $time_report = '';
+            if ( $self->timer ) {
+                my $elapsed = time - $start_time;
+                $time_report = $TIME_HIRES
+                  ? sprintf( ' %8d ms', $elapsed * 1000 )
+                  : sprintf( ' %8s s', $elapsed || '<1' );
+            }
+
+            $self->output( " ok $time_report\n " );
+        }
+    }
+    else {
+        $self->output_test_failure( $parser );
+    }
+    return $parser;
+}
+
+sub _open_spool {
+    my $self = shift;
+    my $test = shift;
+
     if ( my $spool_dir = $ENV{PERL_TEST_HARNESS_DUMP_TAP} ) {
         my $spool = File::Spec->catfile( $spool_dir, $test );
 
@@ -670,78 +756,34 @@ sub _runtest {
         my ( $vol, $dir, $file ) = File::Spec->splitpath( $spool );
         my $path = File::Spec->catdir( $vol, $dir );
         eval { mkpath( $path ) };
-        $self->_croak($@) if $@;
-        
-        open($spool_handle, '>', $spool) or $self->_croak("Can't write $spool ($!)");
-        $args{spool} = $spool_handle;
+        $self->_croak( $@ ) if $@;
+
+        open( my $spool_handle, '>', $spool )
+          or $self->_croak( " Can't write $spool ( $! ) " );
+        return $self->{spool} = $spool_handle;
     }
 
-    my $parser = TAPx::Parser->new( \%args );
+    return;
+}
 
-    $self->_make_callback( 'made_parser', $parser );
+sub _close_spool {
+    my $self = shift;
 
-    my $plan = '';
-    $self->_newline_printed(0);
-    my $start_time = time();
-    my $output = 'output';
-    while ( defined( my $result = $parser->next ) ) {
-        $output = $self->_get_output_method($parser);
-        if ( $result->is_bailout ) {
-            $self->failure_output(
-                    "Bailout called.  Further testing stopped:  "
-                  . $result->explanation
-                  . "\n" );
-            exit 1;
-        }
-        unless ($plan) {
-            $plan = '/' . ( $parser->tests_planned || 0 ) . ' ';
-        }
-        if ( $show_count && $result->is_test ) {
-            $self->$output( "\r$leader" . $result->number . $plan )
-              unless $really_quiet;
-            $self->_newline_printed(0);
-        }
-        $self->_process($result);
+    if ( my $spool_handle = delete $self->{spool} ) {
+        close( $spool_handle )
+          or $self->_croak( " Error closing TAP spool file( $! ) \n " );
     }
-    
-    # Close spool file
-    if (defined($spool_handle)) {
-        close($spool_handle) or $self->_croak("Error closing TAP spool file ($!)\n");
-    }
-    
-    if ($show_count) {
-        my $spaces = ' ' x (
-            1 + length($leader) + length($plan) + length( $parser->tests_run )
-        );
-        $self->$output("\r$spaces\r$leader") unless $really_quiet;
-    }
-    if ( !$parser->has_problems ) {
-        unless ($really_quiet) {
-            my $time_report = '';
-            if ($self->timer) {
-                my $elapsed = time - $start_time;
-                $time_report = $TIME_HIRES ? sprintf(' %8d ms', $elapsed * 1000)
-                                           : sprintf(' %8s s',  $elapsed || '<1');
-            }
-
-            $self->output("ok$time_report\n");
-        }
-    }
-    else {
-        $self->output_test_failure($parser);
-    }
-    return $parser;
 }
 
 sub _process {
     my ( $self, $result ) = @_;
     return if $self->really_quiet;
-    if ( $self->_should_display($result) ) {
+    if ( $self->_should_display( $result ) ) {
         unless ( $self->_newline_printed ) {
-            $self->output("\n") unless $self->quiet;
-            $self->_newline_printed(1);
+            $self->output( " \n " ) unless $self->quiet;
+            $self->_newline_printed( 1 );
         }
-        $self->output( $result->as_string . "\n" ) unless $self->quiet;
+        $self->output( $result->as_string . " \n " ) unless $self->quiet;
     }
 }
 
@@ -755,7 +797,7 @@ sub _should_display {
     return if $self->really_quiet;
     return $self->verbose && !$self->failures
       || ( $result->is_comment && !$self->quiet )
-      || $self->_should_show_failure($result);
+      || $self->_should_show_failure( $result );
 }
 
 sub _should_show_count {
@@ -773,10 +815,10 @@ sub _should_show_failure {
 
 sub _croak {
     my ( $self, $message ) = @_;
-    unless ($message) {
+    unless ( $message ) {
         $message = $self->_error;
     }
-    $self->SUPER::_croak($message);
+    $self->SUPER::_croak( $message );
 }
 
 =head1 USING EXECRC
@@ -832,14 +874,18 @@ with:
 
  /usr/bin/ruby -w t/test_is_written_in_ruby.t
 
-If the list of urls contains "http://www.google.com/", it will be executed as
+If the list of urls contains " http
+            : // www . google . com /", it will be executed as
 follows:
 
- /usr/bin/perl test_html.pl http://www.google.com/
+ / usr / bin / perl test_html . pl http: // www . google . com /
 
-Of course, if C<test_html.pl> outputs anything other than TAP, this will fail.
+              Of course,
+            if C <test_html.pl> outputs anything other than TAP, this will fail
+              .
 
-See the C<README> in the C<examples> directory for a ready-to-run example.
+              See the C <README> in the C <examples> directory
+              for a ready-to-run example .
 
 =head1 REPLACING
 

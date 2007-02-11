@@ -171,7 +171,7 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
         '1..2',
         'ok 1 - this is a test',
         'not ok 2 - this is another test',
-        'Failed 1/2 tests',
+        'Failed 1/2 subtests',
     );
     is_deeply \@output, \@expected,
       '... and failing test output should be correct';
@@ -193,7 +193,7 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
     pop @output;   # get rid of summary line
     @expected = (
         't/source_tests/harness_failure....',
-        'Failed 1/2 tests',
+        'Failed 1/2 subtests',
         'Test Summary Report',
         '-------------------',
         't/source_tests/harness_failure (Wstat: 0 Tests: 2 Failed: 1)',
@@ -242,7 +242,7 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
         'ok 1 - this is a test',
         'not ok 2 - this is another test',
         '1..2',
-        'Failed 1/2 tests',
+        'Failed 1/2 subtests',
     );
     is_deeply \@output, \@expected,
       '... and failing test output should be correct';
