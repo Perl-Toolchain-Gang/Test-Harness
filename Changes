@@ -50,6 +50,8 @@ Revision history for TAP-Parser
     - Added support for timer option to TAPx::Harness which causes the
       elapsed time for each test to be displayed.
     - Setup tapx-dev@hexten.net mailing list.
+	- Fixed accumulating @$exec bug in TAPx::Harness.
+	- Made runtests pass '--exec' option as an array.
     - (#24679) TAPx::Harness now reports failure for tests that die
       after completing all subtests.
     - Added in_todo attribute on TAPx::Parser which is true while the
