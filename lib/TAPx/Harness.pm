@@ -685,8 +685,7 @@ sub _runtest {
         delete $args{source};
     }
     elsif ( $exec = $self->exec ) {
-        push @$exec => $test;
-        $args{exec} = $exec;
+        $args{exec} = [@$exec, $test];
         delete $args{source};
     }
 

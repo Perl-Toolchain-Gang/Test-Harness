@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 119;
+use Test::More tests => 120;
 
 # these tests cannot be run from the t/ directory due to checking for the
 # existence of execrc
@@ -259,6 +259,34 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
       
     cmp_ok($callback_count, '==', 1, 'callback called once');
     isa_ok $parser, 'TAPx::Parser';
+}
+
+{
+    my @output;
+    local $^W;
+    local *TAPx::Harness::_should_show_count = sub {0};
+    local *TAPx::Harness::output             = sub {
+        my $self = shift;
+        push @output => grep { $_ ne '' }
+          map {
+            local $_ = $_;
+            chomp;
+            trim($_)
+          } @_;
+    };
+    my $harness         = TAPx::Harness->new({
+        verbose => 1,
+        exec  => [$^X]
+    });
+
+    $harness->runtests(
+        't/source_tests/harness_complain', # will get mad if run with args
+        't/source_tests/harness',
+    );
+
+    chomp(@output);
+    pop @output;   # get rid of summary line
+    is($output[-1], 'All tests successful.', 'No exec accumulation');
 }
 
 sub trim {
