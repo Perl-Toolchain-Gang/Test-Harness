@@ -1,7 +1,7 @@
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if ( $ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = ( '../lib', 'lib' );
     }
     else {
         unshift @INC, 't/lib';
@@ -18,7 +18,8 @@ plan skip_all => "Not installing prove" if -e "t/SKIP-PROVE";
 plan tests => 1;
 
 my $tests = File::Spec->catfile( 't', 'compat', 'prove*.t' );
-my $prove = File::Spec->catfile( File::Spec->curdir, "blib", "script", "prove" );
+my $prove
+  = File::Spec->catfile( File::Spec->curdir, "blib", "script", "prove" );
 $prove = "$^X $prove";
 
 GLOBBAGE: {

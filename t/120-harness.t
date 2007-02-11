@@ -88,7 +88,7 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
     my @output;
     local $^W;
     local *TAPx::Harness::_should_show_count = sub {0};
-    local *TAPx::Harness::output             = sub {
+    local *TAPx::Harness::output = sub {
         my $self = shift;
         push @output => grep { $_ ne '' }
           map {
@@ -190,7 +190,7 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
     @output = ();
     $harness_whisper->runtests('t/source_tests/harness_failure');
 
-    pop @output;   # get rid of summary line
+    pop @output;    # get rid of summary line
     @expected = (
         't/source_tests/harness_failure....',
         'Failed 1/2 subtests',
@@ -208,7 +208,7 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
     @output = ();
     $harness_mute->runtests('t/source_tests/harness_failure');
 
-    pop @output;   # get rid of summary line
+    pop @output;    # get rid of summary line
     @expected = (
         'Test Summary Report',
         '-------------------',
@@ -224,10 +224,12 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
     # install callback handler
     my $parser;
     my $callback_count = 0;
-    $harness->callback( made_parser => sub {
-        $parser = shift;
-        $callback_count++;
-    });
+    $harness->callback(
+        made_parser => sub {
+            $parser = shift;
+            $callback_count++;
+        }
+    );
 
     @output = ();
     $harness->runtests('t/source_tests/harness_badtap');
@@ -256,8 +258,8 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
     );
     is_deeply \@summary, \@expected_summary,
       '... and the badtap summary should also be correct';
-      
-    cmp_ok($callback_count, '==', 1, 'callback called once');
+
+    cmp_ok( $callback_count, '==', 1, 'callback called once' );
     isa_ok $parser, 'TAPx::Parser';
 }
 
@@ -265,7 +267,7 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
     my @output;
     local $^W;
     local *TAPx::Harness::_should_show_count = sub {0};
-    local *TAPx::Harness::output             = sub {
+    local *TAPx::Harness::output = sub {
         my $self = shift;
         push @output => grep { $_ ne '' }
           map {
@@ -274,19 +276,20 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
             trim($_)
           } @_;
     };
-    my $harness         = TAPx::Harness->new({
-        verbose => 1,
-        exec  => [$^X]
-    });
+    my $harness = TAPx::Harness->new(
+        {   verbose => 1,
+            exec    => [$^X]
+        }
+    );
 
     $harness->runtests(
-        't/source_tests/harness_complain', # will get mad if run with args
+        't/source_tests/harness_complain',    # will get mad if run with args
         't/source_tests/harness',
     );
 
     chomp(@output);
-    pop @output;   # get rid of summary line
-    is($output[-1], 'All tests successful.', 'No exec accumulation');
+    pop @output;                              # get rid of summary line
+    is( $output[-1], 'All tests successful.', 'No exec accumulation' );
 }
 
 sub trim {
@@ -338,8 +341,8 @@ sub get_arg_sets {
       },
 
       { really_quiet => {
-            in        => 1,
-            out       => 1,
+            in  => 1,
+            out => 1,
             test_name =>
               '... and we should be able to set really_quiet to true',
         },

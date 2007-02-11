@@ -12,7 +12,7 @@ use Getopt::Long;
 
 # Allow cuddling the paths with the -I
 @ARGV = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @ARGV;
-my $color_default = -t STDOUT && !($^O =~ /MSWin32/);
+my $color_default = -t STDOUT && !( $^O =~ /MSWin32/ );
 
 Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
 GetOptions(
@@ -41,7 +41,7 @@ GetOptions(
 );
 
 if ( !defined $COLOR ) {
-     $COLOR = $color_default;
+    $COLOR = $color_default;
 }
 
 # XXX otherwise, diagnostics and failure messages are out of sequence
@@ -73,13 +73,13 @@ if ( $WARNINGS_FAIL && $WARNINGS_WARN ) {
 my %args;
 $args{lib}          = get_libs();
 $args{switches}     = get_switches();
-$args{verbose}      = $VERBOSE            if $VERBOSE;
-$args{failures}     = $FAILURES           if $FAILURES;
-$args{quiet}        = 1                   if $QUIET;
-$args{really_quiet} = 1                   if $REALLY_QUIET;
-$args{errors}       = 1                   if $PARSE;
-$args{exec}         = [split(/ /, $EXEC)] if $EXEC;
-$args{execrc}       = $EXECRC             if $EXECRC;
+$args{verbose}      = $VERBOSE if $VERBOSE;
+$args{failures}     = $FAILURES if $FAILURES;
+$args{quiet}        = 1 if $QUIET;
+$args{really_quiet} = 1 if $REALLY_QUIET;
+$args{errors}       = 1 if $PARSE;
+$args{exec}         = [ split( / /, $EXEC ) ] if $EXEC;
+$args{execrc}       = $EXECRC if $EXECRC;
 my $harness = $harness_class->new( \%args );
 $harness->runtests(@tests);
 

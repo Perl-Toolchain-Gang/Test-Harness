@@ -3,6 +3,7 @@
 unshift @INC, 't/lib';
 
 use strict;
+
 #use Test::More tests => 2567;
 use Test::More 'no_plan';
 use File::Spec;
@@ -1604,7 +1605,7 @@ my %samples = (
                 has_skip      => FALSE,
                 has_todo      => FALSE,
                 number        => 3,
-                description   =>
+                description =>
                   '- Test that passing arguments as references work',
                 explanation => '',
             },
@@ -1743,7 +1744,7 @@ my %samples = (
                 has_skip      => FALSE,
                 has_todo      => FALSE,
                 number        => 14,
-                description   =>
+                description =>
                   '- Check so that tid for threads work for main thread',
                 explanation => '',
             },
@@ -1755,7 +1756,7 @@ my %samples = (
                 has_skip      => FALSE,
                 has_todo      => FALSE,
                 number        => 15,
-                description   =>
+                description =>
                   '- Check so that tid for threads work for main thread',
                 explanation => '',
             },
@@ -2179,7 +2180,7 @@ my %samples = (
                 raw        => 'this is junk',
             },
             {   is_comment => TRUE,
-                comment    =>
+                comment =>
                   "this is a comment",
             },
             {   is_plan       => TRUE,
@@ -2213,7 +2214,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
-      },
+    },
 );
 
 my %HANDLER_FOR = (
@@ -2231,11 +2232,12 @@ foreach my $test ( sort keys %samples ) {
 
     # the following acrobatics are necessary to make it easy for the
     # Test::Builder::failure_output() method to be overridden when
-    # TAPx::Parser is not installed.  Otherwise, these tests will fail. 
-    my @switches = 'ARRAY' eq ref $args->{switches} 
-         ? @{ $args->{switches} }
-         : $args->{switches};
-    $args->{switches} = [ '-Ilib',  @switches ];
+    # TAPx::Parser is not installed.  Otherwise, these tests will fail.
+    my @switches =
+      'ARRAY' eq ref $args->{switches}
+      ? @{ $args->{switches} }
+      : $args->{switches};
+    $args->{switches} = [ '-Ilib', @switches ];
 
     $args->{source} = File::Spec->catfile( $SAMPLE_TESTS, $test );
 
@@ -2284,11 +2286,13 @@ sub analyze_test {
     my $count  = 1;
     while ( defined( my $result = $parser->next ) ) {
         my $expected = shift @$results;
-        my $desc     = $result->is_test
-            ? $result->description
-            : $result->raw;
+        my $desc =
+            $result->is_test
+          ? $result->description
+          : $result->raw;
         $desc = $result->plan if $result->is_plan && $desc =~ /SKIP/i;
-        ok defined $expected, "$test $count We should have a result for $desc";
+        ok defined $expected,
+          "$test $count We should have a result for $desc";
         $count++;
         while ( my ( $method, $answer ) = each %$expected ) {
             if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck

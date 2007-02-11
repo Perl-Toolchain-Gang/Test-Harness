@@ -44,12 +44,11 @@ C<TAPx::Base> provides callback management.
 
 =cut
 
-
 sub new {
     my ( $class, $arg_for ) = @_;
 
     my $self = bless {}, $class;
-    return $self->_initialize( $arg_for );
+    return $self->_initialize($arg_for);
 }
 
 sub _initialize {
@@ -80,13 +79,12 @@ sub callback {
     my %ok_map = %{ $self->{ok_callbacks} };
 
     $self->_croak('No callbacks may be installed')
-        unless %ok_map;
+      unless %ok_map;
 
-    $self->_croak(
-        "Callback $event is not supported. Valid callbacks are " 
-           . join(', ', sort keys %ok_map) )
-        unless exists $ok_map{ $event };
-        
+    $self->_croak( "Callback $event is not supported. Valid callbacks are "
+          . join( ', ', sort keys %ok_map ) )
+      unless exists $ok_map{$event};
+
     $self->{code_for}{$event} = $callback;
 }
 
@@ -98,8 +96,8 @@ sub _callback_for {
 sub _make_callback {
     my $self  = shift;
     my $event = shift;
-    
-    my $cb = $self->_callback_for( $event );
+
+    my $cb = $self->_callback_for($event);
     return unless defined $cb;
     return $cb->(@_);
 }

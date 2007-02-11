@@ -4,6 +4,7 @@ use 5.005;
 use strict;
 
 use vars qw{$VERSION @ISA @EXPORT_OK $errstr};
+
 BEGIN {
     $VERSION = '0.50_07';
     $errstr  = '';
@@ -15,8 +16,9 @@ BEGIN {
 
 # Create the main error hash
 my %ERROR = (
-    YAML_PARSE_ERR_NO_FINAL_NEWLINE => "Stream does not end with newline character",
-    
+    YAML_PARSE_ERR_NO_FINAL_NEWLINE =>
+      "Stream does not end with newline character",
+
 );
 
 my %NO = (
@@ -32,47 +34,50 @@ my $ESCAPE_CHAR = '[\\x00-\\x08\\x0b-\\x0d\\x0e-\\x1f\"\n]';
 
 # Escapes for unprintable characters
 my @UNPRINTABLE = qw(z    x01  x02  x03  x04  x05  x06  a
-                     x08  t    n    v    f    r    x0e  x0f
-                     x10  x11  x12  x13  x14  x15  x16  x17
-                     x18  x19  x1a  e    x1c  x1d  x1e  x1f
-                    );
+  x08  t    n    v    f    r    x0e  x0f
+  x10  x11  x12  x13  x14  x15  x16  x17
+  x18  x19  x1a  e    x1c  x1d  x1e  x1f
+);
 
 # Printable characters for escapes
 my %UNESCAPES = (
     z => "\x00", a => "\x07", t    => "\x09",
     n => "\x0a", v => "\x0b", f    => "\x0c",
     r => "\x0d", e => "\x1b", '\\' => '\\',
-    );
+);
 
 # Create an empty TAPx::Parser::YAML object
 sub new {
     my $class = shift;
-    bless [ @_ ], $class;
+    bless [@_], $class;
 }
 
 # Create an object from a file
 sub read {
-    my $class = ref $_[0] ? ref shift : shift;
+    my $class = ref $_[0] ? ref shift: shift;
 
     # Check the file
-    my $file = shift or return $class->_error( 'You did not specify a file name' );
-    return $class->_error( "File '$file' does not exist" )              unless -e $file;
-    return $class->_error( "'$file' is a directory, not a file" )       unless -f _;
-    return $class->_error( "Insufficient permissions to read '$file'" ) unless -r _;
+    my $file = shift
+      or return $class->_error('You did not specify a file name');
+    return $class->_error("File '$file' does not exist") unless -e $file;
+    return $class->_error("'$file' is a directory, not a file") unless -f _;
+    return $class->_error("Insufficient permissions to read '$file'")
+      unless -r _;
 
     # Slurp in the file
     local $/ = undef;
-    open CFG, $file or return $class->_error( "Failed to open file '$file': $!" );
+    open CFG, $file
+      or return $class->_error("Failed to open file '$file': $!");
     my $contents = <CFG>;
     close CFG;
 
-    $class->read_string( $contents );
+    $class->read_string($contents);
 }
 
 # Create an object from a string
 sub read_string {
-    my $class = ref $_[0] ? ref shift : shift;
-    my $self  = bless [], $class;
+    my $class = ref $_[0] ? ref shift: shift;
+    my $self = bless [], $class;
 
     # Handle special cases
     return undef unless defined $_[0];
@@ -82,38 +87,46 @@ sub read_string {
     }
 
     # Split the file into lines
-    my @lines = grep { ! /^\s*(?:\#.+)?$/ }
-                split /(?:\015{1,2}\012|\015|\012)/, shift;
+    my @lines = grep { !/^\s*(?:\#.+)?$/ }
+      split /(?:\015{1,2}\012|\015|\012)/, shift;
 
     # A nibbling parser
-    while ( @lines ) {
+    while (@lines) {
+
         # Do we have a document header?
         if ( $lines[0] =~ /^---(?:\s*(.+)\s*)?$/ ) {
+
             # Handle scalar documents
             shift @lines;
             if ( defined $1 ) {
-                push @$self, $self->_read_scalar( "$1", [ undef ], \@lines );
+                push @$self, $self->_read_scalar( "$1", [undef], \@lines );
                 next;
             }
         }
 
-        if ( ! @lines or $lines[0] =~ /^---(?:\s*(.+)\s*)?$/ ) {
+        if ( !@lines or $lines[0] =~ /^---(?:\s*(.+)\s*)?$/ ) {
+
             # A naked document
             push @$self, undef;
 
-        } elsif ( $lines[0] =~ /^\s*\-/ ) {
-            # An array at the root
-            my $document = [ ];
-            push @$self, $document;
-            $self->_read_array( $document, [ 0 ], \@lines );
+        }
+        elsif ( $lines[0] =~ /^\s*\-/ ) {
 
-        } elsif ( $lines[0] =~ /^(\s*)\w/ ) {
+            # An array at the root
+            my $document = [];
+            push @$self, $document;
+            $self->_read_array( $document, [0], \@lines );
+
+        }
+        elsif ( $lines[0] =~ /^(\s*)\w/ ) {
+
             # A hash at the root
-            my $document = { };
+            my $document = {};
             push @$self, $document;
             $self->_read_hash( $document, [ length($1) ], \@lines );
 
-        } else {
+        }
+        else {
             die "CODE INCOMPLETE (are you sure this is a YAML file?)";
         }
     }
@@ -122,14 +135,15 @@ sub read_string {
 }
 
 sub _check_support {
+
     # Check if we support the next char
-    my $errstr = $NO{substr($_[1], 0, 1)};
+    my $errstr = $NO{ substr( $_[1], 0, 1 ) };
     Carp::croak($errstr) if $errstr;
 }
 
 # Deparse a scalar string to the actual scalar
 sub _read_scalar {
-    my ($self, $string, $indent, $lines) = @_;
+    my ( $self, $string, $indent, $lines ) = @_;
     return undef if $string eq '~';
     if ( $string =~ /^'(.*?)'$/ ) {
         return '' unless defined $1;
@@ -140,14 +154,17 @@ sub _read_scalar {
     if ( $string =~ /^"((?:\\.|[^"])*)"$/ ) {
         my $str = $1;
         $str =~ s/\\"/"/g;
-        $str =~ s/\\([never\\fartz]|x([0-9a-fA-F]{2}))/(length($1)>1)?pack("H2",$2):$UNESCAPES{$1}/gex;
+        $str
+          =~ s/\\([never\\fartz]|x([0-9a-fA-F]{2}))/(length($1)>1)?pack("H2",$2):$UNESCAPES{$1}/gex;
         return $str;
     }
     if ( $string =~ /^['"]/ ) {
+
         # A quote with folding... we don't support that
         die "TAPx::Parser::YAML does not support multi-line quoted scalars";
     }
     unless ( $string eq '>' or $string eq '|' ) {
+
         # Regular unquoted string
         return $string;
     }
@@ -164,61 +181,75 @@ sub _read_scalar {
 
     # Pull the lines
     my @multiline = ();
-    while ( @$lines ) {
+    while (@$lines) {
         $lines->[0] =~ /^(\s*)/;
         last unless length($1) >= $indent->[-1];
-        push @multiline, substr(shift(@$lines), length($1));
+        push @multiline, substr( shift(@$lines), length($1) );
     }
 
-    join( ($string eq '>' ? ' ' : "\n"), @multiline ) . "\n";
+    join( ( $string eq '>' ? ' ' : "\n" ), @multiline ) . "\n";
 }
 
 # Parse an array
 sub _read_array {
-    my ($self, $array, $indent, $lines) = @_;
+    my ( $self, $array, $indent, $lines ) = @_;
 
-    while ( @$lines ) {
+    while (@$lines) {
         $lines->[0] =~ /^(\s*)/;
         if ( length($1) < $indent->[-1] ) {
             return 1;
-        } elsif ( length($1) > $indent->[-1] ) {
+        }
+        elsif ( length($1) > $indent->[-1] ) {
             die "Hash line over-indented";
         }
 
         if ( $lines->[0] =~ /^(\s*\-\s+)\S+\s*:(?:\s+|$)/ ) {
+
             # Inline nested hash
             my $indent2 = length("$1");
             $lines->[0] =~ s/-/ /;
-            push @$array, { };
+            push @$array, {};
             $self->_read_hash( $array->[-1], [ @$indent, $indent2 ], $lines );
 
-        } elsif ( $lines->[0] =~ /^\s*\-(\s*)(.+?)\s*$/ ) {
+        }
+        elsif ( $lines->[0] =~ /^\s*\-(\s*)(.+?)\s*$/ ) {
+
             # Array entry with a value
             shift @$lines;
-            push @$array, $self->_read_scalar( "$2", [ @$indent, undef ], $lines );
+            push @$array,
+              $self->_read_scalar( "$2", [ @$indent, undef ], $lines );
 
-        } elsif ( $lines->[0] =~ /^\s*\-\s*$/ ) {
+        }
+        elsif ( $lines->[0] =~ /^\s*\-\s*$/ ) {
             shift @$lines;
             if ( $lines->[0] =~ /^(\s*)\-/ ) {
                 my $indent2 = length("$1");
                 if ( $indent->[-1] == $indent2 ) {
+
                     # Null array entry
                     push @$array, undef;
-                } else {
+                }
+                else {
+
                     # Naked indenter
-                    push @$array, [ ];
-                    $self->_read_array( $array->[-1], [ @$indent, $indent2 ], $lines );
+                    push @$array, [];
+                    $self->_read_array( $array->[-1], [ @$indent, $indent2 ],
+                        $lines );
                 }
 
-            } elsif ( $lines->[0] =~ /^(\s*)\w/ ) {
-                push @$array, { };
-                $self->_read_hash( $array->[-1], [ @$indent, length("$1") ], $lines );
+            }
+            elsif ( $lines->[0] =~ /^(\s*)\w/ ) {
+                push @$array, {};
+                $self->_read_hash( $array->[-1], [ @$indent, length("$1") ],
+                    $lines );
 
-            } else {
+            }
+            else {
                 die "CODE INCOMPLETE";
             }
 
-        } else {
+        }
+        else {
             die "CODE INCOMPLETE";
         }
     }
@@ -228,13 +259,14 @@ sub _read_array {
 
 # Parse an array
 sub _read_hash {
-    my ($self, $hash, $indent, $lines) = @_;
+    my ( $self, $hash, $indent, $lines ) = @_;
 
-    while ( @$lines ) {
-        $lines->[0] =~/^(\s*)/;
+    while (@$lines) {
+        $lines->[0] =~ /^(\s*)/;
         if ( length($1) < $indent->[-1] ) {
             return 1;
-        } elsif ( length($1) > $indent->[-1] ) {
+        }
+        elsif ( length($1) > $indent->[-1] ) {
             die "Hash line over-indented";
         }
 
@@ -246,22 +278,32 @@ sub _read_hash {
 
         # Do we have a value?
         if ( length $lines->[0] ) {
+
             # Yes
-            $hash->{$key} = $self->_read_scalar( shift(@$lines), [ @$indent, undef ], $lines );
-        } else {
+            $hash->{$key}
+              = $self->_read_scalar( shift(@$lines), [ @$indent, undef ],
+                $lines );
+        }
+        else {
+
             # An indent
             shift @$lines;
             if ( $lines->[0] =~ /^(\s*)-/ ) {
                 $hash->{$key} = [];
-                $self->_read_array( $hash->{$key}, [ @$indent, length($1) ], $lines );
-            } elsif ( $lines->[0] =~ /^(\s*)./ ) {
+                $self->_read_array( $hash->{$key}, [ @$indent, length($1) ],
+                    $lines );
+            }
+            elsif ( $lines->[0] =~ /^(\s*)./ ) {
                 my $indent2 = length("$1");
                 if ( $indent->[-1] == $indent2 ) {
+
                     # Null hash entry
                     $hash->{$key} = undef;
-                } else {
+                }
+                else {
                     $hash->{$key} = {};
-                    $self->_read_hash( $hash->{$key}, [ @$indent, length($1) ], $lines );
+                    $self->_read_hash( $hash->{$key},
+                        [ @$indent, length($1) ], $lines );
                 }
             }
         }
@@ -273,14 +315,12 @@ sub _read_hash {
 # Save an object to a file
 sub write {
     my $self = shift;
-    my $file = shift or return $self->_error(
-        'No file name provided'
-        );
+    my $file = shift or return $self->_error( 'No file name provided' );
 
     # Write it to the file
-    open( CFG, '>' . $file ) or return $self->_error(
-        "Failed to open file '$file' for writing: $!"
-        );
+    open( CFG, '>' . $file )
+      or
+      return $self->_error( "Failed to open file '$file' for writing: $!" );
     print CFG $self->write_string;
     close CFG;
 }
@@ -293,36 +333,41 @@ sub write_string {
     # Iterate over the documents
     my $indent = 0;
     my @lines  = ();
-    foreach my $cursor ( @$self ) {
+    foreach my $cursor (@$self) {
         push @lines, '---';
 
         # An empty document
-        if ( ! defined $cursor ) {
+        if ( !defined $cursor ) {
+
             # Do nothing
 
-        # A scalar document
-        } elsif ( ! ref $cursor ) {
-            $lines[-1] .= $self->_write_scalar( $cursor );
+            # A scalar document
+        }
+        elsif ( !ref $cursor ) {
+            $lines[-1] .= $self->_write_scalar($cursor);
 
-        # A list at the root
-        } elsif ( ref $cursor eq 'ARRAY' ) {
+            # A list at the root
+        }
+        elsif ( ref $cursor eq 'ARRAY' ) {
             push @lines, $self->_write_array( $indent, $cursor );
 
-        # A hash at the root
-        } elsif ( ref $cursor eq 'HASH' ) {
+            # A hash at the root
+        }
+        elsif ( ref $cursor eq 'HASH' ) {
             push @lines, $self->_write_hash( $indent, $cursor );
 
-        } else {
+        }
+        else {
             die "CODE INCOMPLETE";
         }
     }
 
-    join '', map { "$_\n" } @lines;
+    join '', map {"$_\n"} @lines;
 }
 
 sub _write_scalar {
     my $str = $_[1];
-    return '~'  unless defined $str;
+    return '~' unless defined $str;
     if ( $str =~ /$ESCAPE_CHAR/ ) {
         $str =~ s/\\/\\\\/g;
         $str =~ s/"/\\"/g;
@@ -338,23 +383,26 @@ sub _write_scalar {
 }
 
 sub _write_array {
-    my ($self, $indent, $array) = @_;
-    my @lines  = ();
-    foreach my $el ( @$array ) {
-        my $line = ('  ' x $indent) . '-';
-        if ( ! ref $el ) {
-            $line .= ' ' . $self->_write_scalar( $el );
+    my ( $self, $indent, $array ) = @_;
+    my @lines = ();
+    foreach my $el (@$array) {
+        my $line = ( '  ' x $indent ) . '-';
+        if ( !ref $el ) {
+            $line .= ' ' . $self->_write_scalar($el);
             push @lines, $line;
 
-        } elsif ( ref $el eq 'ARRAY' ) {
+        }
+        elsif ( ref $el eq 'ARRAY' ) {
             push @lines, $line;
             push @lines, $self->_write_array( $indent + 1, $el );
 
-        } elsif ( ref $el eq 'HASH' ) {
+        }
+        elsif ( ref $el eq 'HASH' ) {
             push @lines, $line;
             push @lines, $self->_write_hash( $indent + 1, $el );
 
-        } else {
+        }
+        else {
             die "CODE INCOMPLETE";
         }
     }
@@ -363,24 +411,27 @@ sub _write_array {
 }
 
 sub _write_hash {
-    my ($self, $indent, $hash) = @_;
-    my @lines  = ();
+    my ( $self, $indent, $hash ) = @_;
+    my @lines = ();
     foreach my $name ( sort keys %$hash ) {
         my $el   = $hash->{$name};
-        my $line = ('  ' x $indent) . "$name:";
-        if ( ! ref $el ) {
-            $line .= ' ' . $self->_write_scalar( $el );
+        my $line = ( '  ' x $indent ) . "$name:";
+        if ( !ref $el ) {
+            $line .= ' ' . $self->_write_scalar($el);
             push @lines, $line;
 
-        } elsif ( ref $el eq 'ARRAY' ) {
+        }
+        elsif ( ref $el eq 'ARRAY' ) {
             push @lines, $line;
             push @lines, $self->_write_array( $indent + 1, $el );
 
-        } elsif ( ref $el eq 'HASH' ) {
+        }
+        elsif ( ref $el eq 'HASH' ) {
             push @lines, $line;
             push @lines, $self->_write_hash( $indent + 1, $el );
 
-        } else {
+        }
+        else {
             die "CODE INCOMPLETE";
         }
     }
@@ -390,7 +441,7 @@ sub _write_hash {
 
 # Set error
 sub _error {
-    $errstr = $ERROR{$_[1]} ? "$ERROR{$_[1]} ($_[1])" : $_[1];
+    $errstr = $ERROR{ $_[1] } ? "$ERROR{$_[1]} ($_[1])" : $_[1];
     undef;
 }
 

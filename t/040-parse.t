@@ -55,9 +55,9 @@ my $result = shift @results;
 isa_ok $result, $PLAN;
 can_ok $result, 'type';
 is $result->type, 'plan', '... and it should report the correct type';
-ok $result->is_plan,   '... and it should identify itself as a plan';
-is $result->plan,      '1..7', '... and identify the plan';
-ok !$result->directive, '... and this plan should not have a directive';
+ok $result->is_plan, '... and it should identify itself as a plan';
+is $result->plan, '1..7', '... and identify the plan';
+ok !$result->directive,   '... and this plan should not have a directive';
 ok !$result->explanation, '... or a directive explanation';
 is $result->as_string, '1..7',
   '... and have the correct string representation';

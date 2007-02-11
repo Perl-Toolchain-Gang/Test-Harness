@@ -9,7 +9,7 @@ use TAPx::Parser::Source;
 use TAPx::Parser::Source::Perl;
 use File::Spec;
 
-my $test = File::Spec->catfile('t', 'source_tests', 'source');
+my $test = File::Spec->catfile( 't', 'source_tests', 'source' );
 
 my $perl = $^X;
 
@@ -41,7 +41,7 @@ ok $source = TAPx::Parser::Source::Perl->new,
 isa_ok $source, 'TAPx::Parser::Source::Perl', '... and the object it returns';
 
 can_ok $source, 'source';
-ok $source->source( $test ),
+ok $source->source($test),
   '... and calling it with valid args should succeed';
 
 can_ok $source, 'get_stream';
@@ -53,9 +53,8 @@ is $stream->next, '1..1', '... and the first line should be correct';
 is $stream->next, 'ok 1', '... as should the second';
 ok !$stream->next, '... and we should have no more results';
 
-
 # internals tests!
 
 can_ok $source, '_switches';
-ok grep({ $_ eq '-T' } $source->_switches),
-     '... and it should find the taint switch';
+ok grep( { $_ eq '-T' } $source->_switches ),
+  '... and it should find the taint switch';

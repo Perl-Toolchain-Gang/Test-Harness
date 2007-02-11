@@ -53,12 +53,12 @@ sub new {
 }
 
 # XXX the 'not' and 'ok' might be on separate lines in VMS ...
-my $ok           = qr/(?:not )?ok\b/;
-my $num          = qr/\d+/;
+my $ok  = qr/(?:not )?ok\b/;
+my $num = qr/\d+/;
 
 # description is *any* which is not followed by an odd number of escapes
 # following by '#':  \\\#   \#
-my $description  = qr/.*?(?!\\(?:\\\\)*)#?/;
+my $description = qr/.*?(?!\\(?:\\\\)*)#?/;
 
 # if we have an even number of escapes in front of the '#', assert that it
 # does not have an escape in front of it (this gets around the 'no variable
@@ -80,7 +80,7 @@ my %token_for = (
             local *__ANON__ = '__ANON__plan_token_handler';
             my $tests_planned = $1;
             my $explanation   = $2;
-            my $skip          =
+            my $skip =
               ( 0 == $tests_planned || defined $explanation )
               ? 'SKIP'
               : '';

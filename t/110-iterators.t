@@ -27,7 +27,7 @@ foreach my $source ( array_ref_from($tap), \*DATA ) {
         'ARRAY' eq ref $source
       ? 'TAPx::Parser::Iterator::ARRAY'
       : 'TAPx::Parser::Iterator::FH';
-    isa_ok $iter, , $subclass, '... and the object it returns';
+    isa_ok $iter,, $subclass, '... and the object it returns';
 
     can_ok $iter, 'is_first';
     can_ok $iter, 'is_last';

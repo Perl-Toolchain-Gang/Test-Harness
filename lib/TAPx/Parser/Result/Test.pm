@@ -196,8 +196,7 @@ succeeded.  Will now issue a warning and call C<todo_passed>.
 =cut
 
 sub todo_failed {
-    warn
-      'todo_failed() is deprecated.  Please use "todo_passed()"';
+    warn 'todo_failed() is deprecated.  Please use "todo_passed()"';
     goto &todo_passed;
 }
 

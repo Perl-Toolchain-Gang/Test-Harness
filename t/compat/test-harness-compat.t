@@ -27,14 +27,16 @@ my $results = {
             'todo'        => 0
         }
     },
-    join(',', qw(
-        descriptive die die_head_end die_last_minute duplicates
-        head_end head_fail inc_taint junk_before_plan lone_not_bug
-        no_nums no_output schwern sequence_misparse shbang_misparse
-        simple simple_fail skip skip_nomsg skipall skipall_nomsg
-        stdout_stderr switches taint taint_warn todo_inline
-        todo_misparse too_many vms_nit
-    )) => {
+    join(
+        ',', qw(
+          descriptive die die_head_end die_last_minute duplicates
+          head_end head_fail inc_taint junk_before_plan lone_not_bug
+          no_nums no_output schwern sequence_misparse shbang_misparse
+          simple simple_fail skip skip_nomsg skipall skipall_nomsg
+          stdout_stderr switches taint taint_warn todo_inline
+          todo_misparse too_many vms_nit
+          )
+      ) => {
         'failed' => {
             't/sample-tests/die' => {
                 'canon'  => '??',
@@ -163,7 +165,7 @@ my $results = {
             'tests'       => 29,
             'todo'        => 2
         }
-        },
+      },
     'die' => {
         'failed' => {
             't/sample-tests/die' => {
@@ -740,8 +742,7 @@ my $results = {
     }
 };
 
-
-my $num_tests = (keys %$results) * $PER_LOOP;
+my $num_tests = ( keys %$results ) * $PER_LOOP;
 
 plan tests => $num_tests;
 
@@ -749,27 +750,33 @@ SKIP: {
     skip "Not working on Windows yet", $num_tests if $^O =~ /^(MS)?Win32$/;
 
     {
+
         # Suppress subroutine redefined warning
         no warnings 'redefine';
-    
+
         # Silence harness output
         *TAPx::Harness::output = sub {
+
             # do nothing
         };
     }
 
-    for my $test_key (sort keys %$results) {
+    for my $test_key ( sort keys %$results ) {
         my $result = $results->{$test_key};
-        my @test_names = split(/,/, $test_key);
-        my @test_files = map { File::Spec->catfile( $TEST_DIR, $_ ) } @test_names;
-    
-        my ($tot, $fail, $todo, $harness, $aggregate) = execute_tests( tests => \@test_files );
+        my @test_names = split( /,/, $test_key );
+        my @test_files
+          = map { File::Spec->catfile( $TEST_DIR, $_ ) } @test_names;
+
+        my ( $tot, $fail, $todo, $harness, $aggregate )
+          = execute_tests( tests => \@test_files );
 
         my $bench = delete $tot->{bench};
         isa_ok $bench, 'Benchmark';
-    
-        is_deeply $tot,  $result->{totals}, "totals match for $test_key";
-        is_deeply $fail, $result->{failed}, "failure summary matches for $test_key";
-        is_deeply $todo, $result->{todo},   "todo summary matches for $test_key";
+
+        is_deeply $tot, $result->{totals}, "totals match for $test_key";
+        is_deeply $fail, $result->{failed},
+          "failure summary matches for $test_key";
+        is_deeply $todo, $result->{todo},
+          "todo summary matches for $test_key";
     }
 }

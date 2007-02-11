@@ -10,9 +10,9 @@ my $builder = Module::Build->new(
     dist_version_from => 'lib/TAPx/Parser.pm',
     requires          => {
         'Test::More' => 0,
-        'Pod::Usage' => 0,   # for 'runtests'
+        'Pod::Usage' => 0,    # for 'runtests'
     },
-    add_to_cleanup     => ['TAPx-Parser-*'],
+    add_to_cleanup => ['TAPx-Parser-*'],
 );
 
 if ( $builder->prompt( "Do you wish to install the 'runtests' utility?", "y" )

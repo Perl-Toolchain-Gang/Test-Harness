@@ -1,4 +1,4 @@
-if( $ENV{PERL_CORE} && !$ENV{HARNESS_ACTIVE} ) {
+if ( $ENV{PERL_CORE} && !$ENV{HARNESS_ACTIVE} ) {
     print "1..0 # Skip: t/TEST needs numbers\n";
     exit;
 }

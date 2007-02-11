@@ -167,7 +167,7 @@ test result returns true.  This is merely provided as a convenient shortcut.
 
 =cut
 
-sub is_ok { 1 };
+sub is_ok {1}
 
 ##############################################################################
 

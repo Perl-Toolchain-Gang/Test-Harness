@@ -25,7 +25,7 @@ BEGIN {
     foreach my $class (@classes) {
         use_ok $class;
         is $class->VERSION, TAPx::Parser->VERSION,
-            "... and it should have the correct version";
+          "... and it should have the correct version";
     }
     diag("Testing TAPx::Parser $TAPx::Parser::VERSION, Perl $], $^X");
 }

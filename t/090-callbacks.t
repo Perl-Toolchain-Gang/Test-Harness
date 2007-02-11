@@ -66,10 +66,10 @@ my $all  = 0;
         $plan_output = $plan->as_string;
     },
     ELSE => sub {
-         $else++;
+        $else++;
     },
-    ALL  => sub {
-         $all++;
+    ALL => sub {
+        $all++;
     },
 );
 
@@ -85,7 +85,7 @@ $parser->run;
 is $plan_output, '1..5', 'Plan callbacks should succeed';
 is scalar @tests, $parser->tests_run, '... as should the test callbacks';
 is $else, 2, '... and the correct number of "ELSE" lines should be seen';
-is $all, 8, '... and the correct total number of lines should be seen';
+is $all,  8, '... and the correct total number of lines should be seen';
 
 # Check callback name policing
 
@@ -106,5 +106,4 @@ eval {
     );
 };
 
-like $@, qr/Callback/, 
-    'Bad callback keys faulted';
+like $@, qr/Callback/, 'Bad callback keys faulted';

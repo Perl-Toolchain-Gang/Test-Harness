@@ -3,7 +3,7 @@
 BEGIN {
     if ( $ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = ( '../lib', 'lib' );
     }
     else {
         unshift @INC, 't/lib';
@@ -16,19 +16,20 @@ use Test::More tests => 6;
 use File::Spec;
 
 BEGIN {
-    use_ok( 'TAPx::Harness::Compatible' );
+    use_ok('TAPx::Harness::Compatible');
 }
 
 TODO: {
     local $TODO = 'Harness compatibility incomplete';
     my $died;
     sub prepare_for_death { $died = 0; }
-    sub signal_death { $died = 1; }
+    sub signal_death      { $died = 1; }
 
     my $Curdir = File::Spec->curdir;
-    my $SAMPLE_TESTS = $ENV{PERL_CORE}
-    	? File::Spec->catdir($Curdir, 'lib', 'sample-tests')
-    	: File::Spec->catdir($Curdir, 't',   'sample-tests');
+    my $SAMPLE_TESTS =
+      $ENV{PERL_CORE}
+      ? File::Spec->catdir( $Curdir, 'lib', 'sample-tests' )
+      : File::Spec->catdir( $Curdir, 't',   'sample-tests' );
 
     PASSING: {
         local $SIG{__DIE__} = \&signal_death;

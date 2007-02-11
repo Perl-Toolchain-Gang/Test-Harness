@@ -229,8 +229,8 @@ sub _next {
     my $stream = $self->_stream;
     return if $stream->is_last;
 
-    my $result = $self->_grammar->tokenize($stream->next); 
-    $self->_start_tap( $stream->is_first );   # must be after $stream->next
+    my $result = $self->_grammar->tokenize( $stream->next );
+    $self->_start_tap( $stream->is_first );    # must be after $stream->next
 
     if ( $result && $result->is_test ) {
         $self->in_todo( $result->has_todo );
@@ -255,10 +255,10 @@ sub _next {
 }
 
 sub next {
-    my $self    = shift;
-    my $result  = $self->_next;
+    my $self   = shift;
+    my $result = $self->_next;
 
-    if (defined $result) {
+    if ( defined $result ) {
         my $code;
         if ( $code = $self->_callback_for( $result->type ) ) {
             $code->($result);
@@ -269,7 +269,7 @@ sub next {
         $self->_make_callback( 'ALL', $result );
 
         # Echo TAP to spool file
-        $self->_write_to_spool( $result );
+        $self->_write_to_spool($result);
     }
 
     return $result;
@@ -294,6 +294,7 @@ This method merely runs the parser and parses all of the TAP.
 sub run {
     my $self = shift;
     while ( defined( my $result = $self->next ) ) {
+
         # do nothing
     }
 }
@@ -324,13 +325,13 @@ sub run {
     # We seem to have this list hanging around all over the place. We could
     # probably get it from somewhere else to avoid the repetition.
     my @legal_callback = qw(
-        test
-        plan
-        comment
-        bailout
-        unknown
-        ALL
-        ELSE
+      test
+      plan
+      comment
+      bailout
+      unknown
+      ALL
+      ELSE
     );
 
     sub _initialize {
@@ -339,9 +340,9 @@ sub run {
         # everything here is basically designed to convert any TAP source to a
         # stream.
         $arg_for ||= {};
-        
+
         $self->SUPER::_initialize( $arg_for, \@legal_callback );
-        
+
         my $stream = delete $arg_for->{stream};
         my $tap    = delete $arg_for->{tap};
         my $source = delete $arg_for->{source};
@@ -381,7 +382,7 @@ sub run {
                 my $perl = TAPx::Parser::Source::Perl->new;
                 $perl->switches( $arg_for->{switches} )
                   if $arg_for->{switches};
-                  
+
                 $stream = $perl->source($source)->get_stream;
                 if ( defined $stream ) {
                     if ( defined $stream->exit ) {
@@ -411,7 +412,7 @@ sub run {
         while ( my ( $k, $v ) = each %initialize ) {
             $self->{$k} = 'ARRAY' eq ref $v ? [] : $v;
         }
-                
+
         return $self;
     }
 }
@@ -794,7 +795,8 @@ succeeded.  Will now issue a warning and call C<todo_passed>.
 =cut
 
 sub todo_failed {
-    warn '"todo_failed" is deprecated.  Please use "todo_passed".  See the docs.';
+    warn
+      '"todo_failed" is deprecated.  Please use "todo_passed".  See the docs.';
     goto &todo_passed;
 }
 
@@ -824,11 +826,11 @@ failed, any TODO tests unexpectedly succeeded, or any parse errors.
 
 sub has_problems {
     my $self = shift;
-    return $self->failed 
-        || $self->todo_passed 
-        || $self->parse_errors 
-        || $self->wait 
-        || $self->exit;
+    return $self->failed
+      || $self->todo_passed
+      || $self->parse_errors
+      || $self->wait
+      || $self->exit;
 }
 
 ##############################################################################

@@ -241,11 +241,11 @@ failed, any TODO tests unexpectedly succeeded, or any parse errors.
 
 sub has_problems {
     my $self = shift;
-    return $self->failed 
-        || $self->todo_passed 
-        || $self->parse_errors 
-        || $self->exit 
-        || $self->wait;
+    return $self->failed
+      || $self->todo_passed
+      || $self->parse_errors
+      || $self->exit
+      || $self->wait;
 }
 
 ##############################################################################
@@ -260,7 +260,8 @@ succeeded.  Will now issue a warning and call C<todo_passed>.
 =cut
 
 sub todo_failed {
-    warn '"todo_failed" is deprecated.  Please use "todo_passed".  See the docs.';
+    warn
+      '"todo_failed" is deprecated.  Please use "todo_passed".  See the docs.';
     goto &todo_passed;
 }
 

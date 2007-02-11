@@ -1,7 +1,7 @@
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if ( $ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = ( '../lib', 'lib' );
     }
     else {
         unshift @INC, 't/lib';
@@ -21,56 +21,68 @@ plan skip_all => "Skipping because of a Cygwin bug" if ( $^O =~ /cygwin/i );
 
 plan tests => 8;
 
-my $blib = File::Spec->catfile( File::Spec->curdir, "blib" );
-my $blib_lib = File::Spec->catfile( $blib, "lib" );
-my $blib_arch = File::Spec->catfile( $blib, "arch" );
+my $blib      = File::Spec->catfile( File::Spec->curdir, "blib" );
+my $blib_lib  = File::Spec->catfile( $blib,              "lib" );
+my $blib_arch = File::Spec->catfile( $blib,              "arch" );
 my $prove = File::Spec->catfile( $blib, "script", "prove" );
 $prove = "$^X $prove";
 
 CAPITAL_TAINT: {
     local $ENV{PROVE_SWITCHES};
 
-    my @actual = qx/$prove -Ifirst -D -I second -Ithird -Tvdb/;
-    my @expected = ( "# \$TAPx::Harness::Compatible::Switches: -T -I$blib_arch -I$blib_lib -Ifirst -Isecond -Ithird\n" );
+    my @actual   = qx/$prove -Ifirst -D -I second -Ithird -Tvdb/;
+    my @expected = (
+        "# \$TAPx::Harness::Compatible::Switches: -T -I$blib_arch -I$blib_lib -Ifirst -Isecond -Ithird\n"
+    );
     is_deeply( \@actual, \@expected, "Capital taint flags OK" );
 }
 
 LOWERCASE_TAINT: {
     local $ENV{PROVE_SWITCHES};
 
-    my @actual = qx/$prove -dD -Ifirst -I second -t -Ithird -vb/;
-    my @expected = ( "# \$TAPx::Harness::Compatible::Switches: -t -I$blib_arch -I$blib_lib -Ifirst -Isecond -Ithird\n" );
+    my @actual   = qx/$prove -dD -Ifirst -I second -t -Ithird -vb/;
+    my @expected = (
+        "# \$TAPx::Harness::Compatible::Switches: -t -I$blib_arch -I$blib_lib -Ifirst -Isecond -Ithird\n"
+    );
     is_deeply( \@actual, \@expected, "Lowercase taint OK" );
 }
 
 PROVE_SWITCHES: {
     local $ENV{PROVE_SWITCHES} = "-dvb -I fark";
 
-    my @actual = qx/$prove -Ibork -Dd/;
-    my @expected = ( "# \$TAPx::Harness::Compatible::Switches: -I$blib_arch -I$blib_lib -Ifark -Ibork\n" );
+    my @actual   = qx/$prove -Ibork -Dd/;
+    my @expected = (
+        "# \$TAPx::Harness::Compatible::Switches: -I$blib_arch -I$blib_lib -Ifark -Ibork\n"
+    );
     is_deeply( \@actual, \@expected, "PROVE_SWITCHES OK" );
 }
 
 PROVE_SWITCHES_L: {
     my @actual = qx/$prove -l -Ibongo -Dd/;
-    my @expected = ( "# \$TAPx::Harness::Compatible::Switches: -Ilib -Ibongo\n" );
+    my @expected
+      = ("# \$TAPx::Harness::Compatible::Switches: -Ilib -Ibongo\n");
     is_deeply( \@actual, \@expected, "PROVE_SWITCHES OK" );
 }
 
 PROVE_SWITCHES_LB: {
-    my @actual = qx/$prove -lb -Dd/;
-    my @expected = ( "# \$TAPx::Harness::Compatible::Switches: -Ilib -I$blib_arch -I$blib_lib\n" );
+    my @actual   = qx/$prove -lb -Dd/;
+    my @expected = (
+        "# \$TAPx::Harness::Compatible::Switches: -Ilib -I$blib_arch -I$blib_lib\n"
+    );
     is_deeply( \@actual, \@expected, "PROVE_SWITCHES OK" );
 }
 
 PROVE_VERSION: {
-    # This also checks that the prove $VERSION is in sync with TAPx::Harness::Compatible's $VERSION
+
+# This also checks that the prove $VERSION is in sync with TAPx::Harness::Compatible's $VERSION
     local $/ = undef;
 
-    use_ok( 'TAPx::Harness::Compatible' );
+    use_ok('TAPx::Harness::Compatible');
 
-    my $thv = $TAPx::Harness::Compatible::VERSION;
+    my $thv    = $TAPx::Harness::Compatible::VERSION;
     my @actual = qx/$prove --version/;
     is( scalar @actual, 1, 'Only 1 line returned' );
-    like( $actual[0], qq{/^\Qprove v$thv, using TAPx::Harness::Compatible v$thv and Perl v5\E/} );
+    like( $actual[0],
+        qq{/^\Qprove v$thv, using TAPx::Harness::Compatible v$thv and Perl v5\E/}
+    );
 }

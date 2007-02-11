@@ -55,7 +55,7 @@ Note that this method merely returns the comment preceded by a '# '.
 
 =cut
 
-sub comment    { shift->{comment} }
-sub as_string  { shift->{raw} }
+sub comment   { shift->{comment} }
+sub as_string { shift->{raw} }
 
 1;

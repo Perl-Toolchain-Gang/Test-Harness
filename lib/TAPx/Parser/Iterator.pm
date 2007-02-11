@@ -60,6 +60,7 @@ sub new {
 
     my $ref = ref $thing;
     if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
+
         # we may eventually allow a 'fast' switch which can read the entire
         # stream into an array.  This seems to speed things up by 10 to 12
         # per cent.  Should not be used with infinite streams.
@@ -160,21 +161,21 @@ sub next {
     #   not
     #   ok 1 - 'I hate VMS'
     if ( defined $line && $line =~ /^\s*not\s*$/ ) {
-        $line .= ($self->next_raw || '');
+        $line .= ( $self->next_raw || '' );
     }
     return $line;
 }
 
 sub _finish {
     my $self = shift;
-    
+
     my $status = $?;
-    
+
     # If we have a subprocess we need to wait for it to terminate
     if ( defined $self->{pid} ) {
         if ( $self->{pid} == waitpid( $self->{pid}, 0 ) ) {
             $status = $?;
-        };
+        }
     }
 
     close $self->{fh};

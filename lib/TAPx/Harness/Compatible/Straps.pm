@@ -370,9 +370,10 @@ Formats and returns the switches necessary to run the test.
 sub _switches {
     my ( $self, $file ) = @_;
 
-    my @existing_switches
-      = $self->_cleaned_switches( $TAPx::Harness::Compatible::Switches,
-        $ENV{HARNESS_PERL_SWITCHES} );
+    my @existing_switches = $self->_cleaned_switches(
+        $TAPx::Harness::Compatible::Switches,
+        $ENV{HARNESS_PERL_SWITCHES}
+    );
     my @derived_switches;
 
     local *TEST;

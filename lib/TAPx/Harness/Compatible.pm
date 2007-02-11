@@ -4,6 +4,7 @@ require 5.00405;
 
 use TAPx::Harness;
 use TAPx::Parser::Aggregator;
+
 #use TAPx::Harness::Compatible::Straps;
 use Exporter;
 use Benchmark;
@@ -12,15 +13,15 @@ use strict;
 
 # TODO: Emulate at least some of these
 use vars qw(
-    $VERSION 
-    @ISA @EXPORT @EXPORT_OK 
-    $Verbose $Switches $Debug
-    $verbose $switches $debug
-    $Columns
-    $Timer
-    $ML $Last_ML_Print
-    $Strap
-    $has_time_hires
+  $VERSION
+  @ISA @EXPORT @EXPORT_OK
+  $Verbose $Switches $Debug
+  $verbose $switches $debug
+  $Columns
+  $Timer
+  $ML $Last_ML_Print
+  $Strap
+  $has_time_hires
 );
 
 BEGIN {
@@ -44,23 +45,24 @@ $VERSION = '0.50_07';
 *verbose  = *Verbose;
 *switches = *Switches;
 *debug    = *Debug;
-# 
+
+#
 # $ENV{HARNESS_ACTIVE} = 1;
 # $ENV{HARNESS_VERSION} = $VERSION;
-# 
+#
 # END {
 #     # For VMS.
 #     delete $ENV{HARNESS_ACTIVE};
 #     delete $ENV{HARNESS_VERSION};
 # }
-# 
+#
 # my $Files_In_Dir = $ENV{HARNESS_FILELEAK_IN_DIR};
-# 
+#
 # # Stolen from Params::Util
 # sub _CLASS {
 #     (defined $_[0] and ! ref $_[0] and $_[0] =~ m/^[^\W\d]\w*(?:::\w+)*$/s) ? $_[0] : undef;
 # }
-# 
+#
 # # Strap Overloading
 # if ( $ENV{HARNESS_STRAPS_CLASS} ) {
 #     die 'Set HARNESS_STRAP_CLASS, singular, not HARNESS_STRAPS_CLASS';
@@ -85,22 +87,22 @@ $VERSION = '0.50_07';
 # if ( !$HARNESS_STRAP_CLASS->isa('TAPx::Harness::Compatible::Straps') ) {
 #     die "HARNESS_STRAP_CLASS '$HARNESS_STRAP_CLASS' must be a TAPx::Harness::Compatible::Straps subclass";
 # }
-# 
+#
 # $Strap = $HARNESS_STRAP_CLASS->new;
-# 
+#
 # sub strap { return $Strap };
-# 
+#
 
-@ISA = ('Exporter');
+@ISA       = ('Exporter');
 @EXPORT    = qw(&runtests);
 @EXPORT_OK = qw(&execute_tests $verbose $switches);
 
-$Verbose  = $ENV{HARNESS_VERBOSE} || 0;
-$Debug    = $ENV{HARNESS_DEBUG}   || 0;
+$Verbose = $ENV{HARNESS_VERBOSE} || 0;
+$Debug   = $ENV{HARNESS_DEBUG}   || 0;
 $Switches = '-w';
-$Columns  = $ENV{HARNESS_COLUMNS} || $ENV{COLUMNS} || 80;
-$Columns--;             # Some shells have trouble with a full line of text.
-$Timer    = $ENV{HARNESS_TIMER}   || 0;
+$Columns = $ENV{HARNESS_COLUMNS} || $ENV{COLUMNS} || 80;
+$Columns--;    # Some shells have trouble with a full line of text.
+$Timer = $ENV{HARNESS_TIMER} || 0;
 
 =head1 SYNOPSIS
 
@@ -234,44 +236,46 @@ one of the messages in the DIAGNOSTICS section.
 
 sub runtests {
     my @tests = @_;
-    
+
     my $harness   = _new_harness();
     my $aggregate = TAPx::Parser::Aggregator->new();
 
     my $results = $harness->aggregate_tests( $aggregate, @tests );
 
-    $harness->summary( $results );
+    $harness->summary($results);
 
     my $total  = $aggregate->total;
     my $passed = $aggregate->passed;
-    
+
     return $total && $total == $passed;
 }
 
 sub _canon {
     my @list   = sort { $a <=> $b } @_;
-    my @ranges = ( );
+    my @ranges = ();
     my $count  = scalar @list;
     my $pos    = 0;
 
-    while ($pos < $count) {
+    while ( $pos < $count ) {
         my $end = $pos + 1;
-        $end++ while $end < $count && $list[$end] <= $list[$end - 1] + 1;
-        push @ranges, ($end == $pos + 1) ? $list[$pos] 
-                                         : join( '-', $list[$pos], $list[$end - 1] );
+        $end++ while $end < $count && $list[$end] <= $list[ $end - 1 ] + 1;
+        push @ranges, ( $end == $pos + 1 )
+          ? $list[$pos]
+          : join( '-', $list[$pos], $list[ $end - 1 ] );
         $pos = $end;
     }
-    
+
     return join( ' ', @ranges );
 }
 
 sub _new_harness {
+
     # TODO: lib? switches?
     my $args = {
         verbose => $Verbose,
         timer   => $Timer
     };
-    
+
     return TAPx::Harness->new($args);
 }
 
@@ -282,7 +286,7 @@ sub _check_sequence {
         return if defined $prev && $next <= $prev;
         $prev = $next;
     }
-    
+
     return 1;
 }
 
@@ -290,48 +294,52 @@ sub execute_tests {
     my %args = @_;
 
     # TODO: Handle out option
-    
+
     my $harness   = _new_harness();
     my $aggregate = TAPx::Parser::Aggregator->new();
 
     my %tot = (
-        bonus           => 0,
-        max             => 0,
-        ok              => 0,
-        bad             => 0,
-        good            => 0,
-        files           => 0,
-        tests           => 0,
-        sub_skipped     => 0,
-        todo            => 0,
-        skipped         => 0,
-        bench           => undef,
+        bonus       => 0,
+        max         => 0,
+        ok          => 0,
+        bad         => 0,
+        good        => 0,
+        files       => 0,
+        tests       => 0,
+        sub_skipped => 0,
+        todo        => 0,
+        skipped     => 0,
+        bench       => undef,
     );
 
     # Install a callback so we get to see any plans the
     # harness executes.
-    $harness->callback( made_parser => sub {
-        my $parser = shift;
-        $parser->callback( plan => sub {
-            my $plan = shift;
-            if ($plan->directive eq 'SKIP') {
-                $tot{skipped}++;
-            }
-        });
-    });
+    $harness->callback(
+        made_parser => sub {
+            my $parser = shift;
+            $parser->callback(
+                plan => sub {
+                    my $plan = shift;
+                    if ( $plan->directive eq 'SKIP' ) {
+                        $tot{skipped}++;
+                    }
+                }
+            );
+        }
+    );
 
     my $results = $harness->aggregate_tests( $aggregate, @{ $args{tests} } );
 
     $tot{bench} = timediff( $results->{end}, $results->{start} );
-    
+
     # TODO: Work out the circumstances under which the files
     # and tests totals can differ.
     $tot{files} = $tot{tests} = @{ $results->{tests} };
 
-    my %failedtests = ( );
-    my %todo_passed = ( );
+    my %failedtests = ();
+    my %todo_passed = ();
 
-    for my $test (@{ $results->{tests} }) {
+    for my $test ( @{ $results->{tests} } ) {
         my ($parser) = $aggregate->parsers($test);
 
         my @failed = $parser->failed;
@@ -343,52 +351,51 @@ sub execute_tests {
         my $passed        = $parser->passed;
         my $actual_passed = $parser->actual_passed;
 
-        my $ok_seq        = _check_sequence( $parser->actual_passed );
-        
+        my $ok_seq = _check_sequence( $parser->actual_passed );
+
         # Duplicate exit, wait status semantics of old version
         $estat ||= '' unless $wstat;
         $wstat ||= '';
 
-        $tot{max}           += ($planned || 0);
-        $tot{bonus}         += $parser->todo_passed;
-        $tot{ok}            += $passed > $actual_passed ? $passed : $actual_passed;
-        $tot{sub_skipped}   += $parser->skipped;
-        $tot{todo}          += $parser->todo;
-
+        $tot{max} += ( $planned || 0 );
+        $tot{bonus} += $parser->todo_passed;
+        $tot{ok} += $passed > $actual_passed ? $passed : $actual_passed;
+        $tot{sub_skipped} += $parser->skipped;
+        $tot{todo}        += $parser->todo;
 
         if ( @failed || $estat || @errors ) {
             $tot{bad}++;
-            
-            my $huh_planned = $planned ? undef : '??';
-            my $huh_errors  = $ok_seq  ? undef : '??';
-            
+
+            my $huh_planned = $planned ? undef: '??';
+            my $huh_errors  = $ok_seq  ? undef: '??';
+
             $failedtests{$test} = {
-                'canon'     => (_canon( @failed ) || '??'),
-                'estat'     => $estat,
-                'failed'    => $huh_planned || $huh_errors || scalar @failed,
-                'max'       => $huh_planned || $planned,
-                'name'      => $test,
-                'wstat'     => $wstat
+                'canon' => ( _canon(@failed) || '??' ),
+                'estat' => $estat,
+                'failed' => $huh_planned || $huh_errors || scalar @failed,
+                'max'    => $huh_planned || $planned,
+                'name'   => $test,
+                'wstat'  => $wstat
             };
         }
         else {
             $tot{good}++;
         }
-        
+
         my @todo = $parser->todo_passed;
-        if ( @todo ) {
+        if (@todo) {
             $todo_passed{$test} = {
-                'canon'     => _canon( @todo ),
-                'estat'     => $estat,
-                'failed'    => scalar @todo,
-                'max'       => scalar $parser->todo,
-                'name'      => $test,
-                'wstat'     => $wstat
-            }
+                'canon'  => _canon(@todo),
+                'estat'  => $estat,
+                'failed' => scalar @todo,
+                'max'    => scalar $parser->todo,
+                'name'   => $test,
+                'wstat'  => $wstat
+            };
         }
     }
-    
-    return( \%tot, \%failedtests, \%todo_passed );
+
+    return ( \%tot, \%failedtests, \%todo_passed );
 }
 
 =head2 execute_tests( tests => \@test_files, out => \*FH )

@@ -10,8 +10,7 @@ use Test::More tests => 47;
 use TAPx::Parser;
 use TAPx::Parser::Iterator;
 
-my ( $STREAMED, $ITER )
-  = ( 'TAPx::Parser', 'TAPx::Parser::Iterator' );
+my ( $STREAMED, $ITER ) = ( 'TAPx::Parser', 'TAPx::Parser::Iterator' );
 my $ITER_FH    = "${ITER}::FH";
 my $ITER_ARRAY = "${ITER}::ARRAY";
 

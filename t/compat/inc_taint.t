@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if ( $ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = ( '../lib', 'lib' );
     }
     else {
         unshift @INC, 't/lib';
@@ -11,8 +11,8 @@ BEGIN {
 }
 
 sub _all_ok {
-    my($tot) = shift;
-    return $tot->{bad} == 0 && ($tot->{max} || $tot->{skipped}) ? 1 : 0;
+    my ($tot) = shift;
+    return $tot->{bad} == 0 && ( $tot->{max} || $tot->{skipped} ) ? 1 : 0;
 }
 
 use TAPx::Harness::Compatible;
@@ -23,8 +23,12 @@ push @INC, 'we_added_this_lib';
 
 tie *NULL, 'Dev::Null' or die $!;
 select NULL;
-my($tot, $failed) = TAPx::Harness::Compatible::execute_tests(
-    tests => [ $ENV{PERL_CORE} ? 'lib/sample-tests/inc_taint' : 't/sample-tests/inc_taint' ]
+my ( $tot, $failed ) = TAPx::Harness::Compatible::execute_tests(
+    tests => [
+        $ENV{PERL_CORE}
+        ? 'lib/sample-tests/inc_taint'
+        : 't/sample-tests/inc_taint'
+    ]
 );
 select STDOUT;
 

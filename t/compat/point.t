@@ -3,7 +3,7 @@
 BEGIN {
     if ( $ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = ( '../lib', 'lib' );
     }
     else {
         unshift @INC, 't/lib';
@@ -14,31 +14,31 @@ use strict;
 use Test::More tests => 11;
 
 BEGIN {
-    use_ok( 'TAPx::Harness::Compatible::Point' );
+    use_ok('TAPx::Harness::Compatible::Point');
 }
 
 my $point = TAPx::Harness::Compatible::Point->new;
 isa_ok( $point, 'TAPx::Harness::Compatible::Point' );
 ok( !$point->ok, "Should start out not OK" );
 
-$point->set_ok( 1 );
+$point->set_ok(1);
 ok( $point->ok, "should have turned to true" );
 
-$point->set_ok( 0 );
+$point->set_ok(0);
 ok( !$point->ok, "should have turned false" );
 
-$point->set_number( 2112 );
+$point->set_number(2112);
 is( $point->number, 2112, "Number is set" );
 
-$point->set_description( "Blah blah" );
+$point->set_description("Blah blah");
 is( $point->description, "Blah blah", "Description set" );
 
-$point->set_directive( "Go now" );
+$point->set_directive("Go now");
 is( $point->directive, "Go now", "Directive set" );
 
-$point->add_diagnostic( "# Line 1" );
-$point->add_diagnostic( "# Line two" );
-$point->add_diagnostic( "# Third line" );
+$point->add_diagnostic("# Line 1");
+$point->add_diagnostic("# Line two");
+$point->add_diagnostic("# Third line");
 my @diags = $point->diagnostics;
 is( @diags, 3, "Three lines" );
 is_deeply(

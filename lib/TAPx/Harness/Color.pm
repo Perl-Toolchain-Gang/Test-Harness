@@ -16,55 +16,55 @@ my $NO_COLOR;
 BEGIN {
     $NO_COLOR = 0;
 
-    if ( IS_WIN32 ) {
+    if (IS_WIN32) {
         eval 'use Win32::Console';
-        if ( $@ ) {
+        if ($@) {
             $NO_COLOR = $@;
         }
         else {
-            my $console = Win32::Console->new(STD_OUTPUT_HANDLE());
-            
+            my $console = Win32::Console->new( STD_OUTPUT_HANDLE() );
+
             # eval here because we might not know about these variables
             my $fg = eval '$FG_LIGHTGRAY';
             my $bg = eval '$BG_BLACK';
-            
+
             *_set_color = sub {
                 my $self  = shift;
                 my $color = shift;
-                
+
                 my $var;
-                if ($color eq 'reset') {
+                if ( $color eq 'reset' ) {
                     $fg = eval '$FG_LIGHTGRAY';
                     $bg = eval '$BG_BLACK';
                 }
-                elsif ($color =~ /^on_(.+)$/) {
+                elsif ( $color =~ /^on_(.+)$/ ) {
                     $bg = eval '$BG_' . uc($1);
                 }
                 else {
                     $fg = eval '$FG_' . uc($color);
                 }
-                
+
                 # In case of colors that aren't defined
-                $self->_set_color( 'reset' ) 
-                    unless defined $bg && defined $fg;
-                    
-                $console->Attr($bg | $fg);
+                $self->_set_color('reset')
+                  unless defined $bg && defined $fg;
+
+                $console->Attr( $bg | $fg );
             };
 
-            # Not sure if we'll have buffering problems using print instead
-            # of $console->Write(). Don't want to override output unnecessarily
-            # though and it /seems/ to work OK.
-            #
-            # *output = sub {
-            #     my $self = shift;
-            #     $console->Write($_) for @_;
-            #     #print @_;
-            # };
+           # Not sure if we'll have buffering problems using print instead
+           # of $console->Write(). Don't want to override output unnecessarily
+           # though and it /seems/ to work OK.
+           #
+           # *output = sub {
+           #     my $self = shift;
+           #     $console->Write($_) for @_;
+           #     #print @_;
+           # };
         }
     }
     else {
         eval 'use Term::ANSIColor';
-        if ( $@ ) {
+        if ($@) {
             $NO_COLOR = $@;
         }
         else {
@@ -76,7 +76,7 @@ BEGIN {
         }
     }
 
-    if ( $NO_COLOR ) {
+    if ($NO_COLOR) {
         *_set_color = sub { };
     }
 }
@@ -153,42 +153,42 @@ red.
 
 sub failure_output {
     my $self = shift;
-    $self->_set_colors( 'red' );
-    my $out = join('', @_);
+    $self->_set_colors('red');
+    my $out = join( '', @_ );
     my $has_newline = chomp $out;
     $self->output($out);
-    $self->_set_colors( 'reset' );
-    $self->output($/) 
-        if $has_newline;
+    $self->_set_colors('reset');
+    $self->output($/)
+      if $has_newline;
 }
 
 # Set terminal color
 sub _set_colors {
     my $self = shift;
-    for my $color ( @_ ) {
-        $self->_set_color( $color );
+    for my $color (@_) {
+        $self->_set_color($color);
     }
 }
 
 sub _process {
     my ( $self, $parser, $result ) = @_;
-    $self->_set_colors( 'reset' );
+    $self->_set_colors('reset');
     return unless $self->_should_display( $parser, $result );
 
     if ( $result->is_test ) {
         if ( !$result->is_ok ) {    # even if it's TODO
-            $self->_set_colors( 'red' );
+            $self->_set_colors('red');
         }
         elsif ( $result->has_skip ) {
             $self->_set_colors( 'white', 'on_blue' );
 
         }
         elsif ( $result->has_todo ) {
-            $self->_set_colors( 'white' );
+            $self->_set_colors('white');
         }
     }
     $self->output( $result->as_string );
-    $self->_set_colors( 'reset' );
+    $self->_set_colors('reset');
     $self->output("\n");
 }
 

@@ -75,8 +75,7 @@ is_deeply [ $agg->failed ], [qw(tap1 tap2)],
   '... and be able to get their descriptions';
 
 can_ok $agg, 'todo';
-is $agg->todo, 4,
-  '... and we should have the correct number of todo tests';
+is $agg->todo, 4, '... and we should have the correct number of todo tests';
 is_deeply [ $agg->todo ], [qw(tap1 tap2)],
   '... and be able to get their descriptions';
 

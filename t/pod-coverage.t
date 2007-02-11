@@ -12,5 +12,5 @@ my @deprecated = qw(
   passed
 );
 
-local $^W;   # we want it to ignore 'Test::Builder::failure_output redefined'
+local $^W;    # we want it to ignore 'Test::Builder::failure_output redefined'
 all_pod_coverage_ok( { trustme => \@deprecated } );

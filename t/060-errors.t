@@ -49,7 +49,6 @@ is [ $parser->parse_errors ]->[1],
   'Bad plan.  You planned 3 tests but ran 4.',
   '... and telling us we ran the wrong number of tests.';
 
-
 $parser = _parser(<<'END_TAP');
 ok 1 - input file opened
 not ok 2 - first line of the input valid # todo some data
@@ -160,4 +159,5 @@ ok 1 - input file opened
 1..1
 END_TAP
 
-ok $parser->is_good_plan, '... and it should return true if the plan is correct';
+ok $parser->is_good_plan,
+  '... and it should return true if the plan is correct';

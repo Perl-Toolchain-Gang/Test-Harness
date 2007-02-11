@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if($ENV{PERL_CORE}) {
+    if ( $ENV{PERL_CORE} ) {
         chdir 't';
         @INC = '../lib';
     }
@@ -13,7 +13,12 @@ BEGIN {
 use Test::More tests => 6;
 
 BEGIN { use_ok 'TAPx::Harness::Compatible' }
-BEGIN { diag( "Testing TAPx::Harness::Compatible $TAPx::Harness::Compatible::VERSION under Perl $] and Test::More $Test::More::VERSION" ) unless $ENV{PERL_CORE}}
+
+BEGIN {
+    diag(
+        "Testing TAPx::Harness::Compatible $TAPx::Harness::Compatible::VERSION under Perl $] and Test::More $Test::More::VERSION"
+    ) unless $ENV{PERL_CORE};
+}
 
 BEGIN { use_ok 'TAPx::Harness::Compatible::Straps' }
 
