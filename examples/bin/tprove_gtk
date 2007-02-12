@@ -405,7 +405,7 @@ sub run {
     my $source = TAPx::Parser::Source::Perl->new();
 
     foreach my $test ( @{ $self->{_tests} } ) {
-        my $stream = $source->filename($test)->get_stream();
+        my $stream = $source->source($test)->get_stream();
         if ($stream) {
             my $parser = $self->analyze( $test, $stream );
 
@@ -446,7 +446,7 @@ sub analyze {
                 $result->[INDEX_TODO]++;
             }
 
-            if ( $line->passed() ) {
+            if ( $line->is_ok() ) {
                 $result->[INDEX_PASS]++;
             }
             else {
