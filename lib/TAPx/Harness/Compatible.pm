@@ -18,6 +18,7 @@ use vars qw(
   $Verbose $Switches $Debug
   $verbose $switches $debug
   $Columns
+  $Directives
   $Timer
   $ML $Last_ML_Print
   $Strap
@@ -272,8 +273,9 @@ sub _new_harness {
 
     # TODO: lib? switches?
     my $args = {
-        verbose => $Verbose,
-        timer   => $Timer
+        verbose    => $Verbose,
+        timer      => $Timer,
+        directives => $Directives,
     };
 
     return TAPx::Harness->new($args);

@@ -30,6 +30,7 @@ GetOptions(
     'e|exec=s'   => \my $EXEC,
     'execrc=s'   => \my $EXECRC,
     'I=s@'       => \my @INCLUDES,
+    'directives' => \my $DIRECTIVES,
     'h|help|?'   => sub { pod2usage( { -verbose => 1 } ); exit },
     'H|man'      => sub { pod2usage( { -verbose => 2 } ); exit },
 
@@ -80,6 +81,7 @@ $args{really_quiet} = 1 if $REALLY_QUIET;
 $args{errors}       = 1 if $PARSE;
 $args{exec}         = [ split( / /, $EXEC ) ] if $EXEC;
 $args{execrc}       = $EXECRC if $EXECRC;
+$args{directives}   = 1 if $DIRECTIVES;
 my $harness = $harness_class->new( \%args );
 $harness->runtests(@tests);
 
@@ -194,6 +196,7 @@ Boolean options
  -q,  --quiet       Suppress some test output while running tests.
  -Q,  --QUIET       Only print summary results.
  -p,  --parse       Show full list of TAP parse errors, if any.
+      --directives  Only show results with TODO or SKIP directives.
  -T                 Enable tainting checks.
  -t                 Enable tainting warnings.
  -W                 Enable fatal warnings.

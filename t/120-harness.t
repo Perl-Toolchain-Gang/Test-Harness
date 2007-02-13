@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 120;
+use Test::More tests => 122;
 
 # these tests cannot be run from the t/ directory due to checking for the
 # existence of execrc
@@ -97,9 +97,10 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
             trim($_)
           } @_;
     };
-    my $harness         = TAPx::Harness->new( { verbose      => 1 } );
-    my $harness_whisper = TAPx::Harness->new( { quiet        => 1 } );
-    my $harness_mute    = TAPx::Harness->new( { really_quiet => 1 } );
+    my $harness            = TAPx::Harness->new( { verbose      => 1 } );
+    my $harness_whisper    = TAPx::Harness->new( { quiet        => 1 } );
+    my $harness_mute       = TAPx::Harness->new( { really_quiet => 1 } );
+    my $harness_directives = TAPx::Harness->new( { directives   => 1 } );
     can_ok $harness, 'runtests';
 
     # normal tests in verbose mode
@@ -218,6 +219,34 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
     );
     is_deeply \@output, \@expected,
       '... and failing test output should be correct';
+
+    # only show directives
+
+    @output = ();
+    $harness_directives->runtests('t/source_tests/harness_directives');
+
+    chomp(@output);
+
+    @expected = (
+        't/source_tests/harness_directives....',
+        'not ok 2 - we have a something # TODO some output',
+        "ok 3 houston, we don't have liftoff # SKIP no funding",
+        'ok',
+        'All tests successful.',
+        'Test Summary Report',
+        '-------------------',
+        't/source_tests/harness_directives (Wstat: 0 Tests: 3 Failed: 0)',
+        'Tests skipped:',
+        '3',
+    );
+
+    $summary          = pop @output;
+    $expected_summary = qr/^Files=1, Tests=3,  \d+ wallclock secs/;
+
+    is_deeply \@output, \@expected, '... and the output should be correct';
+    like $summary, $expected_summary,
+      '... and the report summary should look correct';
+
 
     # normal tests with bad tap
 

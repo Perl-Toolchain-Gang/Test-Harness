@@ -209,24 +209,12 @@ sub todo_failed {
 Returns a boolean value indicating whether or not this test has a SKIP
 directive.
 
-=cut
-
-sub has_skip { 'SKIP' eq shift->{directive} }
-
-##############################################################################
-
 =head3 C<has_todo>
 
   if ( $result->has_todo ) { ... }
 
 Returns a boolean value indicating whether or not this test has a TODO
 directive.
-
-=cut
-
-sub has_todo { 'TODO' eq shift->{directive} }
-
-##############################################################################
 
 =head3 C<as_string>
 

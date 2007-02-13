@@ -182,4 +182,49 @@ sub passed {
     shift->is_ok;
 }
 
+##############################################################################
+
+=head3 C<has_directive>
+
+  if ( $result->has_directive ) {
+     ...
+  }
+
+Indicates whether or not the given result has a TODO or SKIP directive.
+
+=cut
+
+sub has_directive {
+    my $self = shift;
+    return ($self->has_todo || $self->has_skip) || '';
+}
+
+##############################################################################
+
+=head3 C<has_todo>
+
+ if ( $result->has_todo ) {
+     ...
+ }
+
+Indicates whether or not the given result has a TODO directive.
+
+=cut
+
+sub has_todo { 'TODO' eq (shift->{directive} || '') }
+
+##############################################################################
+
+=head3 C<has_skip>
+
+ if ( $result->has_skip ) {
+     ...
+ }
+
+Indicates whether or not the given result has a SKIP directive.
+
+=cut
+
+sub has_skip { 'SKIP' eq (shift->{directive} || '') }
+
 1;

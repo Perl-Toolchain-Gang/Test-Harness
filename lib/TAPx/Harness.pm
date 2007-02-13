@@ -92,6 +92,7 @@ BEGIN {
             @switches = grep { !$found{$_}++ } @switches;
             return \@switches;
         },
+        directives   => sub { shift; shift },
         verbose      => sub { shift; shift },
         timer        => sub { shift; shift },
         failures     => sub { shift; shift },
@@ -214,6 +215,11 @@ in the summary report.  To see all of the parse errors, set this argument to
 true:
 
   errors => 1
+
+=item * C<directives>
+
+If set to a true value, only test results with directives will be displayed.
+This overrides other settings such as C<verbose> or C<failures>.
 
 =back
 
@@ -801,8 +807,12 @@ sub _get_output_method {
     return $parser->has_problems ? 'failure_output' : 'output';
 }
 
+# XXX this really needs some cleanup!
 sub _should_display {
     my ( $self, $parser, $result ) = @_;
+    if ( $self->directives ) {
+        return $result->has_directive;
+    }
     return if $self->really_quiet;
     return $self->verbose && !$self->failures
       || ( $result->is_comment

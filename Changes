@@ -1,6 +1,8 @@
 Revision history for TAP-Parser
 
 0.50_07
+    - Add a --directives switch to 'runtests' which only shows test results
+      with directives (such as 'TODO' or 'SKIP').
     - Removed some dead code from TAPx::Parser.
     - Added color support for Windows using Win32::Console.
     - Made Color::failure_output reset colors before printing

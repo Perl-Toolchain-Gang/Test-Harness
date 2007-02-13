@@ -121,6 +121,7 @@ t/sample-tests/vms_nit
 t/sample-tests/with_comments
 t/source_tests/source
 t/source_tests/harness
+t/source_tests/harness_directives
 t/source_tests/harness_failure
 t/source_tests/harness_badtap
 t/source_tests/varsource

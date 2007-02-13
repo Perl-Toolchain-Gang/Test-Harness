@@ -88,6 +88,13 @@ sub directive { shift->{directive} }
 
 ##############################################################################
 
+=head3 C<has_skip>
+
+  if ( $result->has_skip ) { ... }
+
+Returns a boolean value indicating whether or not this test has a SKIP
+directive.
+
 =head3 C<explanation>
 
  my $explanation = $plan->explanation;

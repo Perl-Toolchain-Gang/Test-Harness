@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 148;
+use Test::More tests => 222;
 use TAPx::Parser::Result;
 
 use constant RESULT  => 'TAPx::Parser::Result';
@@ -62,10 +62,11 @@ run_tests(
             raw  => '... this line is junk ... ',
         },
     },
-    {   is_unknown => 1,
-        raw        => '... this line is junk ... ',
-        as_string  => '... this line is junk ... ',
-        type       => 'unknown',
+    {   is_unknown    => 1,
+        raw           => '... this line is junk ... ',
+        as_string     => '... this line is junk ... ',
+        type          => 'unknown',
+        has_directive => '',
     }
 );
 
@@ -81,11 +82,12 @@ run_tests(
             comment => 'this is a comment',
         },
     },
-    {   is_comment => 1,
-        raw        => '#   this is a comment',
-        as_string  => '#   this is a comment',
-        comment    => 'this is a comment',
-        type       => 'comment',
+    {   is_comment    => 1,
+        raw           => '#   this is a comment',
+        as_string     => '#   this is a comment',
+        comment       => 'this is a comment',
+        type          => 'comment',
+        has_directive => '',
     }
 );
 
@@ -101,10 +103,11 @@ run_tests(
             bailout => 'This blows!',
         },
     },
-    {   is_bailout => 1,
-        raw        => 'Bailout!  This blows!',
-        as_string  => 'This blows!',
-        type       => 'bailout',
+    {   is_bailout    => 1,
+        raw           => 'Bailout!  This blows!',
+        as_string     => 'This blows!',
+        type          => 'bailout',
+        has_directive => '',
     }
 );
 
@@ -127,6 +130,26 @@ run_tests(
         tests_planned => 20,
         directive     => '',
         explanation   => '',
+        has_directive => '',
+    }
+);
+
+run_tests(
+    {   class => PLAN,
+        data  => {
+            type          => 'plan',
+            raw           => '1..0 # SKIP help me, Rhonda!',
+            tests_planned => 0,
+            directive     => 'SKIP',
+            explanation   => 'help me, Rhonda!',
+        },
+    },
+    {   is_plan       => 1,
+        raw           => '1..0 # SKIP help me, Rhonda!',
+        tests_planned => 0,
+        directive     => 'SKIP',
+        explanation   => 'help me, Rhonda!',
+        has_directive => 1,
     }
 );
 
@@ -146,20 +169,21 @@ my $test = run_tests(
             type        => 'test',
         },
     },
-    {   is_test      => 1,
-        type         => 'test',
-        ok           => 'ok',
-        number       => 5,
-        description  => '... and this test is fine',
-        directive    => '',
-        explanation  => '',
-        is_ok        => 1,
-        is_actual_ok => 1,
-        todo_passed  => '',
-        has_skip     => '',
-        has_todo     => '',
-        as_string    => 'ok 5 ... and this test is fine',
-        is_unplanned => '',
+    {   is_test       => 1,
+        type          => 'test',
+        ok            => 'ok',
+        number        => 5,
+        description   => '... and this test is fine',
+        directive     => '',
+        explanation   => '',
+        is_ok         => 1,
+        is_actual_ok  => 1,
+        todo_passed   => '',
+        has_skip      => '',
+        has_todo      => '',
+        as_string     => 'ok 5 ... and this test is fine',
+        is_unplanned  => '',
+        has_directive => '',
     }
 );
 
@@ -178,6 +202,38 @@ is $test->todo_failed, $test->todo_passed,
 like $warning,
   qr/^\Qtodo_failed() is deprecated.  Please use "todo_passed()"/,
   '... but issue a deprecation warning';
+
+# TODO directive
+
+$test = run_tests(
+    {   class => TEST,
+        data  => {
+            ok          => 'not ok',
+            test_num    => 5,
+            description => '... and this test is fine',
+            directive   => 'TODO',
+            explanation => 'why not?',
+            raw         => 'not ok 5 and this test is fine # TODO why not?',
+            type        => 'test',
+        },
+    },
+    {   is_test       => 1,
+        type          => 'test',
+        ok            => 'not ok',
+        number        => 5,
+        description   => '... and this test is fine',
+        directive     => 'TODO',
+        explanation   => 'why not?',
+        is_ok         => 1,
+        is_actual_ok  => '',
+        todo_passed   => '',
+        has_skip      => '',
+        has_todo      => 1,
+        as_string     => 'not ok 5 ... and this test is fine # TODO why not?',
+        is_unplanned  => '',
+        has_directive => 1,
+    }
+);
 
 sub run_tests {
     my ( $instantiated, $value_for ) = @_;

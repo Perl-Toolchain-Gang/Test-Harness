@@ -12,13 +12,13 @@ use File::Spec;
 use vars qw( $VERSION );
 $VERSION = '2.64';
 
-my $shuffle  = 0;
-my $dry      = 0;
-my $blib     = 0;
-my $lib      = 0;
-my $recurse  = 0;
-my @includes = ();
-my @switches = ();
+my $shuffle    = 0;
+my $dry        = 0;
+my $blib       = 0;
+my $lib        = 0;
+my $recurse    = 0;
+my @includes   = ();
+my @switches   = ();
 
 # Allow cuddling the paths with the -I
 @ARGV = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @ARGV;
@@ -31,16 +31,17 @@ unshift @ARGV, split( ' ', $ENV{PROVE_SWITCHES} )
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
-    'b|blib'    => \$blib,
-    'd|debug'   => \$TAPx::Harness::Compatible::debug,
-    'D|dry'     => \$dry,
-    'h|help|?'  => sub { pod2usage( { -verbose => 1 } ); exit },
-    'H|man'     => sub { pod2usage( { -verbose => 2 } ); exit },
-    'I=s@'      => \@includes,
-    'l|lib'     => \$lib,
-    'perl=s'    => \$ENV{HARNESS_PERL},
-    'r|recurse' => \$recurse,
-    's|shuffle' => \$shuffle,
+    'b|blib'     => \$blib,
+    'd|debug'    => \$TAPx::Harness::Compatible::debug,
+    'directives' => \$TAPx::Harness::Compatible::Directives,
+    'D|dry'      => \$dry,
+    'h|help|?'   => sub { pod2usage( { -verbose => 1 } ); exit },
+    'H|man'      => sub { pod2usage( { -verbose => 2 } ); exit },
+    'I=s@'       => \@includes,
+    'l|lib'      => \$lib,
+    'perl=s'     => \$ENV{HARNESS_PERL},
+    'r|recurse'  => \$recurse,
+    's|shuffle'  => \$shuffle,
     't' => sub { unshift @switches, '-t' },    # Always want -t up front
     'T' => sub { unshift @switches, '-T' },    # Always want -T up front
     'w' => sub { push @switches,    '-w' },
@@ -49,7 +50,8 @@ GetOptions(
     'timer'     => \$TAPx::Harness::Compatible::Timer,
     'v|verbose' => \$TAPx::Harness::Compatible::verbose,
     'V|version' => sub { print_version(); exit; },
-) or exit 1;
+  )
+  or exit 1;
 
 $ENV{TEST_VERBOSE} = 1 if $TAPx::Harness::Compatible::verbose;
 
@@ -125,22 +127,23 @@ prove [options] [files/directories]
 
 =head1 OPTIONS
 
-    -b, --blib      Adds blib/lib to the path for your tests, a la "use blib"
-    -d, --debug     Includes extra debugging information
-    -D, --dry       Dry run: Show the tests to run, but don't run them
-    -h, --help      Display this help
-    -H, --man       Longer manpage for prove
-    -I              Add libraries to @INC, as Perl's -I
-    -l, --lib       Add lib to the path for your tests
-        --perl      Sets the name of the Perl executable to use
-    -r, --recurse   Recursively descend into directories
-    -s, --shuffle   Run the tests in a random order
-        --strap     Define strap class to use
-    -T              Enable tainting checks
-    -t              Enable tainting warnings
-        --timer     Print elapsed time after each test file
-    -v, --verbose   Display standard output of test scripts while running them
-    -V, --version   Display version info
+    -b, --blib        Adds blib/lib to the path for your tests, a la "use blib"
+    -d, --debug       Includes extra debugging information
+    -D, --dry         Dry run: Show the tests to run, but don't run them
+    -h, --help        Display this help
+    -H, --man         Longer manpage for prove
+    -I                Add libraries to @INC, as Perl's -I
+    -l, --lib         Add lib to the path for your tests
+        --perl        Sets the name of the Perl executable to use
+    -r, --recurse     Recursively descend into directories
+    -s, --shuffle     Run the tests in a random order
+        --strap       Define strap class to use
+    -T                Enable tainting checks
+    -t                Enable tainting warnings
+        --timer       Print elapsed time after each test file
+        --directives  Only print results with directives (TODO or SKIP)
+    -v, --verbose     Display standard output of test scripts while running them
+    -V, --version     Display version info
 
 Single-character options may be stacked.  Default options may be set by
 specifying the PROVE_SWITCHES environment variable.
@@ -258,7 +261,11 @@ Runs test programs under perl's -T taint mode.
 
 =head2 --timer
 
-Print elapsed time after each test file
+Print elapsed time after each test file.
+
+=head2 --directives
+
+Only show results with TODO or SKIP directives.
 
 =head2 -v, --verbose
 
