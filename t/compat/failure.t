@@ -19,8 +19,8 @@ BEGIN {
     use_ok('TAPx::Harness::Compatible');
 }
 
-SKIP: {
-    skip 'Harness compatibility incomplete', 5;
+TODO: {
+    todo_skip 'Harness compatibility incomplete', 5;
     local $TODO = 'Harness compatibility incomplete';
     my $died;
     sub prepare_for_death { $died = 0; }
