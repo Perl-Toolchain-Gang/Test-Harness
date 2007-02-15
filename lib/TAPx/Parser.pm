@@ -232,11 +232,15 @@ sub _next {
     my $result = $self->_grammar->tokenize( $stream->next );
     $self->_start_tap( $stream->is_first );    # must be after $stream->next
 
+    # we still have to test for $result because of all sort of strange TAP
+    # edge cases (such as '1..0' plans for skipping everything)
     if ( $result && $result->is_test ) {
         $self->in_todo( $result->has_todo );
-        my $count = $self->tests_planned;
-        if ( defined $count && ( $result->number || 0 ) > $count ) {
-            $result->is_unplanned(1);
+        $self->tests_run( $self->tests_run + 1 );
+        if ( defined ( my $tests_planned = $self->tests_planned ) ) {
+            if ( $self->tests_run > $tests_planned ) {
+                $result->is_unplanned(1);
+            }
         }
     }
 
@@ -965,7 +969,6 @@ sub _aggregate_results {
         test => sub {
             my ( $self, $test ) = @_;
             local *__ANON__ = '__ANON__test_validation';
-            $self->tests_run( $self->tests_run + 1 );
 
             $self->_check_ending_plan;
             if ( $test->number ) {

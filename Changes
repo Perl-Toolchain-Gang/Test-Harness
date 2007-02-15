@@ -1,6 +1,8 @@
 Revision history for TAP-Parser
 
 0.50_07
+    - Fixed bug where we erroneously checked the test number instead of number
+      of tests run to determine if we've run more tests than we planned.
     - Add a --directives switch to 'runtests' which only shows test results
       with directives (such as 'TODO' or 'SKIP').
     - Removed some dead code from TAPx::Parser.
@@ -29,11 +31,11 @@ Revision history for TAP-Parser
       interface we need for the compatibility layer.
     - Make it possible to pass an end time to summary so that it needn't
       be called immediately after the tests complete.
-    - Moved callback handling into TAPx::Base and altered TAPx::Parse
+    - Moved callback handling into TAPx::Base and altered TAPx::Parser
       to use it.
     - Made TAPx::Harness into a subclass of TAPx::Base and implemented
       made_parser callback.
-    - Moved the despatch of callbacks out of run and into next so that
+    - Moved the dispatch of callbacks out of run and into next so that
       they're called when TAPx::Harness iterates through the results.
     - Implemented PERL_TEST_HARNESS_DUMP_TAP which names a directory
       into which the raw TAP of any tests run via TAPx::Harness will

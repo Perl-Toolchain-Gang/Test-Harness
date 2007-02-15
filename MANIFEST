@@ -87,6 +87,7 @@ t/sample-tests/bignum_many
 t/sample-tests/combined
 t/sample-tests/combined_compat
 t/sample-tests/descriptive
+t/sample-tests/descriptive_trailing
 t/sample-tests/die
 t/sample-tests/die_head_end
 t/sample-tests/die_last_minute
@@ -121,6 +122,7 @@ t/sample-tests/vms_nit
 t/sample-tests/with_comments
 t/source_tests/source
 t/source_tests/harness
+t/source_tests/harness_complain
 t/source_tests/harness_directives
 t/source_tests/harness_failure
 t/source_tests/harness_badtap
