@@ -746,6 +746,15 @@ my $num_tests = ( keys %$results ) * $PER_LOOP;
 
 plan tests => $num_tests;
 
+sub is_deeply_dump($$$) {
+    my ( $got, $expect, $msg ) = @_;
+    use Data::Dumper;
+    unless ( is_deeply $got, $expect, $msg ) {
+        diag( Data::Dumper->Dump( [$got],    ['$got'] ) );
+        diag( Data::Dumper->Dump( [$expect], ['$expect'] ) );
+    }
+}
+
 SKIP: {
     skip "Not working on Windows yet", $num_tests if $^O =~ /^(MS)?Win32$/;
 
@@ -773,10 +782,10 @@ SKIP: {
         my $bench = delete $tot->{bench};
         isa_ok $bench, 'Benchmark';
 
-        is_deeply $tot, $result->{totals}, "totals match for $test_key";
-        is_deeply $fail, $result->{failed},
+        is_deeply_dump $tot, $result->{totals}, "totals match for $test_key";
+        is_deeply_dump $fail, $result->{failed},
           "failure summary matches for $test_key";
-        is_deeply $todo, $result->{todo},
+        is_deeply_dump $todo, $result->{todo},
           "todo summary matches for $test_key";
     }
 }

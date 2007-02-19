@@ -372,12 +372,15 @@ sub execute_tests {
             my $huh_errors  = $ok_seq  ? undef: '??';
 
             $failedtests{$test} = {
-                'canon' => ( _canon(@failed) || '??' ),
-                'estat' => $estat,
+                'canon' => $huh_planned
+                  || $huh_errors
+                  || _canon(@failed)
+                  || '??',
+                'estat'  => $estat,
                 'failed' => $huh_planned || $huh_errors || scalar @failed,
-                'max'    => $huh_planned || $planned,
-                'name'   => $test,
-                'wstat'  => $wstat
+                'max' => $huh_planned || $planned,
+                'name'  => $test,
+                'wstat' => $wstat
             };
         }
         else {
