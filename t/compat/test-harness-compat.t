@@ -33,7 +33,7 @@ my $results = {
           head_end head_fail inc_taint junk_before_plan lone_not_bug
           no_nums no_output schwern sequence_misparse shbang_misparse
           simple simple_fail skip skip_nomsg skipall skipall_nomsg
-          stdout_stderr switches taint taint_warn todo_inline
+          stdout_stderr switches taint todo_inline
           todo_misparse too_many vms_nit
           )
       ) => {
@@ -156,13 +156,13 @@ my $results = {
         'totals' => {
             'bad'         => 13,
             'bonus'       => 1,
-            'files'       => 29,
-            'good'        => 16,
-            'max'         => 78,
-            'ok'          => 79,
+            'files'       => 28,
+            'good'        => 15,
+            'max'         => 77,
+            'ok'          => 78,
             'skipped'     => 2,
             'sub_skipped' => 2,
-            'tests'       => 29,
+            'tests'       => 28,
             'todo'        => 2
         }
       },
@@ -638,7 +638,8 @@ my $results = {
             'sub_skipped' => 0,
             'tests'       => 1,
             'todo'        => 0
-        }
+        },
+        'require' => 5.008001,
     },
     'todo_inline' => {
         'failed' => {},
@@ -772,20 +773,26 @@ SKIP: {
 
     for my $test_key ( sort keys %$results ) {
         my $result = $results->{$test_key};
-        my @test_names = split( /,/, $test_key );
-        my @test_files
-          = map { File::Spec->catfile( $TEST_DIR, $_ ) } @test_names;
+        SKIP: {
+            if ( $result->{require} && $] < $result->{require} ) {
+                skip "Test requires Perl $result->{require}, we have $]", 4;
+            }
+            my @test_names = split( /,/, $test_key );
+            my @test_files
+              = map { File::Spec->catfile( $TEST_DIR, $_ ) } @test_names;
 
-        my ( $tot, $fail, $todo, $harness, $aggregate )
-          = execute_tests( tests => \@test_files );
+            my ( $tot, $fail, $todo, $harness, $aggregate )
+              = execute_tests( tests => \@test_files );
 
-        my $bench = delete $tot->{bench};
-        isa_ok $bench, 'Benchmark';
+            my $bench = delete $tot->{bench};
+            isa_ok $bench, 'Benchmark';
 
-        is_deeply_dump $tot, $result->{totals}, "totals match for $test_key";
-        is_deeply_dump $fail, $result->{failed},
-          "failure summary matches for $test_key";
-        is_deeply_dump $todo, $result->{todo},
-          "todo summary matches for $test_key";
+            is_deeply_dump $tot, $result->{totals},
+              "totals match for $test_key";
+            is_deeply_dump $fail, $result->{failed},
+              "failure summary matches for $test_key";
+            is_deeply_dump $todo, $result->{todo},
+              "todo summary matches for $test_key";
+        }
     }
 }
