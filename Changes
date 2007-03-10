@@ -1,5 +1,8 @@
 Revision history for TAP-Parser
 
+0.51
+    - 'execrc' file now allows 'regex' matches for tests.
+
 0.50_07 5 March 2007
     - Fixed bug where we erroneously checked the test number instead of number
       of tests run to determine if we've run more tests than we planned.

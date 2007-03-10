@@ -1,17 +1,11 @@
 ---
-tests:
-# this is the default for all files
-  -
-    - /usr/bin/perl
-    - -wT
-    - *
-
-# whoops!  We have a ruby test here!
+# exact matches take precedence
+exact:
+  # whoops!  We have a ruby test here!
   -
     - /usr/bin/ruby
     - t/ruby.t
-
-# let's test some web pages
+  # let's test some web pages
   -
     - /usr/bin/perl
     - -w
@@ -22,3 +16,18 @@ tests:
     - -w
     - bin/test_html.pl
     - http://www.yahoo.com/
+  # override the regex
+  -
+    - /usr/bin/perl
+    - t/customer.t
+# regex matches are after exact matches
+regex:
+  -
+    - /usr/bin/perl
+    - -w
+    - .*customer.*
+# followed by the default
+default:
+  -
+    - /usr/bin/perl
+    - -wT

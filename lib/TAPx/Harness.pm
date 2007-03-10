@@ -262,23 +262,32 @@ This overrides other settings such as C<verbose> or C<failures>.
 
 sub _read_execrc {
     my $self = shift;
-    $self->_execrc( {} );
+    $self->_execrc( { exact => {}, regex => {} } );
     my $execrc = $self->execrc or return $self;
     my $data   = TAPx::Parser::YAML->read($execrc);
-    my $tests  = $data->[0]{tests};
 
     my %exec_for;
-    foreach my $exec (@$tests) {
-        if ( '*' eq $exec->[-1] ) {
-            pop @$exec;
-
-            # don't override command line
-            $self->exec($exec) unless $self->exec;
-        }
-        else {
-            $exec_for{ $exec->[-1] } = $exec;
+    foreach my $type ( qw{ exact regex } ) {
+        foreach my $exec (@{ $data->[0]{$type} }) {
+            if ( 'regex' eq $type ) {
+                eval { qr/$exec/ };
+                if ( my $error = $@ ) {
+                    warn "Can't use execrc item ($exec) as a regex: $error";
+                    next;
+                }
+            }
+            my $test = $exec->[-1];
+            $exec_for{ $type }{ $test } = $exec;
         }
     }
+
+    if ( my $exec = $data->[0]{default} ) {
+         $exec = $exec->[0];
+
+        # don't override command line
+        $self->exec($exec) unless $self->exec;
+    }
+
     $self->_execrc( \%exec_for );
     return $self;
 }
@@ -686,11 +695,19 @@ sub _get_executable {
     my $execrc = $self->_execrc;
     
     my $executable;
-    if ( my $exec = $execrc->{$test} ) {
+    if ( my $exec = $execrc->{exact}{$test} ) {
         $executable = $exec;
     }
-    elsif ( $exec = $self->exec ) {
-        $executable = [ @$exec, $test ];
+    else {
+         foreach my $regex ( keys %{ $execrc->{regex} } ) {
+             if ( $test =~ qr/$regex/ ) {
+                 $executable = $execrc->{regex}{$regex};
+                 $executable->[-1] = $test;
+             }
+         }
+    }
+    if ( my $exec = $self->exec ) {
+        $executable ||= [ @$exec, $test ];
     }
     return $executable;
 }
@@ -862,37 +879,53 @@ support it, the file format may change.
 
 Sometimes you want to use different executables to run different tests.  If
 that's the case, you'll need to create an C<execrc> file.  This file should be
-a YAML file.  This should be representative a hash with one key, C<tests>,
-whose value is an array of array references.  Each terminating array reference
-should be a list of the exact arguments which eventually get executed.
+a YAML file.  This should be representating a hash with (at present) three
+keys, C<exact>, C<regex>, and C<default>.
 
  ---
- tests:
- # this is the default for all files
-   -
-     - /usr/bin/perl
-     - -wT
-     - *
- 
- # whoops!  We have a ruby test here!
+ exact: 
+   # whoops!  We have a ruby test here!
    -
      - /usr/bin/ruby
      - t/ruby.t
- 
- # let's test some web pages
+ regex:
+   # let's test some web pages
    -
      - /usr/bin/perl
      - -w
      - bin/test_html.pl
-     - http://www.google.com/
+     - ^https?://
+ default:
    -
      - /usr/bin/perl
-     - -w
-     - bin/test_html.pl
-     - http://www.yahoo.com/
+     - -wT
+  
+=over 4
 
-If the terminating element in an array is '*', then the rest of the array are
-the default arguments used to run any test.
+=item * C<exact>
+
+The C<exact> key should be an array reference with each element being an array
+reference whose items are an exact list of what need to be passed to the shell
+to execute the test.  So for the 'exact' item of C<t/ruby.t> above, we attempt
+to execute in the shell:
+
+ /usr/bin/ruby t/ruby.t
+
+=item * C<regex>
+
+This is the same as C<exact>, except that the final element in each array
+reference should be a Perl regular expression.  For the C<^https?://> regular
+expression above, when the harness sees a test for C<http://www.example.com>,
+it will pass the following to the shell:
+
+ /usr/bin/perl -w bin/test_html.pl http://www.example.com/
+
+=item * C<default>
+
+Any item which the harness does not match to another C<execrc> entry will
+automatically be executed with the C<default>.
+
+=back
 
 Blank lines are allowed.  Lines beginning with a '#' are comments (the '#' may
 have spaces in front of it).

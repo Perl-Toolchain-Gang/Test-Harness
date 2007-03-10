@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 130;
+use Test::More tests => 132;
 
 # these tests cannot be run from the t/ directory due to checking for the
 # existence of execrc
@@ -35,6 +35,7 @@ ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
 ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
 foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
+#foreach my $HARNESS ( () ) {   # XXX
     can_ok $HARNESS, 'new';
 
     eval { $HARNESS->new( { no_such_key => 1 } ) };
@@ -325,9 +326,10 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
 
     # make sure execrc parsing is solid (internals test)
     my $harness = TAPx::Harness->new;
-    ok !$harness->exec, 'exec() should not be set with an empty harness';
+    ok !$harness->exec, 'exec() should not be set when the harness is new';
     my %execrc = %{ $harness->_execrc };
-    ok !%execrc, '... nor should execrc';
+    is_deeply \%execrc, { exact => {}, regex => {} },
+         '... nor should execrc';
 
     can_ok $harness, '_read_execrc';
     $harness->execrc('t/data/execrc');
@@ -353,6 +355,17 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
         'http://www.google.com/',
       ],
       '... even if we match something which is not a file';
+    is_deeply $harness->_get_executable('t/some_customer.t'),
+      [ '/usr/bin/perl',
+        '-w',
+        't/some_customer.t'
+      ],
+      '... and regexes should work for specifying tests';
+    is_deeply $harness->_get_executable('t/customer.t'),
+      [ '/usr/bin/perl',
+        't/customer.t'
+      ],
+      '... but an exact match will override a regex test';
 }
 
 sub trim {

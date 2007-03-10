@@ -1,24 +1,18 @@
 ---
-tests:
-# this is the default for all files
-  -
-    - /usr/bin/perl
-    - -wT
-    - *
-
-# whoops!  We have a ruby test here!
+exact:
+  # whoops!  We have a ruby test here!
   -
     - /usr/bin/ruby
     - t/ruby.t
+regex:
+ -
+    - /usr/bin/perl
+    - -w
+    - bin/test_html.pl
+    - ^https?:.*
 
-# let's test some web pages
+default:
   -
     - /usr/bin/perl
-    - -w
-    - bin/test_html.pl
-    - http://www.google.com/
-  -
-    - /usr/bin/perl
-    - -w
-    - bin/test_html.pl
-    - http://www.yahoo.com/
+    - -wT
+
