@@ -122,6 +122,9 @@ t/sample-tests/todo
 t/sample-tests/todo_inline
 t/sample-tests/todo_misparse
 t/sample-tests/too_many
+t/sample-tests/version_good
+t/sample-tests/version_late
+t/sample-tests/version_old
 t/sample-tests/vms_nit
 t/sample-tests/with_comments
 t/source_tests/harness

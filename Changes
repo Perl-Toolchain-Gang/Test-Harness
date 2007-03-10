@@ -9,6 +9,7 @@ Revision history for TAP-Parser
     - Removed now-unused is_first / is_last methods from Iterator and
       simplified remaining logic to suit.
     - Removed now-redundant t/140-varsource.t.
+    - Implemented TAP version syntax.
 
 0.50_07 5 March 2007
     - Fixed bug where we erroneously checked the test number instead of number

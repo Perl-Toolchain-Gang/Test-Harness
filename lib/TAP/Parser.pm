@@ -961,6 +961,15 @@ BEGIN {
     my %state_globals = (
         comment => {},
         bailout => {},
+        version => {
+            act => sub {
+                my ( $self, $version ) = @_;
+                local *__ANON__ = '__ANON__bad_version_handler';
+                $self->_add_error(
+                    "If TAP version is present it must be the first line of output"
+                );
+            },
+        },
     );
 
     # Provides default elements for transitions
@@ -1016,9 +1025,10 @@ BEGIN {
                     local *__ANON__ = '__ANON__version_handler';
                     my $ver_num = $version->version;
                     if ( $ver_num <= $DEFAULT_TAP_VERSION ) {
+                        my $ver_min = $DEFAULT_TAP_VERSION + 1;
                         $self->_add_error(
                                 "Explicit TAP version must be at least "
-                              . "$DEFAULT_TAP_VERSION. Got version $ver_num"
+                              . "$ver_min. Got version $ver_num"
                         );
                     }
                     $self->version($ver_num);
