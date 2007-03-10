@@ -9,11 +9,11 @@ TAPx::Base - Base class that provides common functionality to L<TAPx::Parser> an
 
 =head1 VERSION
 
-Version 0.50_07
+Version 0.51
 
 =cut
 
-$VERSION = '0.50_07';
+$VERSION = '0.51';
 
 =head1 SYNOPSIS
 

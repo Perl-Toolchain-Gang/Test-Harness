@@ -6,7 +6,7 @@ use strict;
 use vars qw{$VERSION @ISA @EXPORT_OK $errstr};
 
 BEGIN {
-    $VERSION = '0.50_07';
+    $VERSION = '0.51';
     $errstr  = '';
 
     require Exporter;
@@ -470,7 +470,7 @@ TAPx::Parser::YAML - Read/Write YAML files with as little code as possible
 
 =head1 VERSION
 
-Version 0.50_07
+Version 0.51
 
 =head1 SYNOPSIS
 

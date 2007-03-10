@@ -9,11 +9,11 @@ TAPx::Parser::Iterator - Internal TAPx::Parser Iterator
 
 =head1 VERSION
 
-Version 0.50_07
+Version 0.51
 
 =cut
 
-$VERSION = '0.50_07';
+$VERSION = '0.51';
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ package TAPx::Parser::Iterator::FH;
 
 use vars qw($VERSION @ISA);
 @ISA     = 'TAPx::Parser::Iterator';
-$VERSION = '0.50_07';
+$VERSION = '0.51';
 
 sub new {
     my ( $class, $thing ) = @_;
@@ -192,7 +192,7 @@ package TAPx::Parser::Iterator::ARRAY;
 
 use vars qw($VERSION @ISA);
 @ISA     = 'TAPx::Parser::Iterator';
-$VERSION = '0.50_07';
+$VERSION = '0.51';
 
 sub new {
     my ( $class, $thing ) = @_;

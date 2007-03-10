@@ -4,7 +4,7 @@ use strict;
 use vars qw($VERSION);
 use TAPx::Parser::Iterator;
 
-$VERSION = '0.50_07';
+$VERSION = '0.51';
 
 =head1 NAME
 

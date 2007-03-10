@@ -3,7 +3,7 @@ package TAPx::Harness::Compatible::Straps;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.50_07';
+$VERSION = '0.51';
 
 use Config;
 use TAPx::Harness::Compatible::Iterator;

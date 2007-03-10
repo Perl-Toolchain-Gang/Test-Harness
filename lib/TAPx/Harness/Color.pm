@@ -87,11 +87,11 @@ TAPx::Harness::Color - Run Perl test scripts with color
 
 =head1 VERSION
 
-Version 0.50_07
+Version 0.51
 
 =cut
 
-$VERSION = '0.50_07';
+$VERSION = '0.51';
 
 =head1 DESCRIPTION
 

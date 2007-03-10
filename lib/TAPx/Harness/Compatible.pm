@@ -36,11 +36,11 @@ TAPx::Harness::Compatible - Run Perl standard test scripts with statistics
 
 =head1 VERSION
 
-Version 0.50_07
+Version 0.51
 
 =cut
 
-$VERSION = '0.50_07';
+$VERSION = '0.51';
 
 # Backwards compatibility for exportable variable names.
 *verbose  = *Verbose;
