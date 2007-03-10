@@ -79,7 +79,8 @@ $args{failures}     = $FAILURES if $FAILURES;
 $args{quiet}        = 1 if $QUIET;
 $args{really_quiet} = 1 if $REALLY_QUIET;
 $args{errors}       = 1 if $PARSE;
-$args{exec}         = [ split( / /, $EXEC ) ] if $EXEC;
+$args{exec}         = length($EXEC) ? [ split( / /, $EXEC) ] : []
+                        if(defined($EXEC));
 $args{execrc}       = $EXECRC if $EXECRC;
 $args{directives}   = 1 if $DIRECTIVES;
 my $harness = $harness_class->new( \%args );
@@ -208,7 +209,7 @@ Boolean options
 Options which take arguments
 
  -I                 Library paths to include.
- -e,  --exec        Program to run the tests with.
+ -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
       --harness     Define test harness to use.  See TAPx::Harness.
       --execrc      Location of 'execrc' file (no short form).
 
