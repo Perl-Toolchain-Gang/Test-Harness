@@ -3,6 +3,7 @@ Revision history for TAP-Parser
 0.51
     - 'execrc' file now allows 'regex' matches for tests.
     - rename 'TAPx' --> 'TAP'
+    - Reimplemented the parse logic of TAP::Parser as a state machine.
 
 0.50_07 5 March 2007
     - Fixed bug where we erroneously checked the test number instead of number

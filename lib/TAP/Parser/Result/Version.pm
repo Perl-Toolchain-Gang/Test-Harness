@@ -16,7 +16,7 @@ Version 0.50_07
 
 =cut
 
-$VERSION = '0.50_07';
+$VERSION = '0.51';
 
 =head1 DESCRIPTION
 

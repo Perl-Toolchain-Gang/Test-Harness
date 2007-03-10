@@ -38,6 +38,7 @@ BEGIN {
         _grammar
         _end_plan_error
         _plan_error_found
+        _state
         exec
         exit
         is_good_plan
@@ -57,8 +58,7 @@ BEGIN {
             *$method = sub {
                 my $self = shift;
                 return $self->{$method} unless @_;
-                unless ( ( ref $self ) =~ /^TAP::Parser/ )
-                {    # trusted methods
+                unless ( ( ref $self ) =~ /^TAP::Parser/ ) { # trusted methods
                     $self->_croak("$method() may not be set externally");
                 }
                 $self->{$method} = shift;
@@ -227,40 +227,6 @@ module and related classes for more information on how to use them.
 
 =cut
 
-sub _next {
-    my $self   = shift;
-    my $stream = $self->_stream;
-    return if $stream->is_last;
-
-    my $result = $self->_grammar->tokenize( $stream->next );
-    $self->_start_tap( $stream->is_first );    # must be after $stream->next
-
-    # we still have to test for $result because of all sort of strange TAP
-    # edge cases (such as '1..0' plans for skipping everything)
-    if ( $result && $result->is_test ) {
-        $self->in_todo( $result->has_todo );
-        $self->tests_run( $self->tests_run + 1 );
-        if ( defined ( my $tests_planned = $self->tests_planned ) ) {
-            if ( $self->tests_run > $tests_planned ) {
-                $result->is_unplanned(1);
-            }
-        }
-    }
-
-    # must set _end_tap first or else _validate chokes on ending plans
-    $self->_validate($result);
-    if ( $stream->is_last ) {
-        $self->_end_tap(1);
-        $self->exit( $stream->exit );
-        $self->wait( $stream->wait );
-        $self->_finish;
-    }
-    elsif ( !$result->is_unknown && !$result->is_comment ) {
-        $self->_can_ignore_output(0);
-    }
-    return $result;
-}
-
 sub next {
     my $self   = shift;
     my $result = $self->_next;
@@ -313,21 +279,22 @@ sub run {
     my %initialize = (
         _can_ignore_output => 1,
         _end_tap           => 0,
-        _plan_found        => 0,     # how many plans were found
+        _plan_found        => 0,                   # how many plans were found
         _start_tap         => 0,
+        _state             => 'INIT',
         version            => $DEFAULT_TAP_VERSION,
-        plan               => '',    # the test plan (e.g., 1..3)
-        tap                => '',    # the TAP
-        tests_run          => 0,     # actual current test numbers
-        results            => [],    # TAP parser results
-        skipped            => [],    #
-        todo               => [],    #
-        passed             => [],    #
-        failed             => [],    #
-        actual_failed      => [],    # how many tests really failed
-        actual_passed      => [],    # how many tests really passed
-        todo_passed        => [],    # tests which unexpectedly succeed
-        parse_errors       => [],    # perfect TAP should have none
+        plan          => '',    # the test plan (e.g., 1..3)
+        tap           => '',    # the TAP
+        tests_run     => 0,     # actual current test numbers
+        results       => [],    # TAP parser results
+        skipped       => [],    #
+        todo          => [],    #
+        passed        => [],    #
+        failed        => [],    #
+        actual_failed => [],    # how many tests really failed
+        actual_passed => [],    # how many tests really passed
+        todo_passed   => [],    # tests which unexpectedly succeed
+        parse_errors  => [],    # perfect TAP should have none
     );
 
     # We seem to have this list hanging around all over the place. We could
@@ -980,91 +947,215 @@ sub _aggregate_results {
     push @{ $self->{failed} }        => $num if !$test->is_ok;
 }
 
-{
-    my %validation_for = (
-        test => sub {
-            my ( $self, $test ) = @_;
-            local *__ANON__ = '__ANON__test_validation';
+sub _conj_list {
+    my $self = shift;
+    my $conj = shift;
+    my $last = pop;
+    return $last unless @_;
+    return join( " $conj ", join( ', ', @_ ), $last );
+}
 
-            $self->_check_ending_plan;
-            if ( $test->number ) {
-                if ( $test->number != $self->tests_run ) {
-                    my $number = $test->number;
-                    my $count  = $self->tests_run;
-                    $self->_add_error(
-                        "Tests out of sequence.  Found ($number) but expected ($count)"
-                    );
-                }
-            }
-            else {
-                $test->_number( $self->tests_run );
-            }
-            $self->_aggregate_results($test);
-        },
-        version => sub {
-            my ( $self, $version ) = @_;
-            local *__ANON__ = '__ANON__version_validation';
-            my $ver_num = $version->version;
-            if ($ver_num <= $DEFAULT_TAP_VERSION) {
-                $self->_add_error(
-                    "Explicit TAP version must be at least "
-                    . "$DEFAULT_TAP_VERSION. Got version $ver_num"
-                );
-            }
-            $self->version( $ver_num );
-        },
-        plan => sub {
-            my ( $self, $plan ) = @_;
-            local *__ANON__ = '__ANON__plan_validation';
-            $self->tests_planned( $plan->tests_planned );
-            $self->plan( $plan->plan );
-            $self->_plan_found( $self->_plan_found + 1 );
-            if ( !$self->_start_tap && !$self->_end_tap ) {
-                if ( !$self->_end_plan_error && !$self->_can_ignore_output ) {
-                    my $line = $plan->as_string;
-                    $self->_end_plan_error(
-                        "Plan ($line) must be at the beginning or end of the TAP output"
-                    );
-                }
-            }
-        },
-        bailout => sub {
-            my ( $self, $bailout ) = @_;
-            local *__ANON__ = '__ANON__bailout_validation';
-            $self->_check_ending_plan;
-        },
-        unknown => sub { },
-        comment => sub { },
-    );
+sub _next {
+    my $self   = shift;
+    my $stream = $self->_stream;
+    return if $stream->is_last;
 
-    sub _check_ending_plan {
-        my $self = shift;
-        if ( !$self->_plan_error_found
-            && ( my $error = $self->_end_plan_error ) )
-        {
+    my $result = $self->_grammar->tokenize( $stream->next );
 
-            # test output found after ending plan
-            $self->_add_error($error);
-            $self->_plan_error_found(1);
-            $self->is_good_plan(0);
+    $self->_start_tap( $stream->is_first );    # must be after $stream->next
+
+    # we still have to test for $result because of all sort of strange TAP
+    # edge cases (such as '1..0' plans for skipping everything)
+    if ( $result && $result->is_test ) {
+        $self->in_todo( $result->has_todo );
+        $self->tests_run( $self->tests_run + 1 );
+        if ( defined( my $tests_planned = $self->tests_planned ) ) {
+            if ( $self->tests_run > $tests_planned ) {
+                $result->is_unplanned(1);
+            }
         }
-        return $self;
     }
 
-    sub _validate {
-        my ( $self, $token ) = @_;
-        return unless $token;    # XXX edge case for 'no output'
-        my $type     = $token->type;
-        my $validate = $validation_for{$type};
-        unless ($validate) {
+    $self->_next_state($result) if $result;
 
-            # should never happen
-            # We could simply leave off keys for which no validation is
-            # required, but that means that new token types in the future are
-            # easily skipped here.
-            $self->_croak("Don't know how how to validate '$type'");
+    if ( $stream->is_last ) {
+        $self->_end_tap(1);
+        $self->exit( $stream->exit );
+        $self->wait( $stream->wait );
+        $self->_finish;
+    }
+    elsif ( !$result->is_unknown && !$result->is_comment ) {
+        $self->_can_ignore_output(0);
+    }
+    return $result;
+}
+
+sub _check_ending_plan {
+    my $self = shift;
+    if ( !$self->_plan_error_found
+        && ( my $error = $self->_end_plan_error ) )
+    {
+
+        # test output found after ending plan
+        $self->_add_error($error);
+        $self->_plan_error_found(1);
+        $self->is_good_plan(0);
+    }
+    return $self;
+}
+
+my %states;
+
+BEGIN {
+
+    # These transitions are defaults for all states
+    my %state_globals = (
+        comment => {},
+        bailout => {
+            act => sub {
+                my ( $self, $bailout ) = @_;
+                local *__ANON__ = '__ANON__bailout_handler';
+                $self->_check_ending_plan;
+            },
+
+            #goto => 'BAILOUT',
+        },
+    );
+
+    # Provides default elements for transitions
+    my %state_defaults = (
+        plan => {
+            act => sub {
+                my ( $self, $plan ) = @_;
+                local *__ANON__ = '__ANON__plan_handler';
+                $self->tests_planned( $plan->tests_planned );
+                $self->plan( $plan->plan );
+                $self->_plan_found( $self->_plan_found + 1 );
+                if ( !$self->_start_tap && !$self->_end_tap ) {
+                    if (   !$self->_end_plan_error
+                        && !$self->_can_ignore_output )
+                    {
+                        my $line = $plan->as_string;
+                        $self->_end_plan_error(
+                            "Plan ($line) must be at the beginning or end of the TAP output"
+                        );
+                    }
+                }
+            },
+        },
+        test => {
+            act => sub {
+                my ( $self, $test ) = @_;
+                local *__ANON__ = '__ANON__test_handler';
+
+                $self->_check_ending_plan;
+                if ( $test->number ) {
+                    if ( $test->number != $self->tests_run ) {
+                        my $number = $test->number;
+                        my $count  = $self->tests_run;
+                        $self->_add_error(
+                            "Tests out of sequence.  Found ($number) but expected ($count)"
+                        );
+                    }
+                }
+                else {
+                    $test->_number( $self->tests_run );
+                }
+                $self->_aggregate_results($test);
+            },
+        },
+    );
+
+    %states = (
+        INIT => {
+            version => {
+                act => sub {
+                    my ( $self, $version ) = @_;
+                    local *__ANON__ = '__ANON__version_handler';
+                    my $ver_num = $version->version;
+                    if ( $ver_num <= $DEFAULT_TAP_VERSION ) {
+                        $self->_add_error(
+                                "Explicit TAP version must be at least "
+                              . "$DEFAULT_TAP_VERSION. Got version $ver_num"
+                        );
+                    }
+                    $self->version($ver_num);
+                },
+                goto => 'PLAN'
+            },
+            plan => { goto => 'PLANNED' },
+            test => { goto => 'UNPLANNED' },
+        },
+        PLAN => {
+            plan => { goto => 'PLANNED' },
+            test => { goto => 'UNPLANNED' },
+        },
+        PLANNED => {
+            test => { goto => 'PLANNED' },
+            plan => {
+                act => sub {
+                    my ( $self, $version ) = @_;
+                    local *__ANON__ = '__ANON__multiple_plan_handler';
+                    $self->_add_error(
+                        "More than one plan found in TAP output");
+                },
+            },
+        },
+        UNPLANNED => {
+            test => { goto => 'UNPLANNED' },
+            plan => { goto => 'PLANNED' },
+        },
+        DONE   => {},
+        BAILED => {
+            version => { goto => 'BAILED' },
+            plan    => { goto => 'BAILED' },
+            test    => { goto => 'BAILED' },
+        },
+    );
+
+    # Apply globals and defaults to state table
+    for my $name ( keys %states ) {
+
+        # Merge with globals
+        my $st = { %state_globals, %{ $states{$name} } };
+
+        # Add defaults
+        for my $next ( keys %$st ) {
+            if ( my $default = $state_defaults{$next} ) {
+                for my $def ( keys %$default ) {
+                    $st->{$next}->{$def} ||= $default->{$def};
+                }
+            }
         }
-        $self->$validate($token);
+
+        # Stuff back in table
+        $states{$name} = $st;
+    }
+}
+
+# Advance the state machine
+sub _next_state {
+    my $self  = shift;
+    my $token = shift;
+
+    my $state = $states{ $self->_state }
+      or die "Illegal state: ", $self->_state;
+
+    my $type = $token->type;
+
+    if ( my $next = $state->{$type} ) {
+        if ( my $act = $next->{act} ) {
+            $self->$act($token);
+        }
+
+        if ( my $goto = $next->{goto} ) {
+            $self->_state($goto);
+        }
+    }
+    else {
+        my $ok = $self->_conj_list( 'or', sort keys %$state );
+
+        #$self->_add_error("Expected $ok. Got $type");
     }
 }
 
@@ -1074,9 +1165,6 @@ sub _finish {
     # sanity checks
     if ( !$self->_plan_found ) {
         $self->_add_error("No plan found in TAP output");
-    }
-    elsif ( $self->_plan_found > 1 ) {
-        $self->_add_error("More than one plan found in TAP output");
     }
     else {
         $self->is_good_plan(1) unless defined $self->is_good_plan;

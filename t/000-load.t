@@ -1,6 +1,6 @@
 #!/usr/bin/perl -wT
 
-use Test::More tests => 32;
+use Test::More tests => 34;
 
 BEGIN {
     my @classes = qw(
@@ -14,6 +14,7 @@ BEGIN {
       TAP::Parser::Result::Test
       TAP::Parser::Result::Unknown
       TAP::Parser::Result::Bailout
+      TAP::Parser::Result::Version
       TAP::Parser::Source
       TAP::Parser::Source::Perl
       TAP::Parser::YAML

@@ -2361,18 +2361,18 @@ foreach my $test ( sort keys %samples ) {
         while ( my ( $method, $answer ) = each %$details ) {
             if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
                 ok $handler->( $parser->$method ),
-                  "... and $method should return a reasonable value";
+                  "... and $method should return a reasonable value ($test)";
             }
             elsif ( !ref $answer ) {
                 local $^W;    # uninit warnings
                 is $parser->$method, $answer,
-                  "... and $method should equal $answer";
+                  "... and $method should equal $answer ($test)";
             }
             else {
                 is scalar $parser->$method, scalar @$answer,
-                  "... and $method should be the correct amount";
+                  "... and $method should be the correct amount ($test)";
                 is_deeply [ $parser->$method ], $answer,
-                  "...... and the correct values"
+                  "...... and the correct values ($test)"
                   or diag +Data::Dumper->Dump(
                     [ [ $parser->$method ], $answer ],
                     [ '*got', '*expected' ]
@@ -2400,15 +2400,15 @@ sub analyze_test {
         while ( my ( $method, $answer ) = each %$expected ) {
             if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
                 ok $handler->( $result->$method ),
-                  "... and $method should return a reasonable value";
+                  "... and $method should return a reasonable value ($test)";
             }
             else {
                 is $result->$method, $answer,
-                  "... and $method should return the correct answer";
+                  "... and $method should return the correct answer ($test)";
             }
         }
     }
-    ok !@$results, '... and we should have the correct number of results';
+    ok !@$results, "... and we should have the correct number of results ($test)";
     return $parser;
 }
 
