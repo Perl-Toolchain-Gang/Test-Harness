@@ -4,6 +4,11 @@ Revision history for TAP-Parser
     - 'execrc' file now allows 'regex' matches for tests.
     - rename 'TAPx' --> 'TAP'
     - Reimplemented the parse logic of TAP::Parser as a state machine.
+    - Removed various ad-hoc state variables from TAP::Parser and moved
+      their logic into the state machine.
+    - Removed now-unused is_first / is_last methods from Iterator and
+      simplified remaining logic to suit.
+    - Removed now-redundant t/140-varsource.t.
 
 0.50_07 5 March 2007
     - Fixed bug where we erroneously checked the test number instead of number

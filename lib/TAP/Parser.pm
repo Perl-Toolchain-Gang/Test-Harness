@@ -29,15 +29,9 @@ my $DEFAULT_TAP_VERSION = 3;
 BEGIN {
     foreach my $method (
         qw<
-        _can_ignore_output
-        _end_tap
-        _plan_found
-        _start_tap
         _stream
         _spool
         _grammar
-        _end_plan_error
-        _plan_error_found
         _state
         exec
         exit
@@ -277,24 +271,20 @@ sub run {
     # of the following, anything beginning with an underscore is strictly
     # internal and should not be exposed.
     my %initialize = (
-        _can_ignore_output => 1,
-        _end_tap           => 0,
-        _plan_found        => 0,                   # how many plans were found
-        _start_tap         => 0,
-        _state             => 'INIT',
-        version            => $DEFAULT_TAP_VERSION,
-        plan          => '',    # the test plan (e.g., 1..3)
-        tap           => '',    # the TAP
-        tests_run     => 0,     # actual current test numbers
-        results       => [],    # TAP parser results
-        skipped       => [],    #
-        todo          => [],    #
-        passed        => [],    #
-        failed        => [],    #
-        actual_failed => [],    # how many tests really failed
-        actual_passed => [],    # how many tests really passed
-        todo_passed   => [],    # tests which unexpectedly succeed
-        parse_errors  => [],    # perfect TAP should have none
+        _state        => 'INIT',
+        version       => $DEFAULT_TAP_VERSION,
+        plan          => '',                    # the test plan (e.g., 1..3)
+        tap           => '',                    # the TAP
+        tests_run     => 0,                     # actual current test numbers
+        results       => [],                    # TAP parser results
+        skipped       => [],                    #
+        todo          => [],                    #
+        passed        => [],                    #
+        failed        => [],                    #
+        actual_failed => [],                    # how many tests really failed
+        actual_passed => [],                    # how many tests really passed
+        todo_passed  => [],    # tests which unexpectedly succeed
+        parse_errors => [],    # perfect TAP should have none
     );
 
     # We seem to have this list hanging around all over the place. We could
@@ -379,8 +369,6 @@ sub run {
         }
 
         $self->_stream($stream);
-        $self->_start_tap(undef);
-        $self->_end_tap(undef);
         $self->_grammar( TAP::Parser::Grammar->new($self) )
           ;    # eventually pass a version
         $self->_spool($spool);
@@ -947,61 +935,22 @@ sub _aggregate_results {
     push @{ $self->{failed} }        => $num if !$test->is_ok;
 }
 
-sub _conj_list {
-    my $self = shift;
-    my $conj = shift;
-    my $last = pop;
-    return $last unless @_;
-    return join( " $conj ", join( ', ', @_ ), $last );
-}
-
 sub _next {
     my $self   = shift;
     my $stream = $self->_stream;
-    return if $stream->is_last;
 
     my $result = $self->_grammar->tokenize( $stream->next );
 
-    $self->_start_tap( $stream->is_first );    # must be after $stream->next
-
-    # we still have to test for $result because of all sort of strange TAP
-    # edge cases (such as '1..0' plans for skipping everything)
-    if ( $result && $result->is_test ) {
-        $self->in_todo( $result->has_todo );
-        $self->tests_run( $self->tests_run + 1 );
-        if ( defined( my $tests_planned = $self->tests_planned ) ) {
-            if ( $self->tests_run > $tests_planned ) {
-                $result->is_unplanned(1);
-            }
-        }
+    if ($result) {
+        $self->_next_state($result);
     }
-
-    $self->_next_state($result) if $result;
-
-    if ( $stream->is_last ) {
-        $self->_end_tap(1);
+    else {
         $self->exit( $stream->exit );
         $self->wait( $stream->wait );
         $self->_finish;
     }
-    elsif ( !$result->is_unknown && !$result->is_comment ) {
-        $self->_can_ignore_output(0);
-    }
+
     return $result;
-}
-
-sub _check_ending_plan {
-    my $self = shift;
-    if ( !$self->_plan_error_found
-        && ( my $error = $self->_end_plan_error ) )
-    {
-
-        # test output found after ending plan
-        $self->_add_error($error);
-        $self->_plan_error_found(1);
-        $self->is_good_plan(0);
-    }
-    return $self;
 }
 
 my %states;
@@ -1011,15 +960,7 @@ BEGIN {
     # These transitions are defaults for all states
     my %state_globals = (
         comment => {},
-        bailout => {
-            act => sub {
-                my ( $self, $bailout ) = @_;
-                local *__ANON__ = '__ANON__bailout_handler';
-                $self->_check_ending_plan;
-            },
-
-            #goto => 'BAILOUT',
-        },
+        bailout => {},
     );
 
     # Provides default elements for transitions
@@ -1030,17 +971,6 @@ BEGIN {
                 local *__ANON__ = '__ANON__plan_handler';
                 $self->tests_planned( $plan->tests_planned );
                 $self->plan( $plan->plan );
-                $self->_plan_found( $self->_plan_found + 1 );
-                if ( !$self->_start_tap && !$self->_end_tap ) {
-                    if (   !$self->_end_plan_error
-                        && !$self->_can_ignore_output )
-                    {
-                        my $line = $plan->as_string;
-                        $self->_end_plan_error(
-                            "Plan ($line) must be at the beginning or end of the TAP output"
-                        );
-                    }
-                }
             },
         },
         test => {
@@ -1048,7 +978,14 @@ BEGIN {
                 my ( $self, $test ) = @_;
                 local *__ANON__ = '__ANON__test_handler';
 
-                $self->_check_ending_plan;
+                $self->in_todo( $test->has_todo );
+                $self->tests_run( $self->tests_run + 1 );
+                if ( defined( my $tests_planned = $self->tests_planned ) ) {
+                    if ( $self->tests_run > $tests_planned ) {
+                        $test->is_unplanned(1);
+                    }
+                }
+
                 if ( $test->number ) {
                     if ( $test->number != $self->tests_run ) {
                         my $number = $test->number;
@@ -1066,6 +1003,11 @@ BEGIN {
         },
     );
 
+# Each state contains a hash the keys of which match a token type. For each token
+# type there may be:
+#   act      A coderef to run
+#   goto     The new state to move to. Stay in this state if missing
+#   continue Goto the new state and run the new state for the current token
     %states = (
         INIT => {
             version => {
@@ -1091,7 +1033,7 @@ BEGIN {
             test => { goto => 'UNPLANNED' },
         },
         PLANNED => {
-            test => { goto => 'PLANNED' },
+            test => {},
             plan => {
                 act => sub {
                     my ( $self, $version ) = @_;
@@ -1101,15 +1043,33 @@ BEGIN {
                 },
             },
         },
+        GOT_PLAN => {
+            test => {
+                act => sub {
+                    my ( $self, $plan ) = @_;
+                    my $line = $self->plan;
+                    $self->_add_error(
+                        "Plan ($line) must be at the beginning or end of the TAP output"
+                    );
+                    $self->is_good_plan(0);
+
+                },
+                continue => 'PLANNED'
+            },
+            plan => {
+                act      => sub { },
+                continue => 'PLANNED'
+            },
+        },
         UNPLANNED => {
-            test => { goto => 'UNPLANNED' },
-            plan => { goto => 'PLANNED' },
+            test => {},
+            plan => { goto => 'GOT_PLAN' },
         },
         DONE   => {},
         BAILED => {
-            version => { goto => 'BAILED' },
-            plan    => { goto => 'BAILED' },
-            test    => { goto => 'BAILED' },
+            version => {},
+            plan    => {},
+            test    => {},
         },
     );
 
@@ -1148,14 +1108,13 @@ sub _next_state {
             $self->$act($token);
         }
 
-        if ( my $goto = $next->{goto} ) {
+        if ( my $cont = $next->{continue} ) {
+            $self->_state($cont);
+            $self->_next_state($token);
+        }
+        elsif ( my $goto = $next->{goto} ) {
             $self->_state($goto);
         }
-    }
-    else {
-        my $ok = $self->_conj_list( 'or', sort keys %$state );
-
-        #$self->_add_error("Expected $ok. Got $type");
     }
 }
 
@@ -1163,7 +1122,7 @@ sub _finish {
     my $self = shift;
 
     # sanity checks
-    if ( !$self->_plan_found ) {
+    if ( !$self->plan ) {
         $self->_add_error("No plan found in TAP output");
     }
     else {
