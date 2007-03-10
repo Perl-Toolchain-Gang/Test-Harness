@@ -120,6 +120,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     descriptive_trailing => {
         results => [
@@ -200,6 +201,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     simple => {
         results => [
@@ -351,6 +353,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     skip => {
         results => [
@@ -427,6 +430,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     skip_nomsg => {
         results => [
@@ -463,6 +467,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     todo_inline => {
         results => [
@@ -521,6 +526,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     duplicates => {
         results => [
@@ -761,6 +767,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     bailout => {
         results => [
@@ -839,6 +846,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     no_output => {
         results       => [],
@@ -994,6 +1002,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     'die' => {
         results       => [],
@@ -1509,6 +1518,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     head_end => {
         results => [
@@ -1598,6 +1608,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     head_fail => {
         results => [
@@ -1687,6 +1698,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     out_of_order => {
         results => [
@@ -1923,6 +1935,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     skipall_nomsg => {
         results => [
@@ -1950,6 +1963,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     todo_misparse => {
         results => [
@@ -1986,6 +2000,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     shbang_misparse => {
         results => [
@@ -2031,6 +2046,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     switches => {
         results => [
@@ -2068,6 +2084,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     inc_taint => {
         results => [
@@ -2105,6 +2122,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     sequence_misparse => {
         results => [
@@ -2186,6 +2204,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
 
     stdout_stderr => {
@@ -2276,6 +2295,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
 
     junk_before_plan => {
@@ -2318,6 +2338,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
+        version       => 3,
     },
     version_good => {
         results => [
@@ -2473,7 +2494,7 @@ my %samples = (
         tests_planned => 5,
         tests_run     => 5,
         parse_errors =>
-          [ 'Explicit TAP version must be at least 4. Got version 3' ],
+          ['Explicit TAP version must be at least 4. Got version 3'],
         'exit'  => 0,
         wait    => 0,
         version => 3,
@@ -2553,7 +2574,7 @@ my %samples = (
         tests_planned => 5,
         tests_run     => 5,
         parse_errors =>
-          [ 'If TAP version is present it must be the first line of output' ],
+          ['If TAP version is present it must be the first line of output'],
         'exit'  => 0,
         wait    => 0,
         version => 3,
