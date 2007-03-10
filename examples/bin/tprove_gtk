@@ -366,8 +366,8 @@ sub _callback_quit {
 
 package TestRunner;
 
-use TAPx::Parser;
-use TAPx::Parser::Source::Perl;
+use TAP::Parser;
+use TAP::Parser::Source::Perl;
 
 use constant {
     INDEX_TOTAL => 0,
@@ -402,7 +402,7 @@ sub add_tests {
 sub run {
     my ($self) = @_;
 
-    my $source = TAPx::Parser::Source::Perl->new();
+    my $source = TAP::Parser::Source::Perl->new();
 
     foreach my $test ( @{ $self->{_tests} } ) {
         my $stream = $source->source($test)->get_stream();
@@ -428,7 +428,7 @@ sub analyze {
     my $writer = $self->{_writer};
     my $result = $self->{_results}->{$test};
 
-    my $parser = TAPx::Parser->new( { stream => $stream } );
+    my $parser = TAP::Parser->new( { stream => $stream } );
     while ( my $line = $parser->next() ) {
         if ( $line->is_plan() ) {
             $result->[INDEX_TOTAL] = $line->tests_planned();

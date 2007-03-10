@@ -1,4 +1,4 @@
-# For shutting up TAPx::Harness::Compatible.
+# For shutting up TAP::Harness::Compatible.
 # Has to work on 5.004 which doesn't have Tie::StdHandle.
 package Dev::Null;
 

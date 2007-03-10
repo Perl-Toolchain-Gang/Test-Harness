@@ -1,20 +1,20 @@
-package TAPx::Harness::Compatible::Iterator;
+package TAP::Harness::Compatible::Iterator;
 
 use strict;
 use vars qw($VERSION);
-use TAPx::Parser::Iterator;
+use TAP::Parser::Iterator;
 
 $VERSION = '0.51';
 
 =head1 NAME
 
-TAPx::Harness::Compatible::Iterator - Internal TAPx::Harness::Compatible Iterator
+TAP::Harness::Compatible::Iterator - Internal TAP::Harness::Compatible Iterator
 
 =head1 SYNOPSIS
 
-  use TAPx::Harness::Compatible::Iterator;
-  my $it = TAPx::Harness::Compatible::Iterator->new(\*TEST);
-  my $it = TAPx::Harness::Compatible::Iterator->new(\@array);
+  use TAP::Harness::Compatible::Iterator;
+  my $it = TAP::Harness::Compatible::Iterator->new(\*TEST);
+  my $it = TAP::Harness::Compatible::Iterator->new(\@array);
 
   my $line = $it->next;
 
@@ -37,7 +37,7 @@ Iterate through it, of course.
 sub new {
     my ( $class, $thing ) = @_;
 
-    return bless { iter => TAPx::Parser::Iterator->new($thing) }, $class;
+    return bless { iter => TAP::Parser::Iterator->new($thing) }, $class;
 }
 
 sub next {

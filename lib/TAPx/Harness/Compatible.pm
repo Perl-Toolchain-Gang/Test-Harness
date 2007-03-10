@@ -1,11 +1,11 @@
-package TAPx::Harness::Compatible;
+package TAP::Harness::Compatible;
 
 require 5.00405;
 
-use TAPx::Harness;
-use TAPx::Parser::Aggregator;
+use TAP::Harness;
+use TAP::Parser::Aggregator;
 
-#use TAPx::Harness::Compatible::Straps;
+#use TAP::Harness::Compatible::Straps;
 use Exporter;
 use Benchmark;
 use Config;
@@ -32,7 +32,7 @@ BEGIN {
 
 =head1 NAME
 
-TAPx::Harness::Compatible - Run Perl standard test scripts with statistics
+TAP::Harness::Compatible - Run Perl standard test scripts with statistics
 
 =head1 VERSION
 
@@ -68,7 +68,7 @@ $VERSION = '0.51';
 # if ( $ENV{HARNESS_STRAPS_CLASS} ) {
 #     die 'Set HARNESS_STRAP_CLASS, singular, not HARNESS_STRAPS_CLASS';
 # }
-# my $HARNESS_STRAP_CLASS  = $ENV{HARNESS_STRAP_CLASS} || 'TAPx::Harness::Compatible::Straps';
+# my $HARNESS_STRAP_CLASS  = $ENV{HARNESS_STRAP_CLASS} || 'TAP::Harness::Compatible::Straps';
 # if ( $HARNESS_STRAP_CLASS =~ /\.pm$/ ) {
 #     # "Class" is actually a filename, that should return the
 #     # class name as its true return value.
@@ -85,8 +85,8 @@ $VERSION = '0.51';
 #     eval "require $HARNESS_STRAP_CLASS";
 #     die $@ if $@;
 # }
-# if ( !$HARNESS_STRAP_CLASS->isa('TAPx::Harness::Compatible::Straps') ) {
-#     die "HARNESS_STRAP_CLASS '$HARNESS_STRAP_CLASS' must be a TAPx::Harness::Compatible::Straps subclass";
+# if ( !$HARNESS_STRAP_CLASS->isa('TAP::Harness::Compatible::Straps') ) {
+#     die "HARNESS_STRAP_CLASS '$HARNESS_STRAP_CLASS' must be a TAP::Harness::Compatible::Straps subclass";
 # }
 #
 # $Strap = $HARNESS_STRAP_CLASS->new;
@@ -107,31 +107,31 @@ $Timer = $ENV{HARNESS_TIMER} || 0;
 
 =head1 SYNOPSIS
 
-  use TAPx::Harness::Compatible;
+  use TAP::Harness::Compatible;
 
   runtests(@test_files);
 
 =head1 DESCRIPTION
 
 B<STOP!> If all you want to do is write a test script, consider
-using Test::Simple.  TAPx::Harness::Compatible is the module that reads the
+using Test::Simple.  TAP::Harness::Compatible is the module that reads the
 output from Test::Simple, Test::More and other modules based on
-Test::Builder.  You don't need to know about TAPx::Harness::Compatible to use
+Test::Builder.  You don't need to know about TAP::Harness::Compatible to use
 those modules.
 
-TAPx::Harness::Compatible runs tests and expects output from the test in a
+TAP::Harness::Compatible runs tests and expects output from the test in a
 certain format.  That format is called TAP, the Test Anything
-Protocol.  It is defined in L<TAPx::Harness::Compatible::TAP>.
+Protocol.  It is defined in L<TAP::Harness::Compatible::TAP>.
 
-C<TAPx::Harness::Compatible::runtests(@tests)> runs all the testscripts named
+C<TAP::Harness::Compatible::runtests(@tests)> runs all the testscripts named
 as arguments and checks standard output for the expected strings
 in TAP format.
 
-The F<prove> utility is a thin wrapper around TAPx::Harness::Compatible.
+The F<prove> utility is a thin wrapper around TAP::Harness::Compatible.
 
 =head2 Taint mode
 
-TAPx::Harness::Compatible will honor the C<-T> or C<-t> in the #! line on your
+TAP::Harness::Compatible will honor the C<-T> or C<-t> in the #! line on your
 test files.  So if you begin a test with:
 
     #!perl -T
@@ -141,24 +141,24 @@ the test will be run with taint mode on.
 =head2 Configuration variables.
 
 These variables can be used to configure the behavior of
-TAPx::Harness::Compatible.  They are exported on request.
+TAP::Harness::Compatible.  They are exported on request.
 
 =over 4
 
-=item C<$TAPx::Harness::Compatible::Verbose>
+=item C<$TAP::Harness::Compatible::Verbose>
 
-The package variable C<$TAPx::Harness::Compatible::Verbose> is exportable and can be
+The package variable C<$TAP::Harness::Compatible::Verbose> is exportable and can be
 used to let C<runtests()> display the standard output of the script
 without altering the behavior otherwise.  The F<prove> utility's C<-v>
 flag will set this.
 
-=item C<$TAPx::Harness::Compatible::switches>
+=item C<$TAP::Harness::Compatible::switches>
 
-The package variable C<$TAPx::Harness::Compatible::switches> is exportable and can be
+The package variable C<$TAP::Harness::Compatible::switches> is exportable and can be
 used to set perl command line options used for running the test
 script(s). The default value is C<-w>. It overrides C<HARNESS_PERL_SWITCHES>.
 
-=item C<$TAPx::Harness::Compatible::Timer>
+=item C<$TAP::Harness::Compatible::Timer>
 
 If set to true, and C<Time::HiRes> is available, print elapsed seconds
 after each test file.
@@ -239,7 +239,7 @@ sub runtests {
     my @tests = @_;
 
     my $harness   = _new_harness();
-    my $aggregate = TAPx::Parser::Aggregator->new();
+    my $aggregate = TAP::Parser::Aggregator->new();
 
     my $results = $harness->aggregate_tests( $aggregate, @tests );
 
@@ -278,7 +278,7 @@ sub _new_harness {
         directives => $Directives,
     };
 
-    return TAPx::Harness->new($args);
+    return TAP::Harness->new($args);
 }
 
 sub _check_sequence {
@@ -298,7 +298,7 @@ sub execute_tests {
     # TODO: Handle out option
 
     my $harness   = _new_harness();
-    my $aggregate = TAPx::Parser::Aggregator->new();
+    my $aggregate = TAP::Parser::Aggregator->new();
 
     my %tot = (
         bonus       => 0,
@@ -451,7 +451,7 @@ __END__
 
 =head1 EXPORT
 
-C<&runtests> is exported by TAPx::Harness::Compatible by default.
+C<&runtests> is exported by TAP::Harness::Compatible by default.
 
 C<&execute_tests>, C<$verbose>, C<$switches> and C<$debug> are
 exported upon request.
@@ -491,7 +491,7 @@ the script dies with this message.
 
 =head1 ENVIRONMENT VARIABLES THAT TEST::HARNESS SETS
 
-TAPx::Harness::Compatible sets these before executing the individual tests.
+TAP::Harness::Compatible sets these before executing the individual tests.
 
 =over 4
 
@@ -502,7 +502,7 @@ are being executed through the harness or by any other means.
 
 =item C<HARNESS_VERSION>
 
-This is the version of TAPx::Harness::Compatible.
+This is the version of TAP::Harness::Compatible.
 
 =back
 
@@ -527,9 +527,9 @@ directory!
 
 =item C<HARNESS_DEBUG>
 
-If true, TAPx::Harness::Compatible will print debugging information about itself as
+If true, TAP::Harness::Compatible will print debugging information about itself as
 it runs the tests.  This is different from C<HARNESS_VERBOSE>, which prints
-the output from the test being run.  Setting C<$TAPx::Harness::Compatible::Debug> will
+the output from the test being run.  Setting C<$TAP::Harness::Compatible::Debug> will
 override this, or you can use the C<-d> switch in the F<prove> utility.
 
 =item C<HARNESS_FILELEAK_IN_DIR>
@@ -573,17 +573,17 @@ switch.
 
 =item C<HARNESS_VERBOSE>
 
-If true, TAPx::Harness::Compatible will output the verbose results of running
-its tests.  Setting C<$TAPx::Harness::Compatible::verbose> will override this,
+If true, TAP::Harness::Compatible will output the verbose results of running
+its tests.  Setting C<$TAP::Harness::Compatible::verbose> will override this,
 or you can use the C<-v> switch in the F<prove> utility.
 
-If true, TAPx::Harness::Compatible will output the verbose results of running
-its tests.  Setting C<$TAPx::Harness::Compatible::verbose> will override this,
+If true, TAP::Harness::Compatible will output the verbose results of running
+its tests.  Setting C<$TAP::Harness::Compatible::verbose> will override this,
 or you can use the C<-v> switch in the F<prove> utility.
 
 =item C<HARNESS_STRAP_CLASS>
 
-Defines the TAPx::Harness::Compatible::Straps subclass to use.  The value may either
+Defines the TAP::Harness::Compatible::Straps subclass to use.  The value may either
 be a filename or a class name.
 
 If HARNESS_STRAP_CLASS is a class name, the class must be in C<@INC>
@@ -596,10 +596,10 @@ of the class, instead of the canonical "1".
 
 =head1 EXAMPLE
 
-Here's how TAPx::Harness::Compatible tests itself
+Here's how TAP::Harness::Compatible tests itself
 
   $ cd ~/src/devel/Test-Harness
-  $ perl -Mblib -e 'use TAPx::Harness::Compatible qw(&runtests $verbose);
+  $ perl -Mblib -e 'use TAP::Harness::Compatible qw(&runtests $verbose);
     $verbose=0; runtests @ARGV;' t/*.t
   Using /home/schwern/src/devel/Test-Harness/blib
   t/base..............ok
@@ -621,7 +621,7 @@ analysis.
 Provide a way of running tests quietly (ie. no printing) for automated
 validation of tests.  This will probably take the form of a version
 of runtests() which rather than printing its output returns raw data
-on the state of the tests.  (Partially done in TAPx::Harness::Compatible::Straps)
+on the state of the tests.  (Partially done in TAP::Harness::Compatible::Straps)
 
 Document the format.
 
@@ -670,7 +670,7 @@ your bug as I make changes.
 
 You can find documentation for this module with the F<perldoc> command.
 
-    perldoc TAPx::Harness::Compatible
+    perldoc TAP::Harness::Compatible
 
 You can get docs for F<prove> with
 
@@ -700,7 +700,7 @@ L<http://search.cpan.org/dist/Test-Harness>
 
 =head1 SOURCE CODE
 
-The source code repository for TAPx::Harness::Compatible is at
+The source code repository for TAP::Harness::Compatible is at
 L<http://svn.perl.org/modules/Test-Harness>.
 
 =head1 AUTHORS

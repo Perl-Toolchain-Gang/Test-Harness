@@ -1,5 +1,5 @@
 # -*- Mode: cperl; cperl-indent-level: 4 -*-
-package TAPx::Harness::Compatible::Point;
+package TAP::Harness::Compatible::Point;
 
 use strict;
 use vars qw($VERSION);
@@ -7,17 +7,17 @@ $VERSION = '0.51';
 
 =head1 NAME
 
-TAPx::Harness::Compatible::Point - object for tracking a single test point
+TAP::Harness::Compatible::Point - object for tracking a single test point
 
 =head1 SYNOPSIS
 
-One TAPx::Harness::Compatible::Point object represents a single test point.
+One TAP::Harness::Compatible::Point object represents a single test point.
 
 =head1 CONSTRUCTION
 
 =head2 new()
 
-    my $point = new TAPx::Harness::Compatible::Point;
+    my $point = new TAP::Harness::Compatible::Point;
 
 Create a test point object.
 

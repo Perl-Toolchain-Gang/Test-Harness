@@ -1,4 +1,4 @@
-package TAPx::Harness::Compatible::Util;
+package TAP::Harness::Compatible::Util;
 
 use strict;
 use vars qw($VERSION);
@@ -14,11 +14,11 @@ use vars qw( @ISA @EXPORT @EXPORT_OK );
 
 =head1 NAME
 
-TAPx::Harness::Compatible::Util - Utility functions for TAPx::Harness::Compatible::*
+TAP::Harness::Compatible::Util - Utility functions for TAP::Harness::Compatible::*
 
 =head1 SYNOPSIS
 
-Utility functions for TAPx::Harness::Compatible::*
+Utility functions for TAP::Harness::Compatible::*
 
 =head1 PUBLIC FUNCTIONS
 

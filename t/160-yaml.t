@@ -11,7 +11,7 @@ BEGIN {
 
 use lib catdir( 't', 'lib' );
 use Test::More tests => 221;
-use TAPx::Parser::YAML;
+use TAP::Parser::YAML;
 
 # Do we have the authorative YAML to test against
 eval { require YAML; };
@@ -26,7 +26,7 @@ $SIG{__DIE__} = sub {
     Carp::confess(@_);
 };
 my $sample_yaml = catfile(qw< t data sample.yml >);
-ok my $data = TAPx::Parser::YAML->read($sample_yaml),
+ok my $data = TAP::Parser::YAML->read($sample_yaml),
   'Reading YAML should succeed';
 my $expected = [
     {   'bill-to' => {
@@ -66,7 +66,7 @@ is_deeply [@$data], $expected, '... and we should be able to read YAML';
 
 my $out_yaml = catfile(qw< t data out.yml >);
 ok $data->write($out_yaml), '... and writing the data should succeed';
-ok my $data2 = TAPx::Parser::YAML->read($out_yaml),
+ok my $data2 = TAP::Parser::YAML->read($out_yaml),
   '... and we shoudl be able to read the new yaml';
 is_deeply $data, $data2, '... and it should be unchanged';
 
@@ -279,19 +279,19 @@ sub yaml_ok {
     my $string = shift;
     my $object = shift;
     my $name   = shift || 'unnamed';
-    bless $object, 'TAPx::Parser::YAML';
+    bless $object, 'TAP::Parser::YAML';
     my %options = (@_);
 
     # If YAML itself is available, test with it first
     # Does the string parse to the structure
-    my $yaml = eval { TAPx::Parser::YAML->read_string($string); };
-    is( $@, '', "$name: TAPx::Parser::YAML parses without error" );
+    my $yaml = eval { TAP::Parser::YAML->read_string($string); };
+    is( $@, '', "$name: TAP::Parser::YAML parses without error" );
     SKIP: {
         skip( "Shortcutting after failure", 2 ) if $@;
-        isa_ok( $yaml, 'TAPx::Parser::YAML' );
+        isa_ok( $yaml, 'TAP::Parser::YAML' );
         is_deeply(
             $yaml, $object,
-            "$name: TAPx::Parser::YAML parses correctly"
+            "$name: TAP::Parser::YAML parses correctly"
         );
     }
 
@@ -300,21 +300,21 @@ sub yaml_ok {
     # whitespace or comments would be lost.
     # So instead we parse back in.
     my $output = eval { $object->write_string };
-    is( $@, '', "$name: TAPx::Parser::YAML serializes without error" );
+    is( $@, '', "$name: TAP::Parser::YAML serializes without error" );
     SKIP: {
         skip( "Shortcutting after failure", 4 ) if $@;
         ok( !!( defined $output and !ref $output ),
-            "$name: TAPx::Parser::YAML serializes correctly",
+            "$name: TAP::Parser::YAML serializes correctly",
         );
-        my $roundtrip = eval { TAPx::Parser::YAML->read_string($output) };
+        my $roundtrip = eval { TAP::Parser::YAML->read_string($output) };
         is( $@, '',
-            "$name: TAPx::Parser::YAML round-trips without error"
+            "$name: TAP::Parser::YAML round-trips without error"
         );
         skip( "Shortcutting after failure", 2 ) if $@;
-        isa_ok( $roundtrip, 'TAPx::Parser::YAML' );
+        isa_ok( $roundtrip, 'TAP::Parser::YAML' );
         is_deeply(
             $roundtrip, $object,
-            "$name: TAPx::Parser::YAML round-trips correctly"
+            "$name: TAP::Parser::YAML round-trips correctly"
         );
     }
 

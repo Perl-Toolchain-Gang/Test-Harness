@@ -1,4 +1,4 @@
-package TAPx::Parser::YAML;
+package TAP::Parser::YAML;
 
 use 5.005;
 use strict;
@@ -22,12 +22,12 @@ my %ERROR = (
 );
 
 my %NO = (
-    '%' => 'TAPx::Parser::YAML does not support directives',
-    '&' => 'TAPx::Parser::YAML does not support anchors',
-    '*' => 'TAPx::Parser::YAML does not support aliases',
-    '?' => 'TAPx::Parser::YAML does not support explicit mapping keys',
-    ':' => 'TAPx::Parser::YAML does not support explicit mapping values',
-    '!' => 'TAPx::Parser::YAML does not support explicit tags',
+    '%' => 'TAP::Parser::YAML does not support directives',
+    '&' => 'TAP::Parser::YAML does not support anchors',
+    '*' => 'TAP::Parser::YAML does not support aliases',
+    '?' => 'TAP::Parser::YAML does not support explicit mapping keys',
+    ':' => 'TAP::Parser::YAML does not support explicit mapping values',
+    '!' => 'TAP::Parser::YAML does not support explicit tags',
 );
 
 my $ESCAPE_CHAR = '[\\x00-\\x08\\x0b-\\x0d\\x0e-\\x1f\"\n]';
@@ -46,7 +46,7 @@ my %UNESCAPES = (
     r => "\x0d", e => "\x1b", '\\' => '\\',
 );
 
-# Create an empty TAPx::Parser::YAML object
+# Create an empty TAP::Parser::YAML object
 sub new {
     my $class = shift;
     bless [@_], $class;
@@ -161,7 +161,7 @@ sub _read_scalar {
     if ( $string =~ /^['"]/ ) {
 
         # A quote with folding... we don't support that
-        die "TAPx::Parser::YAML does not support multi-line quoted scalars";
+        die "TAP::Parser::YAML does not support multi-line quoted scalars";
     }
     unless ( $string eq '>' or $string eq '|' ) {
 
@@ -466,7 +466,7 @@ __END__
 
 =head1 NAME
 
-TAPx::Parser::YAML - Read/Write YAML files with as little code as possible
+TAP::Parser::YAML - Read/Write YAML files with as little code as possible
 
 =head1 VERSION
 
@@ -490,13 +490,13 @@ Version 0.51
     #############################################
     # In your program
     
-    use TAPx::Parser::YAML;
+    use TAP::Parser::YAML;
     
     # Create a YAML file
-    my $yaml = TAPx::Parser::YAML->new;
+    my $yaml = TAP::Parser::YAML->new;
     
     # Open the config
-    $yaml = TAPx::Parser::YAML->read( 'file.yml' );
+    $yaml = TAP::Parser::YAML->read( 'file.yml' );
     
     # Reading properties
     my $root = $yaml->[0]->{rootproperty};
@@ -519,7 +519,7 @@ Version 0.51
 Note that this code is lifted directly from L<YAML::Tiny> and used with
 the permission of Adam Kennedy.
 
-B<TAPx::Parser::YAML> is a perl class to read and write YAML-style files with as
+B<TAP::Parser::YAML> is a perl class to read and write YAML-style files with as
 little code as possible, reducing load time and memory overhead.
 
 Most of the time it is accepted that Perl applications use a lot
@@ -532,7 +532,7 @@ and generating very simple human-readable files. Note that I said
 B<human-readable> and not B<geek-readable>. The sort of files that your
 average manager or secretary should be able to look at and make sense of.
 
-L<TAPx::Parser::YAML> does not generate comments, it won't necesarily preserve the
+L<TAP::Parser::YAML> does not generate comments, it won't necesarily preserve the
 order of your hashes, and it will normalise if reading in and writing out
 again.
 
@@ -543,13 +543,13 @@ easily-embeddable module would be highly useful.
 
 Features will only be added if they are human readable, and can be written
 in a few lines of code. Please don't be offended if your request is
-refused. Someone has to draw the line, and for TAPx::Parser::YAML that someone is me.
+refused. Someone has to draw the line, and for TAP::Parser::YAML that someone is me.
 
 If you need something with more power move up to L<YAML> (4 megabytes of
 memory overhead) or L<YAML::Syck> (275k, but requires libsyck and a C
 compiler).
 
-To restate, L<TAPx::Parser::YAML> does B<not> preserve your comments, whitespace, or
+To restate, L<TAP::Parser::YAML> does B<not> preserve your comments, whitespace, or
 the order of your YAML data. But it should round-trip from Perl structure
 to file and back again just fine.
 
@@ -557,17 +557,17 @@ to file and back again just fine.
 
 =head2 new
 
-The constructor C<new> creates and returns an empty C<TAPx::Parser::YAML> object.
+The constructor C<new> creates and returns an empty C<TAP::Parser::YAML> object.
 
 =head2 read $filename
 
 The C<read> constructor reads a YAML file, and returns a new
-C<TAPx::Parser::YAML> object containing the contents of the file. 
+C<TAP::Parser::YAML> object containing the contents of the file. 
 
 Returns the object on success, or C<undef> on error.
 
-When C<read> fails, C<TAPx::Parser::YAML> sets an error message internally
-you can recover via C<TAPx::Parser::YAML-E<gt>errstr>. Although in B<some>
+When C<read> fails, C<TAP::Parser::YAML> sets an error message internally
+you can recover via C<TAP::Parser::YAML-E<gt>errstr>. Although in B<some>
 cases a failed C<read> will also set the operating system error
 variable C<$!>, not all errors do and you should not rely on using
 the C<$!> variable.
@@ -575,7 +575,7 @@ the C<$!> variable.
 =head2 read_string $string;
 
 The C<read_string> method takes as argument the contents of a YAML file
-(a YAML document) as a string and returns the C<TAPx::Parser::YAML> object for
+(a YAML document) as a string and returns the C<TAP::Parser::YAML> object for
 it.
 
 =head2 write $filename
@@ -592,7 +592,7 @@ Generates the file content for the object and returns it as a string.
 =head2 errstr
 
 When an error occurs, you can retrieve the error message either from the
-C<$TAPx::Parser::YAML::errstr> variable, or using the C<errstr()> method.
+C<$TAP::Parser::YAML::errstr> variable, or using the C<errstr()> method.
 
 =head1 SUPPORT
 

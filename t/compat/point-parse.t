@@ -15,12 +15,12 @@ use strict;
 use Test::More tests => 52;
 
 BEGIN {
-    use_ok('TAPx::Harness::Compatible::Point');
-    use_ok('TAPx::Harness::Compatible::Straps');
+    use_ok('TAP::Harness::Compatible::Point');
+    use_ok('TAP::Harness::Compatible::Straps');
 }
 
-my $strap = TAPx::Harness::Compatible::Straps->new;
-isa_ok( $strap, 'TAPx::Harness::Compatible::Straps', 'new()' );
+my $strap = TAP::Harness::Compatible::Straps->new;
+isa_ok( $strap, 'TAP::Harness::Compatible::Straps', 'new()' );
 
 my $testlines = {
     'not ok'        => { ok => 0 },
@@ -91,8 +91,8 @@ my @untests = (
 );
 
 for my $line ( sort keys %$testlines ) {
-    my $point = TAPx::Harness::Compatible::Point->from_test_line($line);
-    isa_ok( $point, 'TAPx::Harness::Compatible::Point' );
+    my $point = TAP::Harness::Compatible::Point->from_test_line($line);
+    isa_ok( $point, 'TAP::Harness::Compatible::Point' );
 
     my $fields = $testlines->{$line};
     for my $property ( sort keys %$fields ) {

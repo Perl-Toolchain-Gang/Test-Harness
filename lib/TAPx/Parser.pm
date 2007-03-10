@@ -1,20 +1,20 @@
-package TAPx::Parser;
+package TAP::Parser;
 
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAPx::Base;
-use TAPx::Parser::Grammar;
-use TAPx::Parser::Result;
-use TAPx::Parser::Source;
-use TAPx::Parser::Source::Perl;
-use TAPx::Parser::Iterator;
+use TAP::Base;
+use TAP::Parser::Grammar;
+use TAP::Parser::Result;
+use TAP::Parser::Source;
+use TAP::Parser::Source::Perl;
+use TAP::Parser::Iterator;
 
-@ISA = qw(TAPx::Base);
+@ISA = qw(TAP::Base);
 
 =head1 NAME
 
-TAPx::Parser - Parse L<TAP|Test::Harness::TAP> output
+TAP::Parser - Parse L<TAP|Test::Harness::TAP> output
 
 =head1 VERSION
 
@@ -57,7 +57,7 @@ BEGIN {
             *$method = sub {
                 my $self = shift;
                 return $self->{$method} unless @_;
-                unless ( ( ref $self ) =~ /^TAPx::Parser/ )
+                unless ( ( ref $self ) =~ /^TAP::Parser/ )
                 {    # trusted methods
                     $self->_croak("$method() may not be set externally");
                 }
@@ -89,9 +89,9 @@ sub good_plan {
 
 =head1 SYNOPSIS
 
-    use TAPx::Parser;
+    use TAP::Parser;
 
-    my $parser = TAPx::Parser->new( { source => $source } );
+    my $parser = TAP::Parser->new( { source => $source } );
     
     while ( my $result = $parser->next ) {
         print $result->as_string;
@@ -99,7 +99,7 @@ sub good_plan {
 
 =head1 DESCRIPTION
 
-C<TAPx::Parser> is designed to produce a proper parse of TAP output.  It is
+C<TAP::Parser> is designed to produce a proper parse of TAP output.  It is
 ALPHA code and should be treated as such.  The interface is now solid, but it
 is still subject to change.
 
@@ -112,9 +112,9 @@ harnesses C<examples/>.
 
 =head3 C<new>
 
- my $parser = TAPx::Parser->new(\%args);
+ my $parser = TAP::Parser->new(\%args);
 
-Returns a new C<TAPx::Parser> object.
+Returns a new C<TAP::Parser> object.
 
 The arguments should be a hashref with I<one> of the following keys:
 
@@ -129,7 +129,7 @@ If the source contains a newline, it's assumed to be a string of raw TAP
 output.
 
 If the source is a reference, it's assumed to be something to pass to the
-C<TAPx::Parser::Iterator> constructor.  This is used internally and you should
+C<TAP::Parser::Iterator> constructor.  This is used internally and you should
 not use it.
 
 Otherwise, the parser does a C<-e> check to see if the source exists.  If so,
@@ -137,7 +137,7 @@ it attempts to execute the source and read the output as a stream.  This is by
 far the preferred method of using the parser.
 
  foreach my $file ( @test_files ) {
-     my $parser = TAPx::Parser->new( { source => $file } );
+     my $parser = TAP::Parser->new( { source => $file } );
      # do stuff with the parser
  }
 
@@ -148,7 +148,7 @@ The value should be the complete TAP output.
 =item * C<exec>
 
 If passed an array reference, will attempt to create the iterator by passing a
-C<TAPx::Parser::Source> object to C<TAPx::Parser::Iterator>, using the array
+C<TAP::Parser::Source> object to C<TAP::Parser::Iterator>, using the array
 reference strings as the command arguments to C<&IPC::Open3::open3>:
 
  exec => [ '/usr/bin/ruby', 't/my_test.rb' ]
@@ -174,9 +174,9 @@ with the result as the argument if the C<run> method is used:
      unknown => \&unknown_callback,
  );
  
- my $aggregator = TAPx::Parser::Aggregator->new;
+ my $aggregator = TAP::Parser::Aggregator->new;
  foreach my $file ( @test_files ) {
-     my $parser = TAPx::Parser->new(
+     my $parser = TAP::Parser->new(
          {
              source    => $file,
              callbacks => \%callbacks,
@@ -191,7 +191,7 @@ with the result as the argument if the C<run> method is used:
 If using a Perl file as a source, optional switches may be passed which will
 be used when invoking the perl executable.
 
- my $parser = TAPx::Parser->new( {
+ my $parser = TAP::Parser->new( {
      source   => $test_file,
      switches => '-Ilib',
  } );
@@ -204,7 +204,7 @@ If passed a filehandle will write a copy of all parsed TAP to that handle.
 
 =cut
 
-# new implementation supplied by TAPx::Base
+# new implementation supplied by TAP::Base
 
 ##############################################################################
 
@@ -212,7 +212,7 @@ If passed a filehandle will write a copy of all parsed TAP to that handle.
 
 =head3 C<next>
 
-  my $parser = TAPx::Parser->new( { source => $file } );
+  my $parser = TAP::Parser->new( { source => $file } );
   while ( my $result = $parser->next ) {
       print $result->as_string, "\n";
   }
@@ -222,7 +222,7 @@ that it is destructive.  You can't rewind and examine previous results.
 
 If callbacks are used, they will be issued before this call returns.
 
-Each result returned is a subclass of C<TAPx::Parser::Result>.  See that
+Each result returned is a subclass of C<TAP::Parser::Result>.  See that
 module and related classes for more information on how to use them.
 
 =cut
@@ -367,10 +367,10 @@ sub run {
                 '"source" and "exec" are mutually exclusive options');
         }
         if ($tap) {
-            $stream = TAPx::Parser::Iterator->new( [ split "\n" => $tap ] );
+            $stream = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
-            my $source = TAPx::Parser::Source->new;
+            my $source = TAP::Parser::Source->new;
             $source->source($exec);
             $stream = $source->get_stream;
             if ( defined $stream ) {
@@ -384,11 +384,11 @@ sub run {
         }
         elsif ($source) {
             if ( ref $source ) {
-                $stream = TAPx::Parser::Iterator->new($source);
+                $stream = TAP::Parser::Iterator->new($source);
             }
             elsif ( -e $source ) {
 
-                my $perl = TAPx::Parser::Source::Perl->new;
+                my $perl = TAP::Parser::Source::Perl->new;
                 $perl->switches( $arg_for->{switches} )
                   if $arg_for->{switches};
 
@@ -414,7 +414,7 @@ sub run {
         $self->_stream($stream);
         $self->_start_tap(undef);
         $self->_end_tap(undef);
-        $self->_grammar( TAPx::Parser::Grammar->new($self) )
+        $self->_grammar( TAP::Parser::Grammar->new($self) )
           ;    # eventually pass a version
         $self->_spool($spool);
 
@@ -434,7 +434,7 @@ If you've read this far in the docs, you've seen this:
         print $result->as_string;
     }
 
-Each result returned is a C<TAPx::Parser::Result> subclass, referred to as
+Each result returned is a C<TAP::Parser::Result> subclass, referred to as
 I<result types>.
 
 =head2 Result types
@@ -520,7 +520,7 @@ Reports whether or not a given result has passed.  Anything which is B<not> a
 test result returns true.  This is merely provided as a convenient shortcut
 which allows you to do this:
 
- my $parser = TAPx::Parser->new( { source => $source } );
+ my $parser = TAP::Parser->new( { source => $source } );
  while ( my $result = $parser->next ) {
      # only print failing results
      print $result->as_string unless $result->is_ok;
@@ -673,7 +673,7 @@ and will issue a warning.
 If a test number is greater than the number of planned tests, this method will
 return true.  Unplanned tests will I<always> return false for C<is_ok>,
 regardless of whether or not the test C<has_todo> (see
-L<TAPx::Parser::Result::Test> for more information about this).
+L<TAP::Parser::Result::Test> for more information about this).
 
 =head3 C<has_skip>
 
@@ -1109,7 +1109,7 @@ sub _finish {
 =head2 CALLBACKS
 
 As mentioned earlier, a "callback" key may be added may be added to the
-C<TAPx::Parser> constructor.  If present, each callback corresponding to a
+C<TAP::Parser> constructor.  If present, each callback corresponding to a
 given result type will be called with the result as the argument if the C<run>
 method is used.  The callback is expected to be a subroutine reference (or
 anonymous subroutine) which is invoked with the parser result as its argument.
@@ -1122,9 +1122,9 @@ anonymous subroutine) which is invoked with the parser result as its argument.
      unknown => \&unknown_callback,
  );
  
- my $aggregator = TAPx::Parser::Aggregator->new;
+ my $aggregator = TAP::Parser::Aggregator->new;
  foreach my $file ( @test_files ) {
-     my $parser = TAPx::Parser->new(
+     my $parser = TAP::Parser->new(
          {
              source    => $file,
              callbacks => \%callbacks,
@@ -1213,7 +1213,7 @@ See C<examples/tprove_color> for an example of this.
 
 =head1 TAP GRAMMAR
 
-If you're looking for an EBNF grammar, see L<TAPx::Parser::Grammar>.
+If you're looking for an EBNF grammar, see L<TAP::Parser::Grammar>.
 
 =head1 BACKWARDS COMPATABILITY
 
@@ -1254,7 +1254,7 @@ It rarely happens, but sometimes a harness might encounter 'missing tests:
  ok 17
 
 L<Test::Harness> would report tests 3-14 as having failed.  For the
-C<TAPx::Parser>, these tests are not considered failed because they've never
+C<TAP::Parser>, these tests are not considered failed because they've never
 run.  They're reported as parse failures (tests out of sequence).
 
 =back
@@ -1313,7 +1313,7 @@ Andy Armstong, C<< <andy@hexten.net> >>
 
 Please report any bugs or feature requests to
 C<bug-tapx-parser@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TAPx-Parser>.
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TAP-Parser>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 

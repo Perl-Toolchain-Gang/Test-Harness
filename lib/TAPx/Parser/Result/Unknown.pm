@@ -1,16 +1,16 @@
-package TAPx::Parser::Result::Unknown;
+package TAP::Parser::Result::Unknown;
 
 use strict;
 
 use vars qw($VERSION @ISA);
-use TAPx::Parser::Result;
-@ISA = 'TAPx::Parser::Result';
+use TAP::Parser::Result;
+@ISA = 'TAP::Parser::Result';
 
 use vars qw($VERSION);
 
 =head1 NAME
 
-TAPx::Parser::Result::Unknown - Unknown result token.
+TAP::Parser::Result::Unknown - Unknown result token.
 
 =head1 VERSION
 
@@ -22,7 +22,7 @@ $VERSION = '0.51';
 
 =head1 DESCRIPTION
 
-This is a subclass of C<TAPx::Parser::Result>.  A token of this class will be
+This is a subclass of C<TAP::Parser::Result>.  A token of this class will be
 returned if the parser does not recognize the token line.  For example:
 
  1..5

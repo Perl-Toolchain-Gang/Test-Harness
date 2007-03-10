@@ -492,9 +492,9 @@ plan skip_all => 'Harness compatibility not implemented yet';
 
 #plan tests => (keys(%samples) * $tests_per_loop);
 
-use TAPx::Harness::Compatible;
+use TAP::Harness::Compatible;
 my @_INC = map {qq{"-I$_"}} @INC;
-$TAPx::Harness::Compatible::Switches = "@_INC -Mstrict";
+$TAP::Harness::Compatible::Switches = "@_INC -Mstrict";
 
 tie *NULL, 'Dev::Null' or die $!;
 
@@ -515,7 +515,7 @@ for my $test ( sort keys %samples ) {
         eval {
             local $SIG{__WARN__} = sub { $warning .= join '', @_; };
             ( $totals, $failed )
-              = TAPx::Harness::Compatible::execute_tests(
+              = TAP::Harness::Compatible::execute_tests(
                 tests => [$test_path], out => \*NULL );
         };
 
@@ -530,7 +530,7 @@ for my $test ( sort keys %samples ) {
         SKIP: {
             skip "don't apply to a bailout", 6 if $test eq 'bailout';
             is( $@, '', '$@ is empty' );
-            is( TAPx::Harness::Compatible::_all_ok($totals),
+            is( TAP::Harness::Compatible::_all_ok($totals),
                 $expect->{all_ok},
                 "$test - all ok"
             );
@@ -551,7 +551,7 @@ for my $test ( sort keys %samples ) {
             skip "No tests were run", 1 unless $totals->{max};
 
             my $output
-              = TAPx::Harness::Compatible::get_results( $totals, $failed );
+              = TAP::Harness::Compatible::get_results( $totals, $failed );
             like(
                 $output, '/All tests successful|List of Failed/',
                 'Got what looks like a valid summary'

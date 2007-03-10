@@ -5,7 +5,7 @@ use strict;
 use lib 'lib';
 
 use Test::More tests => 144;
-use TAPx::Parser::Source;
+use TAP::Parser::Source;
 use File::Spec;
 
 my $test = File::Spec->catfile( 't', 'source_tests', 'varsource' );
@@ -35,7 +35,7 @@ ok !xnor( 1, undef ), 'xnor 1, undef';
 for ( my $lines = 0; $lines < 5; $lines += 0.5 ) {
 
     # warn "$lines lines\n";
-    ok my $source = TAPx::Parser::Source->new, 'new source made ok';
+    ok my $source = TAP::Parser::Source->new, 'new source made ok';
     ok $source->source( [ $perl, '-T', $test, $lines ] );
     ok my $stream = $source->get_stream, 'get_stream works';
 

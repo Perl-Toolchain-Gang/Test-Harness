@@ -16,30 +16,30 @@ END {
     my @warnings;
     local $^O = 'MSWin32';
     $SIG{__WARN__} = sub { @warnings = shift };
-    delete $INC{'TAPx/Harness/Color.pm'};
-    use_ok 'TAPx::Harness::Color';
-    ok my $harness = TAPx::Harness::Color->new,
+    delete $INC{'TAP/Harness/Color.pm'};
+    use_ok 'TAP::Harness::Color';
+    ok my $harness = TAP::Harness::Color->new,
       '... and loading it on windows should succeed';
-    isa_ok $harness, 'TAPx::Harness', '... but the object it returns';
+    isa_ok $harness, 'TAP::Harness', '... but the object it returns';
 
     ok grep( {qr/^Color test output disabled on Windows/} @warnings ),
-      'Using TAPx::Harness::Color on Windows should disable colored output';
+      'Using TAP::Harness::Color on Windows should disable colored output';
 
 }
 
-use TAPx::Harness;
-use TAPx::Harness::Color;
+use TAP::Harness;
+use TAP::Harness::Color;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
 ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
-foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
+foreach my $HARNESS (qw<TAP::Harness TAP::Harness::Color>) {
 #foreach my $HARNESS ( () ) {   # XXX
     can_ok $HARNESS, 'new';
 
     eval { $HARNESS->new( { no_such_key => 1 } ) };
-    like $@, qr/\QUnknown arguments to TAPx::Harness::new (no_such_key)/,
+    like $@, qr/\QUnknown arguments to TAP::Harness::new (no_such_key)/,
       '... and calling it with bad keys should fail';
 
     eval { $HARNESS->new( { lib => 'aint_no_such_lib' } ) };
@@ -88,8 +88,8 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
 {
     my @output;
     local $^W;
-    local *TAPx::Harness::_should_show_count = sub {0};
-    local *TAPx::Harness::output = sub {
+    local *TAP::Harness::_should_show_count = sub {0};
+    local *TAP::Harness::output = sub {
         my $self = shift;
         push @output => grep { $_ ne '' }
           map {
@@ -98,10 +98,10 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
             trim($_)
           } @_;
     };
-    my $harness            = TAPx::Harness->new( { verbose      => 1 } );
-    my $harness_whisper    = TAPx::Harness->new( { quiet        => 1 } );
-    my $harness_mute       = TAPx::Harness->new( { really_quiet => 1 } );
-    my $harness_directives = TAPx::Harness->new( { directives   => 1 } );
+    my $harness            = TAP::Harness->new( { verbose      => 1 } );
+    my $harness_whisper    = TAP::Harness->new( { quiet        => 1 } );
+    my $harness_mute       = TAP::Harness->new( { really_quiet => 1 } );
+    my $harness_directives = TAP::Harness->new( { directives   => 1 } );
     can_ok $harness, 'runtests';
 
     # normal tests in verbose mode
@@ -290,14 +290,14 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
       '... and the badtap summary should also be correct';
 
     cmp_ok( $callback_count, '==', 1, 'callback called once' );
-    isa_ok $parser, 'TAPx::Parser';
+    isa_ok $parser, 'TAP::Parser';
 }
 
 {
     my @output;
     local $^W;
-    local *TAPx::Harness::_should_show_count = sub {0};
-    local *TAPx::Harness::output = sub {
+    local *TAP::Harness::_should_show_count = sub {0};
+    local *TAP::Harness::output = sub {
         my $self = shift;
         push @output => grep { $_ ne '' }
           map {
@@ -306,7 +306,7 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
             trim($_)
           } @_;
     };
-    my $harness = TAPx::Harness->new(
+    my $harness = TAP::Harness->new(
         {   verbose => 1,
             exec    => [$^X]
         }
@@ -325,7 +325,7 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
 {
 
     # make sure execrc parsing is solid (internals test)
-    my $harness = TAPx::Harness->new;
+    my $harness = TAP::Harness->new;
     ok !$harness->exec, 'exec() should not be set when the harness is new';
     my %execrc = %{ $harness->_execrc };
     is_deeply \%execrc, { exact => {}, regex => {} },

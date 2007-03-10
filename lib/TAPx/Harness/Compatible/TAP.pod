@@ -1,13 +1,13 @@
 
 =head1 NAME
 
-TAPx::Harness::Compatible::TAP - Documentation for the TAP format
+TAP::Harness::Compatible::TAP - Documentation for the TAP format
 
 =head1 SYNOPSIS
 
 TAP, the Test Anything Protocol, is Perl's simple text-based interface
 between testing modules such as Test::More and the test harness
-TAPx::Harness::Compatible.
+TAP::Harness::Compatible.
 
 =head1 TODO
 
@@ -37,7 +37,7 @@ For example, a test file's output might look like:
 
 In this document, the "harness" is any program analyzing TAP output.
 Typically this will be Perl's I<prove> program, or the underlying
-C<TAPx::Harness::Compatible::runtests> subroutine.
+C<TAP::Harness::Compatible::runtests> subroutine.
 
 A harness must only read TAP output from standard output and not
 from standard error.  Lines written to standard output matching
@@ -101,7 +101,7 @@ the following test output
     ok
     ok
 
-has five tests.  The sixth is missing.  TAPx::Harness::Compatible will generate
+has five tests.  The sixth is missing.  TAP::Harness::Compatible will generate
 
     FAILED tests 1, 3, 6
     Failed 3/6 tests, 50.00% okay
@@ -216,7 +216,7 @@ running, or to delineate a group of tests.
 
 Any output line that is not a plan, a test line or a diagnostic is
 incorrect.  How a harness handles the incorrect line is undefined.
-TAPx::Harness::Compatible silently ignores incorrect lines, but will become more
+TAP::Harness::Compatible silently ignores incorrect lines, but will become more
 stringent in the future.
 
 =head1 EXAMPLES
@@ -340,7 +340,7 @@ diagnostic form. Finally, the test count is reported at the end.
 
 In Perl, we use Test::Simple and Test::More to generate TAP output.
 Other languages have solutions that generate TAP, so that they can take
-advantage of TAPx::Harness::Compatible.
+advantage of TAP::Harness::Compatible.
 
 The following sections are provided by their maintainers, and may not
 be up-to-date.
@@ -464,7 +464,7 @@ test-more.php
 
 =head1 AUTHORS
 
-Andy Lester, based on the original TAPx::Harness::Compatible documentation by Michael Schwern.
+Andy Lester, based on the original TAP::Harness::Compatible documentation by Michael Schwern.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -477,7 +477,7 @@ for help and contributions on this document.
 
 The basis for the TAP format was created by Larry Wall in the
 original test script for Perl 1.  Tim Bunce and Andreas Koenig
-developed it further with their modifications to TAPx::Harness::Compatible.
+developed it further with their modifications to TAP::Harness::Compatible.
 
 =head1 COPYRIGHT
 

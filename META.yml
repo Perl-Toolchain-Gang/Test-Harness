@@ -1,5 +1,5 @@
 ---
-name: TAPx-Parser
+name: TAP-Parser
 version: 0.50_07
 author:
   - 'Curtis "Ovid" Poe <ovid@cpan.org>'
@@ -11,77 +11,77 @@ requires:
   Pod::Usage: 0
   Test::More: 0
 provides:
-  TAPx::Base:
-    file: lib/TAPx/Base.pm
+  TAP::Base:
+    file: lib/TAP/Base.pm
     version: 0.50_07
-  TAPx::Harness:
-    file: lib/TAPx/Harness.pm
+  TAP::Harness:
+    file: lib/TAP/Harness.pm
     version: 0.50_07
-  TAPx::Harness::Color:
-    file: lib/TAPx/Harness/Color.pm
+  TAP::Harness::Color:
+    file: lib/TAP/Harness/Color.pm
     version: 0.50_07
-  TAPx::Harness::Compatible:
-    file: lib/TAPx/Harness/Compatible.pm
+  TAP::Harness::Compatible:
+    file: lib/TAP/Harness/Compatible.pm
     version: 0.50_07
-  TAPx::Harness::Compatible::Iterator:
-    file: lib/TAPx/Harness/Compatible/Iterator.pm
+  TAP::Harness::Compatible::Iterator:
+    file: lib/TAP/Harness/Compatible/Iterator.pm
     version: 0.50_07
-  TAPx::Harness::Compatible::Point:
-    file: lib/TAPx/Harness/Compatible/Point.pm
+  TAP::Harness::Compatible::Point:
+    file: lib/TAP/Harness/Compatible/Point.pm
     version: 0.50_07
-  TAPx::Harness::Compatible::Results:
-    file: lib/TAPx/Harness/Compatible/Results.pm
+  TAP::Harness::Compatible::Results:
+    file: lib/TAP/Harness/Compatible/Results.pm
     version: 0.50_07
-  TAPx::Harness::Compatible::Straps:
-    file: lib/TAPx/Harness/Compatible/Straps.pm
+  TAP::Harness::Compatible::Straps:
+    file: lib/TAP/Harness/Compatible/Straps.pm
     version: 0.50_07
-  TAPx::Harness::Compatible::Util:
-    file: lib/TAPx/Harness/Compatible/Util.pm
+  TAP::Harness::Compatible::Util:
+    file: lib/TAP/Harness/Compatible/Util.pm
     version: 0.50_07
-  TAPx::Parser:
-    file: lib/TAPx/Parser.pm
+  TAP::Parser:
+    file: lib/TAP/Parser.pm
     version: 0.50_07
-  TAPx::Parser::Aggregator:
-    file: lib/TAPx/Parser/Aggregator.pm
+  TAP::Parser::Aggregator:
+    file: lib/TAP/Parser/Aggregator.pm
     version: 0.50_07
-  TAPx::Parser::Grammar:
-    file: lib/TAPx/Parser/Grammar.pm
+  TAP::Parser::Grammar:
+    file: lib/TAP/Parser/Grammar.pm
     version: 0.50_07
-  TAPx::Parser::Iterator:
-    file: lib/TAPx/Parser/Iterator.pm
+  TAP::Parser::Iterator:
+    file: lib/TAP/Parser/Iterator.pm
     version: 0.50_07
-  TAPx::Parser::Iterator::ARRAY:
-    file: lib/TAPx/Parser/Iterator.pm
+  TAP::Parser::Iterator::ARRAY:
+    file: lib/TAP/Parser/Iterator.pm
     version: 0.50_07
-  TAPx::Parser::Iterator::FH:
-    file: lib/TAPx/Parser/Iterator.pm
+  TAP::Parser::Iterator::FH:
+    file: lib/TAP/Parser/Iterator.pm
     version: 0.50_07
-  TAPx::Parser::Result:
-    file: lib/TAPx/Parser/Result.pm
+  TAP::Parser::Result:
+    file: lib/TAP/Parser/Result.pm
     version: 0.50_07
-  TAPx::Parser::Result::Bailout:
-    file: lib/TAPx/Parser/Result/Bailout.pm
+  TAP::Parser::Result::Bailout:
+    file: lib/TAP/Parser/Result/Bailout.pm
     version: 0.50_07
-  TAPx::Parser::Result::Comment:
-    file: lib/TAPx/Parser/Result/Comment.pm
+  TAP::Parser::Result::Comment:
+    file: lib/TAP/Parser/Result/Comment.pm
     version: 0.50_07
-  TAPx::Parser::Result::Plan:
-    file: lib/TAPx/Parser/Result/Plan.pm
+  TAP::Parser::Result::Plan:
+    file: lib/TAP/Parser/Result/Plan.pm
     version: 0.50_07
-  TAPx::Parser::Result::Test:
-    file: lib/TAPx/Parser/Result/Test.pm
+  TAP::Parser::Result::Test:
+    file: lib/TAP/Parser/Result/Test.pm
     version: 0.50_07
-  TAPx::Parser::Result::Unknown:
-    file: lib/TAPx/Parser/Result/Unknown.pm
+  TAP::Parser::Result::Unknown:
+    file: lib/TAP/Parser/Result/Unknown.pm
     version: 0.50_07
-  TAPx::Parser::Source:
-    file: lib/TAPx/Parser/Source.pm
+  TAP::Parser::Source:
+    file: lib/TAP/Parser/Source.pm
     version: 0.50_07
-  TAPx::Parser::Source::Perl:
-    file: lib/TAPx/Parser/Source/Perl.pm
+  TAP::Parser::Source::Perl:
+    file: lib/TAP/Parser/Source/Perl.pm
     version: 0.50_07
-  TAPx::Parser::YAML:
-    file: lib/TAPx/Parser/YAML.pm
+  TAP::Parser::YAML:
+    file: lib/TAP/Parser/YAML.pm
     version: 0.50_07
 generated_by: Module::Build version 0.2805
 meta-spec:

@@ -5,7 +5,7 @@ eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
 
 use strict;
 use Pod::Usage 1.12;
-use TAPx::Harness;
+use TAP::Harness;
 use File::Find;
 use File::Spec;
 use Getopt::Long;
@@ -49,10 +49,10 @@ if ( !defined $COLOR ) {
 # or we can't suppress STDERR on quiet
 #$MERGE = 1 if $FAILURES || $QUIET || $REALLY_QUIET;
 
-my $harness_class = 'TAPx::Harness';
+my $harness_class = 'TAP::Harness';
 if ($COLOR) {
-    require TAPx::Harness::Color;
-    $harness_class = 'TAPx::Harness::Color';
+    require TAP::Harness::Color;
+    $harness_class = 'TAP::Harness::Color';
 }
 if ($HARNESS) {
     eval "use $HARNESS";
@@ -176,7 +176,7 @@ __END__
 
 =head1 NAME
 
-runtests - Run tests through a TAPx harness.
+runtests - Run tests through a TAP harness.
 
 =head1 USAGE
 
@@ -190,7 +190,7 @@ Boolean options
  -l,  --lib         Add 'lib' to the path for your tests (-Ilib).
  -b,  --blib        Add 'blib/lib' to the path for your tests (-Iblib/lib).
  -s,  --shuffle     Run the tests in random order.
- -c,  --color       Colored test output (default).  See TAPx::Harness::Color.
+ -c,  --color       Colored test output (default).  See TAP::Harness::Color.
       --nocolor     Do not color test output.
  -f,  --failures    Only show failed tests.
  -r,  --recurse     Recursively descend into directories.
@@ -210,7 +210,7 @@ Options which take arguments
 
  -I                 Library paths to include.
  -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
-      --harness     Define test harness to use.  See TAPx::Harness.
+      --harness     Define test harness to use.  See TAP::Harness.
       --execrc      Location of 'execrc' file (no short form).
 
 =head2 Reading from C<STDIN>
@@ -233,7 +233,7 @@ matching the pattern C<t/*.t>.
 
 Specifying the C<--color> or C<-c> switch is the same as:
 
- runtests --harness TAPx::Harness::Color
+ runtests --harness TAP::Harness::Color
 
 Colored test output is the default, but if output is not to a terminal, color
 is disabled.  You can override this by adding the C<--color> switch.
@@ -250,11 +250,11 @@ switch:
 
 =head2 C<--execrc>
 
-Location of 'execrc' file.  See L<TAPx::Harness> for more information.
+Location of 'execrc' file.  See L<TAP::Harness> for more information.
 
 =head1 PERFORMANCE
 
-Because of its design, C<TAPx::Parser> collects more information than
+Because of its design, C<TAP::Parser> collects more information than
 C<Test::Harness>.  However, the trade-off is sometimes slightly slower
 performance than when using the C<prove> utility which is bundled with
 L<Test::Harness>.  For small tests suites, this is usually not a problem.

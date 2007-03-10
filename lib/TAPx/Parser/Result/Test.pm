@@ -1,16 +1,16 @@
-package TAPx::Parser::Result::Test;
+package TAP::Parser::Result::Test;
 
 use strict;
 
 use vars qw($VERSION @ISA);
-use TAPx::Parser::Result;
-@ISA = 'TAPx::Parser::Result';
+use TAP::Parser::Result;
+@ISA = 'TAP::Parser::Result';
 
 use vars qw($VERSION);
 
 =head1 NAME
 
-TAPx::Parser::Result::Test - Test result token.
+TAP::Parser::Result::Test - Test result token.
 
 =head1 VERSION
 
@@ -22,7 +22,7 @@ $VERSION = '0.51';
 
 =head1 DESCRIPTION
 
-This is a subclass of C<TAPx::Parser::Result>.  A token of this class will be
+This is a subclass of C<TAP::Parser::Result>.  A token of this class will be
 returned if a test line is encountered.
 
  1..1
@@ -30,7 +30,7 @@ returned if a test line is encountered.
 
 =head1 OVERRIDDEN METHODS
 
-This class is the workhorse of the TAPx::Parser system.  Most TAP lines will
+This class is the workhorse of the TAP::Parser system.  Most TAP lines will
 be test lines and if C<< $result->is_test >>, then you have a bunch of methods
 at your disposal.
 

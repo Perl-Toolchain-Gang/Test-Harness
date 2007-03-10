@@ -1,14 +1,14 @@
-package TAPx::Parser::Result;
+package TAP::Parser::Result;
 
 use strict;
 use vars qw($VERSION);
 
-use TAPx::Parser::Result::Plan;
-use TAPx::Parser::Result::Test;
-use TAPx::Parser::Result::Comment;
-use TAPx::Parser::Result::Bailout;
-use TAPx::Parser::Result::Version;
-use TAPx::Parser::Result::Unknown;
+use TAP::Parser::Result::Plan;
+use TAP::Parser::Result::Test;
+use TAP::Parser::Result::Comment;
+use TAP::Parser::Result::Bailout;
+use TAP::Parser::Result::Version;
+use TAP::Parser::Result::Unknown;
 
 BEGIN {
     no strict 'refs';
@@ -22,7 +22,7 @@ BEGIN {
 
 =head1 NAME
 
-TAPx::Parser::Result - TAPx::Parser output
+TAP::Parser::Result - TAP::Parser output
 
 =head1 VERSION
 
@@ -43,12 +43,12 @@ only and should not be relied upon.
 # note that this is bad.  Makes it very difficult to subclass, but then, it
 # would be a lot of work to subclass this system.
 my %class_for = (
-    plan    => 'TAPx::Parser::Result::Plan',
-    test    => 'TAPx::Parser::Result::Test',
-    comment => 'TAPx::Parser::Result::Comment',
-    bailout => 'TAPx::Parser::Result::Bailout',
-    version => 'TAPx::Parser::Result::Version',
-    unknown => 'TAPx::Parser::Result::Unknown',
+    plan    => 'TAP::Parser::Result::Plan',
+    test    => 'TAP::Parser::Result::Test',
+    comment => 'TAP::Parser::Result::Comment',
+    bailout => 'TAP::Parser::Result::Bailout',
+    version => 'TAP::Parser::Result::Version',
+    unknown => 'TAP::Parser::Result::Unknown',
 );
 
 ##############################################################################
@@ -57,7 +57,7 @@ my %class_for = (
 
 =head3 C<new>
 
-  my $result = TAPx::Parser::Result->new($token);
+  my $result = TAP::Parser::Result->new($token);
 
 Returns an instance the appropriate class for the test token passed in.
 

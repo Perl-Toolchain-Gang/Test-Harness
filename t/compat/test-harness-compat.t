@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use Test::More;
-use TAPx::Harness;
-use TAPx::Harness::Compatible qw(execute_tests);
+use TAP::Harness;
+use TAP::Harness::Compatible qw(execute_tests);
 use File::Spec;
 
 my $TEST_DIR = 't/sample-tests';
@@ -765,7 +765,7 @@ SKIP: {
         no warnings 'redefine';
 
         # Silence harness output
-        *TAPx::Harness::output = sub {
+        *TAP::Harness::output = sub {
 
             # do nothing
         };

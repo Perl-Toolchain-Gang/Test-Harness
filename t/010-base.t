@@ -3,16 +3,16 @@
 use strict;
 
 use lib 'lib';
-use TAPx::Base;
+use TAP::Base;
 
 use Test::More tests => 30;
 
 {
 
     # No callbacks allowed
-    can_ok 'TAPx::Base', 'new';
-    ok my $base = TAPx::Base->new(), 'object creation succeeds';
-    isa_ok $base, 'TAPx::Base', 'object of correct type';
+    can_ok 'TAP::Base', 'new';
+    ok my $base = TAP::Base->new(), 'object creation succeeds';
+    isa_ok $base, 'TAP::Base', 'object of correct type';
     foreach my $method (qw(callback _croak _callback_for _initialize)) {
         can_ok $base, $method;
     }
@@ -34,7 +34,7 @@ use Test::More tests => 30;
 
     # No callbacks allowed, constructor should croak
     eval {
-        my $base = TAPx::Base->new(
+        my $base = TAP::Base->new(
             {   callbacks => {
                     some_event => sub {
 
@@ -49,9 +49,9 @@ use Test::More tests => 30;
 
 package CallbackOK;
 use lib 'lib';
-use TAPx::Base;
+use TAP::Base;
 use vars qw(@ISA);
-@ISA = 'TAPx::Base';
+@ISA = 'TAP::Base';
 
 sub _initialize {
     my $self = shift;
@@ -63,7 +63,7 @@ sub _initialize {
 package main;
 {
     ok my $base = CallbackOK->new(), 'object creation succeeds';
-    isa_ok $base, 'TAPx::Base';
+    isa_ok $base, 'TAP::Base';
 
     eval {
         $base->callback(
@@ -111,7 +111,7 @@ package main;
       ),
       'object creation with callback succeeds';
 
-    isa_ok $base, 'TAPx::Base';
+    isa_ok $base, 'TAP::Base';
 
     eval {
         $base->callback(

@@ -3,8 +3,8 @@
 use strict;
 
 use lib 'lib';
-use TAPx::Parser;
-use TAPx::Parser::Iterator;
+use TAP::Parser;
+use TAP::Parser::Iterator;
 
 use Test::More tests => 9;
 
@@ -36,8 +36,8 @@ my %callbacks = (
     }
 );
 
-my $stream = TAPx::Parser::Iterator->new( [ split /\n/ => $tap ] );
-my $parser = TAPx::Parser->new(
+my $stream = TAP::Parser::Iterator->new( [ split /\n/ => $tap ] );
+my $parser = TAP::Parser->new(
     {   stream    => $stream,
         callbacks => \%callbacks,
     }
@@ -73,8 +73,8 @@ my $all  = 0;
     },
 );
 
-$stream = TAPx::Parser::Iterator->new( [ split /\n/ => $tap ] );
-$parser = TAPx::Parser->new(
+$stream = TAP::Parser::Iterator->new( [ split /\n/ => $tap ] );
+$parser = TAP::Parser->new(
     {   stream    => $stream,
         callbacks => \%callbacks,
     }
@@ -97,9 +97,9 @@ is $all,  8, '... and the correct total number of lines should be seen';
     ELSES    => sub { },
 );
 
-$stream = TAPx::Parser::Iterator->new( [ split /\n/ => $tap ] );
+$stream = TAP::Parser::Iterator->new( [ split /\n/ => $tap ] );
 eval {
-    $parser = TAPx::Parser->new(
+    $parser = TAP::Parser->new(
         {   stream    => $stream,
             callbacks => \%callbacks,
         }

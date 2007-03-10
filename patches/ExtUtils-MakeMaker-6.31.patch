@@ -5,9 +5,9 @@ diff -uNr -X diff-exclude ExtUtils-MakeMaker-6.31.orig/lib/ExtUtils/Command/MM.p
  
    test_harness($verbose, @test_libs);
  
-+Run the tests on @ARGV using either Test::Harness or TAPx::Harness. By
++Run the tests on @ARGV using either Test::Harness or TAP::Harness. By
 +default Test::Harness is used but if the environment variable
-+PERL_EUMM_USE_TAPX is set to a true value and TAPx::Harness is installed
++PERL_EUMM_USE_TAPX is set to a true value and TAP::Harness is installed
 +it will be used instead.
 +
 +The $verbose flag affects the verbosity of the tests. Libraries named in
@@ -42,11 +42,11 @@ diff -uNr -X diff-exclude ExtUtils-MakeMaker-6.31.orig/lib/ExtUtils/Command/MM.p
 -    unshift @INC, map { File::Spec->rel2abs($_) } @_;
 -    Test::Harness::runtests(sort { lc $a cmp lc $b } @argv);
 -}
-+    # Consider using TAPx::Harness
++    # Consider using TAP::Harness
 +    if ($ENV{PERL_EUMM_USE_TAPX}) {
-+        eval "require TAPx::Harness";
++        eval "require TAP::Harness";
 +        unless ($@) {
-+            my $harness = TAPx::Harness->new( {
++            my $harness = TAP::Harness->new( {
 +                verbose => $verbose,
 +                lib     => \@libs
 +            } );

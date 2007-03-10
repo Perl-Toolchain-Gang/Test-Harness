@@ -18,8 +18,8 @@ use Test::More;
 plan skip_all => 'Harness has no Straps support yet';
 
 BEGIN {
-    use_ok('TAPx::Harness::Compatible');
+    use_ok('TAP::Harness::Compatible');
 }
 
-my $strap = TAPx::Harness::Compatible->strap;
-isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
+my $strap = TAP::Harness::Compatible->strap;
+isa_ok( $strap, 'TAP::Harness::Compatible::Straps' );

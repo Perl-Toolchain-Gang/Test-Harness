@@ -14,10 +14,10 @@ BEGIN {
 
 use Test::More tests => 89;
 
-BEGIN { use_ok('TAPx::Harness::Compatible::Straps'); }
+BEGIN { use_ok('TAP::Harness::Compatible::Straps'); }
 
-my $strap = TAPx::Harness::Compatible::Straps->new;
-isa_ok( $strap, 'TAPx::Harness::Compatible::Straps', 'new()' );
+my $strap = TAP::Harness::Compatible::Straps->new;
+isa_ok( $strap, 'TAP::Harness::Compatible::Straps', 'new()' );
 
 ### Testing _is_diagnostic()
 
@@ -40,8 +40,8 @@ my %comments = (
 
 for my $line ( sort keys %comments ) {
     my $line_comment = $comments{$line};
-    my $strap        = TAPx::Harness::Compatible::Straps->new;
-    isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
+    my $strap        = TAP::Harness::Compatible::Straps->new;
+    isa_ok( $strap, 'TAP::Harness::Compatible::Straps' );
 
     my $name = substr( $line, 0, 20 );
     ok( $strap->_is_diagnostic( $line, \$comment ), "  comment '$name'" );
@@ -60,8 +60,8 @@ my @not_headers = (
 );
 
 foreach my $unheader (@not_headers) {
-    my $strap = TAPx::Harness::Compatible::Straps->new;
-    isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
+    my $strap = TAP::Harness::Compatible::Straps->new;
+    isa_ok( $strap, 'TAP::Harness::Compatible::Straps' );
 
     ok( !$strap->_is_header($unheader),
         "_is_header(), not a header '$unheader'"
@@ -115,8 +115,8 @@ my %headers = (
 
 for my $header ( sort keys %headers ) {
     my $expect = $headers{$header};
-    my $strap  = TAPx::Harness::Compatible::Straps->new;
-    isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
+    my $strap  = TAP::Harness::Compatible::Straps->new;
+    isa_ok( $strap, 'TAP::Harness::Compatible::Straps' );
 
     ok( $strap->_is_header($header), "_is_header() is a header '$header'" );
 
@@ -142,8 +142,8 @@ my %bails = (
 
 for my $line ( sort keys %bails ) {
     my $expect = $bails{$line};
-    my $strap  = TAPx::Harness::Compatible::Straps->new;
-    isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
+    my $strap  = TAP::Harness::Compatible::Straps->new;
+    isa_ok( $strap, 'TAP::Harness::Compatible::Straps' );
 
     my $reason;
     ok( $strap->_is_bail_out( $line, \$reason ),
@@ -160,8 +160,8 @@ my @unbails = (
 );
 
 foreach my $line (@unbails) {
-    my $strap = TAPx::Harness::Compatible::Straps->new;
-    isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
+    my $strap = TAP::Harness::Compatible::Straps->new;
+    isa_ok( $strap, 'TAP::Harness::Compatible::Straps' );
 
     my $reason;
 

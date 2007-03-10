@@ -7,7 +7,7 @@ BEGIN {
 
 print "1..1\n";
 
-unless ( eval 'require TAPx::Harness::Compatible' ) {
+unless ( eval 'require TAP::Harness::Compatible' ) {
     print "not ok 1\n";
 }
 else {

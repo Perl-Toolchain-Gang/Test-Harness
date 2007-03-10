@@ -12,24 +12,24 @@ BEGIN {
 
 use Test::More tests => 6;
 
-BEGIN { use_ok 'TAPx::Harness::Compatible' }
+BEGIN { use_ok 'TAP::Harness::Compatible' }
 
 BEGIN {
     diag(
-        "Testing TAPx::Harness::Compatible $TAPx::Harness::Compatible::VERSION under Perl $] and Test::More $Test::More::VERSION"
+        "Testing TAP::Harness::Compatible $TAP::Harness::Compatible::VERSION under Perl $] and Test::More $Test::More::VERSION"
     ) unless $ENV{PERL_CORE};
 }
 
-BEGIN { use_ok 'TAPx::Harness::Compatible::Straps' }
+BEGIN { use_ok 'TAP::Harness::Compatible::Straps' }
 
-BEGIN { use_ok 'TAPx::Harness::Compatible::Iterator' }
+BEGIN { use_ok 'TAP::Harness::Compatible::Iterator' }
 
-BEGIN { use_ok 'TAPx::Harness::Compatible::Point' }
+BEGIN { use_ok 'TAP::Harness::Compatible::Point' }
 
-BEGIN { use_ok 'TAPx::Harness::Compatible::Results' }
+BEGIN { use_ok 'TAP::Harness::Compatible::Results' }
 
-BEGIN { use_ok 'TAPx::Harness::Compatible::Util' }
+BEGIN { use_ok 'TAP::Harness::Compatible::Util' }
 
 # If the $VERSION is set improperly, this will spew big warnings.
-#BEGIN { use_ok 'TAPx::Harness::Compatible', 1.1601 }
+#BEGIN { use_ok 'TAP::Harness::Compatible', 1.1601 }
 

@@ -4,15 +4,15 @@ use Module::Build;
 use 5.005;
 
 my $builder = Module::Build->new(
-    module_name       => 'TAPx::Parser',
+    module_name       => 'TAP::Parser',
     license           => 'perl',
     dist_author       => 'Curtis "Ovid" Poe <ovid@cpan.org>',
-    dist_version_from => 'lib/TAPx/Parser.pm',
+    dist_version_from => 'lib/TAP/Parser.pm',
     requires          => {
         'Test::More' => 0,
         'Pod::Usage' => 0,    # for 'runtests'
     },
-    add_to_cleanup => ['TAPx-Parser-*'],
+    add_to_cleanup => ['TAP-Parser-*'],
 );
 
 if ( $builder->prompt( "Do you wish to install the 'runtests' utility?", "y" )

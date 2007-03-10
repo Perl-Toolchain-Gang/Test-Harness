@@ -1,11 +1,11 @@
-package TAPx::Base;
+package TAP::Base;
 
 use strict;
 use vars qw($VERSION);
 
 =head1 NAME
 
-TAPx::Base - Base class that provides common functionality to L<TAPx::Parser> and L<TAPx::Harness>
+TAP::Base - Base class that provides common functionality to L<TAP::Parser> and L<TAP::Harness>
 
 =head1 VERSION
 
@@ -17,16 +17,16 @@ $VERSION = '0.51';
 
 =head1 SYNOPSIS
 
-    package TAPx::Whatever;
+    package TAP::Whatever;
 
-    use TAPx::Base;
+    use TAP::Base;
     
     use vars qw($VERSION @ISA);
-    @ISA = qw(TAPx::Base);
+    @ISA = qw(TAP::Base);
 
     # ... later ...
     
-    my $thing = TAPx::Whatever->new();
+    my $thing = TAP::Whatever->new();
     
     $thing->callback( event => sub {
         # do something interesting
@@ -34,7 +34,7 @@ $VERSION = '0.51';
 
 =head1 DESCRIPTION
 
-C<TAPx::Base> provides callback management.
+C<TAP::Base> provides callback management.
 
 =head1 METHODS
 

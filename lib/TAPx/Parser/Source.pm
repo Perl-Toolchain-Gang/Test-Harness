@@ -1,4 +1,4 @@
-package TAPx::Parser::Source;
+package TAP::Parser::Source;
 
 use strict;
 use vars qw($VERSION);
@@ -11,14 +11,14 @@ use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_MACOS => ( $^O eq 'MacOS' );
 use constant IS_VMS   => ( $^O eq 'VMS' );
 
-use TAPx::Parser::Iterator;
+use TAP::Parser::Iterator;
 
 # Causes problem on MacOS and shouldn't be necessary anyway
 #$SIG{CHLD} = sub { wait };
 
 =head1 NAME
 
-TAPx::Parser::Source - Stream output from some source
+TAP::Parser::Source - Stream output from some source
 
 =head1 VERSION
 
@@ -34,8 +34,8 @@ Takes a command and hopefully returns a stream from it.
 
 =head1 SYNOPSIS
 
- use TAPx::Parser::Source;
- my $source = TAPx::Parser::Source->new;
+ use TAP::Parser::Source;
+ my $source = TAP::Parser::Source->new;
  my $stream = $source->source(['/usr/bin/ruby', 'mytest.rb'])->get_stream;
 
 =head1 METHODS
@@ -44,9 +44,9 @@ Takes a command and hopefully returns a stream from it.
 
 =head3 C<new>
 
- my $source = TAPx::Parser::Source->new;
+ my $source = TAP::Parser::Source->new;
 
-Returns a new C<TAPx::Parser::Source> object.
+Returns a new C<TAP::Parser::Source> object.
 
 =cut
 
@@ -121,7 +121,7 @@ sub get_stream {
             binmode $stdout_handle, ':crlf';
         }
 
-        my $iter = TAPx::Parser::Iterator->new($stdout_handle);
+        my $iter = TAP::Parser::Iterator->new($stdout_handle);
         $iter->pid($pid);
         return $iter;
     }

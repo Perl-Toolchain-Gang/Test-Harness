@@ -49,7 +49,7 @@ BEGIN {
     plan tests => 2 + scalar keys %samples;
 }
 
-BEGIN { use_ok('TAPx::Harness::Compatible::Straps'); }
+BEGIN { use_ok('TAP::Harness::Compatible::Straps'); }
 
 my $Curdir = File::Spec->curdir;
 my $SAMPLE_TESTS =
@@ -57,8 +57,8 @@ my $SAMPLE_TESTS =
   ? File::Spec->catdir( $Curdir, 'lib', 'sample-tests' )
   : File::Spec->catdir( $Curdir, 't',   'sample-tests' );
 
-my $strap = TAPx::Harness::Compatible::Straps->new;
-isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
+my $strap = TAP::Harness::Compatible::Straps->new;
+isa_ok( $strap, 'TAP::Harness::Compatible::Straps' );
 $strap->set_callback(
     sub {
         my ( $self, $line, $type, $totals ) = @_;

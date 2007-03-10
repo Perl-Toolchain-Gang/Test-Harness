@@ -4,9 +4,9 @@ use strict;
 
 #use Test::More 'no_plan';
 use Test::More tests => 52;
-use TAPx::Parser;
+use TAP::Parser;
 
-use TAPx::Parser::Iterator;
+use TAP::Parser::Iterator;
 
 sub array_ref_from {
     my $string = shift;
@@ -20,13 +20,13 @@ my $tap = do { local $/; <DATA> };
 seek DATA, $offset, 0;
 
 foreach my $source ( array_ref_from($tap), \*DATA ) {
-    ok my $iter = TAPx::Parser::Iterator->new($source),
+    ok my $iter = TAP::Parser::Iterator->new($source),
       'We should be able to create a new iterator';
-    isa_ok $iter, 'TAPx::Parser::Iterator', '... and the object it returns';
+    isa_ok $iter, 'TAP::Parser::Iterator', '... and the object it returns';
     my $subclass =
         'ARRAY' eq ref $source
-      ? 'TAPx::Parser::Iterator::ARRAY'
-      : 'TAPx::Parser::Iterator::FH';
+      ? 'TAP::Parser::Iterator::ARRAY'
+      : 'TAP::Parser::Iterator::FH';
     isa_ok $iter,, $subclass, '... and the object it returns';
 
     can_ok $iter, 'is_first';

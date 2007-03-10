@@ -5,13 +5,13 @@ use strict;
 use lib 'lib';
 
 use Test::More tests => 21;
-use TAPx::Parser;
+use TAP::Parser;
 
-my $plan_line = 'TAPx::Parser::Result::Plan';
-my $test_line = 'TAPx::Parser::Result::Test';
+my $plan_line = 'TAP::Parser::Result::Plan';
+my $test_line = 'TAP::Parser::Result::Test';
 
 sub _parser {
-    my $parser = TAPx::Parser->new( { tap => shift } );
+    my $parser = TAP::Parser->new( { tap => shift } );
     $parser->run;
     return $parser;
 }

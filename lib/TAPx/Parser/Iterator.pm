@@ -1,11 +1,11 @@
-package TAPx::Parser::Iterator;
+package TAP::Parser::Iterator;
 
 use strict;
 use vars qw($VERSION);
 
 =head1 NAME
 
-TAPx::Parser::Iterator - Internal TAPx::Parser Iterator
+TAP::Parser::Iterator - Internal TAP::Parser Iterator
 
 =head1 VERSION
 
@@ -17,9 +17,9 @@ $VERSION = '0.51';
 
 =head1 SYNOPSIS
 
-  use TAPx::Parser::Iterator;
-  my $it = TAPx::Parser::Iterator->new(\*TEST);
-  my $it = TAPx::Parser::Iterator->new(\@array);
+  use TAP::Parser::Iterator;
+  my $it = TAP::Parser::Iterator->new(\*TEST);
+  my $it = TAP::Parser::Iterator->new(\@array);
 
   my $line = $it->next;
   if ( $it->is_first ) { ... }
@@ -64,10 +64,10 @@ sub new {
         # we may eventually allow a 'fast' switch which can read the entire
         # stream into an array.  This seems to speed things up by 10 to 12
         # per cent.  Should not be used with infinite streams.
-        return TAPx::Parser::Iterator::FH->new($thing);
+        return TAP::Parser::Iterator::FH->new($thing);
     }
     elsif ( $ref eq 'ARRAY' ) {
-        return TAPx::Parser::Iterator::ARRAY->new($thing);
+        return TAP::Parser::Iterator::ARRAY->new($thing);
     }
     else {
         die "Can't iterate with a ", ref $thing;
@@ -82,10 +82,10 @@ else {
     *_wait2exit = sub { POSIX::WEXITSTATUS( $_[1] ) }
 }
 
-package TAPx::Parser::Iterator::FH;
+package TAP::Parser::Iterator::FH;
 
 use vars qw($VERSION @ISA);
-@ISA     = 'TAPx::Parser::Iterator';
+@ISA     = 'TAP::Parser::Iterator';
 $VERSION = '0.51';
 
 sub new {
@@ -188,10 +188,10 @@ sub _finish {
     return $self;
 }
 
-package TAPx::Parser::Iterator::ARRAY;
+package TAP::Parser::Iterator::ARRAY;
 
 use vars qw($VERSION @ISA);
-@ISA     = 'TAPx::Parser::Iterator';
+@ISA     = 'TAP::Parser::Iterator';
 $VERSION = '0.51';
 
 sub new {

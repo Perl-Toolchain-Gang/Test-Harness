@@ -1,4 +1,4 @@
-package TAPx::Harness;
+package TAP::Harness;
 
 use strict;
 use warnings;
@@ -6,18 +6,18 @@ use Benchmark;
 use File::Spec;
 use File::Path;
 
-use TAPx::Base;
-use TAPx::Parser;
-use TAPx::Parser::Aggregator;
-use TAPx::Parser::YAML;
+use TAP::Base;
+use TAP::Parser;
+use TAP::Parser::Aggregator;
+use TAP::Parser::YAML;
 
 use vars qw($VERSION @ISA);
 
-@ISA = qw(TAPx::Base);
+@ISA = qw(TAP::Base);
 
 =head1 NAME
 
-TAPx::Harness - Run Perl test scripts with statistics
+TAP::Harness - Run Perl test scripts with statistics
 
 =head1 VERSION
 
@@ -52,8 +52,8 @@ automatically aggregated and output to STDOUT.
 
 =head1 SYNOPSIS
 
- use TAPx::Harness;
- my $harness = TAPx::Harness->new( \%args );
+ use TAP::Harness;
+ my $harness = TAP::Harness->new( \%args );
  $harness->runtests(@tests);
 
 =cut
@@ -157,9 +157,9 @@ BEGIN {
     verbose => 1,
     lib     => [ 'lib', 'blib/lib' ],
  )
- my $harness = TAPx::Harness->new( \%args );
+ my $harness = TAP::Harness->new( \%args );
 
-The constructor returns a new C<TAPx::Harness> object.  It accepts an optional
+The constructor returns a new C<TAP::Harness> object.  It accepts an optional
 hashref whose allowed keys are:
 
 =over 4
@@ -225,7 +225,7 @@ This overrides other settings such as C<verbose> or C<failures>.
 
 =cut
 
-# new supplied by TAPx::Base
+# new supplied by TAP::Base
 
 {
     my @legal_callback = qw(
@@ -251,7 +251,7 @@ This overrides other settings such as C<verbose> or C<failures>.
             }
         }
         if ( my @props = keys %arg_for ) {
-            $self->_croak("Unknown arguments to TAPx::Harness::new (@props)");
+            $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
         }
         $self->_read_execrc;
         $self->quiet(0) unless $self->quiet;    # suppress unit warnings
@@ -264,7 +264,7 @@ sub _read_execrc {
     my $self = shift;
     $self->_execrc( { exact => {}, regex => {} } );
     my $execrc = $self->execrc or return $self;
-    my $data   = TAPx::Parser::YAML->read($execrc);
+    my $data   = TAP::Parser::YAML->read($execrc);
 
     my %exec_for;
     foreach my $type ( qw{ exact regex } ) {
@@ -302,7 +302,7 @@ sub _read_execrc {
 
 Accepts and array of C<@tests> to be run.  This should generally be the names
 of test files, but this is not required.  Each element in C<@tests> will be
-passed to C<TAPx::Parser::new()> as a C<source>.  See C<TAPx::Parser> for more
+passed to C<TAP::Parser::new()> as a C<source>.  See C<TAP::Parser> for more
 information.
 
 Tests will be run in the order found.
@@ -317,7 +317,7 @@ Subdirectories will be created as needed.
 sub runtests {
     my ( $self, @tests ) = @_;
 
-    my $aggregate = TAPx::Parser::Aggregator->new;
+    my $aggregate = TAP::Parser::Aggregator->new;
 
     my $results = $self->aggregate_tests( $aggregate, @tests );
 
@@ -375,13 +375,13 @@ sub aggregate_tests {
 
 =head1 SUBCLASSING
 
-C<TAPx::Harness> is designed to be (mostly) easy to subclass.  If you don't
+C<TAP::Harness> is designed to be (mostly) easy to subclass.  If you don't
 like how a particular feature functions, just override the desired methods.
 
 =head2 Methods
 
 The following methods are one's you may wish to override if you want to
-subclass C<TAPx::Harness>.
+subclass C<TAP::Harness>.
 
 =head3 C<summary>
 
@@ -401,11 +401,11 @@ You can print a useful summary time, if desired, with:
 
 =item * C<aggregate>
 
-This is the C<TAPx::Parser::Aggregate> object for all of the tests run.
+This is the C<TAP::Parser::Aggregate> object for all of the tests run.
 
 =item * C<tests>
 
-This is an array reference of all test names.  To get the C<TAPx::Parser>
+This is an array reference of all test names.  To get the C<TAP::Parser>
 object for individual tests:
 
  my $aggregate = $args->{aggregate};
@@ -524,7 +524,7 @@ sub _summary_test_header {
 
   $harness->output(@list_of_strings_to_output);
 
-All output from C<TAPx::Harness> is driven through this method.  If you would
+All output from C<TAP::Harness> is driven through this method.  If you would
 like to redirect output somewhere else, just override this method.
 
 =cut
@@ -735,7 +735,7 @@ sub _runtest {
     my $show_count   = $self->_should_show_count;
     $self->output($leader) unless $really_quiet;
 
-    my $parser = TAPx::Parser->new( $self->_get_parser_args($test) );
+    my $parser = TAP::Parser->new( $self->_get_parser_args($test) );
 
     $self->_make_callback( 'made_parser', $parser );
 
@@ -952,7 +952,7 @@ See the C<README> in the C<examples> directory for a ready-to-run example.
 
 =head1 REPLACING
 
-If you like the C<runtests> utility and L<TAPx::Parser> but you want your own
+If you like the C<runtests> utility and L<TAP::Parser> but you want your own
 harness, all you need to do is write one and provide C<new> and C<runtests>
 methods.  Then you can use the C<runtests> utility like so:
 

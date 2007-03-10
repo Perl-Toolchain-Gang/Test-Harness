@@ -1,4 +1,4 @@
-package TAPx::Parser::Source::Perl;
+package TAP::Parser::Source::Perl;
 
 use strict;
 use vars qw($VERSION @ISA);
@@ -7,13 +7,13 @@ use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_MACOS => ( $^O eq 'MacOS' );
 use constant IS_VMS   => ( $^O eq 'VMS' );
 
-use TAPx::Parser::Iterator;
-use TAPx::Parser::Source;
-@ISA = 'TAPx::Parser::Source';
+use TAP::Parser::Iterator;
+use TAP::Parser::Source;
+@ISA = 'TAP::Parser::Source';
 
 =head1 NAME
 
-TAPx::Parser::Source::Perl - Stream Perl output
+TAP::Parser::Source::Perl - Stream Perl output
 
 =head1 VERSION
 
@@ -28,13 +28,13 @@ $VERSION = '0.51';
 Takes a filename and hopefully returns a stream from it.  The filename should
 be the name of a Perl program.
 
-Note that this is a subclass of L<TAPx::Parser::Source>.  See that module for
+Note that this is a subclass of L<TAP::Parser::Source>.  See that module for
 more methods.
 
 =head1 SYNOPSIS
 
- use TAPx::Parser::Source::Perl;
- my $perl   = TAPx::Parser::Source::Perl->new;
+ use TAP::Parser::Source::Perl;
+ my $perl   = TAP::Parser::Source::Perl->new;
  my $stream = $perl->source($filename)->get_stream;
 
 =head1 METHODS
@@ -43,9 +43,9 @@ more methods.
 
 =head3 C<new>
 
- my $perl = TAPx::Parser::Source::Perl->new;
+ my $perl = TAP::Parser::Source::Perl->new;
 
-Returns a new C<TAPx::Parser::Source::Perl> object.
+Returns a new C<TAP::Parser::Source::Perl> object.
 
 =head2 Instance methods
 
@@ -173,7 +173,7 @@ sub _filtered_inc {
 {
 
     # cache this to avoid repeatedly shelling out to Perl.  This really speeds
-    # up TAPx::Parser.
+    # up TAP::Parser.
     my @inc;
 
     sub _default_inc {

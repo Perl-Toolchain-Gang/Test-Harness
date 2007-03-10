@@ -13,8 +13,8 @@ TODO:
     - Question:  what to do if tests hang?  Jan Dubois and Steven Hay are
       looking into this for another project.  They're looking at Win32::Job to
       manage test sessions on Windows.
-    - Make TAPx::Parser thread-safe!
-    - Convert tprove_gtk into TAPx::Harness::GTK.
+    - Make TAP::Parser thread-safe!
+    - Convert tprove_gtk into TAP::Harness::GTK.
     - Have the aggregator return an iterator.
     - Make sure we get the right harness output with no tests run.
     - Make the 'colored' test output easier to override.

@@ -1,5 +1,5 @@
 # -*- Mode: cperl; cperl-indent-level: 4 -*-
-package TAPx::Harness::Compatible::Results;
+package TAP::Harness::Compatible::Results;
 
 use strict;
 use vars qw($VERSION);
@@ -7,22 +7,22 @@ $VERSION = '0.51';
 
 =head1 NAME
 
-TAPx::Harness::Compatible::Results - object for tracking results from a single test file
+TAP::Harness::Compatible::Results - object for tracking results from a single test file
 
 =head1 SYNOPSIS
 
-One TAPx::Harness::Compatible::Results object represents the results from one
+One TAP::Harness::Compatible::Results object represents the results from one
 test file getting analyzed.
 
 =head1 CONSTRUCTION
 
 =head2 new()
 
-    my $results = new TAPx::Harness::Compatible::Results;
+    my $results = new TAP::Harness::Compatible::Results;
 
 Create a test point object.  Typically, however, you'll not create
 one yourself, but access a Results object returned to you by
-TAPx::Harness::Compatible::Results.
+TAP::Harness::Compatible::Results.
 
 =cut
 

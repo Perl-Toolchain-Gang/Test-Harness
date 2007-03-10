@@ -3,9 +3,9 @@
 use strict;
 
 use lib 'lib';
-use TAPx::Parser;
-use TAPx::Parser::Iterator;
-use TAPx::Parser::Aggregator;
+use TAP::Parser;
+use TAP::Parser::Iterator;
+use TAP::Parser::Aggregator;
 
 use Test::More tests => 34;
 
@@ -20,8 +20,8 @@ not ok 4 - this is a real failure
 ok 5 # skip we have no description
 END_TAP
 
-my $stream = TAPx::Parser::Iterator->new( [ split /\n/ => $tap ] );
-my $parser1 = TAPx::Parser->new( { stream => $stream } );
+my $stream = TAP::Parser::Iterator->new( [ split /\n/ => $tap ] );
+my $parser1 = TAP::Parser->new( { stream => $stream } );
 $parser1->run;
 
 $tap = <<'END_TAP';
@@ -36,13 +36,13 @@ ok 6 - you shall not pass! # TODO should have failed
 not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
 END_TAP
 
-my $parser2 = TAPx::Parser->new( { tap => $tap } );
+my $parser2 = TAP::Parser->new( { tap => $tap } );
 $parser2->run;
 
-can_ok 'TAPx::Parser::Aggregator', 'new';
-ok my $agg = TAPx::Parser::Aggregator->new,
+can_ok 'TAP::Parser::Aggregator', 'new';
+ok my $agg = TAP::Parser::Aggregator->new,
   '... and calling it should succeed';
-isa_ok $agg, 'TAPx::Parser::Aggregator', '... and the object it returns';
+isa_ok $agg, 'TAP::Parser::Aggregator', '... and the object it returns';
 
 can_ok $agg, 'add';
 ok $agg->add( 'tap1', $parser1 ), '... and calling it should succeed';

@@ -1,13 +1,13 @@
-package TAPx::Parser::Grammar;
+package TAP::Parser::Grammar;
 
 use strict;
 use vars qw($VERSION);
 
-use TAPx::Parser::Result;
+use TAP::Parser::Result;
 
 =head1 NAME
 
-TAPx::Parser::Grammar - A grammar for the original TAP version.
+TAP::Parser::Grammar - A grammar for the original TAP version.
 
 =head1 VERSION
 
@@ -19,7 +19,7 @@ $VERSION = '0.51';
 
 =head1 DESCRIPTION
 
-C<TAPx::Parser::Gramamr> is actually just a means for identifying individual
+C<TAP::Parser::Gramamr> is actually just a means for identifying individual
 chunks (usually lines) of TAP.
 
 Do not attempt to use this class directly.  It won't make sense.  It's mainly
@@ -41,7 +41,7 @@ to use a class where one doesn't apparently need one.
 
 =head3 C<new>
 
-  my $grammar = TAPx::Grammar->new;
+  my $grammar = TAP::Grammar->new;
 
 Returns TAP grammar object.  Future versions may accept a version number.
 
@@ -157,7 +157,7 @@ my %token_for = (
 
 Passed a line of TAP, this method will return a data structure representing a
 'token' matching that line of TAP input.  Designed to be passed to
-C<TAPx::Parser::Result> to create a result object.
+C<TAP::Parser::Result> to create a result object.
 
 This is really the only method you need to worry about for the grammar.  The
 methods below are merely for convenience, if needed.
@@ -179,7 +179,7 @@ sub tokenize {
         }
     }
     $token ||= $self->_make_unknown_token($line);
-    return defined $token ? TAPx::Parser::Result->new($token) : ();
+    return defined $token ? TAP::Parser::Result->new($token) : ();
 }
 
 ##############################################################################
@@ -225,7 +225,7 @@ returns the lexed token corresponding to that line.  As a result, the basic
 TAP parsing loop looks similar to the following:
 
  my @tokens;
- my $grammar = TAPx::Grammar->new;
+ my $grammar = TAP::Grammar->new;
  LINE: while ( defined( my $line = $parser->_next_chunk_of_tap ) ) {
      foreach my $type ( $grammar->token_types ) {
          my $syntax  = $grammar->syntax_for($type);
@@ -324,14 +324,14 @@ sub _trim {
 B<NOTE:>  This grammar is slightly out of date.  There's still some discussion
 about it and a new one will be provided when we have things better defined.
 
-The C<TAPx::Parser> does not use a formal grammar because TAP is essentially a
+The C<TAP::Parser> does not use a formal grammar because TAP is essentially a
 stream-based protocol.  In fact, it's quite legal to have an infinite stream.
 For the same reason that we don't apply regexes to streams, we're not using a
 formal grammar here.  Instead, we parse the TAP in lines.
 
 For purposes for forward compatability, any result which does not match the
 following grammar is currently referred to as
-L<TAPx::Parser::Result::Unknown>.  It is I<not> a parse error.
+L<TAP::Parser::Result::Unknown>.  It is I<not> a parse error.
 
 A formal grammar would look similar to the following:
 

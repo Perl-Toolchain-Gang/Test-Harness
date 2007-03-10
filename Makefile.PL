@@ -11,8 +11,8 @@ if ( prompt( "Do you wish to install the 'runtests' utility?", "y" )
 }
 
 WriteMakefile(
-    'NAME'         => 'TAPx::Parser',
-    'VERSION_FROM' => 'lib/TAPx/Parser.pm',
+    'NAME'         => 'TAP::Parser',
+    'VERSION_FROM' => 'lib/TAP/Parser.pm',
     'PREREQ_PM'    => {
         'Test::More' => '0',
         'Pod::Usage' => '0',    # for 'runtests' utility

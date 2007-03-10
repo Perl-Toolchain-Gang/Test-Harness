@@ -1,13 +1,13 @@
-package TAPx::Harness::Color;
+package TAP::Harness::Color;
 
 use strict;
 use warnings;
 
-use TAPx::Parser;
-use TAPx::Harness;
+use TAP::Parser;
+use TAP::Harness;
 
 use vars qw($VERSION @ISA);
-@ISA = 'TAPx::Harness';
+@ISA = 'TAP::Harness';
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 
@@ -83,7 +83,7 @@ BEGIN {
 
 =head1 NAME
 
-TAPx::Harness::Color - Run Perl test scripts with color
+TAP::Harness::Color - Run Perl test scripts with color
 
 =head1 VERSION
 
@@ -98,7 +98,7 @@ $VERSION = '0.51';
 Note that this harness is I<experimental>.  You may not like the colors I've
 chosen and I haven't yet provided an easy way to override them.
 
-This test harness is the same as C<TAPx::Harness>, but test results are output
+This test harness is the same as C<TAP::Harness>, but test results are output
 in color.  Passing tests are printed in green.  Failing tests are in red.
 Skipped tests are blue on a white background and TODO tests are printed in
 white.
@@ -108,8 +108,8 @@ be run without color.
 
 =head1 SYNOPSIS
 
- use TAPx::Harness::Color;
- my $harness = TAPx::Harness::Color->new( \%args );
+ use TAP::Harness::Color;
+ my $harness = TAP::Harness::Color->new( \%args );
  $harness->runtests(@tests);
 
 =head1 METHODS
@@ -123,11 +123,11 @@ be run without color.
     lib     => [ 'lib', 'blib/lib' ],
     shuffle => 0,
  )
- my $harness = TAPx::Harness::Color->new( \%args );
+ my $harness = TAP::Harness::Color->new( \%args );
 
-The constructor returns a new C<TAPx::Harness::Color> object.  If
-C<Term::ANSIColor> is not installed, returns a C<TAPx::Harness> object.  See
-C<TAPx::Harness> for more details.
+The constructor returns a new C<TAP::Harness::Color> object.  If
+C<Term::ANSIColor> is not installed, returns a C<TAP::Harness> object.  See
+C<TAP::Harness> for more details.
 
 =cut
 
@@ -135,7 +135,7 @@ sub new {
     my $class = shift;
     if ($NO_COLOR) {
         warn "Cannot run tests in color: $NO_COLOR";
-        return TAPx::Harness->new(@_);
+        return TAP::Harness->new(@_);
     }
     return $class->SUPER::new(@_);
 }
@@ -146,7 +146,7 @@ sub new {
 
   $harness->failure_output(@list_of_strings_to_output);
 
-Overrides L<TAPx::Harness> C<failure_output> to output failure information in
+Overrides L<TAP::Harness> C<failure_output> to output failure information in
 red.
 
 =cut

@@ -1,14 +1,14 @@
-package TAPx::Parser::Result::Version;
+package TAP::Parser::Result::Version;
 
 use strict;
 
 use vars qw($VERSION @ISA);
-use TAPx::Parser::Result;
-@ISA = 'TAPx::Parser::Result';
+use TAP::Parser::Result;
+@ISA = 'TAP::Parser::Result';
 
 =head1 NAME
 
-TAPx::Parser::Result::Version - TAP version result token.
+TAP::Parser::Result::Version - TAP version result token.
 
 =head1 VERSION
 
@@ -20,7 +20,7 @@ $VERSION = '0.50_07';
 
 =head1 DESCRIPTION
 
-This is a subclass of C<TAPx::Parser::Result>.  A token of this class will be
+This is a subclass of C<TAP::Parser::Result>.  A token of this class will be
 returned if a version line is encountered.
 
  TAP version 4

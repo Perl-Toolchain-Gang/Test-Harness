@@ -3,11 +3,11 @@
 use strict;
 
 use lib 'lib';
-use TAPx::Parser::Grammar;
+use TAP::Parser::Grammar;
 
 use Test::More tests => 63;
 
-my $GRAMMAR = 'TAPx::Parser::Grammar';
+my $GRAMMAR = 'TAP::Parser::Grammar';
 
 can_ok $GRAMMAR, 'new';
 ok my $grammar = $GRAMMAR->new, '... and calling it should succeed';

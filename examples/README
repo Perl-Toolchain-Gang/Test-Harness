@@ -35,7 +35,7 @@ out that line in C<my_execrc>, but the test will fail.
 The C<-> tells C<runtests> to read from C<STDIN> and C<test_urls.txt> is
 merely a list of URLs we wish to test.
 
-See the documentation for C<runtests> and C<TAPx::Harness> for more
+See the documentation for C<runtests> and C<TAP::Harness> for more
 information about how to use this.
 
 If you have C<Term::AnsiColor> installed, try running the following
@@ -49,12 +49,12 @@ results in color.
 =head2 Custom Test Harnesses
 
 The C<tprove*> harnesses in the C<examples/bin/> directory are deprecated in
-favor of the new C<runtests>/C<TAPx::Harness> tools.  They are left in primary
+favor of the new C<runtests>/C<TAP::Harness> tools.  They are left in primary
 for curiosity sake, though you may find the C<tprove_gtk> one useful as a
-reference for how to create a GUI interface for C<TAPx::Parser>.
+reference for how to create a GUI interface for C<TAP::Parser>.
 
-Instead, simple override the desired methods in C<TAPx::Harness> to create
+Instead, simple override the desired methods in C<TAP::Harness> to create
 your own custom test harness.  Don't like how the summary report is formatted?
-Just override the C<&TAPx::Harness::summary> method and use your new subclass:
+Just override the C<&TAP::Harness::summary> method and use your new subclass:
 
- runtests --harness TAPx::Harness::MyHarness
+ runtests --harness TAP::Harness::MyHarness

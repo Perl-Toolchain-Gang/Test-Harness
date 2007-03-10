@@ -5,8 +5,8 @@ use strict;
 use lib 'lib';
 
 use Test::More tests => 202;
-use TAPx::Parser;
-use TAPx::Parser::Iterator;
+use TAP::Parser;
+use TAP::Parser::Iterator;
 
 sub _get_results {
     my $parser = shift;
@@ -18,12 +18,12 @@ sub _get_results {
 }
 
 my ( $PARSER, $PLAN, $TEST, $COMMENT, $BAILOUT, $UNKNOWN ) = qw(
-  TAPx::Parser
-  TAPx::Parser::Result::Plan
-  TAPx::Parser::Result::Test
-  TAPx::Parser::Result::Comment
-  TAPx::Parser::Result::Bailout
-  TAPx::Parser::Result::Unknown
+  TAP::Parser
+  TAP::Parser::Result::Plan
+  TAP::Parser::Result::Test
+  TAP::Parser::Result::Comment
+  TAP::Parser::Result::Bailout
+  TAP::Parser::Result::Unknown
 );
 
 my $tap = <<'END_TAP';
@@ -319,7 +319,7 @@ END_TAP
 my $aref = [ split /\n/ => $tap ];
 
 can_ok $PARSER, 'new';
-ok $parser = $PARSER->new( { stream => TAPx::Parser::Iterator->new($aref) } ),
+ok $parser = $PARSER->new( { stream => TAP::Parser::Iterator->new($aref) } ),
   '... and calling it should succeed';
 isa_ok $parser, $PARSER, '... and the object it returns';
 

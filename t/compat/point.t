@@ -14,11 +14,11 @@ use strict;
 use Test::More tests => 11;
 
 BEGIN {
-    use_ok('TAPx::Harness::Compatible::Point');
+    use_ok('TAP::Harness::Compatible::Point');
 }
 
-my $point = TAPx::Harness::Compatible::Point->new;
-isa_ok( $point, 'TAPx::Harness::Compatible::Point' );
+my $point = TAP::Harness::Compatible::Point->new;
+isa_ok( $point, 'TAP::Harness::Compatible::Point' );
 ok( !$point->ok, "Should start out not OK" );
 
 $point->set_ok(1);

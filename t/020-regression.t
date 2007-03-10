@@ -15,17 +15,17 @@ use constant FALSE => "__FALSE__";
 # if wait() is non-zero, we cannot reliably predict its value
 use constant NOT_ZERO => "__NOT_ZERO__";
 
-use TAPx::Parser;
+use TAP::Parser;
 
 my $SAMPLE_TESTS
   = File::Spec->catdir( File::Spec->curdir, 't', 'sample-tests' );
 
 my %deprecated = map { $_ => 1 } qw(
-  TAPx::Parser::good_plan
-  TAPx::Parser::Result::Plan::passed
-  TAPx::Parser::Result::Test::passed
-  TAPx::Parser::Result::Test::actual_passed
-  TAPx::Parser::Result::passed
+  TAP::Parser::good_plan
+  TAP::Parser::Result::Plan::passed
+  TAP::Parser::Result::Test::passed
+  TAP::Parser::Result::Test::actual_passed
+  TAP::Parser::Result::passed
 );
 $SIG{__WARN__} = sub {
     if ( $_[0] =~ /is deprecated/ ) {
@@ -2335,7 +2335,7 @@ foreach my $test ( sort keys %samples ) {
 
     # the following acrobatics are necessary to make it easy for the
     # Test::Builder::failure_output() method to be overridden when
-    # TAPx::Parser is not installed.  Otherwise, these tests will fail.
+    # TAP::Parser is not installed.  Otherwise, these tests will fail.
     my @switches =
       'ARRAY' eq ref $args->{switches}
       ? @{ $args->{switches} }
@@ -2385,7 +2385,7 @@ foreach my $test ( sort keys %samples ) {
 sub analyze_test {
     my ( $test, $results, $args ) = @_;
 
-    my $parser = TAPx::Parser->new($args);
+    my $parser = TAP::Parser->new($args);
     my $count  = 1;
     while ( defined( my $result = $parser->next ) ) {
         my $expected = shift @$results;

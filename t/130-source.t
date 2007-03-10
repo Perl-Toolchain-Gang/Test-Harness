@@ -5,18 +5,18 @@ use strict;
 use lib 'lib';
 
 use Test::More tests => 28;
-use TAPx::Parser::Source;
-use TAPx::Parser::Source::Perl;
+use TAP::Parser::Source;
+use TAP::Parser::Source::Perl;
 use File::Spec;
 
 my $test = File::Spec->catfile( 't', 'source_tests', 'source' );
 
 my $perl = $^X;
 
-can_ok 'TAPx::Parser::Source', 'new';
-ok my $source = TAPx::Parser::Source->new,
+can_ok 'TAP::Parser::Source', 'new';
+ok my $source = TAP::Parser::Source->new,
   '... and calling it should succeed';
-isa_ok $source, 'TAPx::Parser::Source', '... and the object it returns';
+isa_ok $source, 'TAP::Parser::Source', '... and the object it returns';
 
 can_ok $source, 'source';
 eval { $source->source("$perl $test") };
@@ -29,16 +29,16 @@ ok $source->source( [ $perl, '-T', $test ] ),
 can_ok $source, 'get_stream';
 ok my $stream = $source->get_stream, '... and calling it should succeed';
 
-isa_ok $stream, 'TAPx::Parser::Iterator', '... and the object it returns';
+isa_ok $stream, 'TAP::Parser::Iterator', '... and the object it returns';
 can_ok $stream, 'next';
 is $stream->next, '1..1', '... and the first line should be correct';
 is $stream->next, 'ok 1', '... as should the second';
 ok !$stream->next, '... and we should have no more results';
 
-can_ok 'TAPx::Parser::Source::Perl', 'new';
-ok $source = TAPx::Parser::Source::Perl->new,
+can_ok 'TAP::Parser::Source::Perl', 'new';
+ok $source = TAP::Parser::Source::Perl->new,
   '... and calling it should succeed';
-isa_ok $source, 'TAPx::Parser::Source::Perl', '... and the object it returns';
+isa_ok $source, 'TAP::Parser::Source::Perl', '... and the object it returns';
 
 can_ok $source, 'source';
 ok $source->source($test),
@@ -47,7 +47,7 @@ ok $source->source($test),
 can_ok $source, 'get_stream';
 ok $stream = $source->get_stream, '... and calling it should succeed';
 
-isa_ok $stream, 'TAPx::Parser::Iterator', '... and the object it returns';
+isa_ok $stream, 'TAP::Parser::Iterator', '... and the object it returns';
 can_ok $stream, 'next';
 is $stream->next, '1..1', '... and the first line should be correct';
 is $stream->next, 'ok 1', '... as should the second';

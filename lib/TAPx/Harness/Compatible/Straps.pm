@@ -1,14 +1,14 @@
 # -*- Mode: cperl; cperl-indent-level: 4 -*-
-package TAPx::Harness::Compatible::Straps;
+package TAP::Harness::Compatible::Straps;
 
 use strict;
 use vars qw($VERSION);
 $VERSION = '0.51';
 
 use Config;
-use TAPx::Harness::Compatible::Iterator;
-use TAPx::Harness::Compatible::Point;
-use TAPx::Harness::Compatible::Results;
+use TAP::Harness::Compatible::Iterator;
+use TAP::Harness::Compatible::Point;
+use TAP::Harness::Compatible::Results;
 
 # Flags used as return values from our methods.  Just for internal
 # clarification.
@@ -17,13 +17,13 @@ my $NO  = !$YES;
 
 =head1 NAME
 
-TAPx::Harness::Compatible::Straps - detailed analysis of test results
+TAP::Harness::Compatible::Straps - detailed analysis of test results
 
 =head1 SYNOPSIS
 
-  use TAPx::Harness::Compatible::Straps;
+  use TAP::Harness::Compatible::Straps;
 
-  my $strap = TAPx::Harness::Compatible::Straps->new;
+  my $strap = TAP::Harness::Compatible::Straps->new;
 
   # Various ways to interpret a test
   my $results = $strap->analyze($name, \@test_output);
@@ -43,10 +43,10 @@ TAPx::Harness::Compatible::Straps - detailed analysis of test results
 B<THIS IS ALPHA SOFTWARE> in that the interface is subject to change
 in incompatible ways.  It is otherwise stable.
 
-TAPx::Harness::Compatible is limited to printing out its results.  This makes
+TAP::Harness::Compatible is limited to printing out its results.  This makes
 analysis of the test results difficult for anything but a human.  To
 make it easier for programs to work with test results, we provide
-TAPx::Harness::Compatible::Straps.  Instead of printing the results, straps
+TAP::Harness::Compatible::Straps.  Instead of printing the results, straps
 provide them as raw data.  You can also configure how the tests are to
 be run.
 
@@ -58,7 +58,7 @@ comments.
 
 =head2 new()
 
-  my $strap = TAPx::Harness::Compatible::Straps->new;
+  my $strap = TAP::Harness::Compatible::Straps->new;
 
 Initialize a new strap.
 
@@ -107,7 +107,7 @@ newlines.
 sub analyze {
     my ( $self, $name, $test_output ) = @_;
 
-    my $it = TAPx::Harness::Compatible::Iterator->new($test_output);
+    my $it = TAP::Harness::Compatible::Iterator->new($test_output);
     return $self->_analyze_iterator( $name, $it );
 }
 
@@ -117,7 +117,7 @@ sub _analyze_iterator {
     $self->_reset_file_state;
     $self->{file} = $name;
 
-    my $results = TAPx::Harness::Compatible::Results->new;
+    my $results = TAP::Harness::Compatible::Results->new;
 
     # Set them up here so callbacks can have them.
     $self->{totals}{$name} = $results;
@@ -147,7 +147,7 @@ sub _analyze_line {
     $self->{line}++;
 
     my $linetype;
-    my $point = TAPx::Harness::Compatible::Point->from_test_line($line);
+    my $point = TAP::Harness::Compatible::Point->from_test_line($line);
     if ($point) {
         $linetype = 'test';
 
@@ -255,7 +255,7 @@ Like C<analyze>, but it reads from the given filehandle.
 sub analyze_fh {
     my ( $self, $name, $fh ) = @_;
 
-    my $it = TAPx::Harness::Compatible::Iterator->new($fh);
+    my $it = TAP::Harness::Compatible::Iterator->new($fh);
     return $self->_analyze_iterator( $name, $it );
 }
 
@@ -282,7 +282,7 @@ sub analyze_file {
     }
 
     local $ENV{PERL5LIB} = $self->_INC2PERL5LIB;
-    if ($TAPx::Harness::Compatible::Debug) {
+    if ($TAP::Harness::Compatible::Debug) {
         local $^W = 0;    # ignore undef warnings
         print "# PERL5LIB=$ENV{PERL5LIB}\n";
     }
@@ -371,7 +371,7 @@ sub _switches {
     my ( $self, $file ) = @_;
 
     my @existing_switches = $self->_cleaned_switches(
-        $TAPx::Harness::Compatible::Switches,
+        $TAP::Harness::Compatible::Switches,
         $ENV{HARNESS_PERL_SWITCHES}
     );
     my @derived_switches;
@@ -633,7 +633,7 @@ Andy Lester C<< <andy at petdance.com> >>.
 
 =head1 SEE ALSO
 
-L<TAPx::Harness::Compatible>
+L<TAP::Harness::Compatible>
 
 =cut
 

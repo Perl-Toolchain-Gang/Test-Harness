@@ -1,11 +1,11 @@
-package TAPx::Parser::Aggregator;
+package TAP::Parser::Aggregator;
 
 use strict;
 use vars qw($VERSION);
 
 =head1 NAME
 
-TAPx::Parser::Aggregator - Aggregate TAPx::Parser results.
+TAP::Parser::Aggregator - Aggregate TAP::Parser results.
 
 =head1 VERSION
 
@@ -17,9 +17,9 @@ $VERSION = '0.51';
 
 =head1 SYNOPSIS
 
-    use TAPx::Parser::Aggregator;
+    use TAP::Parser::Aggregator;
 
-    my $aggregate = TAPx::Parser::Aggregator->new;
+    my $aggregate = TAP::Parser::Aggregator->new;
     $aggregate->add( 't/00-load.t', $load_parser );
     $aggregate->add( 't/10-lex.t',  $lex_parser  );
     
@@ -35,7 +35,7 @@ $VERSION = '0.51';
 
 =head1 DESCRIPTION
 
-C<TAPx::Parser::Aggregator> is a simple class which takes parser objects and
+C<TAP::Parser::Aggregator> is a simple class which takes parser objects and
 allows reporting of aggregate results.
 
 =head1 METHODS
@@ -44,9 +44,9 @@ allows reporting of aggregate results.
 
 =head3 C<new>
 
- my $aggregate = TAPx::Parser::Aggregator->new;
+ my $aggregate = TAP::Parser::Aggregator->new;
 
-Returns a new C<TAPx::Parser::Aggregator> object.
+Returns a new C<TAP::Parser::Aggregator> object.
 
 =cut
 
@@ -106,7 +106,7 @@ sub _initialize {
   $aggregate->add( $description, $parser );
 
 Takes two arguments, the description of the TAP source (usually a test file
-name, but it doesn't have to be) and a C<TAPx::Parser> object.
+name, but it doesn't have to be) and a C<TAP::Parser> object.
 
 Trying to reuse a description is a fatal error.
 

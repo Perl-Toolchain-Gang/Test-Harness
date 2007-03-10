@@ -3,21 +3,21 @@
 use strict;
 
 use lib 'lib';
-use TAPx::Parser::Iterator;
+use TAP::Parser::Iterator;
 
 use Test::More tests => 47;
 
-use TAPx::Parser;
-use TAPx::Parser::Iterator;
+use TAP::Parser;
+use TAP::Parser::Iterator;
 
-my ( $STREAMED, $ITER ) = ( 'TAPx::Parser', 'TAPx::Parser::Iterator' );
+my ( $STREAMED, $ITER ) = ( 'TAP::Parser', 'TAP::Parser::Iterator' );
 my $ITER_FH    = "${ITER}::FH";
 my $ITER_ARRAY = "${ITER}::ARRAY";
 
-my $stream = TAPx::Parser::Iterator->new( \*DATA );
-ok my $parser = TAPx::Parser->new( { stream => $stream } ),
+my $stream = TAP::Parser::Iterator->new( \*DATA );
+ok my $parser = TAP::Parser->new( { stream => $stream } ),
   '... and creating a streamed parser should succeed';
-isa_ok $parser, 'TAPx::Parser', '... and the object it returns';
+isa_ok $parser, 'TAP::Parser', '... and the object it returns';
 
 can_ok $parser, '_stream';
 is ref $parser->_stream, $ITER_FH,
@@ -57,7 +57,7 @@ ok 5 # skip we have no description
 END_TAP
 
 $stream = $ITER->new( [ split /\n/ => $tap ] );
-ok $parser = TAPx::Parser->new( { stream => $stream } ),
+ok $parser = TAP::Parser->new( { stream => $stream } ),
   'Now we create a parser with the plan at the end';
 isa_ok $parser->_stream, $ITER_ARRAY,
   '... and now we should have an array iterator';
@@ -96,7 +96,7 @@ END_TAP
 
 $stream = $ITER->new( [ split /\n/ => $tap ] );
 
-ok $parser = TAPx::Parser->new( { stream => $stream } ),
+ok $parser = TAP::Parser->new( { stream => $stream } ),
   'Now we create a parser with a plan as the second line';
 is $parser->next->as_string, 'ok 1 - input file opened',
   '... and the first test should parse correctly';
@@ -134,7 +134,7 @@ END_TAP
 
 $stream = $ITER->new( [ split /\n/ => $tap ] );
 
-ok $parser = TAPx::Parser->new( { stream => $stream } ),
+ok $parser = TAP::Parser->new( { stream => $stream } ),
   'Now we create a parser with the plan as the second to last line';
 is $parser->next->as_string, 'ok 1 - input file opened',
   '... and the first test should parse correctly';

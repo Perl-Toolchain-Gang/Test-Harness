@@ -505,9 +505,9 @@ my %samples = (
     },
 );
 
-use TAPx::Harness::Compatible::Straps;
+use TAP::Harness::Compatible::Straps;
 my @_INC = map {qq{"-I$_"}} @INC;
-$TAPx::Harness::Compatible::Switches = "@_INC -Mstrict";
+$TAP::Harness::Compatible::Switches = "@_INC -Mstrict";
 
 $SIG{__WARN__} = sub {
     warn @_
@@ -527,8 +527,8 @@ for my $test ( sort keys %samples ) {
     }
 
     my $test_path = File::Spec->catfile( $SAMPLE_TESTS, $test );
-    my $strap = TAPx::Harness::Compatible::Straps->new;
-    isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
+    my $strap = TAP::Harness::Compatible::Straps->new;
+    isa_ok( $strap, 'TAP::Harness::Compatible::Straps' );
     my $results = $strap->analyze_file($test_path);
 
     is_deeply(
@@ -557,8 +557,8 @@ for my $test ( sort keys %samples ) {
 }    # for %samples
 
 NON_EXISTENT_FILE: {
-    my $strap = TAPx::Harness::Compatible::Straps->new;
-    isa_ok( $strap, 'TAPx::Harness::Compatible::Straps' );
+    my $strap = TAP::Harness::Compatible::Straps->new;
+    isa_ok( $strap, 'TAP::Harness::Compatible::Straps' );
     ok( !$strap->analyze_file('I_dont_exist'),
         "Can't analyze a non-existant file"
     );

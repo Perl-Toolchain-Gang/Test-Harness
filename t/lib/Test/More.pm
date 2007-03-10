@@ -137,7 +137,7 @@ In some cases, you'll want to completely skip an entire testing script.
   use Test::More skip_all => $skip_reason;
 
 Your script will declare a skip with the reason why you skipped and
-exit immediately with a zero (success).  See L<TAPx::Harness::Compatible> for
+exit immediately with a zero (success).  See L<TAP::Harness::Compatible> for
 details.
 
 If you want to control what functions Test::More will export, you
@@ -721,7 +721,7 @@ necessary to skip tests, or declare that they are supposed to fail
 but will work in the future (a todo test).
 
 For more details on the mechanics of skip and todo tests see
-L<TAPx::Harness::Compatible>.
+L<TAP::Harness::Compatible>.
 
 The way Test::More handles this is with a named block.  Basically, a
 block of tests which can be skipped over or made todo.  It's best if I
@@ -752,7 +752,7 @@ easiest way to illustrate:
     }
 
 If pigs cannot fly, the whole block of tests will be skipped
-completely.  Test::More will output special ok's which TAPx::Harness::Compatible
+completely.  Test::More will output special ok's which TAP::Harness::Compatible
 interprets as skipped tests.  Its important to include $how_many tests
 are in the block so the total number of tests comes out right (unless
 you're using C<no_plan>, in which case you can leave $how_many off if
@@ -818,7 +818,7 @@ because you haven't fixed a bug or haven't finished a new feature:
 
 With a todo block, the tests inside are expected to fail.  Test::More
 will run the tests normally, but print out special flags indicating
-they are "todo".  TAPx::Harness::Compatible will interpret failures as being ok.
+they are "todo".  TAP::Harness::Compatible will interpret failures as being ok.
 Should anything succeed, it will report it as an unexpected success.
 
 The nice part about todo tests, as opposed to simply commenting out a
@@ -845,7 +845,7 @@ inside an C<eval BLOCK> with and using C<alarm>.  In these extreme
 cases you have no choice but to skip over the broken tests entirely.
 
 The syntax and behavior is similar to a C<SKIP: BLOCK> except the
-tests will be marked as failing but todo.  TAPx::Harness::Compatible will
+tests will be marked as failing but todo.  TAP::Harness::Compatible will
 interpret them as passing.
 
 =cut
@@ -1140,16 +1140,16 @@ instead.
 
 =item The eq_* family has some caveats.
 
-=item TAPx::Harness::Compatible upgrades
+=item TAP::Harness::Compatible upgrades
 
-no_plan and todo depend on new TAPx::Harness::Compatible features and fixes.  If
+no_plan and todo depend on new TAP::Harness::Compatible features and fixes.  If
 you're going to distribute tests that use no_plan or todo your
-end-users will have to upgrade TAPx::Harness::Compatible to the latest one on
-CPAN.  If you avoid no_plan and TODO tests, the stock TAPx::Harness::Compatible
+end-users will have to upgrade TAP::Harness::Compatible to the latest one on
+CPAN.  If you avoid no_plan and TODO tests, the stock TAP::Harness::Compatible
 will work fine.
 
 If you simply depend on Test::More, it's own dependencies will cause a
-TAPx::Harness::Compatible upgrade.
+TAP::Harness::Compatible upgrade.
 
 =back
 
@@ -1181,7 +1181,7 @@ And it plays well with Test::More.
 L<Test> is the old testing module.  Its main benefit is that it has
 been distributed with Perl since 5.004_05.
 
-L<TAPx::Harness::Compatible> for details on how your test results are interpreted
+L<TAP::Harness::Compatible> for details on how your test results are interpreted
 by Perl.
 
 L<Test::Unit> describes a very featureful unit testing interface.

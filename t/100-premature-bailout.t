@@ -3,9 +3,9 @@
 use strict;
 
 use Test::More tests => 14;
-use TAPx::Parser;
+use TAP::Parser;
 
-use TAPx::Parser::Iterator;
+use TAP::Parser::Iterator;
 
 sub tap_to_lines {
     my $string = shift;
@@ -25,8 +25,8 @@ Bail out!  We ran out of foobar.
 not ok 5
 END_TAP
 
-my $parser = TAPx::Parser->new(
-    {   stream => TAPx::Parser::Iterator->new( tap_to_lines($tap) ),
+my $parser = TAP::Parser->new(
+    {   stream => TAP::Parser::Iterator->new( tap_to_lines($tap) ),
     }
 );
 
@@ -103,8 +103,8 @@ is( $bailout->explanation, 'We ran out of foobar.',
 
 my $more_tap = "1..1\nok 1 - input file opened\n";
 
-my $second_parser = TAPx::Parser->new(
-    {   stream => TAPx::Parser::Iterator->new( [ split( /\n/, $more_tap ) ] ),
+my $second_parser = TAP::Parser->new(
+    {   stream => TAP::Parser::Iterator->new( [ split( /\n/, $more_tap ) ] ),
     }
 );
 

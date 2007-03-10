@@ -5,14 +5,14 @@ use strict;
 use lib 'lib';
 
 use Test::More tests => 222;
-use TAPx::Parser::Result;
+use TAP::Parser::Result;
 
-use constant RESULT  => 'TAPx::Parser::Result';
-use constant PLAN    => 'TAPx::Parser::Result::Plan';
-use constant TEST    => 'TAPx::Parser::Result::Test';
-use constant COMMENT => 'TAPx::Parser::Result::Comment';
-use constant BAILOUT => 'TAPx::Parser::Result::Bailout';
-use constant UNKNOWN => 'TAPx::Parser::Result::Unknown';
+use constant RESULT  => 'TAP::Parser::Result';
+use constant PLAN    => 'TAP::Parser::Result::Plan';
+use constant TEST    => 'TAP::Parser::Result::Test';
+use constant COMMENT => 'TAP::Parser::Result::Comment';
+use constant BAILOUT => 'TAP::Parser::Result::Bailout';
+use constant UNKNOWN => 'TAP::Parser::Result::Unknown';
 
 my $warning;
 $SIG{__WARN__} = sub { $warning = shift };

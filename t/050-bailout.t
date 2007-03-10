@@ -7,7 +7,7 @@ use lib 'lib';
 #use Test::More 'no_plan';
 
 use Test::More tests => 33;
-use TAPx::Parser;
+use TAP::Parser;
 
 my $tap = <<'END_TAP';
 1..4
@@ -19,7 +19,7 @@ ok 3 - read the rest of the file
 not ok 4 - this is a real failure
 Bail out!  We ran out of foobar.
 END_TAP
-ok my $parser = TAPx::Parser->new( { tap => $tap } ),
+ok my $parser = TAP::Parser->new( { tap => $tap } ),
   '... we should be able to parse bailed out tests';
 
 my @results;
