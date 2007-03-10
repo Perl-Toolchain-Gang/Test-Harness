@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 122;
+use Test::More tests => 130;
 
 # these tests cannot be run from the t/ directory due to checking for the
 # existence of execrc
@@ -319,6 +319,40 @@ foreach my $HARNESS (qw<TAPx::Harness TAPx::Harness::Color>) {
     chomp(@output);
     pop @output;                              # get rid of summary line
     is( $output[-1], 'All tests successful.', 'No exec accumulation' );
+}
+
+{
+
+    # make sure execrc parsing is solid (internals test)
+    my $harness = TAPx::Harness->new;
+    ok !$harness->exec, 'exec() should not be set with an empty harness';
+    my %execrc = %{ $harness->_execrc };
+    ok !%execrc, '... nor should execrc';
+
+    can_ok $harness, '_read_execrc';
+    $harness->execrc('t/data/execrc');
+    ok $harness->_read_execrc, '... and reading the execrc should succeed';
+
+    can_ok $harness, '_get_executable';
+    is_deeply $harness->_get_executable('t/some_test.t'),
+      [ '/usr/bin/perl',
+        '-wT',
+        't/some_test.t'
+      ],
+      '... and it should return default results for unmatcheable test names';
+
+    is_deeply $harness->_get_executable('t/ruby.t'),
+      [ '/usr/bin/ruby',
+        't/ruby.t'
+      ],
+      '... but an exact match should return a specific executable';
+    is_deeply $harness->_get_executable('http://www.google.com/'),
+      [ '/usr/bin/perl',
+        '-w',
+        'bin/test_html.pl',
+        'http://www.google.com/',
+      ],
+      '... even if we match something which is not a file';
 }
 
 sub trim {

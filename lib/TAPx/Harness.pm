@@ -263,7 +263,7 @@ This overrides other settings such as C<verbose> or C<failures>.
 sub _read_execrc {
     my $self = shift;
     $self->_execrc( {} );
-    my $execrc = $self->execrc or return;
+    my $execrc = $self->execrc or return $self;
     my $data   = TAPx::Parser::YAML->read($execrc);
     my $tests  = $data->[0]{tests};
 
@@ -681,31 +681,44 @@ sub output_test_failure {
     $self->output("\n");
 }
 
-sub _runtest {
-    my ( $self, $leader, $test ) = @_;
+sub _get_executable {
+    my ( $self, $test ) = @_;
+    my $execrc = $self->_execrc;
+    
+    my $executable;
+    if ( my $exec = $execrc->{$test} ) {
+        $executable = $exec;
+    }
+    elsif ( $exec = $self->exec ) {
+        $executable = [ @$exec, $test ];
+    }
+    return $executable;
+}
 
-    my $execrc       = $self->_execrc;
-    my $really_quiet = $self->really_quiet;
-    my $show_count   = $self->_should_show_count;
-    $self->output($leader) unless $really_quiet;
-
+sub _get_parser_args {
+    my ( $self, $test ) = @_;
     my %args = ( source => $test );
     my @switches = $self->lib if $self->lib;
     push @switches => $self->switches if $self->switches;
     $args{switches} = \@switches;
 
-    if ( my $exec = $execrc->{$test} ) {
+    if ( my $exec = $self->_get_executable($test) ) {
         $args{exec} = $exec;
-        delete $args{source};
-    }
-    elsif ( $exec = $self->exec ) {
-        $args{exec} = [ @$exec, $test ];
         delete $args{source};
     }
 
     $args{spool} = $self->_open_spool($test);
+    return \%args;
+}
 
-    my $parser = TAPx::Parser->new( \%args );
+sub _runtest {
+    my ( $self, $leader, $test ) = @_;
+
+    my $really_quiet = $self->really_quiet;
+    my $show_count   = $self->_should_show_count;
+    $self->output($leader) unless $really_quiet;
+
+    my $parser = TAPx::Parser->new( $self->_get_parser_args($test) );
 
     $self->_make_callback( 'made_parser', $parser );
 
