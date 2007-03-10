@@ -347,17 +347,12 @@ A formal grammar would look similar to the following:
      Suggestions welcome.
  *)
  
- (* POSIX character classes and other terminals *)
- 
- digit              ::= [:digit:]
- character          ::= ([:print:] - "\n")
- positiveInteger    ::= ( digit - '0' ) {digit}
- nonNegativeInteger ::= digit {digit}
- 
- tap            ::= { comment | unknown } leading_plan lines 
+ tap            ::= version? { comment | unknown } leading_plan lines 
                     | 
                     lines trailing_plan {comment}
  
+ version        ::= 'TAP version ' positiveInteger {positiveInteger} "\n"
+
  leading_plan   ::= plan skip_directive? "\n"
 
  trailing_plan  ::= plan "\n"
@@ -387,6 +382,14 @@ A formal grammar would look similar to the following:
  bailout        ::= 'Bail out!' {character}
 
  unknown        ::= { (character - "\n") }
+
+ (* POSIX character classes and other terminals *)
+ 
+ digit              ::= [:digit:]
+ character          ::= ([:print:] - "\n")
+ positiveInteger    ::= ( digit - '0' ) {digit}
+ nonNegativeInteger ::= digit {digit}
+ 
 
 =cut
 
