@@ -1075,12 +1075,6 @@ BEGIN {
             test => {},
             plan => { goto => 'GOT_PLAN' },
         },
-        DONE   => {},
-        BAILED => {
-            version => {},
-            plan    => {},
-            test    => {},
-        },
     );
 
     # Apply globals and defaults to state table
