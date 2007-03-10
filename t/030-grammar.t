@@ -5,7 +5,7 @@ use strict;
 use lib 'lib';
 use TAPx::Parser::Grammar;
 
-use Test::More tests => 59;
+use Test::More tests => 63;
 
 my $GRAMMAR = 'TAPx::Parser::Grammar';
 
@@ -20,7 +20,7 @@ isa_ok $grammar, $GRAMMAR, '... and the object it returns';
 can_ok $grammar, 'token_types';
 ok my @types = sort( $grammar->token_types ),
   '... and calling it should succeed';
-is_deeply [qw(bailout comment plan test)], \@types,
+is_deeply \@types, [qw(bailout comment plan test version)], 
   '... and return the correct token types';
 
 can_ok $grammar, 'syntax_for';

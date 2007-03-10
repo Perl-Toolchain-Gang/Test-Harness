@@ -24,6 +24,8 @@ Version 0.51
 
 $VERSION = '0.51';
 
+my $DEFAULT_TAP_VERSION = 3;
+
 BEGIN {
     foreach my $method (
         qw<
@@ -43,6 +45,7 @@ BEGIN {
         tests_planned
         tests_run
         wait
+        version
         in_todo
         >
       )
@@ -312,6 +315,7 @@ sub run {
         _end_tap           => 0,
         _plan_found        => 0,     # how many plans were found
         _start_tap         => 0,
+        version            => $DEFAULT_TAP_VERSION,
         plan               => '',    # the test plan (e.g., 1..3)
         tap                => '',    # the TAP
         tests_run          => 0,     # actual current test numbers
@@ -330,6 +334,7 @@ sub run {
     # probably get it from somewhere else to avoid the repetition.
     my @legal_callback = qw(
       test
+      version
       plan
       comment
       bailout
@@ -434,7 +439,7 @@ I<result types>.
 
 =head2 Result types
 
-Basically, you fetch individual results from the TAP.  The five types, with
+Basically, you fetch individual results from the TAP.  The six types, with
 examples of each, are as follows:
 
 =over 4
@@ -442,6 +447,10 @@ examples of each, are as follows:
 =item * Plan
 
  1..42
+
+=item * Version
+
+ TAP version 4
 
 =item * Test
 
@@ -865,6 +874,13 @@ plan of '1..17' will mean that 17 tests were planned.
 Returns the number of tests which actually were run.  Hopefully this will
 match the number of C<< $parser->tests_planned >>.
 
+=head3 C<version>
+
+  $parser->version;
+  
+Once the parser is done, this will return the version number for the
+parsed TAP. Version numbers were introduced with TAP version 4 so if no
+version number is found version 3 is assumed.
 
 =head3 C<exit>
 
@@ -984,6 +1000,18 @@ sub _aggregate_results {
                 $test->_number( $self->tests_run );
             }
             $self->_aggregate_results($test);
+        },
+        version => sub {
+            my ( $self, $version ) = @_;
+            local *__ANON__ = '__ANON__version_validation';
+            my $ver_num = $version->version;
+            if ($ver_num <= $DEFAULT_TAP_VERSION) {
+                $self->_add_error(
+                    "Explicit TAP version must be at least "
+                    . "$DEFAULT_TAP_VERSION. Got version $ver_num"
+                );
+            }
+            $self->version( $ver_num );
         },
         plan => sub {
             my ( $self, $plan ) = @_;

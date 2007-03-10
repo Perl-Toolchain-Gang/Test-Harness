@@ -73,6 +73,18 @@ my $directive = qr/
                    /x;
 
 my %token_for = (
+    version => {
+        syntax  => qr/^TAP\s+version\s+(\d+)\s*\z/i,
+        handler => sub {
+            my ( $self, $line ) = @_;
+            local *__ANON__ = '__ANON__version_token_handler';
+            my $version = $1;
+            return $self->_make_version_token(
+                $line,
+                $version,
+            );
+        }
+    },
     plan => {
         syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\b(.*))?\z/i,
         handler => sub {
@@ -231,6 +243,15 @@ TAP parsing loop looks similar to the following:
 sub handler_for {
     my ( $proto, $type ) = @_;
     return $token_for{$type}{handler};
+}
+
+sub _make_version_token {
+    my ( $self, $line, $version ) = @_;
+    return {
+        type          => 'version',
+        raw           => $line,
+        version       => $version,
+    };
 }
 
 sub _make_plan_token {

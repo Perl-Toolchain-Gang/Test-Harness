@@ -1,0 +1,63 @@
+package TAPx::Parser::Result::Version;
+
+use strict;
+
+use vars qw($VERSION @ISA);
+use TAPx::Parser::Result;
+@ISA = 'TAPx::Parser::Result';
+
+=head1 NAME
+
+TAPx::Parser::Result::Version - TAP version result token.
+
+=head1 VERSION
+
+Version 0.50_07
+
+=cut
+
+$VERSION = '0.50_07';
+
+=head1 DESCRIPTION
+
+This is a subclass of C<TAPx::Parser::Result>.  A token of this class will be
+returned if a version line is encountered.
+
+ TAP version 4
+ ok 1
+ not ok 2
+
+The first version of TAP to include an explicit version number is 4.
+
+=head1 OVERRIDDEN METHODS
+
+Mainly listed here to shut up the pitiful screams of the pod coverage tests.
+They keep me awake at night.
+
+=over 4
+
+=item * C<as_string>
+
+=item * C<raw>
+
+=back
+
+=cut
+
+##############################################################################
+
+=head2 Instance methods
+
+=head3 C<version> 
+
+  if ( $result->is_version ) {
+     print $result->version;
+  }
+
+This is merely a synonym for C<as_string>.
+
+=cut
+
+sub version { shift->{version} }
+
+1;

@@ -7,11 +7,12 @@ use TAPx::Parser::Result::Plan;
 use TAPx::Parser::Result::Test;
 use TAPx::Parser::Result::Comment;
 use TAPx::Parser::Result::Bailout;
+use TAPx::Parser::Result::Version;
 use TAPx::Parser::Result::Unknown;
 
 BEGIN {
     no strict 'refs';
-    foreach my $token (qw<plan comment test bailout unknown>) {
+    foreach my $token (qw<plan comment test bailout version unknown>) {
         my $method = "is_$token";
         *$method = sub { return $token eq shift->type };
     }
@@ -46,6 +47,7 @@ my %class_for = (
     test    => 'TAPx::Parser::Result::Test',
     comment => 'TAPx::Parser::Result::Comment',
     bailout => 'TAPx::Parser::Result::Bailout',
+    version => 'TAPx::Parser::Result::Version',
     unknown => 'TAPx::Parser::Result::Unknown',
 );
 
@@ -106,6 +108,12 @@ Indicates whether or not this is a comment.
 Indicates whether or not this is bailout line.
 
  Bail out! We're out of dilithium crystals.
+
+=item * C<is_version>
+
+Indicates whether or not this is a TAP version line.
+
+ TAP version 4
 
 =item * C<is_unknown>
 
