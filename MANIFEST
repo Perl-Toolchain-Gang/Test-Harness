@@ -52,7 +52,6 @@ t/150-results.t
 t/160-yaml.t
 t/compat/00compile.t
 t/compat/base.t
-t/compat/callback.t
 t/compat/failure.t
 t/compat/inc_taint.t
 t/compat/nonumbers.t
