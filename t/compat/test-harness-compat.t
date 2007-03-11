@@ -756,43 +756,61 @@ sub is_deeply_dump($$$) {
     }
 }
 
-SKIP: {
-    skip "Not working on Windows yet", $num_tests if $^O =~ /^(MS)?Win32$/;
+sub local_name {
+	my $name = shift;
+	return File::Spec->catfile( split /\//, $name );
+}
 
-    {
+sub local_result {
+	my $hash = shift;
+	my $new = {};
 
-        # Suppress subroutine redefined warning
-        no warnings 'redefine';
+	while ( my ($file, $want) = each %$hash ) {
+		if (exists $want->{name} ) {
+			$want->{name} = local_name($want->{name});
+		}
+		$new->{local_name($file)} = $want;
+	}
+	return $new;
+}
 
-        # Silence harness output
-        *TAP::Harness::output = sub {
+{
 
-            # do nothing
-        };
-    }
+    # Suppress subroutine redefined warning
+    no warnings 'redefine';
 
-    for my $test_key ( sort keys %$results ) {
-        my $result = $results->{$test_key};
-        SKIP: {
-            if ( $result->{require} && $] < $result->{require} ) {
-                skip "Test requires Perl $result->{require}, we have $]", 4;
-            }
-            my @test_names = split( /,/, $test_key );
-            my @test_files
-              = map { File::Spec->catfile( $TEST_DIR, $_ ) } @test_names;
+    # Silence harness output
+    *TAP::Harness::output = sub {
 
-            my ( $tot, $fail, $todo, $harness, $aggregate )
-              = execute_tests( tests => \@test_files );
+        # do nothing
+    };
+}
 
-            my $bench = delete $tot->{bench};
-            isa_ok $bench, 'Benchmark';
-
-            is_deeply_dump $tot, $result->{totals},
-              "totals match for $test_key";
-            is_deeply_dump $fail, $result->{failed},
-              "failure summary matches for $test_key";
-            is_deeply_dump $todo, $result->{todo},
-              "todo summary matches for $test_key";
+for my $test_key ( sort keys %$results ) {
+    my $result = $results->{$test_key};
+    SKIP: {
+        if ( $result->{require} && $] < $result->{require} ) {
+            skip "Test requires Perl $result->{require}, we have $]", 4;
         }
+        my @test_names = split( /,/, $test_key );
+        my @test_files
+          = map { File::Spec->catfile( $TEST_DIR, $_ ) } @test_names;
+
+        my ( $tot, $fail, $todo, $harness, $aggregate )
+          = execute_tests( tests => \@test_files );
+
+        my $bench = delete $tot->{bench};
+        isa_ok $bench, 'Benchmark';
+
+		# Localise filenames in failed, todo
+		my $lfailed = local_result($result->{failed});
+		my $ltodo   = local_result($result->{todo});
+
+        is_deeply_dump $tot, $result->{totals},
+          "totals match for $test_key";
+        is_deeply_dump $fail, $lfailed,
+          "failure summary matches for $test_key";
+        is_deeply_dump $todo, $ltodo,
+          "todo summary matches for $test_key";
     }
 }
