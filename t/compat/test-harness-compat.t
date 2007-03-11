@@ -757,21 +757,21 @@ sub is_deeply_dump($$$) {
 }
 
 sub local_name {
-	my $name = shift;
-	return File::Spec->catfile( split /\//, $name );
+    my $name = shift;
+    return File::Spec->catfile( split /\//, $name );
 }
 
 sub local_result {
-	my $hash = shift;
-	my $new = {};
+    my $hash = shift;
+    my $new  = {};
 
-	while ( my ($file, $want) = each %$hash ) {
-		if (exists $want->{name} ) {
-			$want->{name} = local_name($want->{name});
-		}
-		$new->{local_name($file)} = $want;
-	}
-	return $new;
+    while ( my ( $file, $want ) = each %$hash ) {
+        if ( exists $want->{name} ) {
+            $want->{name} = local_name( $want->{name} );
+        }
+        $new->{ local_name($file) } = $want;
+    }
+    return $new;
 }
 
 {
@@ -802,15 +802,13 @@ for my $test_key ( sort keys %$results ) {
         my $bench = delete $tot->{bench};
         isa_ok $bench, 'Benchmark';
 
-		# Localise filenames in failed, todo
-		my $lfailed = local_result($result->{failed});
-		my $ltodo   = local_result($result->{todo});
+        # Localise filenames in failed, todo
+        my $lfailed = local_result( $result->{failed} );
+        my $ltodo   = local_result( $result->{todo} );
 
-        is_deeply_dump $tot, $result->{totals},
-          "totals match for $test_key";
+        is_deeply_dump $tot, $result->{totals}, "totals match for $test_key";
         is_deeply_dump $fail, $lfailed,
           "failure summary matches for $test_key";
-        is_deeply_dump $todo, $ltodo,
-          "todo summary matches for $test_key";
+        is_deeply_dump $todo, $ltodo, "todo summary matches for $test_key";
     }
 }

@@ -19,6 +19,7 @@ WriteMakefile(
     },
     'INSTALLDIRS' => 'site',
     'PL_FILES'    => {},
+    'LICENSE'     => 'perl',
     'test'        => { 'TESTS' => 't/*.t t/compat/*.t' },
     @program,
 );

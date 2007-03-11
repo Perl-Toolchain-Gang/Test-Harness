@@ -264,25 +264,25 @@ sub _read_execrc {
     my $self = shift;
     $self->_execrc( { exact => {}, regex => {} } );
     my $execrc = $self->execrc or return $self;
-    my $data   = TAP::Parser::YAML->read($execrc);
+    my $data = TAP::Parser::YAML->read($execrc);
 
     my %exec_for;
-    foreach my $type ( qw{ exact regex } ) {
-        foreach my $exec (@{ $data->[0]{$type} }) {
+    foreach my $type (qw{ exact regex }) {
+        foreach my $exec ( @{ $data->[0]{$type} } ) {
             if ( 'regex' eq $type ) {
-                eval { qr/$exec/ };
+                eval {qr/$exec/};
                 if ( my $error = $@ ) {
                     warn "Can't use execrc item ($exec) as a regex: $error";
                     next;
                 }
             }
             my $test = $exec->[-1];
-            $exec_for{ $type }{ $test } = $exec;
+            $exec_for{$type}{$test} = $exec;
         }
     }
 
     if ( my $exec = $data->[0]{default} ) {
-         $exec = $exec->[0];
+        $exec = $exec->[0];
 
         # don't override command line
         $self->exec($exec) unless $self->exec;
@@ -693,18 +693,18 @@ sub output_test_failure {
 sub _get_executable {
     my ( $self, $test ) = @_;
     my $execrc = $self->_execrc;
-    
+
     my $executable;
     if ( my $exec = $execrc->{exact}{$test} ) {
         $executable = $exec;
     }
     else {
-         foreach my $regex ( keys %{ $execrc->{regex} } ) {
-             if ( $test =~ qr/$regex/ ) {
-                 $executable = $execrc->{regex}{$regex};
-                 $executable->[-1] = $test;
-             }
-         }
+        foreach my $regex ( keys %{ $execrc->{regex} } ) {
+            if ( $test =~ qr/$regex/ ) {
+                $executable = $execrc->{regex}{$regex};
+                $executable->[-1] = $test;
+            }
+        }
     }
     if ( my $exec = $self->exec ) {
         $executable ||= [ @$exec, $test ];
@@ -837,18 +837,25 @@ sub _get_output_method {
     return $parser->has_problems ? 'failure_output' : 'output';
 }
 
-# XXX this really needs some cleanup!
 sub _should_display {
     my ( $self, $parser, $result ) = @_;
-    if ( $self->directives ) {
-        return $result->has_directive;
-    }
-    return if $self->really_quiet;
-    return $self->verbose && !$self->failures
-      || ( $result->is_comment
-        && !$self->quiet
-        && ( $result->is_test || !$parser->in_todo ) )
-      || $self->_should_show_failure($result);
+
+    # Always output directives
+    return $result->has_directive if $self->directives;
+
+    # Nothing else if really quiet
+    return 0 if $self->really_quiet;
+
+    return 1
+      if $self->_should_show_failure($result)
+      || ( $self->verbose && !$self->failures );
+
+    return 1
+      if $result->is_comment
+      && !$self->quiet
+      && ( !$parser->in_todo || $result->is_test );
+
+    return 0;
 }
 
 sub _should_show_count {
