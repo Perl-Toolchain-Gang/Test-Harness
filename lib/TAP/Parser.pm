@@ -369,8 +369,7 @@ sub run {
         }
 
         $self->_stream($stream);
-        $self->_grammar( TAP::Parser::Grammar->new($self) )
-          ;    # eventually pass a version
+        $self->_grammar( TAP::Parser::Grammar->new($self) );
         $self->_spool($spool);
 
         while ( my ( $k, $v ) = each %initialize ) {

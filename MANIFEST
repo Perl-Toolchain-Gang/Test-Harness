@@ -15,12 +15,6 @@ lib/TAP/Base.pm
 lib/TAP/Harness.pm
 lib/TAP/Harness/Color.pm
 lib/TAP/Harness/Compatible.pm
-lib/TAP/Harness/Compatible/Iterator.pm
-lib/TAP/Harness/Compatible/Point.pm
-lib/TAP/Harness/Compatible/Results.pm
-lib/TAP/Harness/Compatible/Straps.pm
-lib/TAP/Harness/Compatible/TAP.pod
-lib/TAP/Harness/Compatible/Util.pm
 lib/TAP/Parser.pm
 lib/TAP/Parser/Aggregator.pm
 lib/TAP/Parser/Grammar.pm
@@ -37,7 +31,7 @@ lib/TAP/Parser/Source/Perl.pm
 lib/TAP/Parser/YAML.pm
 Makefile.PL
 MANIFEST
-META.yml			# Will be created by "make dist"
+META.yml
 perltidyrc
 README
 t/000-load.t
@@ -60,19 +54,10 @@ t/compat/00compile.t
 t/compat/base.t
 t/compat/callback.t
 t/compat/failure.t
-t/compat/from_line.t
-t/compat/harness.t
 t/compat/inc_taint.t
 t/compat/nonumbers.t
 t/compat/ok.t
-t/compat/point-parse.t
-t/compat/point.t
-t/compat/prove-globbing.t
-t/compat/prove-switches.t
-t/compat/strap-analyze.t
-t/compat/strap.t
 t/compat/test-harness-compat.t
-t/compat/test-harness.t
 t/compat/version.t
 t/data/execrc
 t/data/sample.yml

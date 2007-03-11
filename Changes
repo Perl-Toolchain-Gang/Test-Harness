@@ -10,6 +10,9 @@ Revision history for TAP-Parser
       simplified remaining logic to suit.
     - Removed now-redundant t/140-varsource.t.
     - Implemented TAP version syntax.
+    - Tidied TAP::Harness::Compatible documentation
+    - Removed redundant modules below TAP::Harness::Compatible
+    - Removed unused compatibility tests
 
 0.50_07 5 March 2007
     - Fixed bug where we erroneously checked the test number instead of number
