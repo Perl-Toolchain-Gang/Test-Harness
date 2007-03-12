@@ -9,11 +9,11 @@ TAP::Parser::Iterator - Internal TAP::Parser Iterator
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-$VERSION = '0.51';
+$VERSION = '0.52';
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ package TAP::Parser::Iterator::FH;
 
 use vars qw($VERSION @ISA);
 @ISA     = 'TAP::Parser::Iterator';
-$VERSION = '0.51';
+$VERSION = '0.52';
 
 sub new {
     my ( $class, $thing ) = @_;
@@ -160,7 +160,7 @@ package TAP::Parser::Iterator::ARRAY;
 
 use vars qw($VERSION @ISA);
 @ISA     = 'TAP::Parser::Iterator';
-$VERSION = '0.51';
+$VERSION = '0.52';
 
 sub new {
     my ( $class, $thing ) = @_;
