@@ -24,7 +24,7 @@ Version 0.52
 
 $VERSION = '0.52';
 
-my $DEFAULT_TAP_VERSION = 3;
+my $DEFAULT_TAP_VERSION = 12;
 
 BEGIN {
     foreach my $method (
@@ -833,8 +833,8 @@ match the number of C<< $parser->tests_planned >>.
   $parser->version;
   
 Once the parser is done, this will return the version number for the
-parsed TAP. Version numbers were introduced with TAP version 4 so if no
-version number is found version 3 is assumed.
+parsed TAP. Version numbers were introduced with TAP version 13 so if no
+version number is found version 12 is assumed.
 
 =head3 C<exit>
 
