@@ -7,7 +7,7 @@ use TAP::Parser::Result;
 
 =head1 NAME
 
-TAP::Parser::Grammar - A grammar for the original TAP version.
+TAP::Parser::Grammar - A grammar for the Test Anything Protocol.
 
 =head1 VERSION
 

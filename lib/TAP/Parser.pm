@@ -398,13 +398,13 @@ examples of each, are as follows:
 
 =over 4
 
+=item * Version
+
+ TAP version 12
+
 =item * Plan
 
  1..42
-
-=item * Version
-
- TAP version 4
 
 =item * Test
 
