@@ -7,7 +7,7 @@ C<Test::WWW::Mechanize> installed, you can cd into C<examples/> (the directory
 where this README lives) and run the following command after installing the
 C<runtests> utility:
 
- examples $ runtests --execrc my_execrc t -q - <test_urls.txt 
+ examples $ runtests --exec ./my_exec t -v - < test_urls.txt
  t/10-stuff..............Failed 1/6 tests
          (less 2 skipped tests: 3 okay)
          (1 test unexpectedly succeeded)
@@ -20,17 +20,17 @@ C<runtests> utility:
  t/10-stuff.t          (Wstat: 256 Tests: 6 Failed: 1)
    Failed tests:  2
    TODO passed:   6
-   Tests skipped: 3-4
+   uests skipped: 3-4
  Files=4, Tests=10,  3 wallclock secs ( 0.92 cusr +  0.23 csys =  1.15 CPU)
 
-The C<my_execrc> is a file which tells the test harness how to execute any
-tests it encounters.
+The C<my_exec> is a Perl program which tells the test harness how to execute
+any tests it encounters.
 
 The C<t> argument tells it to search in the C<t/> directory for any tests.
-One of the tests it finds is written in Ruby, but the C<my_execrc> file tells
+One of the tests it finds is written in Ruby, but the C<my_exec> program tells
 it how to run this test.  If you have Ruby installed but the test fails, try
 changing the path.  If you don't have Ruby installed, you can simply comment
-out that line in C<my_execrc>, but the test will fail.
+out those lines in C<my_exec>, but the test will fail.
 
 The C<-> tells C<runtests> to read from C<STDIN> and C<test_urls.txt> is
 merely a list of URLs we wish to test.
@@ -38,13 +38,7 @@ merely a list of URLs we wish to test.
 See the documentation for C<runtests> and C<TAP::Harness> for more
 information about how to use this.
 
-If you have C<Term::AnsiColor> installed, try running the following
-(experimental) command:
-
- runtests --execrc my_execrc -vc t/ - < test_urls.txt
-
-The C<-v> and C<-c> switches tell the harness to be both verbose and to output
-results in color.
+The C<-v> tells the harness to run in verbose mode.
 
 =head2 Custom Test Harnesses
 

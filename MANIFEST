@@ -5,11 +5,10 @@ Changes
 examples/bin/forked_tests.pl
 examples/bin/test_html.pl
 examples/bin/tprove_gtk
-examples/my_execrc
+examples/my_exec
 examples/README
 examples/t/10-stuff.t
 examples/t/ruby.t
-examples/tapx_harness_execrc
 examples/test_urls.txt
 lib/TAP/Base.pm
 lib/TAP/Harness.pm
@@ -48,8 +47,8 @@ t/100-premature-bailout.t
 t/110-iterators.t
 t/120-harness.t
 t/130-source.t
-t/150-results.t
-t/160-yaml.t
+t/140-results.t
+t/150-yaml.t
 t/compat/00compile.t
 t/compat/base.t
 t/compat/failure.t
@@ -58,7 +57,6 @@ t/compat/nonumbers.t
 t/compat/ok.t
 t/compat/test-harness-compat.t
 t/compat/version.t
-t/data/execrc
 t/data/sample.yml
 t/lib/Dev/Null.pm
 t/lib/if.pm

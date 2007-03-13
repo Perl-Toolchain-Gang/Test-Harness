@@ -4,6 +4,9 @@ Revision history for TAP-Parser
     - Incorporate Schwern's investigations into TAP versions.
       Unversioned TAP is now TAP v12. The lowest explicit version number
       that can be specified is 13.
+    - Renumbered tests to eliminate gaps.
+    - Killed execrc.  The '--exec' switch to runtests handles all of this for
+      us.
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

@@ -100,18 +100,10 @@ BEGIN {
         quiet        => sub { shift; shift },
         really_quiet => sub { shift; shift },
         exec         => sub { shift; shift },
-        execrc => sub {
-            my ( $self, $execrc ) = @_;
-            unless ( -f $execrc ) {
-                $self->_error("Cannot find execrc ($execrc)");
-            }
-            return $execrc;
-        },
     );
     my @getter_setters = qw/
       _curr_parser
       _curr_test
-      _execrc
       _longest
       _newline_printed
       _printed_summary_header
@@ -204,10 +196,6 @@ TAP is fine.  You can use this argument to specify the name of the program
 
   exec => '/usr/bin/ruby -w'
 
-=item * C<execrc>
-
-Location of 'execrc' file.  See L<USING EXECRC> below.
-
 =item * C<errors>
 
 If parse errors are found in the TAP output, a note of this will be made
@@ -253,43 +241,10 @@ This overrides other settings such as C<verbose> or C<failures>.
         if ( my @props = keys %arg_for ) {
             $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
         }
-        $self->_read_execrc;
         $self->quiet(0) unless $self->quiet;    # suppress unit warnings
         $self->really_quiet(0) unless $self->really_quiet;
         return $self;
     }
-}
-
-sub _read_execrc {
-    my $self = shift;
-    $self->_execrc( { exact => {}, regex => {} } );
-    my $execrc = $self->execrc or return $self;
-    my $data = TAP::Parser::YAML->read($execrc);
-
-    my %exec_for;
-    foreach my $type (qw{ exact regex }) {
-        foreach my $exec ( @{ $data->[0]{$type} } ) {
-            if ( 'regex' eq $type ) {
-                eval {qr/$exec/};
-                if ( my $error = $@ ) {
-                    warn "Can't use execrc item ($exec) as a regex: $error";
-                    next;
-                }
-            }
-            my $test = $exec->[-1];
-            $exec_for{$type}{$test} = $exec;
-        }
-    }
-
-    if ( my $exec = $data->[0]{default} ) {
-        $exec = $exec->[0];
-
-        # don't override command line
-        $self->exec($exec) unless $self->exec;
-    }
-
-    $self->_execrc( \%exec_for );
-    return $self;
 }
 
 ##############################################################################
@@ -690,41 +645,13 @@ sub output_test_failure {
     $self->output("\n");
 }
 
-sub _get_executable {
-    my ( $self, $test ) = @_;
-    my $execrc = $self->_execrc;
-
-    my $executable;
-    if ( my $exec = $execrc->{exact}{$test} ) {
-        $executable = $exec;
-    }
-    else {
-        foreach my $regex ( keys %{ $execrc->{regex} } ) {
-            if ( $test =~ qr/$regex/ ) {
-                $executable = $execrc->{regex}{$regex};
-                $executable->[-1] = $test;
-            }
-        }
-    }
-    if ( my $exec = $self->exec ) {
-        $executable ||= [ @$exec, $test ];
-    }
-    return $executable;
-}
-
 sub _get_parser_args {
     my ( $self, $test ) = @_;
     my %args = ( source => $test );
     my @switches = $self->lib if $self->lib;
     push @switches => $self->switches if $self->switches;
     $args{switches} = \@switches;
-
-    if ( my $exec = $self->_get_executable($test) ) {
-        $args{exec} = $exec;
-        delete $args{source};
-    }
-
-    $args{spool} = $self->_open_spool($test);
+    $args{spool}    = $self->_open_spool($test);
     return \%args;
 }
 
@@ -878,84 +805,6 @@ sub _croak {
     }
     $self->SUPER::_croak($message);
 }
-
-=head1 USING EXECRC
-
-B<WARNING>:  this functionality is still experimental.  While we intend to
-support it, the file format may change.
-
-Sometimes you want to use different executables to run different tests.  If
-that's the case, you'll need to create an C<execrc> file.  This file should be
-a YAML file.  This should be representating a hash with (at present) three
-keys, C<exact>, C<regex>, and C<default>.
-
- ---
- exact: 
-   # whoops!  We have a ruby test here!
-   -
-     - /usr/bin/ruby
-     - t/ruby.t
- regex:
-   # let's test some web pages
-   -
-     - /usr/bin/perl
-     - -w
-     - bin/test_html.pl
-     - ^https?://
- default:
-   -
-     - /usr/bin/perl
-     - -wT
-  
-=over 4
-
-=item * C<exact>
-
-The C<exact> key should be an array reference with each element being an array
-reference whose items are an exact list of what need to be passed to the shell
-to execute the test.  So for the 'exact' item of C<t/ruby.t> above, we attempt
-to execute in the shell:
-
- /usr/bin/ruby t/ruby.t
-
-=item * C<regex>
-
-This is the same as C<exact>, except that the final element in each array
-reference should be a Perl regular expression.  For the C<^https?://> regular
-expression above, when the harness sees a test for C<http://www.example.com>,
-it will pass the following to the shell:
-
- /usr/bin/perl -w bin/test_html.pl http://www.example.com/
-
-=item * C<default>
-
-Any item which the harness does not match to another C<execrc> entry will
-automatically be executed with the C<default>.
-
-=back
-
-Blank lines are allowed.  Lines beginning with a '#' are comments (the '#' may
-have spaces in front of it).
-
-So for the above C<execrc> file, if it's named 'my_execrc' (as it is in the
-C<examples/> directory which comes with this distribution), then you could
-potentially run it like this, if you're using the C<runtests> utility:
-
- runtests --execrc my_execrc t/ - < list_of_urls.txt
-
-Then for a test named C<t/test_is_written_in_ruby.t>, it will be executed
-with:
-
- /usr/bin/ruby -w t/test_is_written_in_ruby.t
-
-If the list of urls contains "http://www.google.com/", it will be executed as
-follows:
-
- /usr/bin/perl test_html.pl http://www.google.com/
-
-Of course, if C<test_html.pl> outputs anything other than TAP, this will fail.
-
-See the C<README> in the C<examples> directory for a ready-to-run example.
 
 =head1 REPLACING
 

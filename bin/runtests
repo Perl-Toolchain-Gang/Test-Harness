@@ -28,7 +28,6 @@ GetOptions(
     'q|quiet'    => \my $QUIET,
     'Q|QUIET'    => \my $REALLY_QUIET,
     'e|exec=s'   => \my $EXEC,
-    'execrc=s'   => \my $EXECRC,
     'I=s@'       => \my @INCLUDES,
     'directives' => \my $DIRECTIVES,
     'h|help|?'   => sub { pod2usage( { -verbose => 1 } ); exit },
@@ -81,7 +80,6 @@ $args{really_quiet} = 1 if $REALLY_QUIET;
 $args{errors}       = 1 if $PARSE;
 $args{exec}         = length($EXEC) ? [ split( / /, $EXEC) ] : []
                         if(defined($EXEC));
-$args{execrc}       = $EXECRC if $EXECRC;
 $args{directives}   = 1 if $DIRECTIVES;
 my $harness = $harness_class->new( \%args );
 $harness->runtests(@tests);
@@ -211,7 +209,6 @@ Options which take arguments
  -I                 Library paths to include.
  -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
       --harness     Define test harness to use.  See TAP::Harness.
-      --execrc      Location of 'execrc' file (no short form).
 
 =head2 Reading from C<STDIN>
 
@@ -247,10 +244,7 @@ switch:
 
  runtests --exec '/usr/bin/ruby -w' t/
  runtests --exec '/usr/bin/perl -Tw -mstrict -Ilib' t/
-
-=head2 C<--execrc>
-
-Location of 'execrc' file.  See L<TAP::Harness> for more information.
+ runtests --exec '/path/to/my/customer/exec'
 
 =head1 PERFORMANCE
 

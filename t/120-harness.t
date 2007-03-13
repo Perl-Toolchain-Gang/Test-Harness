@@ -4,10 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 132;
-
-# these tests cannot be run from the t/ directory due to checking for the
-# existence of execrc
+use Test::More tests => 114;
 
 END {
 
@@ -51,12 +48,6 @@ foreach my $HARNESS (qw<TAP::Harness TAP::Harness::Color>) {
     eval { $HARNESS->new( { lib => [qw/bad_lib_1 bad_lib_2/] } ) };
     ok $error = $@, '... and calling it with non-existent libs should fail';
     like $error, qr/^\QNo such libs (bad_lib_1 bad_lib_2)/,
-      '... with an appropriate error message';
-
-    eval { $HARNESS->new( { execrc => 'aint_no_such_execrc' } ) };
-    ok $error = $@,
-      '... and calling it with a non-existent execrc should fail';
-    like $error, qr/^\QCannot find execrc (aint_no_such_execrc)/,
       '... with an appropriate error message';
 
     ok my $harness = $HARNESS->new,
@@ -322,52 +313,6 @@ foreach my $HARNESS (qw<TAP::Harness TAP::Harness::Color>) {
     is( $output[-1], 'All tests successful.', 'No exec accumulation' );
 }
 
-{
-
-    # make sure execrc parsing is solid (internals test)
-    my $harness = TAP::Harness->new;
-    ok !$harness->exec, 'exec() should not be set when the harness is new';
-    my %execrc = %{ $harness->_execrc };
-    is_deeply \%execrc, { exact => {}, regex => {} },
-         '... nor should execrc';
-
-    can_ok $harness, '_read_execrc';
-    $harness->execrc('t/data/execrc');
-    ok $harness->_read_execrc, '... and reading the execrc should succeed';
-
-    can_ok $harness, '_get_executable';
-    is_deeply $harness->_get_executable('t/some_test.t'),
-      [ '/usr/bin/perl',
-        '-wT',
-        't/some_test.t'
-      ],
-      '... and it should return default results for unmatcheable test names';
-
-    is_deeply $harness->_get_executable('t/ruby.t'),
-      [ '/usr/bin/ruby',
-        't/ruby.t'
-      ],
-      '... but an exact match should return a specific executable';
-    is_deeply $harness->_get_executable('http://www.google.com/'),
-      [ '/usr/bin/perl',
-        '-w',
-        'bin/test_html.pl',
-        'http://www.google.com/',
-      ],
-      '... even if we match something which is not a file';
-    is_deeply $harness->_get_executable('t/some_customer.t'),
-      [ '/usr/bin/perl',
-        '-w',
-        't/some_customer.t'
-      ],
-      '... and regexes should work for specifying tests';
-    is_deeply $harness->_get_executable('t/customer.t'),
-      [ '/usr/bin/perl',
-        't/customer.t'
-      ],
-      '... but an exact match will override a regex test';
-}
-
 sub trim {
     $_[0] =~ s/^\s+|\s+$//g;
     return $_[0];
@@ -443,11 +388,6 @@ sub get_arg_sets {
             in        => 1,
             out       => 1,
             test_name => '... and we should be able to set failures to true'
-        },
-        execrc => {
-            in        => 't/data/execrc',
-            out       => 't/data/execrc',
-            test_name => '... and we should be able to set execrc'
         },
       };
 }
