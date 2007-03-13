@@ -3,15 +3,7 @@ package TAP::Parser::Source;
 use strict;
 use vars qw($VERSION);
 
-use IPC::Open3;
-use IO::Select;
-use IO::Handle;
-
-use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
-use constant IS_MACOS => ( $^O eq 'MacOS' );
-use constant IS_VMS   => ( $^O eq 'VMS' );
-
-use TAP::Parser::Iterator;
+use TAP::Parser::Iterator::Process;
 
 # Causes problem on MacOS and shouldn't be necessary anyway
 #$SIG{CHLD} = sub { wait };
@@ -100,31 +92,7 @@ sub get_stream {
     my @command = $self->_get_command
       or $self->_croak("No command found!");
 
-    my $stdout_handle = IO::Handle->new();
-
-    my $pid;
-    eval { $pid = open3( undef, $stdout_handle, undef, @command ); };
-
-    if ($@) {
-
-        # TODO: Need to do something better with the error info here.
-        $self->exit( $? >> 8 );
-        $self->error("Could not execute (@command): $!");
-        return;
-    }
-    else {
-        if (IS_WIN32) {
-
-            # open3 defaults to raw mode, need this for Windows. Maybe
-            # other platforms too?
-            # TODO: What was the first perl version that supports this?
-            binmode $stdout_handle, ':crlf';
-        }
-
-        my $iter = TAP::Parser::Iterator->new($stdout_handle);
-        $iter->pid($pid);
-        return $iter;
-    }
+    return TAP::Parser::Iterator::Process->new(@command);
 }
 
 sub _get_command { @{ shift->source } }

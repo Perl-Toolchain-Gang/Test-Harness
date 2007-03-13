@@ -7,6 +7,10 @@ Revision history for TAP-Parser
     - Renumbered tests to eliminate gaps.
     - Killed execrc.  The '--exec' switch to runtests handles all of this for
       us.
+    - Refactored T::P::Iterator into
+      T::P::Iterator::(Array|Process|Stream) so that we have a
+      process specific iterator with which to experiment with
+      STDOUT/STDERR merging.
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

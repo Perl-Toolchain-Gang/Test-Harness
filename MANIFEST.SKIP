@@ -1,0 +1,18 @@
+\.tmproj$
+\.tar\.gz$
+\B\.svn\b
+^\.cvsignore
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^blib/
+^pm_to_blib$
+
+# Temp, old and emacs backup files.
+~$
+^\.DS_Store
+\.(old|tmp|bak)$
+^#.*#$
+^\.#
+^cover_db

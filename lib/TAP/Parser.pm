@@ -8,7 +8,8 @@ use TAP::Parser::Grammar;
 use TAP::Parser::Result;
 use TAP::Parser::Source;
 use TAP::Parser::Source::Perl;
-use TAP::Parser::Iterator;
+use TAP::Parser::Iterator::Array;
+use TAP::Parser::Iterator::Stream;
 
 @ISA = qw(TAP::Base);
 
@@ -122,9 +123,9 @@ determine how to handle the source, the following steps are taken.
 If the source contains a newline, it's assumed to be a string of raw TAP
 output.
 
-If the source is a reference, it's assumed to be something to pass to the
-C<TAP::Parser::Iterator> constructor.  This is used internally and you should
-not use it.
+If the source is a reference, it's assumed to be something to pass to
+the C<TAP::Parser::Iterator::Stream> constructor. This is used
+internally and you should not use it.
 
 Otherwise, the parser does a C<-e> check to see if the source exists.  If so,
 it attempts to execute the source and read the output as a stream.  This is by
@@ -141,9 +142,10 @@ The value should be the complete TAP output.
 
 =item * C<exec>
 
-If passed an array reference, will attempt to create the iterator by passing a
-C<TAP::Parser::Source> object to C<TAP::Parser::Iterator>, using the array
-reference strings as the command arguments to C<&IPC::Open3::open3>:
+If passed an array reference, will attempt to create the iterator by
+passing a C<TAP::Parser::Source> object to
+C<TAP::Parser::Iterator::Source>, using the array reference strings as
+the command arguments to C<&IPC::Open3::open3>:
 
  exec => [ '/usr/bin/ruby', 't/my_test.rb' ]
 
@@ -324,7 +326,8 @@ sub run {
                 '"source" and "exec" are mutually exclusive options');
         }
         if ($tap) {
-            $stream = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
+            $stream
+              = TAP::Parser::Iterator::Array->new( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
             my $source = TAP::Parser::Source->new;
@@ -340,8 +343,16 @@ sub run {
             }
         }
         elsif ($source) {
-            if ( ref $source ) {
-                $stream = TAP::Parser::Iterator->new($source);
+            if ( my $ref = ref $source ) {
+                if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
+                    $stream = TAP::Parser::Iterator::Stream->new($source);
+                }
+                elsif ( $ref eq 'ARRAY' ) {
+                    $stream = TAP::Parser::Iterator::Array->new($source);
+                }
+                else {
+                    $self->_croak( "Can't iterate with a $ref" );
+                }
             }
             elsif ( -e $source ) {
 
@@ -1027,8 +1038,7 @@ BEGIN {
                         my $ver_min = $DEFAULT_TAP_VERSION + 1;
                         $self->_add_error(
                                 "Explicit TAP version must be at least "
-                              . "$ver_min. Got version $ver_num"
-                        );
+                              . "$ver_min. Got version $ver_num" );
                     }
                     $self->version($ver_num);
                 },

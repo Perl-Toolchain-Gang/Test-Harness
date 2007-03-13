@@ -1,11 +1,11 @@
-package TAP::Parser::Iterator;
+package TAP::Parser::Iterator::Stream;
 
 use strict;
 use vars qw($VERSION);
 
 =head1 NAME
 
-TAP::Parser::Iterator - Internal TAP::Parser Iterator
+TAP::Parser::Iterator::Stream - Internal TAP::Parser Iterator
 
 =head1 VERSION
 
@@ -18,8 +18,7 @@ $VERSION = '0.52';
 =head1 SYNOPSIS
 
   use TAP::Parser::Iterator;
-  my $it = TAP::Parser::Iterator->new(\*TEST);
-  my $it = TAP::Parser::Iterator->new(\@array);
+  my $it = TAP::Parser::Iterator::Stream->new(\*TEST);
 
   my $line = $it->next;
 
@@ -29,7 +28,7 @@ Originally ripped off from C<Test::Harness>.
 
 B<FOR INTERNAL USE ONLY!>
 
-This is a simple iterator wrapper for arrays and filehandles.
+This is a simple iterator wrapper for filehandles.
 
 =head2 new()
 
@@ -43,26 +42,15 @@ Iterate through it, of course.
 
 Iterate raw input without applying any fixes for quirky input syntax.
 
+=head2 wait()
+
+Get the wait status for this iterator. Only valid if we've been connected to a process. See C<pid>.
+
+=head2 exit()
+
+Get the exit status for this iterator. Only valid if we've been connected to a process. See C<pid>.
+
 =cut
-
-sub new {
-    my ( $proto, $thing ) = @_;
-
-    my $ref = ref $thing;
-    if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
-
-        # we may eventually allow a 'fast' switch which can read the entire
-        # stream into an array.  This seems to speed things up by 10 to 12
-        # per cent.  Should not be used with infinite streams.
-        return TAP::Parser::Iterator::FH->new($thing);
-    }
-    elsif ( $ref eq 'ARRAY' ) {
-        return TAP::Parser::Iterator::ARRAY->new($thing);
-    }
-    else {
-        die "Can't iterate with a ", ref $thing;
-    }
-}
 
 eval { require POSIX; &POSIX::WEXITSTATUS(0) };
 if ($@) {
@@ -71,12 +59,6 @@ if ($@) {
 else {
     *_wait2exit = sub { POSIX::WEXITSTATUS( $_[1] ) }
 }
-
-package TAP::Parser::Iterator::FH;
-
-use vars qw($VERSION @ISA);
-@ISA     = 'TAP::Parser::Iterator';
-$VERSION = '0.52';
 
 sub new {
     my ( $class, $thing ) = @_;
@@ -155,36 +137,5 @@ sub _finish {
     $self->{exit} = $self->_wait2exit($status);
     return $self;
 }
-
-package TAP::Parser::Iterator::ARRAY;
-
-use vars qw($VERSION @ISA);
-@ISA     = 'TAP::Parser::Iterator';
-$VERSION = '0.52';
-
-sub new {
-    my ( $class, $thing ) = @_;
-    chomp @$thing;
-    bless {
-        idx   => 0,
-        array => $thing,
-        exit  => undef,
-    }, $class;
-}
-
-sub wait { shift->exit }
-
-sub exit {
-    my $self = shift;
-    return 0 if $self->{idx} >= @{ $self->{array} };
-    return;
-}
-
-sub next {
-    my $self = shift;
-    return $self->{array}->[ $self->{idx}++ ];
-}
-
-sub next_raw { shift->next }
 
 1;

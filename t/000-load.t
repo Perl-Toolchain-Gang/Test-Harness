@@ -1,13 +1,15 @@
 #!/usr/bin/perl -wT
 
-use Test::More tests => 34;
+use Test::More tests => 38;
 
 BEGIN {
     my @classes = qw(
       TAP::Parser
       TAP::Parser::Aggregator
       TAP::Parser::Grammar
-      TAP::Parser::Iterator
+      TAP::Parser::Iterator::Array
+      TAP::Parser::Iterator::Process
+      TAP::Parser::Iterator::Stream
       TAP::Parser::Result
       TAP::Parser::Result::Comment
       TAP::Parser::Result::Plan

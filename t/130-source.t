@@ -29,7 +29,7 @@ ok $source->source( [ $perl, '-T', $test ] ),
 can_ok $source, 'get_stream';
 ok my $stream = $source->get_stream, '... and calling it should succeed';
 
-isa_ok $stream, 'TAP::Parser::Iterator', '... and the object it returns';
+isa_ok $stream, 'TAP::Parser::Iterator::Process', '... and the object it returns';
 can_ok $stream, 'next';
 is $stream->next, '1..1', '... and the first line should be correct';
 is $stream->next, 'ok 1', '... as should the second';
@@ -47,7 +47,7 @@ ok $source->source($test),
 can_ok $source, 'get_stream';
 ok $stream = $source->get_stream, '... and calling it should succeed';
 
-isa_ok $stream, 'TAP::Parser::Iterator', '... and the object it returns';
+isa_ok $stream, 'TAP::Parser::Iterator::Process', '... and the object it returns';
 can_ok $stream, 'next';
 is $stream->next, '1..1', '... and the first line should be correct';
 is $stream->next, 'ok 1', '... as should the second';

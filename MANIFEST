@@ -17,7 +17,9 @@ lib/TAP/Harness/Compatible.pm
 lib/TAP/Parser.pm
 lib/TAP/Parser/Aggregator.pm
 lib/TAP/Parser/Grammar.pm
-lib/TAP/Parser/Iterator.pm
+lib/TAP/Parser/Iterator/Array.pm
+lib/TAP/Parser/Iterator/Process.pm
+lib/TAP/Parser/Iterator/Stream.pm
 lib/TAP/Parser/Result.pm
 lib/TAP/Parser/Result/Bailout.pm
 lib/TAP/Parser/Result/Comment.pm
@@ -31,6 +33,7 @@ lib/TAP/Parser/YAML.pm
 Makefile.PL
 MANIFEST
 META.yml
+patches/ExtUtils-MakeMaker-6.31.patch
 perltidyrc
 README
 t/000-load.t
@@ -50,7 +53,6 @@ t/130-source.t
 t/140-results.t
 t/150-yaml.t
 t/compat/00compile.t
-t/compat/base.t
 t/compat/failure.t
 t/compat/inc_taint.t
 t/compat/nonumbers.t
