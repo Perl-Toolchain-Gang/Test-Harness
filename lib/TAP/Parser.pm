@@ -1158,11 +1158,12 @@ sub _finish {
 
 =head2 CALLBACKS
 
-As mentioned earlier, a "callback" key may be added may be added to the
-C<TAP::Parser> constructor.  If present, each callback corresponding to a
-given result type will be called with the result as the argument if the C<run>
-method is used.  The callback is expected to be a subroutine reference (or
-anonymous subroutine) which is invoked with the parser result as its argument.
+As mentioned earlier, a "callback" key may be added to the
+C<TAP::Parser> constructor. If present, each callback corresponding to a
+given result type will be called with the result as the argument if the
+C<run> method is used. The callback is expected to be a subroutine
+reference (or anonymous subroutine) which is invoked with the parser
+result as its argument.
 
  my %callbacks = (
      test    => \&test_callback,
@@ -1189,7 +1190,7 @@ Callbacks may also be added like this:
  $parser->callback( test => \&test_callback );
  $parser->callback( plan => \&plan_callback );
 
-There are, at the present time, seven keys allowed for callbacks.  These keys
+There are, at the present time, eight keys allowed for callbacks.  These keys
 are case-sensitive.
 
 =over 4
@@ -1198,29 +1199,33 @@ are case-sensitive.
 
 Invoked if C<< $result->is_test >> returns true.
 
-=item 2 C<plan>
+=item 2 C<version>
+
+Invoked if C<< $result->is_version >> returns true.
+
+=item 3 C<plan>
 
 Invoked if C<< $result->is_plan >> returns true.
 
-=item 3 C<comment>
+=item 4 C<comment>
 
 Invoked if C<< $result->is_comment >> returns true.
 
-=item 4 C<bailout>
+=item 5 C<bailout>
 
 Invoked if C<< $result->is_unknown >> returns true.
 
-=item 5 C<unknown>
+=item 6 C<unknown>
 
 Invoked if C<< $result->is_unknown >> returns true.
 
-=item 6 C<ELSE>
+=item 7 C<ELSE>
 
 If a result does not have a callback defined for it, this callback will be
 invoked.  Thus, if all five of the previous result types are specified as
 callbacks, this callback will I<never> be invoked.
 
-=item 7 C<ALL>
+=item 8 C<ALL>
 
 This callback will always be invoked and this will happen for each result
 after one of the above six callbacks is invoked.  For example, if
@@ -1347,8 +1352,6 @@ just words of encouragement have all been forthcoming.
 =item * Corion
 
 =item * Mark Stosberg
-
-=item * Andy Armstrong
 
 =item * Matt Kraai
 

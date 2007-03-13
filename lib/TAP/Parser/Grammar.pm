@@ -19,8 +19,8 @@ $VERSION = '0.52';
 
 =head1 DESCRIPTION
 
-C<TAP::Parser::Gramamr> is actually just a means for identifying individual
-chunks (usually lines) of TAP.
+C<TAP::Parser::Grammar> tokenizes lines from a TAP stream and constructs
+L<TAP::Parser::Result> subclasses to represent the tokens.
 
 Do not attempt to use this class directly.  It won't make sense.  It's mainly
 here to ensure that we will be able to have pluggable grammars when TAP is
