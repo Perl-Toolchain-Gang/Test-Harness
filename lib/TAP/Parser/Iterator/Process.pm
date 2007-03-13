@@ -52,11 +52,11 @@ Iterate raw input without applying any fixes for quirky input syntax.
 
 =head2 wait()
 
-Get the wait status for this iterator. Only valid if we've been connected to a process. See C<pid>.
+Get the wait status for this iterator's process.
 
 =head2 exit()
 
-Get the exit status for this iterator. Only valid if we've been connected to a process. See C<pid>.
+Get the exit status for this iterator's process.
 
 =cut
 
@@ -82,11 +82,13 @@ sub new {
     #    my $stdout_handle = IO::Handle->new();
 
     my $out = IO::Handle->new;
-#    my $err = IO::Handle->new;
+
+    #    my $err = IO::Handle->new;
     my $pid;
 
     _autoflush($out);
- #   _autoflush($err);
+
+    #   _autoflush($err);
 
     eval { $pid = open3( undef, $out, undef, @command ); };
 
@@ -104,48 +106,33 @@ sub new {
         # other platforms too?
         # TODO: What was the first perl version that supports this?
         binmode $out, ':crlf';
+
         # binmode $err, ':crlf';
     }
 
     my $self = bless {
-        out  => $out,
+        out => $out,
+
         # err  => $err,
+        pid  => $pid,
         exit => undef,
     }, $class;
-
-    $self->pid($pid);
 
     return $self;
 }
 
 ##############################################################################
 
-=head3 C<pid>
-
-  my $pid = $source->pid;
-  $source->pid($pid);
-
-Getter/Setter for the pid of the process the filehandle reads from.  Only
-makes sense when a filehandle is being used for the iterator.
-
-=cut
-
-sub pid {
-    my $self = shift;
-    return $self->{pid} unless @_;
-    $self->{pid} = shift;
-    return $self;
-}
-
 sub wait { $_[0]->{wait} }
 sub exit { $_[0]->{exit} }
 
 sub next_raw {
     my $self = shift;
+
     # my $out  = $self->{out};
     # my $err  = $self->{err};
 
-    my $fh   = $self->{out};
+    my $fh = $self->{out};
 
     if ( defined( my $line = <$fh> ) ) {
         chomp $line;
@@ -157,7 +144,7 @@ sub next_raw {
     }
 
     # my $sel = IO::Select->new( $out, $err );
-    # 
+    #
     # if ( my @ready = $sel->can_read ) {
     #     for my $fh (@ready) {
     #         if ( eof($fh) ) {
@@ -173,7 +160,7 @@ sub next_raw {
     #         }
     #     }
     # }
-    # 
+    #
     # $self->_finish;
     return;
 }
@@ -205,7 +192,8 @@ sub _finish {
     }
 
     close $self->{out};
-#    close $self->{err};
+
+    #    close $self->{err};
 
     $self->{next} = undef;
     $self->{wait} = $status;

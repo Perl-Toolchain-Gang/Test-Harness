@@ -44,51 +44,25 @@ Iterate raw input without applying any fixes for quirky input syntax.
 
 =head2 wait()
 
-Get the wait status for this iterator. Only valid if we've been connected to a process. See C<pid>.
+Get the wait status for this iterator. Always returns zero.
 
 =head2 exit()
 
-Get the exit status for this iterator. Only valid if we've been connected to a process. See C<pid>.
+Get the exit status for this iterator. Always returns zero.
 
 =cut
-
-eval { require POSIX; &POSIX::WEXITSTATUS(0) };
-if ($@) {
-    *_wait2exit = sub { $_[1] >> 8 };
-}
-else {
-    *_wait2exit = sub { POSIX::WEXITSTATUS( $_[1] ) }
-}
 
 sub new {
     my ( $class, $thing ) = @_;
     bless {
-        fh   => $thing,
-        exit => undef,
+        fh => $thing,
     }, $class;
 }
 
 ##############################################################################
 
-=head3 C<pid>
-
-  my $pid = $source->pid;
-  $source->pid($pid);
-
-Getter/Setter for the pid of the process the filehandle reads from.  Only
-makes sense when a filehandle is being used for the iterator.
-
-=cut
-
-sub pid {
-    my $self = shift;
-    return $self->{pid} unless @_;
-    $self->{pid} = shift;
-    return $self;
-}
-
-sub wait { $_[0]->{wait} }
-sub exit { $_[0]->{exit} }
+sub wait { shift->wait }
+sub exit { shift->{fh} ? 0 : () }
 
 sub next_raw {
     my $self = shift;
@@ -120,22 +94,7 @@ sub next {
 
 sub _finish {
     my $self = shift;
-
-    my $status = $?;
-
-    # If we have a subprocess we need to wait for it to terminate
-    if ( defined $self->{pid} ) {
-        if ( $self->{pid} == waitpid( $self->{pid}, 0 ) ) {
-            $status = $?;
-        }
-    }
-
-    close $self->{fh};
-
-    $self->{next} = undef;
-    $self->{wait} = $status;
-    $self->{exit} = $self->_wait2exit($status);
-    return $self;
+    close delete $self->{fh};
 }
 
 1;
