@@ -755,6 +755,7 @@ sub _process {
             $self->output("\n") unless $self->quiet;
             $self->_newline_printed(1);
         }
+        # TODO: quiet gets tested here /and/ in _should_display
         $self->output( $result->as_string . "\n" ) unless $self->quiet;
     }
 }
@@ -772,6 +773,8 @@ sub _should_display {
 
     # Nothing else if really quiet
     return 0 if $self->really_quiet;
+
+#    return 1 if $result->is_unknown;
 
     return 1
       if $self->_should_show_failure($result)

@@ -344,15 +344,7 @@ sub run {
         }
         elsif ($source) {
             if ( my $ref = ref $source ) {
-                if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
-                    $stream = TAP::Parser::Iterator::Stream->new($source);
-                }
-                elsif ( $ref eq 'ARRAY' ) {
-                    $stream = TAP::Parser::Iterator::Array->new($source);
-                }
-                else {
-                    $self->_croak( "Can't iterate with a $ref" );
-                }
+                $stream = TAP::Parser::Iterator->new($source);
             }
             elsif ( -e $source ) {
 

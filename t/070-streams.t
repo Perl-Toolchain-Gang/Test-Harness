@@ -11,8 +11,8 @@ use TAP::Parser;
 use TAP::Parser::Iterator;
 
 my ( $STREAMED, $ITER ) = ( 'TAP::Parser', 'TAP::Parser::Iterator' );
-my $ITER_FH    = "${ITER}::FH";
-my $ITER_ARRAY = "${ITER}::ARRAY";
+my $ITER_FH    = "${ITER}::Stream";
+my $ITER_ARRAY = "${ITER}::Array";
 
 my $stream = TAP::Parser::Iterator->new( \*DATA );
 ok my $parser = TAP::Parser->new( { stream => $stream } ),

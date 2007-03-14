@@ -1,7 +1,9 @@
 package TAP::Parser::Iterator::Stream;
 
 use strict;
-use vars qw($VERSION);
+use TAP::Parser::Iterator;
+use vars qw($VERSION @ISA);
+@ISA     = 'TAP::Parser::Iterator';
 
 =head1 NAME
 
@@ -62,7 +64,7 @@ sub new {
 ##############################################################################
 
 sub wait { shift->wait }
-sub exit { shift->{fh} ? 0 : () }
+sub exit { shift->{fh} ? () : 0 }
 
 sub next_raw {
     my $self = shift;

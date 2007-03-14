@@ -25,12 +25,12 @@ foreach my $source ( array_ref_from($tap), \*DATA ) {
     isa_ok $iter, 'TAP::Parser::Iterator', '... and the object it returns';
     my $subclass =
         'ARRAY' eq ref $source
-      ? 'TAP::Parser::Iterator::ARRAY'
-      : 'TAP::Parser::Iterator::FH';
+      ? 'TAP::Parser::Iterator::Array'
+      : 'TAP::Parser::Iterator::Stream';
     isa_ok $iter,, $subclass, '... and the object it returns';
 
     can_ok $iter, 'exit';
-    ok !defined $iter->exit, '... and it should be undef before we are done';
+    ok !defined $iter->exit, "... and it should be undef before we are done ($subclass)";
 
     can_ok $iter, 'next';
     is $iter->next, 'one', 'next() should return the first result';
@@ -43,7 +43,7 @@ foreach my $source ( array_ref_from($tap), \*DATA ) {
 
     ok !defined $iter->next, 'next() should return undef after it is empty';
 
-    is $iter->exit, 0, '... and exit should now return 0';
+    is $iter->exit, 0, "... and exit should now return 0 ($subclass)";
 }
 
 __DATA__

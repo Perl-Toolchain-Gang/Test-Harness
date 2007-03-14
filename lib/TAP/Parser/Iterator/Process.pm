@@ -1,7 +1,9 @@
 package TAP::Parser::Iterator::Process;
 
 use strict;
-use vars qw($VERSION);
+use TAP::Parser::Iterator;
+use vars qw($VERSION @ISA);
+@ISA     = 'TAP::Parser::Iterator';
 
 use IPC::Open3;
 use IO::Select;

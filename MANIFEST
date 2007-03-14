@@ -1,5 +1,15 @@
+_build/auto_features
+_build/build_params
+_build/cleanup
+_build/config_data
+_build/features
+_build/magicnum
+_build/notes
+_build/prereqs
+_build/runtime_params
 bin/prove
 bin/runtests
+Build
 Build.PL
 Changes
 examples/bin/forked_tests.pl
@@ -17,6 +27,7 @@ lib/TAP/Harness/Compatible.pm
 lib/TAP/Parser.pm
 lib/TAP/Parser/Aggregator.pm
 lib/TAP/Parser/Grammar.pm
+lib/TAP/Parser/Iterator.pm
 lib/TAP/Parser/Iterator/Array.pm
 lib/TAP/Parser/Iterator/Process.pm
 lib/TAP/Parser/Iterator/Stream.pm
