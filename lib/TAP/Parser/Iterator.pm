@@ -63,7 +63,7 @@ sub new {
         return TAP::Parser::Iterator::Array->new($thing);
     }
     else {
-        die "Can't iterate with a ", ref $thing;
+        die "Can't iterate with a $ref";
     }
 }
 

@@ -1,9 +1,9 @@
-#!/usr/bin/perl -wT
+#!/usr/bin/perl -w
 
 use strict;
 
 #use Test::More 'no_plan';
-use Test::More tests => 26;
+use Test::More tests => 39;
 use TAP::Parser;
 
 use TAP::Parser::Iterator;
@@ -19,18 +19,27 @@ my $offset = tell DATA;
 my $tap = do { local $/; <DATA> };
 seek DATA, $offset, 0;
 
-foreach my $source ( array_ref_from($tap), \*DATA ) {
-    ok my $iter = TAP::Parser::Iterator->new($source),
+my @schedule = (
+    'TAP::Parser::Iterator',
+    'TAP::Parser::Iterator::Array',
+    [ array_ref_from($tap) ],
+    'TAP::Parser::Iterator',
+    'TAP::Parser::Iterator::Stream',
+    [ \*DATA ],
+    'TAP::Parser::Iterator::Process',
+    'TAP::Parser::Iterator::Process',
+    [ $^X, '-e', 'print "one\ntwo\n\nthree\n"' ],
+);
+
+while ( my ( $class, $subclass, $source ) = splice @schedule, 0, 3 ) {
+    ok my $iter = $class->new(@$source),
       'We should be able to create a new iterator';
     isa_ok $iter, 'TAP::Parser::Iterator', '... and the object it returns';
-    my $subclass =
-        'ARRAY' eq ref $source
-      ? 'TAP::Parser::Iterator::Array'
-      : 'TAP::Parser::Iterator::Stream';
-    isa_ok $iter,, $subclass, '... and the object it returns';
+    isa_ok $iter, $subclass, '... and the object it returns';
 
     can_ok $iter, 'exit';
-    ok !defined $iter->exit, "... and it should be undef before we are done ($subclass)";
+    ok !defined $iter->exit,
+      "... and it should be undef before we are done ($subclass)";
 
     can_ok $iter, 'next';
     is $iter->next, 'one', 'next() should return the first result';
