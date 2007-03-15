@@ -72,13 +72,13 @@ else {
 
 sub _open_process {
     my $self    = shift;
-    my $merged  = shift;
+    my $merge   = shift;
     my @command = @_;
 
     my $out = IO::Handle->new;
     my $pid;
 
-    my $err = $merged ? undef : '>&STDERR';
+    my $err = $merge ? undef: '>&STDERR';
 
     eval { $pid = open3( undef, $out, $err, @command ); };
 
@@ -111,7 +111,7 @@ sub new {
 
     my $self = bless { exit => undef }, $class;
 
-    my ($out, $pid) = $self->_open_process($merge, @command);
+    my ( $out, $pid ) = $self->_open_process( $merge, @command );
 
     $self->{out} = $out;
     $self->{pid} = $pid;
@@ -127,39 +127,16 @@ sub exit { $_[0]->{exit} }
 sub next_raw {
     my $self = shift;
 
-    # my $out  = $self->{out};
-    # my $err  = $self->{err};
-
-    my $fh = $self->{out};
-
-    if ( defined( my $line = <$fh> ) ) {
-        chomp $line;
-        return $line;
-    }
-    else {
-        $self->_finish;
-        return;
+    if ( my $fh = $self->{out} ) {
+        if ( defined( my $line = <$fh> ) ) {
+            chomp $line;
+            return $line;
+        }
+        else {
+            $self->_finish;
+        }
     }
 
-    # my $sel = IO::Select->new( $out, $err );
-    #
-    # if ( my @ready = $sel->can_read ) {
-    #     for my $fh (@ready) {
-    #         if ( eof($fh) ) {
-    #             $sel->remove($fh);
-    #             next;
-    #         }
-    #         if ( defined( my $line = <$fh> ) ) {
-    #             chomp $line;
-    #             return $line;
-    #         }
-    #         else {
-    #             die "Oops: unexpected eof";
-    #         }
-    #     }
-    # }
-    #
-    # $self->_finish;
     return;
 }
 
@@ -189,11 +166,8 @@ sub _finish {
         }
     }
 
-    close $self->{out};
+    close delete $self->{out};
 
-    #    close $self->{err};
-
-    $self->{next} = undef;
     $self->{wait} = $status;
     $self->{exit} = $self->_wait2exit($status);
     return $self;

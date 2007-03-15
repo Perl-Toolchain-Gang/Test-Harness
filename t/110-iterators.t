@@ -25,7 +25,7 @@ my @schedule = (
     'TAP::Parser::Iterator::Stream',
     \*DATA,
     'TAP::Parser::Iterator::Process',
-    { command => [ $^X, '-e', 'print "one\ntwo\n\nthree\n"' ] },
+    { command => [ $^X, '-e', 'print qq/one\ntwo\n\nthree\n/' ] },
 );
 
 while ( my ( $subclass, $source ) = splice @schedule, 0, 2 ) {
