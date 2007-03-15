@@ -22,6 +22,8 @@ Revision history for TAP-Parser
       TAP::Parser::Source, TAP::Parser and TAP::Harness.
     - Added --merge option to runtests to enable STDOUT/STDERR merging.
       This behaviour used to be the default.
+    - Made T::P::I::Process use open3 for both merged and non-merged
+      streams so that it works on Windows.
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

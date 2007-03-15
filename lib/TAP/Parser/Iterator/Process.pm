@@ -70,14 +70,17 @@ else {
     *_wait2exit = sub { POSIX::WEXITSTATUS( $_[1] ) }
 }
 
-sub _open_process_merged {
+sub _open_process {
     my $self    = shift;
+    my $merged  = shift;
     my @command = @_;
 
     my $out = IO::Handle->new;
     my $pid;
 
-    eval { $pid = open3( undef, $out, undef, @command ); };
+    my $err = $merged ? undef : '>&STDERR';
+
+    eval { $pid = open3( undef, $out, $err, @command ); };
 
     if ($@) {
 
@@ -98,20 +101,6 @@ sub _open_process_merged {
     return ( $out, $pid );
 }
 
-sub _open_process {
-    my $self    = shift;
-    my @command = @_;
-
-    my $pid = open( my $out, '-|' );
-    die "Could not fork: $!" unless defined $pid;
-
-    if ( 0 == $pid ) {
-        exec(@command) or die "Could not execute (@command): $!";
-    }
-
-    return ( $out, $pid );
-}
-
 sub new {
     my $class = shift;
     my $args  = shift;
@@ -122,9 +111,7 @@ sub new {
 
     my $self = bless { exit => undef }, $class;
 
-    my ( $out, $pid ) = $merge
-      ? $self->_open_process_merged(@command)
-      : $self->_open_process(@command);
+    my ($out, $pid) = $self->_open_process($merge, @command);
 
     $self->{out} = $out;
     $self->{pid} = $pid;
