@@ -3,7 +3,7 @@ package TAP::Parser::Iterator::Process;
 use strict;
 use TAP::Parser::Iterator;
 use vars qw($VERSION @ISA);
-@ISA     = 'TAP::Parser::Iterator';
+@ISA = 'TAP::Parser::Iterator';
 
 use IPC::Open3;
 use IO::Select;
@@ -70,27 +70,12 @@ else {
     *_wait2exit = sub { POSIX::WEXITSTATUS( $_[1] ) }
 }
 
-sub _autoflush {
-    my $flushed = shift;
-    my $old_fh  = select $flushed;
-    $| = 1;
-    select $old_fh;
-}
-
-sub new {
-    my $class   = shift;
+sub _open_process_merged {
+    my $self    = shift;
     my @command = @_;
 
-    #    my $stdout_handle = IO::Handle->new();
-
     my $out = IO::Handle->new;
-
-    #    my $err = IO::Handle->new;
     my $pid;
-
-    _autoflush($out);
-
-    #   _autoflush($err);
 
     eval { $pid = open3( undef, $out, undef, @command ); };
 
@@ -108,17 +93,41 @@ sub new {
         # other platforms too?
         # TODO: What was the first perl version that supports this?
         binmode $out, ':crlf';
-
-        # binmode $err, ':crlf';
     }
 
-    my $self = bless {
-        out => $out,
+    return ( $out, $pid );
+}
 
-        # err  => $err,
-        pid  => $pid,
-        exit => undef,
-    }, $class;
+sub _open_process {
+    my $self    = shift;
+    my @command = @_;
+
+    my $pid = open( my $out, '-|' );
+    die "Could not fork: $!" unless defined $pid;
+
+    if ( 0 == $pid ) {
+        exec(@command) or die "Could not execute (@command): $!";
+    }
+
+    return ( $out, $pid );
+}
+
+sub new {
+    my $class = shift;
+    my $args  = shift;
+
+    my @command = @{ delete $args->{command} }
+      or die "Must supply a command to execute";
+    my $merge = delete $args->{merge};
+
+    my $self = bless { exit => undef }, $class;
+
+    my ( $out, $pid ) = $merge
+      ? $self->_open_process_merged(@command)
+      : $self->_open_process(@command);
+
+    $self->{out} = $out;
+    $self->{pid} = $pid;
 
     return $self;
 }

@@ -101,6 +101,7 @@ BEGIN {
         quiet        => sub { shift; shift },
         really_quiet => sub { shift; shift },
         exec         => sub { shift; shift },
+        merge        => sub { shift; shift },
     );
     my @getter_setters = qw/
       _curr_parser
@@ -196,6 +197,11 @@ TAP is fine.  You can use this argument to specify the name of the program
 (and optional switches) to run your tests with:
 
   exec => '/usr/bin/ruby -w'
+  
+=item * C<merge>
+
+If C<merge> is true the harness will create parsers that merge STDOUT
+and STDERR together for any processes they start.
 
 =item * C<errors>
 
@@ -656,6 +662,7 @@ sub _get_parser_args {
     push @switches => $self->switches if $self->switches;
     $args{switches} = \@switches;
     $args{spool}    = $self->_open_spool($test);
+    $args{merge}    = $self->merge;
     return \%args;
 }
 

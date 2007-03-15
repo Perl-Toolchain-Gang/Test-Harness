@@ -3,7 +3,7 @@ package TAP::Parser::Source;
 use strict;
 use vars qw($VERSION);
 
-use TAP::Parser::Iterator::Process;
+use TAP::Parser::Iterator;
 
 # Causes problem on MacOS and shouldn't be necessary anyway
 #$SIG{CHLD} = sub { wait };
@@ -92,7 +92,8 @@ sub get_stream {
     my @command = $self->_get_command
       or $self->_croak("No command found!");
 
-    return TAP::Parser::Iterator::Process->new(@command);
+    return TAP::Parser::Iterator->new(
+        { command => \@command, merge => $self->merge } );
 }
 
 sub _get_command { @{ shift->source } }
@@ -136,18 +137,18 @@ sub exit {
 
 ##############################################################################
 
-=head3 C<pid>
+=head3 C<merge>
 
-  my $pid = $source->pid;
+  my $merge = $source->merge;
 
-Returns the pid of the command being used to execute the tests.
+Sets or returns the flag that dictates whether STDOUT and STDERR are merged.
 
 =cut
 
-sub pid {
+sub merge {
     my $self = shift;
-    return $self->{pid} unless @_;
-    $self->{pid} = shift;
+    return $self->{merge} unless @_;
+    $self->{merge} = shift;
     return $self;
 }
 

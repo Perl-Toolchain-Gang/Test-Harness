@@ -196,6 +196,12 @@ be used when invoking the perl executable.
 
 If passed a filehandle will write a copy of all parsed TAP to that handle.
 
+=item * C<merge>
+
+If exec is used to specify a process to run this flag determines
+whether STDOUT and STDERR of the process are merged. If false STDOUT is
+not captured.
+
 =back
 
 =cut
@@ -317,6 +323,7 @@ sub run {
         my $exec   = delete $arg_for->{exec};
         my $merge  = delete $arg_for->{merge};
         my $spool  = delete $arg_for->{spool};
+
         if ( 1 < grep {defined} $stream, $tap, $source ) {
             $self->_croak(
                 "You may only choose one of 'stream', 'tap', or'source'");
@@ -349,8 +356,11 @@ sub run {
             elsif ( -e $source ) {
 
                 my $perl = TAP::Parser::Source::Perl->new;
+
                 $perl->switches( $arg_for->{switches} )
                   if $arg_for->{switches};
+
+                $perl->merge( $merge );
 
                 $stream = $perl->source($source)->get_stream;
                 if ( defined $stream ) {

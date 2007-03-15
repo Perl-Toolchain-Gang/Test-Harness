@@ -18,6 +18,10 @@ Revision history for TAP-Parser
     - Added tests for T::P::I::Process.
     - TAP::Harness now displays the first five TAP syntax errors and
       explains how to pass the -p flag to runtests to see them all.
+    - Added merge option to TAP::Parser::Iterator::Process,
+      TAP::Parser::Source, TAP::Parser and TAP::Harness.
+    - Added --merge option to runtests to enable STDOUT/STDERR merging.
+      This behaviour used to be the default.
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

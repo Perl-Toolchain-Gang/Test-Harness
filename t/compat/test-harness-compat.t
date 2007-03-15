@@ -796,8 +796,15 @@ for my $test_key ( sort keys %$results ) {
         my @test_files
           = map { File::Spec->catfile( $TEST_DIR, $_ ) } @test_names;
 
+        # For now we supress STDERR because it crufts up /our/ test
+        # results. Should probably capture and analyse it.
+        open my $olderr, '>&', \*STDERR or die $!;
+        open STDERR, '>', File::Spec->devnull or die $!;
+        
         my ( $tot, $fail, $todo, $harness, $aggregate )
           = execute_tests( tests => \@test_files );
+          
+        open STDERR, '>&', $olderr or die $!;
 
         my $bench = delete $tot->{bench};
         isa_ok $bench, 'Benchmark';

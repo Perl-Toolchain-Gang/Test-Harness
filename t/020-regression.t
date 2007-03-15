@@ -2604,6 +2604,7 @@ foreach my $test ( sort keys %samples ) {
     $args->{switches} = [ '-Ilib', @switches ];
 
     $args->{source} = File::Spec->catfile( $SAMPLE_TESTS, $test );
+    $args->{merge} = 1;
 
     my $parser = eval { analyze_test( $test, $results, $args ) };
     my $error = $@;

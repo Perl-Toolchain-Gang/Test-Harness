@@ -4,7 +4,8 @@ use strict;
 use vars qw($VERSION);
 
 use TAP::Parser::Iterator::Array;
-use TAP::Parser::Iterator::Array;
+use TAP::Parser::Iterator::Stream;
+use TAP::Parser::Iterator::Process;
 
 =head1 NAME
 
@@ -61,6 +62,9 @@ sub new {
     }
     elsif ( $ref eq 'ARRAY' ) {
         return TAP::Parser::Iterator::Array->new($thing);
+    }
+    elsif ( $ref eq 'HASH' ) {
+        return TAP::Parser::Iterator::Process->new($thing);
     }
     else {
         die "Can't iterate with a $ref";

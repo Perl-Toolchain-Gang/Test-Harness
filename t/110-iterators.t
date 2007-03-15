@@ -20,19 +20,16 @@ my $tap = do { local $/; <DATA> };
 seek DATA, $offset, 0;
 
 my @schedule = (
-    'TAP::Parser::Iterator',
     'TAP::Parser::Iterator::Array',
-    [ array_ref_from($tap) ],
-    'TAP::Parser::Iterator',
+    array_ref_from($tap),
     'TAP::Parser::Iterator::Stream',
-    [ \*DATA ],
+    \*DATA,
     'TAP::Parser::Iterator::Process',
-    'TAP::Parser::Iterator::Process',
-    [ $^X, '-e', 'print "one\ntwo\n\nthree\n"' ],
+    { command => [ $^X, '-e', 'print "one\ntwo\n\nthree\n"' ] },
 );
 
-while ( my ( $class, $subclass, $source ) = splice @schedule, 0, 3 ) {
-    ok my $iter = $class->new(@$source),
+while ( my ( $subclass, $source ) = splice @schedule, 0, 2 ) {
+    ok my $iter = TAP::Parser::Iterator->new($source),
       'We should be able to create a new iterator';
     isa_ok $iter, 'TAP::Parser::Iterator', '... and the object it returns';
     isa_ok $iter, $subclass, '... and the object it returns';
