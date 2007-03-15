@@ -77,30 +77,20 @@ sub new {
     my @command = @{ delete $args->{command} }
       or die "Must supply a command to execute";
     my $merge = delete $args->{merge};
+    my ($pid, $err, $sel);
 
     my $out = IO::Handle->new;
-    my $err = $merge ? undef : IO::Handle->new;
 
-    my $pid;
-    eval { $pid = open3( undef, $out, $err, @command ); };
-    my $sel = $merge ? undef : IO::Select->new( $out, $err );
-
-    if ($@) {
-
-        # TODO: Need to do something better with the error info here.
-        # $self->exit( $? >> 8 );
-        # $self->error("Could not execute (@command): $!");
-        die "Could not execute (@command): $@";
-    }
-
-    if (IS_WIN32) {
-
-        # open3 defaults to raw mode, need this for Windows. Maybe
-        # other platforms too?
-        # TODO: What was the first perl version that supports this?
-        binmode $out, ':crlf';
-        binmode $err, ':crlf' if defined $err;
-    }
+	if (IS_WIN32) {
+	    eval { $pid = open3( undef, $out, $merge ? undef : '>&STDERR', @command ); };
+        die "Could not execute (@command): $@" if $@;
+    	binmode $out, ':crlf';
+	} else {
+	    $err = $merge ? undef : IO::Handle->new;
+	    eval { $pid = open3( undef, $out, $err, @command ); };
+        die "Could not execute (@command): $@" if $@;
+	    $sel = $merge ? undef : IO::Select->new( $out, $err );
+	}	
 
     return bless {
         out  => $out,
