@@ -304,6 +304,7 @@ sub run {
       comment
       bailout
       unknown
+      yaml
       ALL
       ELSE
     );
@@ -360,7 +361,7 @@ sub run {
                 $perl->switches( $arg_for->{switches} )
                   if $arg_for->{switches};
 
-                $perl->merge( $merge );
+                $perl->merge($merge);
 
                 $stream = $perl->source($source)->get_stream;
                 if ( defined $stream ) {
@@ -382,7 +383,7 @@ sub run {
         }
 
         $self->_stream($stream);
-        $self->_grammar( TAP::Parser::Grammar->new($self) );
+        $self->_grammar( TAP::Parser::Grammar->new($stream) );
         $self->_spool($spool);
 
         while ( my ( $k, $v ) = each %initialize ) {
@@ -476,6 +477,10 @@ C<merge> option.
 =head3 C<is_bailout>
 
 Indicates whether or not this is bailout line.
+
+=head3 C<is_yaml>
+
+Indicates whether or not the current item is a YAML block.
 
 =head3 C<is_unknown>
 
@@ -953,7 +958,8 @@ sub _next {
     my $self   = shift;
     my $stream = $self->_stream;
 
-    my $result = $self->_grammar->tokenize( $stream );
+    my $result = eval { $self->_grammar->tokenize };
+    $self->_add_error($@) if $@;
 
     if ($result) {
         $self->_next_state($result);
@@ -1024,6 +1030,12 @@ BEGIN {
                 $self->_aggregate_results($test);
             },
         },
+        yaml => {
+            act => sub {
+                my ( $self, $test ) = @_;
+                local *__ANON__ = '__ANON__yaml_handler';
+            },
+        },
     );
 
 # Each state contains a hash the keys of which match a token type. For each token
@@ -1056,7 +1068,7 @@ BEGIN {
             test => { goto => 'UNPLANNED' },
         },
         PLANNED => {
-            test => {},
+            test => { goto => 'PLANNED_AFTER_TEST' },
             plan => {
                 act => sub {
                     my ( $self, $version ) = @_;
@@ -1065,6 +1077,11 @@ BEGIN {
                         "More than one plan found in TAP output");
                 },
             },
+        },
+        PLANNED_AFTER_TEST => {
+            test => { act => sub { }, continue => 'PLANNED' },
+            plan => { act => sub { }, continue => 'PLANNED' },
+            yaml => { goto => 'PLANNED' },
         },
         GOT_PLAN => {
             test => {
@@ -1085,8 +1102,13 @@ BEGIN {
             },
         },
         UNPLANNED => {
-            test => {},
+            test => { goto => 'UNPLANNED_AFTER_TEST' },
             plan => { goto => 'GOT_PLAN' },
+        },
+        UNPLANNED_AFTER_TEST => {
+            test => { act => sub { }, continue => 'UNPLANNED' },
+            plan => { act => sub { }, continue => 'UNPLANNED' },
+            yaml => { goto => 'PLANNED' },
         },
     );
 
@@ -1204,7 +1226,7 @@ Callbacks may also be added like this:
  $parser->callback( test => \&test_callback );
  $parser->callback( plan => \&plan_callback );
 
-There are, at the present time, eight keys allowed for callbacks.  These keys
+There are, at the present time, nine keys allowed for callbacks.  These keys
 are case-sensitive.
 
 =over 4
@@ -1228,6 +1250,10 @@ Invoked if C<< $result->is_comment >> returns true.
 =item 5 C<bailout>
 
 Invoked if C<< $result->is_unknown >> returns true.
+
+=item 6 C<yaml>
+
+Invoked if C<< $result->is_yaml >> returns true.
 
 =item 6 C<unknown>
 

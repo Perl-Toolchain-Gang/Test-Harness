@@ -6,17 +6,33 @@ use lib 'lib';
 use TAP::Parser::Grammar;
 use TAP::Parser::Iterator::Array;
 
-use Test::More tests => 63;
+use Test::More tests => 67;
 
 my $GRAMMAR = 'TAP::Parser::Grammar';
 
-# Quote a scalar into a stream
-sub qs($) {
-    return TAP::Parser::Iterator::Array->new( [@_] );
+# Array based stream that we can push items in to
+package SS;
+
+sub new {
+    my $class = shift;
+    return bless [], $class;
 }
 
+sub next {
+    my $self = shift;
+    return shift @$self;
+}
+
+sub put {
+    my $self = shift;
+    unshift @$self, @_;
+}
+
+package main;
+
+my $stream = SS->new;
 can_ok $GRAMMAR, 'new';
-ok my $grammar = $GRAMMAR->new, '... and calling it should succeed';
+ok my $grammar = $GRAMMAR->new($stream), '... and calling it should succeed';
 isa_ok $grammar, $GRAMMAR, '... and the object it returns';
 
 # Note:  all methods are actually class methods.  See the docs for the reason
@@ -26,7 +42,7 @@ isa_ok $grammar, $GRAMMAR, '... and the object it returns';
 can_ok $grammar, 'token_types';
 ok my @types = sort( $grammar->token_types ),
   '... and calling it should succeed';
-is_deeply \@types, [qw(bailout comment plan test version)],
+is_deeply \@types, [qw(bailout comment plan test version yaml)],
   '... and return the correct token types';
 
 can_ok $grammar, 'syntax_for';
@@ -65,7 +81,8 @@ is_deeply $plan_token, $expected,
   '... and it should contain the correct data';
 
 can_ok $grammar, 'tokenize';
-ok my $token = $grammar->tokenize( qs $plan),
+$stream->put($plan);
+ok my $token = $grammar->tokenize,
   '... and calling it with data should return a token';
 is_deeply $token, $expected,
   '... and the token should contain the correct data';
@@ -88,7 +105,8 @@ $expected = {
 is_deeply $plan_token, $expected,
   '... and it should contain the correct data';
 
-ok $token = $grammar->tokenize( qs $plan),
+$stream->put($plan);
+ok $token = $grammar->tokenize,
   '... and calling it with data should return a token';
 is_deeply $token, $expected,
   '... and the token should contain the correct data';
@@ -112,7 +130,8 @@ $expected = {
 is_deeply $plan_token, $expected,
   '... and it should contain the correct data';
 
-ok $token = $grammar->tokenize( qs $plan),
+$stream->put($plan);
+ok $token = $grammar->tokenize,
   '... and calling it with data should return a token';
 is_deeply $token, $expected,
   '... and the token should contain the correct data';
@@ -129,7 +148,8 @@ my $bailout = 'Bail out!';
 like $bailout, $syntax_for{'bailout'},
   'Bail out! should match a bailout syntax';
 
-ok $token = $grammar->tokenize( qs $bailout),
+$stream->put($bailout);
+ok $token = $grammar->tokenize,
   '... and calling it with data should return a token';
 $expected = {
     'bailout' => '',
@@ -143,7 +163,8 @@ $bailout = 'Bail out! some explanation';
 like $bailout, $syntax_for{'bailout'},
   'Bail out! should match a bailout syntax';
 
-ok $token = $grammar->tokenize( qs $bailout),
+$stream->put($bailout);
+ok $token = $grammar->tokenize,
   '... and calling it with data should return a token';
 $expected = {
     'bailout' => 'some explanation',
@@ -159,7 +180,8 @@ my $comment = '# this is a comment';
 like $comment, $syntax_for{'comment'},
   'Comments should match the comment syntax';
 
-ok $token = $grammar->tokenize( qs $comment),
+$stream->put($comment);
+ok $token = $grammar->tokenize,
   '... and calling it with data should return a token';
 $expected = {
     'comment' => 'this is a comment',
@@ -174,7 +196,8 @@ is_deeply $token, $expected,
 my $test = 'ok 1 this is a test';
 like $test, $syntax_for{'test'}, 'Tests should match the test syntax';
 
-ok $token = $grammar->tokenize( qs $test),
+$stream->put($test);
+ok $token = $grammar->tokenize,
   '... and calling it with data should return a token';
 
 $expected = {
@@ -194,7 +217,8 @@ is_deeply $token, $expected,
 $test = 'not ok 2 this is a test # TODO whee!';
 like $test, $syntax_for{'test'}, 'Tests should match the test syntax';
 
-ok $token = $grammar->tokenize( qs $test),
+$stream->put($test);
+ok $token = $grammar->tokenize,
   '... and calling it with data should return a token';
 
 $expected = {
@@ -214,7 +238,8 @@ is_deeply $token, $expected,
   $test = 'ok 22 this is a test \# TODO whee!';
 like $test, $syntax_for{'test'}, 'Tests should match the test syntax';
 
-ok $token = $grammar->tokenize( qs $test),
+$stream->put($test);
+ok $token = $grammar->tokenize,
   '... and calling it with data should return a token';
 
 $expected = {

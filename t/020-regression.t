@@ -279,6 +279,100 @@ my %samples = (
         wait          => 0,
         version       => 12,
     },
+    simple_yaml => {
+        results => [
+            {   is_plan       => TRUE,
+                raw           => '1..5',
+                tests_planned => 5,
+                passed        => TRUE,
+                is_ok         => TRUE,
+            },
+            {   actual_passed => TRUE,
+                is_actual_ok  => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => FALSE,
+                number        => 1,
+                description   => "",
+            },
+            {   actual_passed => TRUE,
+                is_actual_ok  => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => FALSE,
+                number        => 2,
+                description   => "",
+            },
+            {   is_yaml => TRUE,
+                yaml    => bless(
+                    [   [   { 'fnurk' => 'skib', 'ponk' => 'gleeb' },
+                            { 'bar'   => 'krup', 'foo'  => 'plink' }
+                        ]
+                    ],
+                    'TAP::Parser::YAML'
+                ),
+            },
+            {   actual_passed => TRUE,
+                is_actual_ok  => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => FALSE,
+                number        => 3,
+                description   => "",
+            },
+            {   actual_passed => TRUE,
+                is_actual_ok  => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => FALSE,
+                number        => 4,
+                description   => "",
+            },
+            {   is_yaml => TRUE,
+                yaml    => bless(
+                    [   {   'got'      => [ '1', 'pong', '4' ],
+                            'expected' => [ '1', '2',    '4' ]
+                        }
+                    ],
+                    'TAP::Parser::YAML'
+                ),
+            },
+            {   actual_passed => TRUE,
+                is_actual_ok  => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => FALSE,
+                number        => 5,
+                description   => "",
+            },
+        ],
+        plan          => '1..5',
+        passed        => [ 1 .. 5 ],
+        actual_passed => [ 1 .. 5 ],
+        failed        => [],
+        actual_failed => [],
+        todo          => [],
+        todo_passed   => [],
+        skipped       => [],
+        good_plan     => TRUE,
+        is_good_plan  => TRUE,
+        tests_planned => 5,
+        tests_run     => 5,
+        parse_errors  => [],
+        'exit'        => 0,
+        wait          => 0,
+        version       => 12,
+    },
     simple_fail => {
         results => [
             {   is_plan       => TRUE,
@@ -2650,6 +2744,10 @@ sub analyze_test {
     my $parser = TAP::Parser->new($args);
     my $count  = 1;
     while ( defined( my $result = $parser->next ) ) {
+        # if ( $test eq 'simple_yaml' ) {
+        #     use Data::Dumper;
+        #     diag( Dumper($result) );
+        # }
         my $expected = shift @$results;
         my $desc =
             $result->is_test
@@ -2663,6 +2761,10 @@ sub analyze_test {
             if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
                 ok $handler->( $result->$method ),
                   "... and $method should return a reasonable value ($test)";
+            }
+            elsif ( ref $answer ) {
+                is_deeply $result->$method, $answer,
+                  "... and $method should return the correct answer ($test)";
             }
             else {
                 is $result->$method, $answer,

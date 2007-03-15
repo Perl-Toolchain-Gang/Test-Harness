@@ -32,6 +32,9 @@ Revision history for TAP-Parser
     - Altered the T::P::Grammar interface so that it gets a stream
       rather than the next line from the stream in preparation for
       making it handle YAML diagnostics.
+    - Implemented YAML syntax. Currently YAML may only follow a
+      test result. The first line of YAML is '---' and the last
+      line is '...'.
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

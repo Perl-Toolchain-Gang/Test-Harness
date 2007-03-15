@@ -1,0 +1,62 @@
+package TAP::Parser::Result::YAML;
+
+use strict;
+
+use vars qw($VERSION @ISA);
+use TAP::Parser::Result;
+@ISA = 'TAP::Parser::Result';
+
+=head1 NAME
+
+TAP::Parser::Result::YAML - YAML result token.
+
+=head1 VERSION
+
+Version 0.52
+
+=cut
+
+$VERSION = '0.52';
+
+=head1 DESCRIPTION
+
+This is a subclass of C<TAP::Parser::Result>.  A token of this class will be
+returned if a YAML block is encountered.
+
+ 1..1
+ ok 1 - woo hooo!
+
+C<1..1> is the plan.  Gotta have a plan.
+
+=head1 OVERRIDDEN METHODS
+
+Mainly listed here to shut up the pitiful screams of the pod coverage tests.
+They keep me awake at night.
+
+=over 4
+
+=item * C<as_string>
+
+=item * C<raw>
+
+=back
+
+=cut
+
+##############################################################################
+
+=head2 Instance methods
+
+=head3 C<yaml> 
+
+  if ( $result->is_yaml ) {
+     print $result->yaml;
+  }
+
+Return the L<TAP::Parser::YAML> object for this result.
+
+=cut
+
+sub yaml {shift->{yaml} }
+
+1;

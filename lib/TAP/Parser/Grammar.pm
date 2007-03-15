@@ -4,6 +4,7 @@ use strict;
 use vars qw($VERSION);
 
 use TAP::Parser::Result;
+use TAP::Parser::YAML;
 
 =head1 NAME
 
@@ -48,8 +49,8 @@ Returns TAP grammar object.  Future versions may accept a version number.
 =cut
 
 sub new {
-    my ($class) = @_;
-    bless {}, $class;
+    my ( $class, $stream ) = @_;
+    bless { stream => $stream }, $class;
 }
 
 # XXX the 'not' and 'ok' might be on separate lines in VMS ...
@@ -147,6 +148,14 @@ my %token_for = (
             return $self->_make_bailout_token( $line, _trim($explanation) );
         },
     },
+    yaml => {
+        syntax  => qr/^---/,
+        handler => sub {
+            my ( $self, $line ) = @_;
+            local *__ANON__ = '__ANON__yaml_token_handler';
+            return $self->_make_yaml_token($line);
+        },
+    },
 );
 
 ##############################################################################
@@ -165,10 +174,10 @@ methods below are merely for convenience, if needed.
 =cut
 
 sub tokenize {
-    my $self   = shift;
-    my $stream = shift;
+    my $self = shift;
 
-    my $line = $stream->next;
+    my $stream = $self->{stream};
+    my $line   = $stream->next;
     return unless defined $line;
 
     my $token;
@@ -311,6 +320,28 @@ sub _make_bailout_token {
         type    => 'bailout',
         raw     => $line,
         bailout => _trim($1)
+    };
+}
+
+sub _make_yaml_token {
+    my ( $self, @yaml ) = @_;
+
+    my $stream = $self->{stream};
+
+    # If we don't find the end-of-YAML '...' marker we'll end up consuming the
+    # whole stream. Nasty. It'd be nicer if we had a YAML parser to which we
+    # could pass a line at a time. Hmmm.
+    while ( defined( my $line = $stream->next ) ) {
+        last if $line =~ /^[.][.][.]/;
+        push @yaml, $line;
+    }
+
+    my $raw = join( "\n", @yaml ) . "\n";
+
+    return {
+        type => 'yaml',
+        raw  => $raw,
+        yaml => TAP::Parser::YAML->read_string($raw)
     };
 }
 

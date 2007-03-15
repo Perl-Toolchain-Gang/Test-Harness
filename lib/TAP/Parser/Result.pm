@@ -3,16 +3,17 @@ package TAP::Parser::Result;
 use strict;
 use vars qw($VERSION);
 
+use TAP::Parser::Result::Bailout;
+use TAP::Parser::Result::Comment;
 use TAP::Parser::Result::Plan;
 use TAP::Parser::Result::Test;
-use TAP::Parser::Result::Comment;
-use TAP::Parser::Result::Bailout;
-use TAP::Parser::Result::Version;
 use TAP::Parser::Result::Unknown;
+use TAP::Parser::Result::Version;
+use TAP::Parser::Result::YAML;
 
 BEGIN {
     no strict 'refs';
-    foreach my $token (qw<plan comment test bailout version unknown>) {
+    foreach my $token (qw<plan comment test bailout version unknown yaml>) {
         my $method = "is_$token";
         *$method = sub { return $token eq shift->type };
     }
@@ -49,6 +50,7 @@ my %class_for = (
     bailout => 'TAP::Parser::Result::Bailout',
     version => 'TAP::Parser::Result::Version',
     unknown => 'TAP::Parser::Result::Unknown',
+    yaml    => 'TAP::Parser::Result::YAML',
 );
 
 ##############################################################################
@@ -120,6 +122,10 @@ Indicates whether or not this is a TAP version line.
 Indicates whether or not the current line could be parsed.
 
  ... this line is junk ...
+
+=item * C<is_yaml>
+
+Indicates whether or not this is a YAML chunk.
 
 =back
 

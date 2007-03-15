@@ -28,6 +28,7 @@ lib/TAP/Parser/Result/Plan.pm
 lib/TAP/Parser/Result/Test.pm
 lib/TAP/Parser/Result/Unknown.pm
 lib/TAP/Parser/Result/Version.pm
+lib/TAP/Parser/Result/YAML.pm
 lib/TAP/Parser/Source.pm
 lib/TAP/Parser/Source/Perl.pm
 lib/TAP/Parser/YAML.pm
@@ -96,6 +97,7 @@ t/sample-tests/sequence_misparse
 t/sample-tests/shbang_misparse
 t/sample-tests/simple
 t/sample-tests/simple_fail
+t/sample-tests/simple_yaml
 t/sample-tests/skip
 t/sample-tests/skip_nomsg
 t/sample-tests/skipall
