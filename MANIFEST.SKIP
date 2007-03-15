@@ -2,6 +2,8 @@
 \.tar\.gz$
 \B\.svn\b
 ^\.cvsignore
+\..*\.swp
+^_build/
 
 # Makemaker generated files and dirs.
 ^MANIFEST\.
