@@ -16,6 +16,8 @@ Revision history for TAP-Parser
     - Fixed infinite recursion in T::P::I::Stream and added regression
       coverage for same.
     - Added tests for T::P::I::Process.
+    - TAP::Harness now displays the first five TAP syntax errors and
+      explains how to pass the -p flag to runtests to see them all.
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

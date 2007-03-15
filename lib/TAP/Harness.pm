@@ -38,6 +38,7 @@ END {
 }
 
 my $TIME_HIRES;
+my $MAX_ERRORS = 5;
 
 BEGIN {
     eval 'use Time::HiRes qw(time)';
@@ -419,21 +420,24 @@ sub summary {
             }
 
             if ( my @errors = $parser->parse_errors ) {
+                my $explain;
+                if ( @errors > $MAX_ERRORS && !$self->errors ) {
+                    $explain = "Displayed the first $MAX_ERRORS of "
+                      . scalar(@errors)
+                      . " TAP syntax errors.\n"
+                      . "Re-run runtests with the -p option to see them all.\n";
+                    splice @errors, $MAX_ERRORS;
+                }
                 $self->_summary_test_header( $test, $parser );
-                if ( $self->errors || 1 == @errors ) {
-                    $self->failure_output(
-                        sprintf "  Parse errors: %s\n",
-                        shift @errors
-                    );
-                    foreach my $error (@errors) {
-                        my $spaces = ' ' x 16;
-                        $self->failure_output("$spaces$error\n");
-                    }
+                $self->failure_output(
+                    sprintf "  Parse errors: %s\n",
+                    shift @errors
+                );
+                foreach my $error (@errors) {
+                    my $spaces = ' ' x 16;
+                    $self->failure_output("$spaces$error\n");
                 }
-                else {
-                    $self->failure_output(
-                        "  Errors encountered while parsing tap\n");
-                }
+                $self->failure_output($explain) if $explain;
             }
         }
     }
@@ -755,6 +759,7 @@ sub _process {
             $self->output("\n") unless $self->quiet;
             $self->_newline_printed(1);
         }
+
         # TODO: quiet gets tested here /and/ in _should_display
         $self->output( $result->as_string . "\n" ) unless $self->quiet;
     }
@@ -774,7 +779,7 @@ sub _should_display {
     # Nothing else if really quiet
     return 0 if $self->really_quiet;
 
-#    return 1 if $result->is_unknown;
+    #    return 1 if $result->is_unknown;
 
     return 1
       if $self->_should_show_failure($result)
