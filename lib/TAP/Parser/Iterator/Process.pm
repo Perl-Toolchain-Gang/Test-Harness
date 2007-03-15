@@ -70,17 +70,20 @@ else {
     *_wait2exit = sub { POSIX::WEXITSTATUS( $_[1] ) }
 }
 
-sub _open_process {
-    my $self    = shift;
-    my $merge   = shift;
-    my @command = @_;
+sub new {
+    my $class = shift;
+    my $args  = shift;
+
+    my @command = @{ delete $args->{command} }
+      or die "Must supply a command to execute";
+    my $merge = delete $args->{merge};
 
     my $out = IO::Handle->new;
+    my $err = $merge ? undef : IO::Handle->new;
+
     my $pid;
-
-    my $err = $merge ? undef: '>&STDERR';
-
     eval { $pid = open3( undef, $out, $err, @command ); };
+    my $sel = $merge ? undef : IO::Select->new( $out, $err );
 
     if ($@) {
 
@@ -96,27 +99,16 @@ sub _open_process {
         # other platforms too?
         # TODO: What was the first perl version that supports this?
         binmode $out, ':crlf';
+        binmode $err, ':crlf' if defined $err;
     }
 
-    return ( $out, $pid );
-}
-
-sub new {
-    my $class = shift;
-    my $args  = shift;
-
-    my @command = @{ delete $args->{command} }
-      or die "Must supply a command to execute";
-    my $merge = delete $args->{merge};
-
-    my $self = bless { exit => undef }, $class;
-
-    my ( $out, $pid ) = $self->_open_process( $merge, @command );
-
-    $self->{out} = $out;
-    $self->{pid} = $pid;
-
-    return $self;
+    return bless {
+        out  => $out,
+        err  => $err,
+        sel  => $sel,
+        pid  => $pid,
+        exit => undef
+    }, $class;
 }
 
 ##############################################################################
@@ -127,15 +119,47 @@ sub exit { $_[0]->{exit} }
 sub next_raw {
     my $self = shift;
 
-    if ( my $fh = $self->{out} ) {
-        if ( defined( my $line = <$fh> ) ) {
-            chomp $line;
-            return $line;
+    if ( my $out = $self->{out} ) {
+        # If we also have an error handle we need to do the while
+        # select dance.
+        if ( my $err = $self->{err} ) {
+            my $sel = $self->{sel};
+            my $flip = 0;
+
+            # Loops forever while we're reading from STDERR
+            while ( my @ready = $sel->can_read ) {
+                # Load balancing :)
+                @ready = reverse @ready if $flip;
+                $flip = !$flip;
+                
+                for my $fh (@ready) {
+                    if ( defined( my $line = <$fh> ) ) {
+                        if ( $fh == $err ) {
+                            warn $line;
+                        }
+                        else {
+                            chomp $line;
+                            return $line;
+                        }
+                    }
+                    else {
+                        $sel->remove($fh);
+                    }
+                }
+            }
         }
         else {
-            $self->_finish;
+
+            # Only one handle: just a simple read
+            if ( defined( my $line = <$out> ) ) {
+                chomp $line;
+                return $line;
+            }
         }
     }
+
+    # We only get here when the stream(s) is/are exhausted
+    $self->_finish;
 
     return;
 }
@@ -166,10 +190,13 @@ sub _finish {
         }
     }
 
-    close delete $self->{out};
+    (delete $self->{out})->close if $self->{out};
+    (delete $self->{err})->close if $self->{err};
+    delete $self->{sel} if $self->{sel};
 
     $self->{wait} = $status;
     $self->{exit} = $self->_wait2exit($status);
+    
     return $self;
 }
 

@@ -24,6 +24,11 @@ Revision history for TAP-Parser
       This behaviour used to be the default.
     - Made T::P::I::Process use open3 for both merged and non-merged
       streams so that it works on Windows.
+    - Implemented Eric Wilhelm's IO::Select based multiple stream
+      handler so that STDERR is piped to us even if stream merging is
+      turned off. This tends to reduce the temporal skew between the
+      two streams so that error messages appear closer to their
+      correct location.
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.
