@@ -3,7 +3,8 @@
 use strict;
 
 #use Test::More 'no_plan';
-use Test::More tests => 39;
+use Test::More tests => 52;
+use File::Spec;
 use TAP::Parser;
 
 use TAP::Parser::Iterator;
@@ -26,6 +27,11 @@ my @schedule = (
     \*DATA,
     'TAP::Parser::Iterator::Process',
     { command => [ $^X, '-e', 'print qq/one\ntwo\n\nthree\n/' ] },
+    'TAP::Parser::Iterator::Process',
+    {   command =>
+          [ $^X, File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' ) ],
+        merge => 1
+    },
 );
 
 while ( my ( $subclass, $source ) = splice @schedule, 0, 2 ) {

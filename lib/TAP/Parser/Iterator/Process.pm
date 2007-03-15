@@ -77,20 +77,23 @@ sub new {
     my @command = @{ delete $args->{command} }
       or die "Must supply a command to execute";
     my $merge = delete $args->{merge};
-    my ($pid, $err, $sel);
+    my ( $pid, $err, $sel );
 
     my $out = IO::Handle->new;
 
-	if (IS_WIN32) {
-	    eval { $pid = open3( undef, $out, $merge ? undef : '>&STDERR', @command ); };
+    if (IS_WIN32) {
+        eval {
+            $pid = open3( undef, $out, $merge ? undef: '>&STDERR', @command );
+        };
         die "Could not execute (@command): $@" if $@;
-    	binmode $out, ':crlf';
-	} else {
-	    $err = $merge ? undef : IO::Handle->new;
-	    eval { $pid = open3( undef, $out, $err, @command ); };
+        binmode $out, ':crlf';
+    }
+    else {
+        $err = $merge ? undef: IO::Handle->new;
+        eval { $pid = open3( undef, $out, $err, @command ); };
         die "Could not execute (@command): $@" if $@;
-	    $sel = $merge ? undef : IO::Select->new( $out, $err );
-	}	
+        $sel = $merge ? undef: IO::Select->new( $out, $err );
+    }
 
     return bless {
         out  => $out,
@@ -110,18 +113,20 @@ sub next_raw {
     my $self = shift;
 
     if ( my $out = $self->{out} ) {
+
         # If we also have an error handle we need to do the while
         # select dance.
         if ( my $err = $self->{err} ) {
-            my $sel = $self->{sel};
+            my $sel  = $self->{sel};
             my $flip = 0;
 
             # Loops forever while we're reading from STDERR
             while ( my @ready = $sel->can_read ) {
+
                 # Load balancing :)
                 @ready = reverse @ready if $flip;
                 $flip = !$flip;
-                
+
                 for my $fh (@ready) {
                     if ( defined( my $line = <$fh> ) ) {
                         if ( $fh == $err ) {
@@ -180,13 +185,13 @@ sub _finish {
         }
     }
 
-    (delete $self->{out})->close if $self->{out};
-    (delete $self->{err})->close if $self->{err};
-    delete $self->{sel} if $self->{sel};
+    ( delete $self->{out} )->close if $self->{out};
+    ( delete $self->{err} )->close if $self->{err};
+    delete $self->{sel}            if $self->{sel};
 
     $self->{wait} = $status;
     $self->{exit} = $self->_wait2exit($status);
-    
+
     return $self;
 }
 

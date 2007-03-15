@@ -87,6 +87,7 @@ t/sample-tests/junk_before_plan
 t/sample-tests/lone_not_bug
 t/sample-tests/no_nums
 t/sample-tests/no_output
+t/sample-tests/out_err_mix
 t/sample-tests/out_of_order
 t/sample-tests/schwern
 t/sample-tests/schwern-todo-quiet
