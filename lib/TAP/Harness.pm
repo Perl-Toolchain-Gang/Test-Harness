@@ -786,8 +786,6 @@ sub _should_display {
     # Nothing else if really quiet
     return 0 if $self->really_quiet;
 
-    #    return 1 if $result->is_unknown;
-
     return 1
       if $self->_should_show_failure($result)
       || ( $self->verbose && !$self->failures );

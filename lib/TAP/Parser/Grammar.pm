@@ -83,7 +83,7 @@ my %token_for = (
                 $line,
                 $version,
             );
-        }
+          }
     },
     plan => {
         syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\b(.*))?\z/i,
@@ -165,10 +165,12 @@ methods below are merely for convenience, if needed.
 =cut
 
 sub tokenize {
-    my $self = shift;
-    return unless @_ && defined $_[0];
+    my $self   = shift;
+    my $stream = shift;
 
-    my $line = shift;
+    my $line = $stream->next;
+    return unless defined $line;
+
     my $token;
 
     foreach my $token_data ( values %token_for ) {
@@ -248,9 +250,9 @@ sub handler_for {
 sub _make_version_token {
     my ( $self, $line, $version ) = @_;
     return {
-        type          => 'version',
-        raw           => $line,
-        version       => $version,
+        type    => 'version',
+        raw     => $line,
+        version => $version,
     };
 }
 

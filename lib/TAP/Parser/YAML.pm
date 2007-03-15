@@ -3,15 +3,11 @@ package TAP::Parser::YAML;
 use 5.005;
 use strict;
 
-use vars qw{$VERSION @ISA @EXPORT_OK $errstr};
+use vars qw{$VERSION $errstr};
 
 BEGIN {
     $VERSION = '0.52';
     $errstr  = '';
-
-    require Exporter;
-    @ISA       = qw{ Exporter  };
-    @EXPORT_OK = qw{ Load Dump };
 }
 
 # Create the main error hash
