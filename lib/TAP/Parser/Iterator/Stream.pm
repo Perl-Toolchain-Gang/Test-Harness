@@ -63,7 +63,7 @@ sub new {
 
 ##############################################################################
 
-sub wait { shift->wait }
+sub wait { shift->exit }
 sub exit { shift->{fh} ? () : 0 }
 
 sub next_raw {

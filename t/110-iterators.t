@@ -3,7 +3,7 @@
 use strict;
 
 #use Test::More 'no_plan';
-use Test::More tests => 24;
+use Test::More tests => 26;
 use TAP::Parser;
 
 use TAP::Parser::Iterator;
@@ -44,6 +44,8 @@ foreach my $source ( array_ref_from($tap), \*DATA ) {
     ok !defined $iter->next, 'next() should return undef after it is empty';
 
     is $iter->exit, 0, "... and exit should now return 0 ($subclass)";
+
+    is $iter->wait, 0, "wait should also now return 0 ($subclass)";
 }
 
 __DATA__

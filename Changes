@@ -13,6 +13,7 @@ Revision history for TAP-Parser
       STDOUT/STDERR merging.
     - Removed vestigial exit status handling from T::P::I::Stream.
     - Removed unused pid interface from T::P::I::Process.
+    - Fixed infinite recursion in 
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.
