@@ -469,7 +469,9 @@ Indicates whether or not this is a test line.
 
 =head3 C<is_comment>
 
-Indicates whether or not this is a comment.
+Indicates whether or not this is a comment. Comments will generally
+only appear in the TAP stream if STDERR is merged to STDOUT. See the
+C<merge> option.
 
 =head3 C<is_bailout>
 

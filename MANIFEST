@@ -1,12 +1,3 @@
-_build/auto_features
-_build/build_params
-_build/cleanup
-_build/config_data
-_build/features
-_build/magicnum
-_build/notes
-_build/prereqs
-_build/runtime_params
 bin/prove
 bin/runtests
 Build
