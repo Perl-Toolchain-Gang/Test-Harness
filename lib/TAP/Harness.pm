@@ -806,7 +806,12 @@ sub _format_result {
             return $formatter->$method( $self, $result, $prev_result );
         }
     }
-    return $result->as_string . "\n";
+    return $result->as_string;
+}
+
+sub _output_result {
+    my ( $self, $parser, $result, $prev_result ) = @_;
+    $self->output( $self->_format_result( $result, $prev_result ) );
 }
 
 sub _process {
@@ -819,8 +824,10 @@ sub _process {
         }
 
         # TODO: quiet gets tested here /and/ in _should_display
-        $self->output( $self->_format_result( $result, $prev_result ) )
-          unless $self->quiet;
+        unless ( $self->quiet ) {
+            $self->_output_result( $parser, $result, $prev_result );
+            $self->output("\n");
+        }
     }
 }
 
@@ -842,6 +849,7 @@ sub _should_display {
       if $self->_should_show_failure($result)
       || ( $self->verbose && !$self->failures );
 
+    # TODO: Work out what to do with is_yaml results
     return 1
       if ( $result->is_comment || $result->is_yaml )
       && !$self->quiet

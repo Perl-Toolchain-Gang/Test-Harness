@@ -10,29 +10,32 @@ use File::Find;
 use File::Spec;
 use Getopt::Long;
 
+my $DEFAULT_FORMATTER = 'TAP::Harness::Formatter::Basic';
+
 # Allow cuddling the paths with the -I
 @ARGV = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @ARGV;
 my $color_default = -t STDOUT && !( $^O =~ /MSWin32/ );
 
 Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
 GetOptions(
-    'v|verbose'  => \my $VERBOSE,
-    'f|failures' => \my $FAILURES,
-    'l|lib'      => \my $LIB,
-    'b|blib'     => \my $BLIB,
-    's|shuffle'  => \my $SHUFFLE,
-    'c|color!'   => \my $COLOR,
-    'harness=s'  => \my $HARNESS,
-    'r|recurse'  => \my $RECURSE,
-    'p|parse'    => \my $PARSE,
-    'q|quiet'    => \my $QUIET,
-    'Q|QUIET'    => \my $REALLY_QUIET,
-    'e|exec=s'   => \my $EXEC,
-    'm|merge'    => \my $MERGE,
-    'I=s@'       => \my @INCLUDES,
-    'directives' => \my $DIRECTIVES,
-    'h|help|?'   => sub { pod2usage( { -verbose => 1 } ); exit },
-    'H|man'      => sub { pod2usage( { -verbose => 2 } ); exit },
+    'v|verbose'   => \my $VERBOSE,
+    'f|failures'  => \my $FAILURES,
+    'l|lib'       => \my $LIB,
+    'b|blib'      => \my $BLIB,
+    's|shuffle'   => \my $SHUFFLE,
+    'c|color!'    => \my $COLOR,
+    'harness=s'   => \my $HARNESS,
+    'formatter=s' => \my $FORMATTER,
+    'r|recurse'   => \my $RECURSE,
+    'p|parse'     => \my $PARSE,
+    'q|quiet'     => \my $QUIET,
+    'Q|QUIET'     => \my $REALLY_QUIET,
+    'e|exec=s'    => \my $EXEC,
+    'm|merge'     => \my $MERGE,
+    'I=s@'        => \my @INCLUDES,
+    'directives'  => \my $DIRECTIVES,
+    'h|help|?'    => sub { pod2usage( { -verbose => 1 } ); exit },
+    'H|man'       => sub { pod2usage( { -verbose => 2 } ); exit },
 
     #'x|xtension=s' => \my $EXTENSION,
     'T' => \my $TAINT_FAIL,
@@ -60,6 +63,18 @@ if ($HARNESS) {
     $harness_class = $HARNESS;
 }
 
+my $formatter_class;
+if ($FORMATTER) {
+    eval "use $FORMATTER";
+    die "Cannot use formatter ($FORMATTER): $@" if $@;
+    $formatter_class = $FORMATTER;
+}
+
+unless ($formatter_class) {
+    eval "use $DEFAULT_FORMATTER";
+    $formatter_class = $DEFAULT_FORMATTER unless $@;
+}
+
 my @tests = get_tests(@ARGV);
 
 shuffle(@tests) if $SHUFFLE;
@@ -80,9 +95,14 @@ $args{failures}     = $FAILURES if $FAILURES;
 $args{quiet}        = 1 if $QUIET;
 $args{really_quiet} = 1 if $REALLY_QUIET;
 $args{errors}       = 1 if $PARSE;
-$args{exec}         = length($EXEC) ? [ split( / /, $EXEC) ] : []
-                        if(defined($EXEC));
-$args{directives}   = 1 if $DIRECTIVES;
+$args{exec}         = length($EXEC) ? [ split( / /, $EXEC ) ] : []
+  if ( defined($EXEC) );
+$args{directives} = 1 if $DIRECTIVES;
+
+if ($formatter_class) {
+    $args{formatter} = $formatter_class->new;
+}
+
 my $harness = $harness_class->new( \%args );
 $harness->runtests(@tests);
 
@@ -212,6 +232,7 @@ Options which take arguments
  -I                 Library paths to include.
  -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
       --harness     Define test harness to use.  See TAP::Harness.
+      --formatter   Result formatter to use. See TAP::Harness.
 
 =head2 Reading from C<STDIN>
 

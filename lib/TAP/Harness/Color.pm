@@ -170,11 +170,8 @@ sub _set_colors {
     }
 }
 
-sub _process {
-    my ( $self, $parser, $result ) = @_;
-    $self->_set_colors('reset');
-    return unless $self->_should_display( $parser, $result );
-
+sub _output_result {
+    my ( $self, $parser, $result, $prev_result ) = @_;
     if ( $result->is_test ) {
         if ( !$result->is_ok ) {    # even if it's TODO
             $self->_set_colors('red');
@@ -187,9 +184,8 @@ sub _process {
             $self->_set_colors('white');
         }
     }
-    $self->output( $result->as_string );
+    $self->SUPER::_output_result($parser, $result, $prev_result);
     $self->_set_colors('reset');
-    $self->output("\n");
 }
 
 1;
