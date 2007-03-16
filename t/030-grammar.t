@@ -6,7 +6,7 @@ use lib 'lib';
 use TAP::Parser::Grammar;
 use TAP::Parser::Iterator::Array;
 
-use Test::More tests => 67;
+use Test::More tests => 69;
 
 my $GRAMMAR = 'TAP::Parser::Grammar';
 
@@ -39,11 +39,20 @@ isa_ok $grammar, $GRAMMAR, '... and the object it returns';
 # why.  We'll still use the instance because that should be forward
 # compatible.
 
+my @V12 = qw(bailout comment plan test version);
+my @V13 = ( @V12, 'yaml' );
+
 can_ok $grammar, 'token_types';
 ok my @types = sort( $grammar->token_types ),
-  '... and calling it should succeed';
-is_deeply \@types, [qw(bailout comment plan test version yaml)],
-  '... and return the correct token types';
+  '... and calling it should succeed (v12)';
+is_deeply \@types, \@V12,
+  '... and return the correct token types (v12)';
+  
+$grammar->set_version(13);  
+ok @types = sort( $grammar->token_types ),
+  '... and calling it should succeed (v13)';
+is_deeply \@types, \@V13,
+  '... and return the correct token types (v13)';
 
 can_ok $grammar, 'syntax_for';
 can_ok $grammar, 'handler_for';

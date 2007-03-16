@@ -382,13 +382,15 @@ sub run {
             $self->_croak("PANIC:  could not determine stream");
         }
 
-        $self->_stream($stream);
-        $self->_grammar( TAP::Parser::Grammar->new($stream) );
-        $self->_spool($spool);
-
         while ( my ( $k, $v ) = each %initialize ) {
             $self->{$k} = 'ARRAY' eq ref $v ? [] : $v;
         }
+
+        $self->_stream($stream);
+        my $grammar = TAP::Parser::Grammar->new($stream);
+        $grammar->set_version( $self->version );
+        $self->_grammar($grammar);
+        $self->_spool($spool);
 
         return $self;
     }
@@ -1057,6 +1059,7 @@ BEGIN {
                               . "$ver_min. Got version $ver_num" );
                     }
                     $self->version($ver_num);
+                    $self->_grammar->set_version($ver_num);
                 },
                 goto => 'PLAN'
             },
@@ -1079,8 +1082,8 @@ BEGIN {
             },
         },
         PLANNED_AFTER_TEST => {
-            test => { act => sub { }, continue => 'PLANNED' },
-            plan => { act => sub { }, continue => 'PLANNED' },
+            test => { act  => sub { }, continue => 'PLANNED' },
+            plan => { act  => sub { }, continue => 'PLANNED' },
             yaml => { goto => 'PLANNED' },
         },
         GOT_PLAN => {
@@ -1106,8 +1109,8 @@ BEGIN {
             plan => { goto => 'GOT_PLAN' },
         },
         UNPLANNED_AFTER_TEST => {
-            test => { act => sub { }, continue => 'UNPLANNED' },
-            plan => { act => sub { }, continue => 'UNPLANNED' },
+            test => { act  => sub { }, continue => 'UNPLANNED' },
+            plan => { act  => sub { }, continue => 'UNPLANNED' },
             yaml => { goto => 'PLANNED' },
         },
     );

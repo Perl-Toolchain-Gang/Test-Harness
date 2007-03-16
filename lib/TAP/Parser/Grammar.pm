@@ -2,6 +2,7 @@ package TAP::Parser::Grammar;
 
 use strict;
 use vars qw($VERSION);
+use Carp;
 
 use TAP::Parser::Result;
 use TAP::Parser::YAML;
@@ -42,15 +43,17 @@ to use a class where one doesn't apparently need one.
 
 =head3 C<new>
 
-  my $grammar = TAP::Grammar->new;
+  my $grammar = TAP::Grammar->new($stream);
 
-Returns TAP grammar object.  Future versions may accept a version number.
+Returns TAP grammar object that will parse the specified stream.
 
 =cut
 
 sub new {
     my ( $class, $stream ) = @_;
-    bless { stream => $stream }, $class;
+    my $self = bless { stream => $stream }, $class;
+    $self->set_version(12);
+    return $self;
 }
 
 # XXX the 'not' and 'ok' might be on separate lines in VMS ...
@@ -73,7 +76,7 @@ my $directive = qr/
                      )?
                    /x;
 
-my %token_for = (
+my %v12 = (
     version => {
         syntax  => qr/^TAP\s+version\s+(\d+)\s*\z/i,
         handler => sub {
@@ -145,9 +148,16 @@ my %token_for = (
             my ( $self, $line ) = @_;
             local *__ANON__ = '__ANON__bailout_token_handler';
             my $explanation = $1;
-            return $self->_make_bailout_token( $line, _trim($explanation) );
+            return $self->_make_bailout_token(
+                $line,
+                _trim($explanation)
+            );
         },
     },
+);
+
+my %v13 = (
+    %v12,
     yaml => {
         syntax  => qr/^---/,
         handler => sub {
@@ -158,14 +168,43 @@ my %token_for = (
     },
 );
 
+my %token_for = (
+    '12' => \%v12,
+    '13' => \%v13,
+);
+
+##############################################################################
+
+=head3 C<set_version>
+
+  $grammar->set_version(13);
+  
+Tell the grammar which TAP syntax version to support. The lowest
+supported version is 12. Although 'TAP version' isn't valid version 12
+syntax it is accepted so that higher version numbers may be parsed.
+
+=cut
+
+sub set_version {
+    my $self    = shift;
+    my $version = shift;
+
+    if ( my $tokens = $token_for{$version} ) {
+        $self->{tokens} = $tokens;
+    }
+    else {
+        croak "Unsupported syntax version: $version";
+    }
+}
+
 ##############################################################################
 
 =head3 C<tokenize>
 
-  my $token = $grammar->tokenize($string);
+  my $token = $grammar->tokenize;
 
-Passed a line of TAP, this method will return a data structure representing a
-'token' matching that line of TAP input.  Designed to be passed to
+This method will return a data structure representing a 'token' matching
+the next line of TAP input. Designed to be passed to
 C<TAP::Parser::Result> to create a result object.
 
 This is really the only method you need to worry about for the grammar.  The
@@ -182,7 +221,7 @@ sub tokenize {
 
     my $token;
 
-    foreach my $token_data ( values %token_for ) {
+    foreach my $token_data ( values %{ $self->{tokens} } ) {
         if ( $line =~ $token_data->{syntax} ) {
             my $handler = $token_data->{handler};
             $token = $self->$handler($line);
@@ -205,7 +244,10 @@ Returns the different types of tokens which this grammar can parse.
 
 =cut
 
-sub token_types { keys %token_for }
+sub token_types {
+    my $self = shift;
+    return keys %{ $self->{tokens} };
+}
 
 ##############################################################################
 
@@ -221,8 +263,8 @@ C<< qr/^#(.*)/ >>.
 =cut
 
 sub syntax_for {
-    my ( $proto, $type ) = @_;
-    return $token_for{$type}{syntax};
+    my ( $self, $type ) = @_;
+    return $self->{tokens}->{$type}->{syntax};
 }
 
 ##############################################################################
@@ -252,8 +294,8 @@ TAP parsing loop looks similar to the following:
 =cut
 
 sub handler_for {
-    my ( $proto, $type ) = @_;
-    return $token_for{$type}{handler};
+    my ( $self, $type ) = @_;
+    return $self->{tokens}->{$type}->{handler};
 }
 
 sub _make_version_token {

@@ -102,6 +102,7 @@ BEGIN {
         really_quiet => sub { shift; shift },
         exec         => sub { shift; shift },
         merge        => sub { shift; shift },
+        formatter    => sub { shift; shift },
     );
     my @getter_setters = qw/
       _curr_parser
@@ -202,6 +203,40 @@ TAP is fine.  You can use this argument to specify the name of the program
 
 If C<merge> is true the harness will create parsers that merge STDOUT
 and STDERR together for any processes they start.
+
+=item * C<formatter>
+
+If set C<formatter> must be an object that is capable of formatting
+individual items from the TAP stream. For each type of item it is
+capable of formatting it must expose a method called format_I<type>.
+
+For example:
+
+    sub format_yaml {
+        my ($self, $harness, $result, $prev_result) = @_;
+        # Format the item and return a string
+        return _format_yaml_line( $result, $prev_result );
+    }
+
+The formatting method is called with three arguments in addition to $self:
+
+=over
+
+=item C<$harness>
+
+The test harness.
+
+=item C<$result>
+
+The result which we should format.
+
+=item C<$prev_result>
+
+The previous result. This is necessary in the case of, for example,
+C<format_yaml> which will want to know whether the preceding test passed
+or failed.
+
+=back
 
 =item * C<errors>
 
@@ -678,9 +713,13 @@ sub _runtest {
     $self->_make_callback( 'made_parser', $parser );
 
     my $plan = '';
+
     $self->_newline_printed(0);
-    my $start_time = time();
-    my $output     = 'output';
+
+    my $start_time  = time();
+    my $output      = 'output';
+    my $prev_result = undef;
+
     while ( defined( my $result = $parser->next ) ) {
         $output = $self->_get_output_method($parser);
         if ( $result->is_bailout ) {
@@ -698,7 +737,8 @@ sub _runtest {
               unless $really_quiet;
             $self->_newline_printed(0);
         }
-        $self->_process( $parser, $result );
+        $self->_process( $parser, $result, $prev_result );
+        $prev_result = $result;
     }
 
     $self->_close_spool;
@@ -758,17 +798,29 @@ sub _close_spool {
     }
 }
 
+sub _format_result {
+    my ( $self, $result, $prev_result ) = @_;
+    my $sig = 'format_' . $result->type;
+    if ( my $formatter = $self->formatter ) {
+        if ( my $method = $formatter->can($sig) ) {
+            return $formatter->$method( $self, $result, $prev_result );
+        }
+    }
+    return $result->as_string . "\n";
+}
+
 sub _process {
-    my ( $self, $parser, $result ) = @_;
+    my ( $self, $parser, $result, $prev_result ) = @_;
     return if $self->really_quiet;
-    if ( $self->_should_display( $parser, $result ) ) {
+    if ( $self->_should_display( $parser, $result, $prev_result ) ) {
         unless ( $self->_newline_printed ) {
             $self->output("\n") unless $self->quiet;
             $self->_newline_printed(1);
         }
 
         # TODO: quiet gets tested here /and/ in _should_display
-        $self->output( $result->as_string . "\n" ) unless $self->quiet;
+        $self->output( $self->_format_result( $result, $prev_result ) )
+          unless $self->quiet;
     }
 }
 
@@ -778,7 +830,7 @@ sub _get_output_method {
 }
 
 sub _should_display {
-    my ( $self, $parser, $result ) = @_;
+    my ( $self, $parser, $result, $prev_result ) = @_;
 
     # Always output directives
     return $result->has_directive if $self->directives;
@@ -791,9 +843,12 @@ sub _should_display {
       || ( $self->verbose && !$self->failures );
 
     return 1
-      if $result->is_comment
+      if ( $result->is_comment || $result->is_yaml )
       && !$self->quiet
-      && ( !$parser->in_todo || $result->is_test );
+      && !$parser->in_todo;
+
+    # Old line. Makes no sense. Can't be is_test /and/ is_comment.
+    #      && ( !$parser->in_todo || $result->is_test );
 
     return 0;
 }

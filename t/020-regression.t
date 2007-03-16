@@ -281,6 +281,9 @@ my %samples = (
     },
     simple_yaml => {
         results => [
+            {   is_version => TRUE,
+                raw        => 'TAP version 13',
+            },
             {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
@@ -371,7 +374,7 @@ my %samples = (
         parse_errors  => [],
         'exit'        => 0,
         wait          => 0,
-        version       => 12,
+        version       => 13,
     },
     simple_fail => {
         results => [
