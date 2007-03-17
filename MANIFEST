@@ -53,7 +53,7 @@ t/110-iterators.t
 t/120-harness.t
 t/130-source.t
 t/140-results.t
-t/160-yamlish.t
+t/150-yamlish.t
 t/compat/00compile.t
 t/compat/failure.t
 t/compat/inc_taint.t
