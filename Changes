@@ -46,6 +46,7 @@ Revision history for TAP-Parser
     - Added support for double quoted hash keys
     - Added TAP::Parser::YAMLish::Writer and renamed T::P::YAMLish as
       T::P::YAMLish::Reader.
+    - Added extra TAP::Parser::YAMLish::Writer output options
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

@@ -51,6 +51,15 @@ sub _make_writer {
     if ( 'CODE' eq $ref ) {
         return $out;
     }
+    elsif ( 'ARRAY' eq $ref ) {
+        return sub { push @$out, shift };
+    }
+    elsif ( 'SCALAR' eq $ref ) {
+        return sub { $$out .= shift() . "\n" };
+    }
+    elsif ( 'GLOB' eq $ref || 'IO::Handle' eq $ref ) {
+        return sub { print $out shift(), "\n" };
+    }
 
     die "Can't write to $out";
 }
@@ -129,6 +138,31 @@ Version 0.52
 
 =head1 SYNOPSIS
 
+    use TAP::Parser::YAMLish::Writer;
+    
+    my $data = {
+        one => 1,
+        two => 2,
+        three => [ 1, 2, 3 ],
+    };
+    
+    my $yw = TAP::Parser::YAMLish::Writer->new;
+    
+    # Write to an array...
+    $yw->write( $data, \@some_array );
+    
+    # ...an open file handle...
+    $yw->write( $data, $some_file_handle );
+    
+    # ...a string ...
+    $yw->write( $data, \$some_string );
+    
+    # ...or a closure
+    $yw->write( $data, sub {
+        my $line = shift;
+        print "$line\n";
+    } );
+
 =head1 DESCRIPTION
 
 Encodes a scalar, hash reference or array reference as YAMLish.
@@ -141,11 +175,9 @@ Encodes a scalar, hash reference or array reference as YAMLish.
 
 The constructor C<new> creates and returns an empty C<TAP::Parser::YAMLish::Writer> object.
 
-=item C<< write( $obj, $stream ) >>
+=item C<< write( $obj, $output ) >>
 
-Encode a scalar, hash reference or array reference as YAMLish.
-The second argument is a closure that will be called for each
-line of output. If omitted output goes to STDOUT.
+Encode a scalar, hash reference or array reference as YAML.
 
     my $writer = sub {
         my $line = shift;
@@ -160,6 +192,25 @@ line of output. If omitted output goes to STDOUT.
     
     my $yw = TAP::Parser::YAMLish::Writer->new;
     $yw->write( $data, $writer );
+
+
+The C< $output > argument may be
+
+=over
+
+=item * a reference to a scalar to append YAML to
+
+=item * the handle of an open file
+
+=item * a reference to an array into which YAML will be pushed
+
+=item * a code reference
+
+=back
+
+If you supply a code reference the subroutine will be called once for
+each line of output with the line as its only argument. Passed lines
+will have no trailing newline.
 
 =back
 
