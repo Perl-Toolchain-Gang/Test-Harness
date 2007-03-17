@@ -1,4 +1,4 @@
-package TAP::Parser::YAMLish;
+package TAP::Parser::YAMLish::Reader;
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ my $IS_HASH_KEY  = qr{ ^ [\w\'\"] }x;
 my $IS_END_YAML  = qr{ ^ [.][.][.] \s* $ }x;
 my $IS_QQ_STRING = qr{ ^ $QQ_STRING $ }x;
 
-# Create an empty TAP::Parser::YAMLish object
+# Create an empty TAP::Parser::YAMLish::Reader object
 sub new {
     my $class = shift;
     bless {}, $class;
@@ -287,7 +287,7 @@ __END__
 
 =head1 NAME
 
-TAP::Parser::YAMLish - Read YAMLish data from iterator
+TAP::Parser::YAMLish::Reader - Read YAMLish data from iterator
 
 =head1 VERSION
 
@@ -306,7 +306,7 @@ permission of Adam Kennedy.
 
 =item C<< new >>
 
-The constructor C<new> creates and returns an empty C<TAP::Parser::YAMLish> object.
+The constructor C<new> creates and returns an empty C<TAP::Parser::YAMLish::Reader> object.
 
 =item C<< read( $stream ) >>
 

@@ -5,7 +5,7 @@ use vars qw($VERSION);
 use Carp;
 
 use TAP::Parser::Result;
-use TAP::Parser::YAMLish;
+use TAP::Parser::YAMLish::Reader;
 
 =head1 NAME
 
@@ -368,7 +368,7 @@ sub _make_bailout_token {
 sub _make_yaml_token {
     my ( $self, @yaml ) = @_;
 
-    my $yaml = TAP::Parser::YAMLish->new;
+    my $yaml = TAP::Parser::YAMLish::Reader->new;
     my $data = $yaml->read($self->{stream}, @yaml);
 
     return {

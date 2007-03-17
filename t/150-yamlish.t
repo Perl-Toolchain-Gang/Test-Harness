@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Data::Dumper;
 
-use TAP::Parser::YAMLish;
+use TAP::Parser::YAMLish::Reader;
 
 my @SCHEDULE;
 
@@ -483,8 +483,8 @@ sub iter {
 
 for my $test (@SCHEDULE) {
     my $name = $test->{name};
-    ok my $yaml = TAP::Parser::YAMLish->new, "$name: Created";
-    isa_ok $yaml, 'TAP::Parser::YAMLish';
+    ok my $yaml = TAP::Parser::YAMLish::Reader->new, "$name: Created";
+    isa_ok $yaml, 'TAP::Parser::YAMLish::Reader';
 
     #     diag "$name\n";
 

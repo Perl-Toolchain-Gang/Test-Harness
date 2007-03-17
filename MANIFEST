@@ -31,7 +31,7 @@ lib/TAP/Parser/Result/Version.pm
 lib/TAP/Parser/Result/YAML.pm
 lib/TAP/Parser/Source.pm
 lib/TAP/Parser/Source/Perl.pm
-lib/TAP/Parser/YAMLish.pm
+lib/TAP/Parser/YAMLish/Reader.pm
 Makefile.PL
 MANIFEST
 META.yml

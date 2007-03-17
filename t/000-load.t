@@ -19,7 +19,7 @@ BEGIN {
       TAP::Parser::Result::Version
       TAP::Parser::Source
       TAP::Parser::Source::Perl
-      TAP::Parser::YAMLish
+      TAP::Parser::YAMLish::Reader
       TAP::Harness
       TAP::Harness::Color
       TAP::Base
