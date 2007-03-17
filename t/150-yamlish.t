@@ -476,13 +476,13 @@ for my $test (@SCHEDULE) {
 
     #     diag "$name\n";
 
-    unless ( $test->{in} ) {
-        pass for 1 .. 2;
-        use YAML;
-        diag "Input for test:\n";
-        diag( Dump( $test->{out} ) );
-        next;
-    }
+    # unless ( $test->{in} ) {
+    #     pass for 1 .. 2;
+    #     use YAML;
+    #     diag "Input for test:\n";
+    #     diag( Dump( $test->{out} ) );
+    #     next;
+    # }
 
     my $source = join( "\n", @{ $test->{in} } ) . "\n";
 
