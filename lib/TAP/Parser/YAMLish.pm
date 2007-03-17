@@ -52,10 +52,11 @@ sub read {
         $obj = sub {
             return shift @extra if @extra;
             return $reader->();
-        }
+          }
     }
 
-    $self->{reader} = $obj;
+    $self->{reader}  = $obj;
+    $self->{capture} = [];
 
     # Prime the reader
     $self->_next;
@@ -76,6 +77,16 @@ sub read {
     return $doc;
 }
 
+sub get_raw {
+    my $self = shift;
+
+    if ( defined( my $capture = $self->{capture} ) ) {
+        return join( "\n", @$capture ) . "\n";
+    }
+
+    return '';
+}
+
 sub _peek {
     my $self = shift;
     return $self->{next} unless wantarray;
@@ -88,7 +99,9 @@ sub _next {
     my $self = shift;
     die "_next called with no reader"
       unless $self->{reader};
-    $self->{next} = $self->{reader}->();
+    my $line = $self->{reader}->();
+    $self->{next} = $line;
+    push @{ $self->{capture} }, $line;
 }
 
 sub _read {

@@ -374,7 +374,7 @@ sub _make_yaml_token {
 
     return {
         type => 'yaml',
-        raw  => 'oops',
+        raw  => $yaml->get_raw,
         yaml => $data
     };
 }

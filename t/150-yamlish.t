@@ -459,7 +459,7 @@ BEGIN {
         },
     );
 
-    plan tests => @SCHEDULE * 4;
+    plan tests => @SCHEDULE * 5;
 }
 
 sub iter {
@@ -484,16 +484,19 @@ for my $test (@SCHEDULE) {
         next;
     }
 
-    # diag "Input:\n";
-    # diag( Data::Dumper->Dump( [ $test->{in} ], ['$input'] ) );
+    my $source = join( "\n", @{ $test->{in} } ) . "\n";
 
     my $iter = iter( $test->{in} );
     my $got = eval { $yaml->read($iter) };
+
+    my $raw = $yaml->get_raw;
+
     if ( my $err = $test->{error} ) {
         unless ( like $@, $err, "$name: Error message" ) {
             diag "Error: $@\n";
         }
         ok !$got, "$name: No result";
+        pass;
     }
     else {
         my $want = $test->{out};
@@ -501,8 +504,10 @@ for my $test (@SCHEDULE) {
             diag "Error: $@\n";
         }
         unless ( is_deeply $got, $want, "$name: Result matches" ) {
+            local $Data::Dumper::Useqq = 1;
             diag( Data::Dumper->Dump( [$got],  ['$got'] ) );
             diag( Data::Dumper->Dump( [$want], ['$expected'] ) );
         }
+        is $raw, $source, "$name: Captured source matches";
     }
 }
