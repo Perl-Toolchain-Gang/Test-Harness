@@ -13,14 +13,6 @@ use lib catdir( 't', 'lib' );
 use Test::More tests => 221;
 use TAP::Parser::YAML;
 
-# Do we have the authorative YAML to test against
-eval { require YAML; };
-my $COMPARE_YAML = !!$YAML::VERSION;
-
-# Do we have YAML::Syck to test against?
-eval { require YAML::Syck; };
-my $COMPARE_SYCK = !!$YAML::Syck::VERSION;
-
 $SIG{__DIE__} = sub {
     require Carp;
     Carp::confess(@_);

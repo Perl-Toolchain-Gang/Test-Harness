@@ -159,20 +159,6 @@ sub next_raw {
     return;
 }
 
-sub next {
-    my $self = shift;
-    my $line = $self->next_raw;
-
-    # vms nit:  When encountering 'not ok', vms often has the 'not' on a line
-    # by itself:
-    #   not
-    #   ok 1 - 'I hate VMS'
-    if ( defined $line && $line =~ /^\s*not\s*$/ ) {
-        $line .= ( $self->next_raw || '' );
-    }
-    return $line;
-}
-
 sub _finish {
     my $self = shift;
 

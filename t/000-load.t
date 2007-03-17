@@ -1,6 +1,6 @@
 #!/usr/bin/perl -wT
 
-use Test::More tests => 38;
+use Test::More tests => 40;
 
 BEGIN {
     my @classes = qw(
@@ -20,6 +20,7 @@ BEGIN {
       TAP::Parser::Source
       TAP::Parser::Source::Perl
       TAP::Parser::YAML
+      TAP::Parser::YAMLish
       TAP::Harness
       TAP::Harness::Color
       TAP::Base

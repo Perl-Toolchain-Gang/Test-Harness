@@ -54,10 +54,6 @@ sub new {
 
     my $ref = ref $thing;
     if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
-
-        # we may eventually allow a 'fast' switch which can read the entire
-        # stream into an array.  This seems to speed things up by 10 to 12
-        # per cent.  Should not be used with infinite streams.
         return TAP::Parser::Iterator::Stream->new($thing);
     }
     elsif ( $ref eq 'ARRAY' ) {
@@ -69,6 +65,20 @@ sub new {
     else {
         die "Can't iterate with a $ref";
     }
+}
+
+sub next {
+    my $self = shift;
+    my $line = $self->next_raw;
+
+    # vms nit:  When encountering 'not ok', vms often has the 'not' on a line
+    # by itself:
+    #   not
+    #   ok 1 - 'I hate VMS'
+    if ( defined $line && $line =~ /^\s*not\s*$/ ) {
+        $line .= ( $self->next_raw || '' );
+    }
+    return $line;
 }
 
 1;

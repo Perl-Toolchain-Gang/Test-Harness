@@ -38,6 +38,7 @@ Revision history for TAP-Parser
     - Made grammar version-aware. Different grammars may now be selected
       depending on the TAP version being parsed.
     - Added formatter delegate mechanism for test results.
+    - Added prototype stream based YAML(ish) parser.
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.
