@@ -24,11 +24,12 @@ sub new {
 
 sub write {
     my $self = shift;
+    
+    die "Need something to write"
+      unless @_;
+    
     my $obj  = shift;
     my $out  = shift || \*STDOUT;
-
-    die "Need something to write"
-      unless defined $obj;
 
     die "Need a reference to something I can write to"
       unless ref $out;
@@ -68,8 +69,6 @@ sub _enc_scalar {
     if ( $val =~ /$ESCAPE_CHAR/ ) {
         $val =~ s/\\/\\\\/g;
         $val =~ s/"/\\"/g;
-
-        #$val =~ s/\n/\\n/g;
         $val =~ s/ ( [\x00-\x1f] ) / '\\' . $UNPRINTABLE[ ord($1) ] /gex;
         return qq{"$val"};
     }
