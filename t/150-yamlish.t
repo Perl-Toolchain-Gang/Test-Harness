@@ -457,6 +457,18 @@ BEGIN {
                 "\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377"
             ],
         },
+        {   name => 'Quoted hash keys',
+            in   => [
+                '---',
+                '  "quoted": Magic!',
+                '  "\n\t": newline, tab',
+                '...',
+            ],
+            out => {
+                quoted => 'Magic!',
+                "\n\t" => 'newline, tab',
+            },
+        },
     );
 
     plan tests => @SCHEDULE * 5;

@@ -43,6 +43,7 @@ Revision history for TAP-Parser
     - Altered T::P::Grammar to use T::P::YAMLish
     - Removed T::P::YAML
     - Added raw source capture to T::P::YAMLish
+    - Added support for double quoted hash keys
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

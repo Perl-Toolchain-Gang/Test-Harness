@@ -14,7 +14,11 @@ my %UNESCAPES = (
     r => "\x0d", e => "\x1b", '\\' => '\\',
 );
 
-my $EOYAML = qr{ ^ [.][.][.] \s* $ }x;
+my $QQ_STRING    = qr{ " (?:\\. | [^"])* " }x;
+my $HASH_LINE    = qr{ ^ ($QQ_STRING|\S+) \s* : (?: \s+ (.+?) \s* )? $ }x;
+my $IS_HASH_KEY  = qr{ ^ [\w\'\"] }x;
+my $IS_END_YAML  = qr{ ^ [.][.][.] \s* $ }x;
+my $IS_QQ_STRING = qr{ ^ $QQ_STRING $ }x;
 
 # Create an empty TAP::Parser::YAMLish object
 sub new {
@@ -69,7 +73,7 @@ sub read {
     # Which might not be a bad idea.
     my $dots = $self->_peek;
     die "Missing '...' at end of YAMLish"
-      unless $dots =~ $EOYAML;
+      unless $dots =~ $IS_END_YAML;
 
     delete $self->{reader};
     delete $self->{next};
@@ -120,10 +124,10 @@ sub _read {
         if ( $next =~ /^ - /x ) {
             return $self->_read_array($indent);
         }
-        elsif ( $next =~ /^ \w /x ) {
+        elsif ( $next =~ $IS_HASH_KEY ) {
             return $self->_read_hash( $next, $indent );
         }
-        elsif ( $next =~ $EOYAML ) {
+        elsif ( $next =~ $IS_END_YAML ) {
             die "Premature end of YAMLish";
         }
         else {
@@ -135,7 +139,24 @@ sub _read {
     }
 }
 
-# Deparse a scalar string to the actual scalar
+# Parse a double quoted string
+sub _read_qq {
+    my $self = shift;
+    my $str  = shift;
+
+    # For convenient handling of hash keys we just return our argument
+    # if it doesn't look like a quoted string.
+    unless ( $str =~ s/^ " (.*?) " $/$1/x ) {
+        return $str;
+    }
+
+    $str =~ s/\\"/"/gx;
+    $str =~ s/ \\ ( [tartan\\favez] | x([0-9a-fA-F]{2}) ) 
+                 / (length($1) > 1) ? pack("H2", $2) : $UNESCAPES{$1} /gex;
+    return $str;
+}
+
+# Parse a scalar string to the actual scalar
 sub _read_scalar {
     my $self   = shift;
     my $string = shift;
@@ -147,12 +168,8 @@ sub _read_scalar {
         return $rv;
     }
 
-    if ( $string =~ /^ " ( (?:\\. | [^"])* ) " $/x ) {
-        my $str = $1;
-        $str =~ s/\\"/"/g;
-        $str =~ s/ \\ ( [tartan\\favez] | x([0-9a-fA-F]{2}) ) 
-                 / (length($1) > 1) ? pack("H2", $2) : $UNESCAPES{$1} /gex;
-        return $str;
+    if ( $string =~ $IS_QQ_STRING ) {
+        return $self->_read_qq($string);
     }
 
     if ( $string =~ /^['"]/ ) {
@@ -187,7 +204,7 @@ sub _read_nested {
     if ( $line =~ /^ -/x ) {
         return $self->_read_array($indent);
     }
-    elsif ( $line =~ /^ \w/x ) {
+    elsif ( $line =~ $IS_HASH_KEY ) {
         return $self->_read_hash( $line, $indent );
     }
     else {
@@ -203,10 +220,10 @@ sub _read_array {
 
     while (1) {
         my ( $line, $indent ) = $self->_peek;
-        last if $indent < $limit || !defined $line || $line =~ $EOYAML;
+        last if $indent < $limit || !defined $line || $line =~ $IS_END_YAML;
 
         if ( $indent > $limit ) {
-            die "Aray line over-indented";
+            die "Array line over-indented";
         }
 
         if ( $line =~ /^ (- \s+) \S+ \s* : (?: \s+ | $ ) /x ) {
@@ -223,7 +240,7 @@ sub _read_array {
             $self->_next;
             push @$ar, $self->_read_nested;
         }
-        elsif ( $line =~ /^ \w /x ) {
+        elsif ( $line =~ $IS_HASH_KEY ) {
             $self->_next;
             push @$ar, $self->_read_hash( $line, $indent, );
         }
@@ -243,9 +260,9 @@ sub _read_hash {
 
     while (1) {
         die "Badly formed hash line: '$line'"
-          unless $line =~ / ^ (\S+) \s* : (?: \s+ (.+?) \s* )? $ /x;
+          unless $line =~ $HASH_LINE;
 
-        my ( $key, $value ) = ( $1, $2 );
+        my ( $key, $value ) = ( $self->_read_qq($1), $2 );
         $self->_next;
 
         if ( defined $value ) {
@@ -256,7 +273,7 @@ sub _read_hash {
         }
 
         ( $line, $indent ) = $self->_peek;
-        last if $indent < $limit || !defined $line || $line =~ $EOYAML;
+        last if $indent < $limit || !defined $line || $line =~ $IS_END_YAML;
     }
 
     return $hash;
