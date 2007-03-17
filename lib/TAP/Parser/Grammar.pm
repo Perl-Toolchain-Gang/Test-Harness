@@ -5,7 +5,6 @@ use vars qw($VERSION);
 use Carp;
 
 use TAP::Parser::Result;
-use TAP::Parser::YAML;
 use TAP::Parser::YAMLish;
 
 =head1 NAME
@@ -375,7 +374,7 @@ sub _make_yaml_token {
     return {
         type => 'yaml',
         raw  => $yaml->get_raw,
-        yaml => $data
+        data => $data
     };
 }
 

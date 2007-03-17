@@ -47,16 +47,16 @@ They keep me awake at night.
 
 =head2 Instance methods
 
-=head3 C<yaml> 
+=head3 C<data> 
 
   if ( $result->is_yaml ) {
-     print $result->yaml;
+     print $result->data;
   }
 
-Return the L<TAP::Parser::YAML> object for this result.
+Return the parsed YAML data for this result
 
 =cut
 
-sub yaml {shift->{yaml} }
+sub data {shift->{data} }
 
 1;

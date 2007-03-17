@@ -295,6 +295,10 @@ The constructor C<new> creates and returns an empty C<TAP::Parser::YAMLish> obje
 
 Read YAMLish from a TAP::Parser::Iterator and return the data structure it represents.
 
+=item C<< get_raw >>
+
+Return the raw YAMLish source from the most recent C<read>.
+
 =back
 
 =head1 AUTHOR

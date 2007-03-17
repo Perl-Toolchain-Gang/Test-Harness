@@ -9,7 +9,6 @@ use File::Path;
 use TAP::Base;
 use TAP::Parser;
 use TAP::Parser::Aggregator;
-use TAP::Parser::YAML;
 
 use vars qw($VERSION @ISA);
 

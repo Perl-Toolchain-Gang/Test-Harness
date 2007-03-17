@@ -311,7 +311,7 @@ my %samples = (
                 description   => "",
             },
             {   is_yaml => TRUE,
-                yaml    => [
+                data    => [
                     { 'fnurk' => 'skib', 'ponk' => 'gleeb' },
                     { 'bar'   => 'krup', 'foo'  => 'plink' }
                 ],
@@ -339,7 +339,7 @@ my %samples = (
                 description   => "",
             },
             {   is_yaml => TRUE,
-                yaml    => {
+                data    => {
                     'got'      => [ '1', 'pong', '4' ],
                     'expected' => [ '1', '2',    '4' ]
                 },
