@@ -7,6 +7,9 @@ use vars qw{$VERSION};
 
 $VERSION = '0.52';
 
+# TODO:
+#   Handle blessed object syntax
+
 # Printable characters for escapes
 my %UNESCAPES = (
     z => "\x00", a => "\x07", t    => "\x09",

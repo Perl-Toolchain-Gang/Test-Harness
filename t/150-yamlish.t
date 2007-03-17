@@ -516,7 +516,7 @@ for my $test (@SCHEDULE) {
             diag "Error: $@\n";
         }
         unless ( is_deeply $got, $want, "$name: Result matches" ) {
-            local $Data::Dumper::Useqq = 1;
+            local $Data::Dumper::Useqq = $Data::Dumper::Useqq = 1;
             diag( Data::Dumper->Dump( [$got],  ['$got'] ) );
             diag( Data::Dumper->Dump( [$want], ['$expected'] ) );
         }
