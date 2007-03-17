@@ -6,6 +6,7 @@ use Carp;
 
 use TAP::Parser::Result;
 use TAP::Parser::YAML;
+use TAP::Parser::YAMLish;
 
 =head1 NAME
 
@@ -368,22 +369,13 @@ sub _make_bailout_token {
 sub _make_yaml_token {
     my ( $self, @yaml ) = @_;
 
-    my $stream = $self->{stream};
-
-    # If we don't find the end-of-YAML '...' marker we'll end up consuming the
-    # whole stream. Nasty. It'd be nicer if we had a YAML parser to which we
-    # could pass a line at a time. Hmmm.
-    while ( defined( my $line = $stream->next ) ) {
-        last if $line =~ /^[.][.][.]/;
-        push @yaml, $line;
-    }
-
-    my $raw = join( "\n", @yaml ) . "\n";
+    my $yaml = TAP::Parser::YAMLish->new;
+    my $data = $yaml->read($self->{stream}, @yaml);
 
     return {
         type => 'yaml',
-        raw  => $raw,
-        yaml => TAP::Parser::YAML->read_string($raw)
+        raw  => 'oops',
+        yaml => $data
     };
 }
 

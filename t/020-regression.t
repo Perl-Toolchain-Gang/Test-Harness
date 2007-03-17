@@ -311,13 +311,10 @@ my %samples = (
                 description   => "",
             },
             {   is_yaml => TRUE,
-                yaml    => bless(
-                    [   [   { 'fnurk' => 'skib', 'ponk' => 'gleeb' },
-                            { 'bar'   => 'krup', 'foo'  => 'plink' }
-                        ]
-                    ],
-                    'TAP::Parser::YAML'
-                ),
+                yaml    => [
+                    { 'fnurk' => 'skib', 'ponk' => 'gleeb' },
+                    { 'bar'   => 'krup', 'foo'  => 'plink' }
+                ],
             },
             {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
@@ -340,13 +337,10 @@ my %samples = (
                 description   => "",
             },
             {   is_yaml => TRUE,
-                yaml    => bless(
-                    [   {   'got'      => [ '1', 'pong', '4' ],
-                            'expected' => [ '1', '2',    '4' ]
-                        }
-                    ],
-                    'TAP::Parser::YAML'
-                ),
+                yaml    => {
+                    'got'      => [ '1', 'pong', '4' ],
+                    'expected' => [ '1', '2',    '4' ]
+                },
             },
             {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
@@ -2679,9 +2673,8 @@ my %samples = (
 );
 
 my %HANDLER_FOR = (
-    NOT_ZERO, sub { local $^W; 0 != shift },
-    TRUE,     sub { local $^W; !!shift },
-    FALSE,    sub { local $^W; !shift },
+    NOT_ZERO, sub { local $^W; 0 != shift }, TRUE,
+    sub { local $^W; !!shift }, FALSE, sub { local $^W; !shift },
 );
 
 foreach my $test ( sort keys %samples ) {
@@ -2747,6 +2740,7 @@ sub analyze_test {
     my $parser = TAP::Parser->new($args);
     my $count  = 1;
     while ( defined( my $result = $parser->next ) ) {
+
         # if ( $test eq 'simple_yaml' ) {
         #     use Data::Dumper;
         #     diag( Dumper($result) );

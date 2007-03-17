@@ -191,6 +191,272 @@ BEGIN {
             }
         },
 
+        # Tests harvested from YAML::Tiny
+        {   in    => ['...'],
+            name  => 'Regression: empty',
+            error => qr{document\s+header\s+not\s+found}
+        },
+        {   in => [
+                '# comment',
+                '...'
+            ],
+            name  => 'Regression: only_comment',
+            error => qr{document\s+header\s+not\s+found}
+        },
+        {   out => undef,
+            in  => [
+                '---',
+                '...'
+            ],
+            name  => 'Regression: only_header',
+            error => qr{Premature\s+end}i,
+        },
+        {   out => undef,
+            in  => [
+                '---',
+                '---',
+                '...'
+            ],
+            name  => 'Regression: two_header',
+            error => qr{Unexpected\s+start}i,
+        },
+        {   out => undef,
+            in  => [
+                '--- ~',
+                '...'
+            ],
+            name => 'Regression: one_undef'
+        },
+        {   out => undef,
+            in  => [
+                '---  ~',
+                '...'
+            ],
+            name => 'Regression: one_undef2'
+        },
+        {   in => [
+                '--- ~',
+                '---',
+                '...'
+            ],
+            name  => 'Regression: two_undef',
+            error => qr{Missing\s+'[.][.][.]'},
+        },
+        {   out => 'foo',
+            in  => [
+                '--- foo',
+                '...'
+            ],
+            name => 'Regression: one_scalar',
+        },
+        {   out => 'foo',
+            in  => [
+                '---  foo',
+                '...'
+            ],
+            name => 'Regression: one_scalar2',
+        },
+        {   in => [
+                '--- foo',
+                '--- bar',
+                '...'
+            ],
+            name  => 'Regression: two_scalar',
+            error => qr{Missing\s+'[.][.][.]'},
+        },
+        {   out => ['foo'],
+            in  => [
+                '---',
+                '- foo',
+                '...'
+            ],
+            name => 'Regression: one_list1'
+        },
+        {   out => [
+                'foo',
+                'bar'
+            ],
+            in => [
+                '---',
+                '- foo',
+                '- bar',
+                '...'
+            ],
+            name => 'Regression: one_list2'
+        },
+        {   out => [
+                undef,
+                'bar'
+            ],
+            in => [
+                '---',
+                '- ~',
+                '- bar',
+                '...'
+            ],
+            name => 'Regression: one_listundef'
+        },
+        {   out => { 'foo' => 'bar' },
+            in  => [
+                '---',
+                'foo: bar',
+                '...'
+            ],
+            name => 'Regression: one_hash1'
+        },
+        {   out => {
+                'foo'  => 'bar',
+                'this' => undef
+            },
+            in => [
+                '---',
+                'foo: bar',
+                'this: ~',
+                '...'
+            ],
+            name => 'Regression: one_hash2'
+        },
+        {   out => {
+                'foo' => [
+                    'bar',
+                    undef,
+                    'baz'
+                ]
+            },
+            in => [
+                '---',
+                'foo:',
+                '  - bar',
+                '  - ~',
+                '  - baz',
+                '...'
+            ],
+            name => 'Regression: array_in_hash'
+        },
+        {   out => {
+                'bar' => { 'foo' => 'bar' },
+                'foo' => undef
+            },
+            in => [
+                '---',
+                'foo: ~',
+                'bar:',
+                '  foo: bar',
+                '...'
+            ],
+            name => 'Regression: hash_in_hash'
+        },
+        {   out => [
+                {   'foo'  => undef,
+                    'this' => 'that'
+                },
+                'foo', undef,
+                {   'foo'  => 'bar',
+                    'this' => 'that'
+                }
+            ],
+            in => [
+                '---',
+                '-',
+                '  foo: ~',
+                '  this: that',
+                '- foo',
+                '- ~',
+                '-',
+                '  foo: bar',
+                '  this: that',
+                '...'
+            ],
+            name => 'Regression: hash_in_array'
+        },
+        {   out => ['foo'],
+            in  => [
+                '---',
+                '- \'foo\'',
+                '...'
+            ],
+            name => 'Regression: single_quote1'
+        },
+        {   out => ['  '],
+            in  => [
+                '---',
+                '- \'  \'',
+                '...'
+            ],
+            name => 'Regression: single_spaces'
+        },
+        {   out => [''],
+            in  => [
+                '---',
+                '- \'\'',
+                '...'
+            ],
+            name => 'Regression: single_null'
+        },
+        {   out => '  ',
+            in  => [
+                '--- "  "',
+                '...'
+            ],
+            name => 'Regression: only_spaces'
+        },
+        {   out => [
+                undef,
+                {   'foo'  => 'bar',
+                    'this' => 'that'
+                },
+                'baz'
+            ],
+            in => [
+                '---',
+                '- ~',
+                '- foo: bar',
+                '  this: that',
+                '- baz',
+                '...'
+            ],
+            name => 'Regression: inline_nested_hash'
+        },
+        {   name => "Unprintables",
+            in   => [
+                "---",
+                "- \"\\z\\x01\\x02\\x03\\x04\\x05\\x06\\a\\x08\\t\\n\\v\\f\\r\\x0e\\x0f\"",
+                "- \"\\x10\\x11\\x12\\x13\\x14\\x15\\x16\\x17\\x18\\x19\\x1a\\e\\x1c\\x1d\\x1e\\x1f\"",
+                "- \" !\\\"#\$%&'()*+,-./\"",
+                "- 0123456789:;<=>?",
+                "- '\@ABCDEFGHIJKLMNO'",
+                "- 'PQRSTUVWXYZ[\\]^_'",
+                "- '`abcdefghijklmno'",
+                "- 'pqrstuvwxyz{|}~\177'",
+                "- \200\201\202\203\204\205\206\207\210\211\212\213\214\215\216\217",
+                "- \220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237",
+                "- \240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257",
+                "- \260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277",
+                "- \300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317",
+                "- \320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337",
+                "- \340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357",
+                "- \360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377",
+                "..."
+            ],
+            out => [
+                "\0\1\2\3\4\5\6\a\b\t\n\13\f\r\16\17",
+                "\20\21\22\23\24\25\26\27\30\31\32\e\34\35\36\37",
+                " !\"#\$%&'()*+,-./",
+                "0123456789:;<=>?",
+                "\@ABCDEFGHIJKLMNO",
+                "PQRSTUVWXYZ[\\]^_",
+                "`abcdefghijklmno",
+                "pqrstuvwxyz{|}~\177",
+                "\200\201\202\203\204\205\206\207\210\211\212\213\214\215\216\217",
+                "\220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237",
+                "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257",
+                "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277",
+                "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317",
+                "\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337",
+                "\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357",
+                "\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377"
+            ],
+        },
     );
 
     plan tests => @SCHEDULE * 4;

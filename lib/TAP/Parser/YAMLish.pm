@@ -26,6 +26,11 @@ sub read {
     my $self = shift;
     my $obj  = shift;
 
+    # Extra lines to prepend to the YAML stream. Crazy interface but it
+    # makes it easier for us to jump in here from the T::P::Grammar.
+    # This interface may change.
+    my @extra = @_;
+
     die "Must have something to read from"
       unless defined $obj;
 
@@ -39,6 +44,15 @@ sub read {
           unless $next;
         my $target = $obj;
         $obj = sub { $target->$next(); };
+    }
+
+    # Modify the iterator to include any extra lines we've been passed.
+    if (@extra) {
+        my $reader = $obj;
+        $obj = sub {
+            return shift @extra if @extra;
+            return $reader->();
+        }
     }
 
     $self->{reader} = $obj;
@@ -96,9 +110,15 @@ sub _read {
         elsif ( $next =~ /^ \w /x ) {
             return $self->_read_hash( $next, $indent );
         }
+        elsif ( $next =~ $EOYAML ) {
+            die "Premature end of YAMLish";
+        }
         else {
             die "Unsupported YAMLish syntax: '$next'";
         }
+    }
+    else {
+        die "YAMLish document header not found";
     }
 }
 
@@ -182,6 +202,7 @@ sub _read_array {
             push @$ar, $self->_read_hash( $line, $indent );
         }
         elsif ( $line =~ /^ - \s* (.+?) \s* $/x ) {
+            die "Unexpected start of YAMLish" if $line =~ /^---/;
             $self->_next;
             push @$ar, $self->_read_scalar($1);
         }

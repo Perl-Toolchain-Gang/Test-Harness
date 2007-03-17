@@ -31,7 +31,6 @@ lib/TAP/Parser/Result/Version.pm
 lib/TAP/Parser/Result/YAML.pm
 lib/TAP/Parser/Source.pm
 lib/TAP/Parser/Source/Perl.pm
-lib/TAP/Parser/YAML.pm
 lib/TAP/Parser/YAMLish.pm
 Makefile.PL
 MANIFEST
@@ -54,7 +53,6 @@ t/110-iterators.t
 t/120-harness.t
 t/130-source.t
 t/140-results.t
-t/150-yaml.t
 t/160-yamlish.t
 t/compat/00compile.t
 t/compat/failure.t
