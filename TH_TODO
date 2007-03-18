@@ -1,0 +1,128 @@
+These are the bugs from Test::Harness as of March 18, 2007.  The "[ ]" box
+should be checked off as we verify that each one is no longer an issue for
+THC.  Feel free to add notes for each one, if needed.
+
+Legend:
+
+ [ ] - open issue (may be fixed, but research is needed)
+ [*] - fixed
+ [-] - not applicable (e.g., anything to do with Test::Harness::Straps)
+
+Need investigation:
+
+- [ ] 24985   [PATCH] fix VMS exit handling broken in 2.64    new Important 4
+  weeks ago 2.64
+- [ ] 24926   prove -b and -l should use absolute paths   new Important 4
+  weeks ago 2.64
+- [ ] 24669   Setting $ENV{HARNESS_VERBOSE} breaks t/failure and
+  t/test-harness   new Normal 6 weeks ago 2.64
+- [ ] 12030   Test::Harness should propogate $PERLLIB in the same way it does
+  $PERL5LIB should $PERL5LIB be unset open    Critical 5 months ago    2.46
+- [ ] 21938   Unable to handle circular links new     5 months ago        
+- [ ] 21063   forked processes from test scripts cause hang   new Normal 7
+  months ago    2.63_02
+- [ ] 20688   HARNESS_PERL gets @INC wrong    new Normal 8 months ago        
+- [ ] 20203   Makefile does not obey PREFIX= and LIB= directives  new
+  Important 9 months ago    2.62
+  months ago        
+- [ ] 17969   No header for failed tests when STDOUT redirected.  new
+  Unimportant 1 years ago 2.48
+- [ ] 17968   Enhancement Req - Harness::_show_results() option not to die on
+  failure.    new Normal 1 years ago 2.57_03
+- [ ] 17632   diag output available in data structure new Important 1 years
+  ago 2.57_03
+  Note:  we're fixing this now.
+- [ ] 17210   prove -b and prove -l should set PERL5LIB   new Important 1
+  years ago 2.56
+- [ ] 16832   Redirect T::H output to a filehandle of one's choosing  new
+  1 years ago     
+- [ ] 11723   Wishlist: Add ability to stop testing on failure    open
+  Wishlist 1 years ago 2.46
+- [ ] 14767   Can't locate Devel/Cover.pm in @INC during runtests()   new
+  1 years ago     
+- [ ] 14378   prove bug - incorrect IO redirection    new     1 years ago     
+- [ ] 13840   local $ENV{PERL5LIB} work around for Cygwin new Important 1
+  years ago     
+- [ ] 13661   -M option for prove would be nice   new Wishlist 1 years ago     
+- [ ] 13652   Devel::Cover --cover option new Wishlist 1 years ago     
+- [ ] 13214   Working Path containing :: breaks @INC in Test::Harness new
+  Normal 1 years ago 2.48
+- [ ] 12480   Ignore that last patch, use this one    new     1 years ago     
+- [ ] 12458   Set HARNESS_IS_VERBOSE when in verbose mode.    new Wishlist 1
+  years ago     
+  Note:  I don't think is an issue for THC, but I could be mistaken.
+- [ ] 12457   Only set HARNESS_ACTIVE when the test is run.   new Unimportant
+  1 years ago     
+  2.47_03
+  Note:  fixed a long time ago :)
+- [ ] 11595   Provide T::H and TAP version to test scripts    new Wishlist 2
+  years ago     
+- [ ] 9599    Allow prove to run tests in the perl debugger   new Wishlist 2
+  years ago     
+- [ ] 9589    Allow prove to run tests in the perl debugger   new Wishlist 2
+  years ago     
+- [ ] 8596    Obtain failed test information when runtests is done    new
+  Wishlist 2 years ago     
+  Note:  working on this now.
+- [ ] 8851    Additional documentation notes from dejagnu new Wishlist 2 years
+  ago     
+- [ ] 8789    wish: a comment that only appears in verbose mode   new Wishlist
+  2 years ago     
+- [ ] 8767    [PATCH] Test::Harness fails to install when first perl in path
+  isnt the version of perl the install is running for  new Normal 2 years ago
+  2.44
+- [ ] 7561    refs in @INC are stringified and cause shell syntax errors  new
+  Important 2 years ago     
+- [ ] 5898    Apache test -- Perl-test-framework  new     2 years ago     
+- [ ] 5246    Directory names containing ':' break it new Important 3 years
+  ago     
+- [ ] 2101    Let prove randomize tests and play back.    new Wishlist 3 years
+  ago     
+- [ ] 4533    Allow a runfirst parm somehow in Harness    new     3 years ago     
+- [ ] 3767    Check for core dumps after each test (optionally, of course)
+  new Wishlist 3 years ago     
+
+Fixed:
+
+- [*] 25349   [PATCH] documentation for -w flag to prove  new Normal 9 days
+  ago  2.64
+- [*] 21978   Nit-pick: Version wrong in META.yml open    Unimportant 4 months
+  ago    2.64
+- [*] 20180   Display benchmark timing even on failure.   new Unimportant 9
+- [*] 12206   wish: which test unexpected succeeded?  new Wishlist 1 years ago
+- [*] 4988    test failed count/percentage is wrong when dying mid-test (test
+  included)   new Normal 3 years ago 2.40
+- [*] 4979    wrong test count should result in failure   new Normal 3 years
+  ago 2.40
+- [*] 3768    Improve message if test counts don't match  new     3 years ago
+
+Not applicable:
+
+- [-] 22064   Test::Harness::Straps::_default_inc cache is broken open
+  Normal 3 months ago    2.64
+- [-] 22079   "error" in Documentation    open    Unimportant 3 months ago
+  2.64
+  Note:  This applies to an interface specific to T:H.
+- [-] 20631   [PATCH] prove --perl was broken.    open        8 months ago        
+  Note:  I believe that our --exec switch makes this a non-issue. We don't
+  support --perl
+- [-] 8753    Test::Harness should run executable .t files directly   open
+  Important 10 months ago       
+  Note:  This is a non-issue.  With out --exec switch, users have full control
+  over how they want their tests run.
+- [-] 19247   FEATURE SPEC - Overloadable straps class    new Wishlist 10
+  months ago       
+- [-] 2590    Enable test files to have arguments new Wishlist 1 years ago
+  2.28
+  Note:  this is a duplicate of 16796 
+- [-] 16796   How To Pass Arguments?  new     1 years ago     
+  Note:  the --exec switch fixes this issue.
+- [-] 14993   Support ::Straps subclasses through HARNESS_STRAPS variable new
+  Wishlist 1 years ago     
+- [-] 14140   Consecutive run do not give the same output stalled Normal 1
+  years ago     
+  Note:  fixed with --merge switch.
+- [-] 11325   [PATCH lib/Test/Harness/Straps.pm] Collect and Report Diagnostic
+  Output new Wishlist 2 years ago     
+- [-] 3111    Test::Harness::Straps complains at 100k tests   open        2
+  years ago     
