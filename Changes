@@ -59,6 +59,10 @@ Revision history for TAP-Parser
     - Set TAP_VERSION env var in Parser [11595]
     - Added setup, teardown hooks to T::P::I::Process to facilitate the
       setup and cleanup of the test script's environment
+    - Implemented PERL_TEST_LIBS environment variable that contains a
+      colon separated list of library paths used to run each test
+      script. This allows [17210] to be worked around by providing the
+      information necessary to build -I switches for child scripts.
       
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

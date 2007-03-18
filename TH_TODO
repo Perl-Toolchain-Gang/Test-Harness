@@ -12,8 +12,6 @@ Legend:
 Need investigation:
 
 - [ ] 20688   HARNESS_PERL gets @INC wrong    new Normal 8 months ago        
-- [ ] 17210   prove -b and prove -l should set PERL5LIB   new Important 1
-  years ago 2.56
 - [ ] 16832   Redirect T::H output to a filehandle of one's choosing  new
   1 years ago     
 - [ ] 11723   Wishlist: Add ability to stop testing on failure    open
@@ -128,3 +126,8 @@ Not applicable:
   years ago     
 
 Won't fix:
+
+- [!] 17210   prove -b and prove -l should set PERL5LIB   new Important 1
+  years ago 2.56
+  Note: But see PERL_TEST_LIBS that allows this problem to be worked around.
+  
