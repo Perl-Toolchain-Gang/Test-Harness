@@ -159,11 +159,12 @@ my %v12 = (
 my %v13 = (
     %v12,
     yaml => {
-        syntax  => qr/^---/,
+        syntax  => qr/^ (\s+) (---.*) $/x,
         handler => sub {
             my ( $self, $line ) = @_;
             local *__ANON__ = '__ANON__yaml_token_handler';
-            return $self->_make_yaml_token($line);
+            my ( $pad, $marker ) = ( $1, $2 );
+            return $self->_make_yaml_token( $pad, $marker );
         },
     },
 );
@@ -366,10 +367,23 @@ sub _make_bailout_token {
 }
 
 sub _make_yaml_token {
-    my ( $self, @yaml ) = @_;
+    my ( $self, $pad, $marker ) = @_;
 
-    my $yaml = TAP::Parser::YAMLish::Reader->new;
-    my $data = $yaml->read($self->{stream}, @yaml);
+    my $yaml   = TAP::Parser::YAMLish::Reader->new;
+
+    my $stream = $self->{stream};
+
+    # Construct a reader that reads from our input stripping leading
+    # spaces from each line.
+    my $leader = length($pad);
+    my $strip  = qr{ ^ (\s{$leader}) (.*) $ }x;
+    my $reader = sub {
+        my $line = $stream->next;
+        return $2 if $line =~ $strip;
+        return;
+    };
+
+    my $data = $yaml->read( $reader, $marker );
 
     return {
         type => 'yaml',

@@ -38,20 +38,8 @@ sub read {
     # This interface may change.
     my @extra = @_;
 
-    die "Must have something to read from"
-      unless defined $obj;
-
-    # This interface is pretty specific to TAP iterators - because
-    # that's all we currently need - but that dependency is isolated
-    # here. After this point all we have is a closure that we call to
-    # get the next line of input sans newline.
-    unless ( 'CODE' eq ref $obj ) {
-        my $next = eval { $obj->can('next') };
-        die "Don't know how to get input from $obj"
-          unless $next;
-        my $target = $obj;
-        $obj = sub { $target->$next(); };
-    }
+    die "Must have a code reference to read input from"
+        unless ref $obj eq 'CODE';
 
     # Modify the iterator to include any extra lines we've been passed.
     if (@extra) {

@@ -2745,10 +2745,6 @@ sub analyze_test {
     my $count  = 1;
     while ( defined( my $result = $parser->next ) ) {
 
-        # if ( $test eq 'simple_yaml' ) {
-        #     use Data::Dumper;
-        #     diag( Dumper($result) );
-        # }
         my $expected = shift @$results;
         my $desc =
             $result->is_test
