@@ -7,15 +7,11 @@ Legend:
  [ ] - open issue (may be fixed, but research is needed)
  [*] - fixed
  [-] - not applicable (e.g., anything to do with Test::Harness::Straps)
+ [!] - wont fix
 
 Need investigation:
 
 - [ ] 20688   HARNESS_PERL gets @INC wrong    new Normal 8 months ago        
-- [ ] 20203   Makefile does not obey PREFIX= and LIB= directives  new
-  Important 9 months ago    2.62
-  months ago        
-- [ ] 17969   No header for failed tests when STDOUT redirected.  new
-  Unimportant 1 years ago 2.48
 - [ ] 17968   Enhancement Req - Harness::_show_results() option not to die on
   failure.    new Normal 1 years ago 2.57_03
 - [ ] 17632   diag output available in data structure new Important 1 years
@@ -44,8 +40,6 @@ Need investigation:
   1 years ago     
   2.47_03
   Note:  fixed a long time ago :)
-- [ ] 11595   Provide T::H and TAP version to test scripts    new Wishlist 2
-  years ago     
 - [ ] 9599    Allow prove to run tests in the perl debugger   new Wishlist 2
   years ago     
 - [ ] 9589    Allow prove to run tests in the perl debugger   new Wishlist 2
@@ -73,6 +67,8 @@ Need investigation:
 
 Fixed:
 
+- [*] 11595   Provide T::H and TAP version to test scripts    new Wishlist 2
+  years ago     
 - [*] 21938   Unable to handle circular links new     5 months ago        
 - [*] 12030   Test::Harness should propogate $PERLLIB in the same way it does
   $PERL5LIB should $PERL5LIB be unset open    Critical 5 months ago    2.46
@@ -92,6 +88,10 @@ Fixed:
 
 Not applicable:
 
+- [-] 17969   No header for failed tests when STDOUT redirected.  new
+  Unimportant 1 years ago 2.48
+- [-] 20203   Makefile does not obey PREFIX= and LIB= directives  new
+  Important 9 months ago    2.62
 - [-] 21063   forked processes from test scripts cause hang   new Normal 7
   months ago    2.63_02
 - [-] 24669   Setting $ENV{HARNESS_VERBOSE} breaks t/failure and
@@ -126,3 +126,5 @@ Not applicable:
   Output new Wishlist 2 years ago     
 - [-] 3111    Test::Harness::Straps complains at 100k tests   open        2
   years ago     
+
+Won't fix:

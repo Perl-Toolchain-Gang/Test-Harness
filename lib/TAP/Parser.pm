@@ -26,6 +26,15 @@ Version 0.52
 $VERSION = '0.52';
 
 my $DEFAULT_TAP_VERSION = 12;
+my $MAX_TAP_VERSION     = 13;
+
+$ENV{TAP_VERSION} = $MAX_TAP_VERSION;
+
+END {
+
+    # For VMS.
+    delete $ENV{TAP_VERSION};
+}
 
 BEGIN {
     foreach my $method (
@@ -1057,6 +1066,14 @@ BEGIN {
                         $self->_add_error(
                                 "Explicit TAP version must be at least "
                               . "$ver_min. Got version $ver_num" );
+                        $ver_num = $DEFAULT_TAP_VERSION;
+                    }
+                    if ( $ver_num > $MAX_TAP_VERSION ) {
+                        $self->_add_error(
+                                "TAP specified version $ver_num but we don't "
+                              . "about versions later than $MAX_TAP_VERSION"
+                        );
+                        $ver_num = $MAX_TAP_VERSION;
                     }
                     $self->version($ver_num);
                     $self->_grammar->set_version($ver_num);

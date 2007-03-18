@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 202;
+use Test::More tests => 203;
 use TAP::Parser;
 use TAP::Parser::Iterator;
 
@@ -43,6 +43,8 @@ can_ok $PARSER, 'new';
 ok my $parser = $PARSER->new( { tap => $tap } ),
   '... and calling it should succeed';
 isa_ok $parser, $PARSER, '... and the object it returns';
+
+ok $ENV{TAP_VERSION}, 'TAP_VERSION env variable should be set';
 
 # results() is sane?
 
