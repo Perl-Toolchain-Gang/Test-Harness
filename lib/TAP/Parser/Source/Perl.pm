@@ -111,9 +111,11 @@ sub get_stream {
 
     # Nasty kludge. It might be nicer if we got the libs separately
     # although at least this way we find any -I switches that were
-    # supplied other then as explicit libs
+    # supplied other then as explicit libs.
+    # We filter out any names containing colons because they will break
+    # PERL5LIB
     my @libs;
-    for (@switches) {
+    for ( grep { $_ !~ /:/ } @switches ) {
         push @libs, $1 if / ^ -I (.*) $ /x;
     }
 
