@@ -114,8 +114,9 @@ sub print_version {
 }
 
 sub all_in {
-    my $parms = shift;
-    my %parms = (
+    my $parms   = shift;
+    my $visited = shift || {};
+    my %parms   = (
         start   => ".",
         recurse => 1,
         %$parms,
@@ -134,8 +135,12 @@ sub all_in {
             next if $file eq "CVS";
 
             my $currfile = File::Spec->catfile( $start, $file );
+
             if ( -d $currfile ) {
-                push( @hits, all_in( { %parms, start => $currfile } ) )
+                my ( $dev, $ino ) = lstat $currfile;
+                next if $dev && $visited->{ $dev, $ino }++;
+                push( @hits,
+                    all_in( { %parms, start => $currfile }, $visited ) )
                   if $parms{recurse};
             }
             else {

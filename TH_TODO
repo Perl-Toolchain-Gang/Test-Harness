@@ -10,7 +10,6 @@ Legend:
 
 Need investigation:
 
-- [ ] 21938   Unable to handle circular links new     5 months ago        
 - [ ] 21063   forked processes from test scripts cause hang   new Normal 7
   months ago    2.63_02
 - [ ] 20688   HARNESS_PERL gets @INC wrong    new Normal 8 months ago        
@@ -76,6 +75,7 @@ Need investigation:
 
 Fixed:
 
+- [*] 21938   Unable to handle circular links new     5 months ago        
 - [*] 12030   Test::Harness should propogate $PERLLIB in the same way it does
   $PERL5LIB should $PERL5LIB be unset open    Critical 5 months ago    2.46
 - [*] 24926   prove -b and -l should use absolute paths   new Important 4

@@ -54,6 +54,8 @@ Revision history for TAP-Parser
     - Added libs and switches handling to T::H::Compatible. This and the
       previous change fix [24926]
     - Added PERLLIB to libraries stripped in _default_inc [12030]
+    - Our version of prove now handles directories containing circular
+      links correctly [21938]
       
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.
