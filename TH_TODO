@@ -12,17 +12,6 @@ Legend:
 Need investigation:
 
 - [ ] 20688   HARNESS_PERL gets @INC wrong    new Normal 8 months ago        
-- [ ] 16832   Redirect T::H output to a filehandle of one's choosing  new
-  1 years ago     
-- [ ] 11723   Wishlist: Add ability to stop testing on failure    open
-  Wishlist 1 years ago 2.46
-- [ ] 14767   Can't locate Devel/Cover.pm in @INC during runtests()   new
-  1 years ago     
-- [ ] 14378   prove bug - incorrect IO redirection    new     1 years ago     
-- [ ] 13840   local $ENV{PERL5LIB} work around for Cygwin new Important 1
-  years ago     
-- [ ] 13661   -M option for prove would be nice   new Wishlist 1 years ago     
-- [ ] 13652   Devel::Cover --cover option new Wishlist 1 years ago     
 - [ ] 13214   Working Path containing :: breaks @INC in Test::Harness new
   Normal 1 years ago 2.48
 - [ ] 12480   Ignore that last patch, use this one    new     1 years ago     
@@ -60,6 +49,13 @@ Need investigation:
 
 Fixed:
 
+- [*] 14767   Can't locate Devel/Cover.pm in @INC during runtests()   new
+  1 years ago
+  Note: The person who raised the ticket wanted PERL5OPT to be
+        cleared. Instead we propagate the test's libs into its
+        children by setting PERL5LIB. This doesn't have the same
+        effect but it does remove the failure due to PERL5OPT pointing
+        to an unloadable module.
 - [*] 17210   prove -b and prove -l should set PERL5LIB   new Important 1
   years ago 2.56
 - [*] 11595   Provide T::H and TAP version to test scripts    new Wishlist 2
@@ -83,6 +79,18 @@ Fixed:
 
 Not applicable:
 
+- [-] 13840   local $ENV{PERL5LIB} work around for Cygwin new Important 1
+  years ago     
+  Note: I tried the steps outlined on this thread
+        http://lyxus.net/ggr but couldn't reproduce the problem. It
+        works fine on a recent Cygwin.
+- [-] 14378   prove bug - incorrect IO redirection    new     1 years ago     
+- [-] 16832   Redirect T::H output to a filehandle of one's choosing  new
+  1 years ago     
+  Note: We still have this problem with TAP::Harness::Compatible but
+        new applications should use TAP::Harness which will shortly
+        allow view delegates to be plugged which pretty much solves
+        this problem.
 - [-] 17632   diag output available in data structure new Important 1 years
   ago 2.57_03
   Note:  we're fixing this now.
@@ -128,3 +136,11 @@ Not applicable:
   years ago     
 
 Won't fix:
+
+- [!] 11723   Wishlist: Add ability to stop testing on failure    open
+  Wishlist 1 years ago 2.46
+  Note: See the correspondance attached to the ticket.
+- [!] 13661   -M option for prove would be nice   new Wishlist 1 years ago     
+  Note: See the correspondance attached to the ticket.
+- [!] 13652   Devel::Cover --cover option new Wishlist 1 years ago     
+  Note: See correspondance. It doesn't sound like that great an idea.
