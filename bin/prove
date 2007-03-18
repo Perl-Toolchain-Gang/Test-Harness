@@ -11,13 +11,13 @@ use File::Spec;
 use vars qw( $VERSION );
 $VERSION = '2.64';
 
-my $shuffle    = 0;
-my $dry        = 0;
-my $blib       = 0;
-my $lib        = 0;
-my $recurse    = 0;
-my @includes   = ();
-my @switches   = ();
+my $shuffle  = 0;
+my $dry      = 0;
+my $blib     = 0;
+my $lib      = 0;
+my $recurse  = 0;
+my @includes = ();
+my @switches = ();
 
 # Allow cuddling the paths with the -I
 @ARGV = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @ARGV;
@@ -49,8 +49,7 @@ GetOptions(
     'timer'     => \$TAP::Harness::Compatible::Timer,
     'v|verbose' => \$TAP::Harness::Compatible::verbose,
     'V|version' => sub { print_version(); exit; },
-  )
-  or exit 1;
+) or exit 1;
 
 $ENV{TEST_VERBOSE} = 1 if $TAP::Harness::Compatible::verbose;
 
@@ -71,7 +70,7 @@ if ($lib) {
 }
 
 # Build up TH switches
-push( @switches, map { /\s/ && !/^".*"$/ ? qq["-I$_"] : "-I$_" } @includes );
+push @switches, map { /\s/ && !/^".*"$/ ? qq["-I$_"] : "-I$_" } @includes;
 $TAP::Harness::Compatible::Switches = join( ' ', @switches );
 print
   "# \$TAP::Harness::Compatible::Switches: $TAP::Harness::Compatible::Switches\n"

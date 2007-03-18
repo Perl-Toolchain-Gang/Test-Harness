@@ -82,7 +82,7 @@ BEGIN {
                 $dirs .= 's' if @bad_libs > 1;
                 $self->_error("No such $dirs (@bad_libs)");
             }
-            return [ map {"-I$_"} @$libs ];
+            return [ map { '-I' . File::Spec->rel2abs($_) } @$libs ];
         },
         switches => sub {
             my ( $self, $switches ) = @_;

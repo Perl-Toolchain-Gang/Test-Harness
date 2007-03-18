@@ -12,8 +12,6 @@ Need investigation:
 
 - [ ] 24985   [PATCH] fix VMS exit handling broken in 2.64    new Important 4
   weeks ago 2.64
-- [ ] 24926   prove -b and -l should use absolute paths   new Important 4
-  weeks ago 2.64
 - [ ] 24669   Setting $ENV{HARNESS_VERBOSE} breaks t/failure and
   t/test-harness   new Normal 6 weeks ago 2.64
 - [ ] 12030   Test::Harness should propogate $PERLLIB in the same way it does
@@ -84,6 +82,8 @@ Need investigation:
 
 Fixed:
 
+- [*] 24926   prove -b and -l should use absolute paths   new Important 4
+  weeks ago 2.64
 - [*] 25349   [PATCH] documentation for -w flag to prove  new Normal 9 days
   ago  2.64
 - [*] 21978   Nit-pick: Version wrong in META.yml open    Unimportant 4 months

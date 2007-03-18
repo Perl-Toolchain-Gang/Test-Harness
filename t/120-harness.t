@@ -32,7 +32,8 @@ ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
 ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
 foreach my $HARNESS (qw<TAP::Harness TAP::Harness::Color>) {
-#foreach my $HARNESS ( () ) {   # XXX
+
+    #foreach my $HARNESS ( () ) {   # XXX
     can_ok $HARNESS, 'new';
 
     eval { $HARNESS->new( { no_such_key => 1 } ) };
@@ -239,7 +240,6 @@ foreach my $HARNESS (qw<TAP::Harness TAP::Harness::Color>) {
     like $summary, $expected_summary,
       '... and the report summary should look correct';
 
-
     # normal tests with bad tap
 
     # install callback handler
@@ -318,13 +318,17 @@ sub trim {
     return $_[0];
 }
 
+sub liblist {
+    return [ map { '-I' . File::Spec->rel2abs($_) } @_ ];
+}
+
 sub get_arg_sets {
 
     # keys are keys to new()
     return {
         lib => {
             in        => 'lib',
-            out       => ['-Ilib'],
+            out       => liblist('lib'),
             test_name => '... a single lib switch should be correct'
         },
         verbose => {
@@ -334,8 +338,8 @@ sub get_arg_sets {
         },
       },
       { lib => {
-            in        => [ 'lib',   't' ],
-            out       => [ '-Ilib', '-It' ],
+            in        => [ 'lib',        't' ],
+            out       => liblist( 'lib', 't' ),
             test_name => '... multiple lib switches should be correct'
         },
         verbose => {

@@ -49,7 +49,10 @@ Revision history for TAP-Parser
     - Added extra TAP::Parser::YAMLish::Writer output options
     - Inline YAML documents must now be indented by at least one space
     - Fixed broken dependencies in bin/prove
-
+    - Make library paths absolute before running tests in case tests
+      chdir before loading modules.
+    - Added libs and switches handling to T::H::Compatible. This and the
+      previous change fix [24926]
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.
     - rename 'TAPx' --> 'TAP'
