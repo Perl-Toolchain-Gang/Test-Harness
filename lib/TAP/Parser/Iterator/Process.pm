@@ -79,6 +79,10 @@ sub new {
     my $merge = delete $args->{merge};
     my ( $pid, $err, $sel );
 
+    if ( my $setup = delete $args->{setup} ) {
+        $setup->(@command);
+    }
+
     my $out = IO::Handle->new;
 
     if (IS_WIN32) {
@@ -95,13 +99,21 @@ sub new {
         $sel = $merge ? undef: IO::Select->new( $out, $err );
     }
 
-    return bless {
+    my $self = bless {
         out  => $out,
         err  => $err,
         sel  => $sel,
         pid  => $pid,
-        exit => undef
+        exit => undef,
     }, $class;
+
+    if ( my $teardown = delete $args->{teardown} ) {
+        $self->{teardown} = sub {
+            $teardown->(@command);
+        };
+    }
+
+    return $self;
 }
 
 ##############################################################################
@@ -177,6 +189,10 @@ sub _finish {
 
     $self->{wait} = $status;
     $self->{exit} = $self->_wait2exit($status);
+
+    if ( my $teardown = $self->{teardown} ) {
+        $teardown->();
+    }
 
     return $self;
 }

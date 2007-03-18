@@ -57,6 +57,8 @@ Revision history for TAP-Parser
     - Our version of prove now handles directories containing circular
       links correctly [21938]
     - Set TAP_VERSION env var in Parser [11595]
+    - Added setup, teardown hooks to T::P::I::Process to facilitate the
+      setup and cleanup of the test script's environment
       
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

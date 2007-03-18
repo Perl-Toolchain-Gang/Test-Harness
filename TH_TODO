@@ -12,11 +12,6 @@ Legend:
 Need investigation:
 
 - [ ] 20688   HARNESS_PERL gets @INC wrong    new Normal 8 months ago        
-- [ ] 17968   Enhancement Req - Harness::_show_results() option not to die on
-  failure.    new Normal 1 years ago 2.57_03
-- [ ] 17632   diag output available in data structure new Important 1 years
-  ago 2.57_03
-  Note:  we're fixing this now.
 - [ ] 17210   prove -b and prove -l should set PERL5LIB   new Important 1
   years ago 2.56
 - [ ] 16832   Redirect T::H output to a filehandle of one's choosing  new
@@ -88,6 +83,11 @@ Fixed:
 
 Not applicable:
 
+- [-] 17632   diag output available in data structure new Important 1 years
+  ago 2.57_03
+  Note:  we're fixing this now.
+- [-] 17968   Enhancement Req - Harness::_show_results() option not to die on
+  failure.    new Normal 1 years ago 2.57_03
 - [-] 17969   No header for failed tests when STDOUT redirected.  new
   Unimportant 1 years ago 2.48
 - [-] 20203   Makefile does not obey PREFIX= and LIB= directives  new

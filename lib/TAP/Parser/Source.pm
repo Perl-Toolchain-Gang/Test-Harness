@@ -93,7 +93,10 @@ sub get_stream {
       or $self->_croak("No command found!");
 
     return TAP::Parser::Iterator->new(
-        { command => \@command, merge => $self->merge } );
+        {   command => \@command,
+            merge   => $self->merge
+        }
+    );
 }
 
 sub _get_command { @{ shift->source } }
