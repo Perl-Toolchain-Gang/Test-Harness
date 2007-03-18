@@ -11,9 +11,6 @@ Legend:
 
 Need investigation:
 
-- [ ] 20688   HARNESS_PERL gets @INC wrong    new Normal 8 months ago        
-- [ ] 13214   Working Path containing :: breaks @INC in Test::Harness new
-  Normal 1 years ago 2.48
 - [ ] 12480   Ignore that last patch, use this one    new     1 years ago     
 - [ ] 12458   Set HARNESS_IS_VERBOSE when in verbose mode.    new Wishlist 1
   years ago     
@@ -39,8 +36,6 @@ Need investigation:
 - [ ] 7561    refs in @INC are stringified and cause shell syntax errors  new
   Important 2 years ago     
 - [ ] 5898    Apache test -- Perl-test-framework  new     2 years ago     
-- [ ] 5246    Directory names containing ':' break it new Important 3 years
-  ago     
 - [ ] 2101    Let prove randomize tests and play back.    new Wishlist 3 years
   ago     
 - [ ] 4533    Allow a runfirst parm somehow in Harness    new     3 years ago     
@@ -79,6 +74,14 @@ Fixed:
 
 Not applicable:
 
+- [-] 5246    Directory names containing ':' break it new Important 3 years
+  ago     
+- [-] 13214   Working Path containing :: breaks @INC in Test::Harness new
+  Normal 1 years ago 2.48
+  Note: dup of [5246]
+- [-] 20688   HARNESS_PERL gets @INC wrong    new Normal 8 months ago
+  Note: It does affect us - but only in taint mode. May revisit if that
+        proves to be a huge problem.
 - [-] 13840   local $ENV{PERL5LIB} work around for Cygwin new Important 1
   years ago     
   Note: I tried the steps outlined on this thread
