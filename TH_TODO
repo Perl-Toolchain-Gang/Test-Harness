@@ -60,6 +60,8 @@ Need investigation:
 
 Fixed:
 
+- [*] 17210   prove -b and prove -l should set PERL5LIB   new Important 1
+  years ago 2.56
 - [*] 11595   Provide T::H and TAP version to test scripts    new Wishlist 2
   years ago     
 - [*] 21938   Unable to handle circular links new     5 months ago        
@@ -126,8 +128,3 @@ Not applicable:
   years ago     
 
 Won't fix:
-
-- [!] 17210   prove -b and prove -l should set PERL5LIB   new Important 1
-  years ago 2.56
-  Note: But see PERL_TEST_LIBS that allows this problem to be worked around.
-  

@@ -116,11 +116,15 @@ sub get_stream {
     for (@switches) {
         push @libs, $1 if / ^ -I (.*) $ /x;
     }
-    my $previous = $ENV{PERL_TEST_LIBS};
+
+    my $previous = $ENV{PERL5LIB};
+    if ($previous) {
+        push @libs, split( /:/, $previous );
+    }
 
     my $setup = sub {
         if (@libs) {
-            $ENV{PERL_TEST_LIBS} = join( ':', @libs );
+            $ENV{PERL5LIB} = join( ':', @libs );
         }
     };
 
@@ -128,10 +132,10 @@ sub get_stream {
     # variables. I don't know if this is actually necessary.
     my $teardown = sub {
         if ($previous) {
-            $ENV{PERL_TEST_LIBS} = $previous;
+            $ENV{PERL5LIB} = $previous;
         }
         else {
-            delete $ENV{PERL_TEST_LIBS};
+            delete $ENV{PERL5LIB};
         }
     };
 
