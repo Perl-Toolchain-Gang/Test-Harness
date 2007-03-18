@@ -48,6 +48,7 @@ Revision history for TAP-Parser
       T::P::YAMLish::Reader.
     - Added extra TAP::Parser::YAMLish::Writer output options
     - Inline YAML documents must now be indented by at least one space
+    - Fixed broken dependencies in bin/prove
 
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

@@ -3,7 +3,6 @@
 use strict;
 
 use TAP::Harness::Compatible;
-use TAP::Harness::Compatible::Util qw( all_in blibdirs shuffle );
 
 use Getopt::Long;
 use Pod::Usage 1.12;
@@ -115,6 +114,80 @@ sub print_version {
     );
 }
 
+sub all_in {
+    my $parms = shift;
+    my %parms = (
+        start   => ".",
+        recurse => 1,
+        %$parms,
+    );
+
+    my @hits  = ();
+    my $start = $parms{start};
+
+    local *DH;
+    if ( opendir( DH, $start ) ) {
+        my @files = sort readdir DH;
+        closedir DH;
+        for my $file (@files) {
+            next if $file eq File::Spec->updir || $file eq File::Spec->curdir;
+            next if $file eq ".svn";
+            next if $file eq "CVS";
+
+            my $currfile = File::Spec->catfile( $start, $file );
+            if ( -d $currfile ) {
+                push( @hits, all_in( { %parms, start => $currfile } ) )
+                  if $parms{recurse};
+            }
+            else {
+                push( @hits, $currfile ) if $currfile =~ /\.t$/;
+            }
+        }
+    }
+    else {
+        warn "$start: $!\n";
+    }
+
+    return @hits;
+}
+
+sub shuffle {
+
+    # Fisher-Yates shuffle
+    my $i = @_;
+    while ($i) {
+        my $j = rand $i--;
+        @_[ $i, $j ] = @_[ $j, $i ];
+    }
+}
+
+sub blibdirs {
+    my $dir = File::Spec->curdir;
+    if ( $^O eq 'VMS' ) {
+        ( $dir = VMS::Filespec::unixify($dir) ) =~ s-/\z--;
+    }
+    my $archdir = "arch";
+    if ( $^O eq "MacOS" ) {
+
+        # Double up the MP::A so that it's not used only once.
+        $archdir = $MacPerl::Architecture = $MacPerl::Architecture;
+    }
+
+    my $i = 5;
+    while ( $i-- ) {
+        my $blib      = File::Spec->catdir( $dir,  "blib" );
+        my $blib_lib  = File::Spec->catdir( $blib, "lib" );
+        my $blib_arch = File::Spec->catdir( $blib, $archdir );
+
+        if ( -d $blib && -d $blib_arch && -d $blib_lib ) {
+            return ( $blib_arch, $blib_lib );
+        }
+        $dir = File::Spec->catdir( $dir, File::Spec->updir );
+    }
+    warn "$0: Cannot find blib\n";
+    return;
+}
+
 __END__
 
 =head1 NAME
@@ -144,7 +217,8 @@ prove [options] [files/directories]
         --directives  Only print results with directives (TODO or SKIP)
     -v, --verbose     Display standard output of test scripts while running them
     -V, --version     Display version info
-
+    -w                Report on warnings
+ 
 Single-character options may be stacked.  Default options may be set by
 specifying the PROVE_SWITCHES environment variable.
 
@@ -275,6 +349,10 @@ TEST_VERBOSE in case your tests rely on them.
 =head2 -V, --version
 
 Display version info.
+
+=head2 -w 
+
+Report on warnings, as per C<perl -w>.
 
 =head1 BUGS
 
