@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 203;
+use Test::More tests => 209;
 use TAP::Parser;
 use TAP::Parser::Iterator;
 
@@ -17,16 +17,19 @@ sub _get_results {
     return @results;
 }
 
-my ( $PARSER, $PLAN, $TEST, $COMMENT, $BAILOUT, $UNKNOWN ) = qw(
+my ( $PARSER, $PLAN, $TEST, $COMMENT, $BAILOUT, $UNKNOWN, $YAML, $VERSION ) = qw(
   TAP::Parser
   TAP::Parser::Result::Plan
   TAP::Parser::Result::Test
   TAP::Parser::Result::Comment
   TAP::Parser::Result::Bailout
   TAP::Parser::Result::Unknown
+  TAP::Parser::Result::YAML
+  TAP::Parser::Result::Version
 );
 
 my $tap = <<'END_TAP';
+TAP version 13
 1..7
 ok 1 - input file opened
 ... this is junk
@@ -34,6 +37,8 @@ not ok first line of the input valid # todo some data
 # this is a comment
 ok 3 - read the rest of the file
 not ok 4 - this is a real failure
+  --- YAML!
+  ...
 ok 5 # skip we have no description
 ok 6 - you shall not pass! # TODO should have failed
 not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
@@ -49,7 +54,11 @@ ok $ENV{TAP_VERSION}, 'TAP_VERSION env variable should be set';
 # results() is sane?
 
 ok my @results = _get_results($parser), 'The parser should return results';
-is scalar @results, 10, '... and there should be one for each line';
+is scalar @results, 12, '... and there should be one for each line';
+
+my $version = shift @results;
+isa_ok $version, $VERSION;
+is $version->version, '13', '... and the version should be 13';
 
 # check the test plan
 
@@ -178,6 +187,13 @@ is $failed->as_string, 'not ok 4 - this is a real failure',
   '... and its string representation should be correct';
 is $failed->raw, 'not ok 4 - this is a real failure',
   '... and raw() should return the original line';
+
+# Some YAML
+my $yaml = shift @results;
+isa_ok $yaml, $YAML;
+is $yaml->type, 'yaml', '... and it should report the correct type';
+ok $yaml->is_yaml, '... and it should identify itself as yaml';
+is_deeply $yaml->data, 'YAML!', '... and data should be correct';
 
 # ok 5 # skip we have no description
 # skipped test
