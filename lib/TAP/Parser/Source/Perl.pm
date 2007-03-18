@@ -179,6 +179,7 @@ sub _filtered_inc {
         return @inc if @inc;
         my $proto = shift;
         local $ENV{PERL5LIB};
+        local $ENV{PERLLIB}; # [12030] fix untested
         my $perl = $proto->_get_perl;
         chomp( @inc = `$perl -le "print join qq[\\n], \@INC"` );
         return @inc;

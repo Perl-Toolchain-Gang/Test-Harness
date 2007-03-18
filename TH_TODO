@@ -10,12 +10,6 @@ Legend:
 
 Need investigation:
 
-- [ ] 24985   [PATCH] fix VMS exit handling broken in 2.64    new Important 4
-  weeks ago 2.64
-- [ ] 24669   Setting $ENV{HARNESS_VERBOSE} breaks t/failure and
-  t/test-harness   new Normal 6 weeks ago 2.64
-- [ ] 12030   Test::Harness should propogate $PERLLIB in the same way it does
-  $PERL5LIB should $PERL5LIB be unset open    Critical 5 months ago    2.46
 - [ ] 21938   Unable to handle circular links new     5 months ago        
 - [ ] 21063   forked processes from test scripts cause hang   new Normal 7
   months ago    2.63_02
@@ -82,6 +76,8 @@ Need investigation:
 
 Fixed:
 
+- [*] 12030   Test::Harness should propogate $PERLLIB in the same way it does
+  $PERL5LIB should $PERL5LIB be unset open    Critical 5 months ago    2.46
 - [*] 24926   prove -b and -l should use absolute paths   new Important 4
   weeks ago 2.64
 - [*] 25349   [PATCH] documentation for -w flag to prove  new Normal 9 days
@@ -98,6 +94,10 @@ Fixed:
 
 Not applicable:
 
+- [-] 24669   Setting $ENV{HARNESS_VERBOSE} breaks t/failure and
+  t/test-harness   new Normal 6 weeks ago 2.64
+- [-] 24985   [PATCH] fix VMS exit handling broken in 2.64    new Important 4
+  weeks ago 2.64
 - [-] 22064   Test::Harness::Straps::_default_inc cache is broken open
   Normal 3 months ago    2.64
 - [-] 22079   "error" in Documentation    open    Unimportant 3 months ago
