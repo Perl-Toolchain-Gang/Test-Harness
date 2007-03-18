@@ -377,13 +377,15 @@ sub _make_yaml_token {
     # spaces from each line.
     my $leader = length($pad);
     my $strip  = qr{ ^ (\s{$leader}) (.*) $ }x;
+    my @extra  = ( $marker );
     my $reader = sub {
+        return shift @extra if @extra;
         my $line = $stream->next;
         return $2 if $line =~ $strip;
         return;
     };
 
-    my $data = $yaml->read( $reader, $marker );
+    my $data = $yaml->read( $reader );
 
     return {
         type => 'yaml',

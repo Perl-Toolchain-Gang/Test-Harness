@@ -33,22 +33,8 @@ sub read {
     my $self = shift;
     my $obj  = shift;
 
-    # Extra lines to prepend to the YAML stream. Crazy interface but it
-    # makes it easier for us to jump in here from the T::P::Grammar.
-    # This interface may change.
-    my @extra = @_;
-
     die "Must have a code reference to read input from"
         unless ref $obj eq 'CODE';
-
-    # Modify the iterator to include any extra lines we've been passed.
-    if (@extra) {
-        my $reader = $obj;
-        $obj = sub {
-            return shift @extra if @extra;
-            return $reader->();
-          }
-    }
 
     $self->{reader}  = $obj;
     $self->{capture} = [];
