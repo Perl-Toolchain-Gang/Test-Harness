@@ -34,7 +34,7 @@ sub read {
     my $obj  = shift;
 
     die "Must have a code reference to read input from"
-        unless ref $obj eq 'CODE';
+      unless ref $obj eq 'CODE';
 
     $self->{reader}  = $obj;
     $self->{capture} = [];
@@ -121,10 +121,8 @@ sub _read_qq {
     my $self = shift;
     my $str  = shift;
 
-    # For convenient handling of hash keys we just return our argument
-    # if it doesn't look like a quoted string.
     unless ( $str =~ s/^ " (.*?) " $/$1/x ) {
-        return $str;
+        die "Internal: not a quoted string";
     }
 
     $str =~ s/\\"/"/gx;
@@ -139,6 +137,23 @@ sub _read_scalar {
     my $string = shift;
 
     return undef if $string eq '~';
+
+    if ( $string eq '>' || $string eq '|' ) {
+
+        my ( $line, $indent ) = $self->_peek;
+        die "Multi-line scalar content missing" unless defined $line;
+
+        my @multiline = ($line);
+
+        while (1) {
+            $self->_next;
+            my ( $next, $ind ) = $self->_peek;
+            last if $ind < $indent;
+            push @multiline, $next;
+        }
+
+        return join( ( $string eq '>' ? ' ' : "\n" ), @multiline ) . "\n";
+    }
 
     if ( $string =~ /^ ' (.*) ' $/x ) {
         ( my $rv = $1 ) =~ s/''/'/g;
@@ -156,21 +171,7 @@ sub _read_scalar {
     }
 
     # Regular unquoted string
-    return $string unless $string eq '>' or $string eq '|';
-
-    my ( $line, $indent ) = $self->_peek;
-    die "Multi-line scalar content missing" unless defined $line;
-
-    my @multiline = ($line);
-
-    while (1) {
-        $self->_next;
-        my ( $next, $ind ) = $self->_peek;
-        last if $ind < $indent;
-        push @multiline, $next;
-    }
-
-    return join( ( $string eq '>' ? ' ' : "\n" ), @multiline ) . "\n";
+    return $string;
 }
 
 sub _read_nested {
@@ -239,7 +240,7 @@ sub _read_hash {
         die "Badly formed hash line: '$line'"
           unless $line =~ $HASH_LINE;
 
-        my ( $key, $value ) = ( $self->_read_qq($1), $2 );
+        my ( $key, $value ) = ( $self->_read_scalar($1), $2 );
         $self->_next;
 
         if ( defined $value ) {

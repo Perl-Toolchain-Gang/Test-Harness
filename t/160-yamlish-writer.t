@@ -98,6 +98,22 @@ BEGIN {
                 '...',
             ],
         },
+        {   name => 'Empty key',
+            in   => { '' => 'empty' },
+            out  => [
+                '---',
+                "'': empty",
+                '...',
+            ],
+        },
+        {   name => 'Empty value',
+            in   => { '' => '' },
+            out  => [
+                '---',
+                "'': ''",
+                '...',
+            ],
+        },
         {   name => 'Complex',
             in   => {
                 'bill-to' => {

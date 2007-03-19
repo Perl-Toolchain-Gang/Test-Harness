@@ -11,7 +11,6 @@ Legend:
 
 Need investigation:
 
-- [ ] 12480   Ignore that last patch, use this one    new     1 years ago     
 - [ ] 12458   Set HARNESS_IS_VERBOSE when in verbose mode.    new Wishlist 1
   years ago     
   Note:  I don't think is an issue for THC, but I could be mistaken.
@@ -74,6 +73,7 @@ Fixed:
 
 Not applicable:
 
+- [-] 12480   Ignore that last patch, use this one    new     1 years ago
 - [-] 5246    Directory names containing ':' break it new Important 3 years
   ago     
 - [-] 13214   Working Path containing :: breaks @INC in Test::Harness new
