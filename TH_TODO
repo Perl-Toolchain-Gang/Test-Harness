@@ -14,12 +14,6 @@ Need investigation:
 - [ ] 12458   Set HARNESS_IS_VERBOSE when in verbose mode.    new Wishlist 1
   years ago     
   Note:  I don't think is an issue for THC, but I could be mistaken.
-- [ ] 12457   Only set HARNESS_ACTIVE when the test is run.   new Unimportant
-  1 years ago     
-  2.47_03
-  Note:  fixed a long time ago :)
-- [ ] 9599    Allow prove to run tests in the perl debugger   new Wishlist 2
-  years ago     
 - [ ] 9589    Allow prove to run tests in the perl debugger   new Wishlist 2
   years ago     
 - [ ] 8596    Obtain failed test information when runtests is done    new
@@ -27,8 +21,6 @@ Need investigation:
   Note:  working on this now.
 - [ ] 8851    Additional documentation notes from dejagnu new Wishlist 2 years
   ago     
-- [ ] 8789    wish: a comment that only appears in verbose mode   new Wishlist
-  2 years ago     
 - [ ] 8767    [PATCH] Test::Harness fails to install when first perl in path
   isnt the version of perl the install is running for  new Normal 2 years ago
   2.44
@@ -73,6 +65,16 @@ Fixed:
 
 Not applicable:
 
+- [-] 8789    wish: a comment that only appears in verbose mode   new Wishlist
+  2 years ago
+  Note: This will be part of our handling of YAMLish diagnostics
+- [-] 9599    Allow prove to run tests in the perl debugger   new Wishlist 2
+  years ago
+  Note: dup of [9589]
+- [-] 12457   Only set HARNESS_ACTIVE when the test is run.   new Unimportant
+  1 years ago     
+  2.47_03
+  Note:  fixed a long time ago :)
 - [-] 12480   Ignore that last patch, use this one    new     1 years ago
 - [-] 5246    Directory names containing ':' break it new Important 3 years
   ago     
