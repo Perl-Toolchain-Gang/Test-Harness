@@ -63,6 +63,7 @@ Revision history for TAP-Parser
       PERL5LIB for the duration of a test run so that any Perl children
       of the test script inherit the same library paths.
     - Fixed handling of single quoted hash keys in T::P::Y::Reader
+    - Made runtests return the TAP::Parser::Aggregator
       
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.

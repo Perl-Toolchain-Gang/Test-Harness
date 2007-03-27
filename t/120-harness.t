@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 114;
+use Test::More tests => 116;
 
 END {
 
@@ -98,7 +98,10 @@ foreach my $HARNESS (qw<TAP::Harness TAP::Harness::Color>) {
 
     # normal tests in verbose mode
 
-    $harness->runtests('t/source_tests/harness');
+    ok my $aggregate = $harness->runtests('t/source_tests/harness'),
+        '... runtests returns the aggregate';
+
+    isa_ok $aggregate, 'TAP::Parser::Aggregator';
 
     chomp(@output);
 

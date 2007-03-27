@@ -308,6 +308,8 @@ should name a directory into which a copy of the raw TAP for each test
 will be written. TAP is written to files named for each test.
 Subdirectories will be created as needed.
 
+Returns a TAP::Parser::Aggregator containing the test results.
+
 =cut
 
 sub runtests {
@@ -318,6 +320,8 @@ sub runtests {
     my $results = $self->aggregate_tests( $aggregate, @tests );
 
     $self->summary($results);
+    
+    return $aggregate;
 }
 
 =head3 C<aggregate_tests>
@@ -394,10 +398,6 @@ This is created with C<< Benchmark->new >> and it the time the tests started.
 You can print a useful summary time, if desired, with:
 
   $self->output(timestr( timediff( Benchmark->new, $start_time ), 'nop' ));
-
-=item * C<aggregate>
-
-This is the C<TAP::Parser::Aggregate> object for all of the tests run.
 
 =item * C<tests>
 
