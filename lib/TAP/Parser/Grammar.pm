@@ -204,12 +204,8 @@ sub set_version {
 
   my $token = $grammar->tokenize;
 
-This method will return a data structure representing a 'token' matching
-the next line of TAP input. Designed to be passed to
-C<TAP::Parser::Result> to create a result object.
-
-This is really the only method you need to worry about for the grammar.  The
-methods below are merely for convenience, if needed.
+This method will return a C<TAP::Parser::Result> object representing the
+current line of TAP.
 
 =cut
 
