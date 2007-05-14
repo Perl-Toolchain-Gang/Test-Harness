@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 116;
+use Test::More;
 
 END {
 
@@ -27,11 +27,21 @@ END {
 use TAP::Harness;
 use TAP::Harness::Color;
 
+my @HARNESSES = 'TAP::Harness';
+my $PLAN      = 71;
+
+if ( TAP::Harness::Color->can_color ) {
+    push @HARNESSES, 'TAP::Harness::Color';
+    $PLAN += 45;
+}
+
+plan tests => $PLAN;
+
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
 ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
-foreach my $HARNESS (qw<TAP::Harness TAP::Harness::Color>) {
+foreach my $HARNESS (@HARNESSES) {
 
     #foreach my $HARNESS ( () ) {   # XXX
     can_ok $HARNESS, 'new';
@@ -99,7 +109,7 @@ foreach my $HARNESS (qw<TAP::Harness TAP::Harness::Color>) {
     # normal tests in verbose mode
 
     ok my $aggregate = $harness->runtests('t/source_tests/harness'),
-        '... runtests returns the aggregate';
+      '... runtests returns the aggregate';
 
     isa_ok $aggregate, 'TAP::Parser::Aggregator';
 

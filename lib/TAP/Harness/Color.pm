@@ -139,6 +139,21 @@ sub new {
     }
     return $class->SUPER::new(@_);
 }
+##############################################################################
+
+=head3 C<can_color>
+
+  Test::Harness::Color->can_color()
+
+Returns a boolean indicating whether or not this module can actually
+generate colored output. This will be false if it could not load the
+modules needed for the current platform.
+
+=cut
+
+sub can_color {
+    return !$NO_COLOR;
+}
 
 ##############################################################################
 
