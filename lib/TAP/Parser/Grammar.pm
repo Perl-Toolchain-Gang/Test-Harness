@@ -60,22 +60,6 @@ sub new {
 my $ok  = qr/(?:not )?ok\b/;
 my $num = qr/\d+/;
 
-# description is *any* which is not followed by an odd number of escapes
-# following by '#':  \\\#   \#
-my $description = qr/.*?(?!\\(?:\\\\)*)#?/;
-
-# if we have an even number of escapes in front of the '#', assert that it
-# does not have an escape in front of it (this gets around the 'no variable
-# length lookbehind assertions')
-my $directive = qr/
-                     (?<!\\)(?:\\\\)*
-                     (?i:
-                       \#\s+
-                       (TODO|SKIP)\b
-                       (.*)
-                     )?
-                   /x;
-
 my %v12 = (
     version => {
         syntax  => qr/^TAP\s+version\s+(\d+)\s*\z/i,
@@ -104,21 +88,20 @@ my %v12 = (
         },
     },
     test => {
-        syntax => qr/^
-            ($ok)
-            \s*
-            ($num)?
-            \s*
-            ($description)?
-            $directive    # $4 = directive, $5 = explanation
-        \z/x,
+        syntax  => qr/^($ok) \s* ($num)? \s* (.*) \z/x,
         handler => sub {
             my ( $self, $line ) = @_;
             local *__ANON__ = '__ANON__test_token_handler';
-            my ( $ok, $num, $desc, $dir, $explanation )
-              = ( $1, $2, $3, $4, $5 );
-            return $self->_make_test_token( $line, $ok, $num, $desc, uc $dir,
-                $explanation );
+            my ( $ok, $num, $desc ) = ( $1, $2, $3 );
+            my ( $dir, $explanation ) = ( '', '' );
+            if ( $desc
+                =~ m/^ ( [^\\\#]* (?: \\. [^\\\#]* )* ) 
+                       \# \s* (SKIP|TODO) \b \s* (.*) $/ix
+              ) {
+                ( $desc, $dir, $explanation ) = ( $1, $2, $3 );
+            }
+            return $self->_make_test_token( $line, $ok, $num, _trim( $desc ),
+                uc $dir, $explanation );
         },
     },
     comment => {
