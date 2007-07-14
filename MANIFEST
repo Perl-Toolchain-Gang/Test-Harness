@@ -37,7 +37,6 @@ Makefile.PL
 MANIFEST
 META.yml
 patches/ExtUtils-MakeMaker-6.31.patch
-perltidyrc
 README
 t/000-load.t
 t/010-base.t
@@ -84,6 +83,8 @@ t/sample-tests/die_head_end
 t/sample-tests/die_last_minute
 t/sample-tests/die_unfinished
 t/sample-tests/duplicates
+t/sample-tests/escape_eol
+t/sample-tests/escape_hash
 t/sample-tests/head_end
 t/sample-tests/head_fail
 t/sample-tests/inc_taint
@@ -124,5 +125,3 @@ t/source_tests/harness_complain
 t/source_tests/harness_directives
 t/source_tests/harness_failure
 t/source_tests/source
-TH_TODO
-TODO

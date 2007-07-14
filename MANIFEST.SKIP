@@ -3,6 +3,7 @@
 \B\.svn\b
 ^\.cvsignore
 \..*\.swp
+\..*\.swo
 ^_build/
 
 # Makemaker generated files and dirs.
@@ -19,3 +20,8 @@
 ^#.*#$
 ^\.#
 ^cover_db
+^andy
+^TODO$
+^TH_TODO$
+^perltidyrc$
+
