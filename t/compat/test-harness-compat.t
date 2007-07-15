@@ -769,7 +769,7 @@ sub local_result {
         if ( exists $want->{name} ) {
             $want->{name} = local_name( $want->{name} );
         }
-        $new->{ local_name($file) } = $want;
+        $new->{ local_name( $file ) } = $want;
     }
     return $new;
 }
@@ -798,13 +798,14 @@ for my $test_key ( sort keys %$results ) {
 
         # For now we supress STDERR because it crufts up /our/ test
         # results. Should probably capture and analyse it.
-        open my $olderr, '>&', \*STDERR or die $!;
+        local *OLDERR;
+        open OLDERR, '>&STDERR' or die $!;
         open STDERR, '>', File::Spec->devnull or die $!;
-        
+
         my ( $tot, $fail, $todo, $harness, $aggregate )
           = execute_tests( tests => \@test_files );
-          
-        open STDERR, '>&', $olderr or die $!;
+
+        open STDERR, '>&OLDERR' or die $!;
 
         my $bench = delete $tot->{bench};
         isa_ok $bench, 'Benchmark';
@@ -814,8 +815,7 @@ for my $test_key ( sort keys %$results ) {
         my $ltodo   = local_result( $result->{todo} );
 
         is_deeply_dump $tot, $result->{totals}, "totals match for $test_key";
-        is_deeply_dump $fail, $lfailed,
-          "failure summary matches for $test_key";
-        is_deeply_dump $todo, $ltodo, "todo summary matches for $test_key";
+        is_deeply_dump $fail, $lfailed, "failure summary matches for $test_key";
+        is_deeply_dump $todo, $ltodo,   "todo summary matches for $test_key";
     }
 }
