@@ -235,13 +235,12 @@ $expected = {
     'test_num'    => '2',
     'raw'         => 'not ok 2 this is a test # TODO whee!'
 };
-is_deeply $token, $expected,
-'... and the TODO should be parsed';
+is_deeply $token, $expected, '... and the TODO should be parsed';
 
-  # false TODO tests
+# false TODO tests
 
-  # escaping that hash mark ('#') means this should *not* be a TODO test
-  $test = 'ok 22 this is a test \# TODO whee!';
+# escaping that hash mark ('#') means this should *not* be a TODO test
+$test = 'ok 22 this is a test \# TODO whee!';
 like $test, $syntax_for{'test'}, 'Tests should match the test syntax';
 
 $stream->put( $test );
