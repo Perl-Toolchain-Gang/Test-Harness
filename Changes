@@ -65,7 +65,7 @@ Revision history for TAP-Parser
     - Fixed handling of single quoted hash keys in T::P::Y::Reader
     - Made runtests return the TAP::Parser::Aggregator
     - Fixed t/120-harness.t has failures if TAP::Harness::Color cannot
-      load optional modules [27125] - thanks DROLKSY
+      load optional modules [27125] - thanks DROLSKY
     - Fixed parsing of \# in test description  
 0.51 12 March 2007
     - 'execrc' file now allows 'regex' matches for tests.
