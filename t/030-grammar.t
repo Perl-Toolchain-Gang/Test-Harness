@@ -98,6 +98,7 @@ is_deeply $token, $expected,
 $plan = '1..0 # SKIP why not?';
 like $plan, $syntax_for{'plan'}, 'a basic plan should match its syntax';
 
+$plan =~ $syntax_for{'plan'};
 ok $plan_token = $grammar->$method( $plan ),
   '... and the handler should return a token';
 
@@ -122,6 +123,7 @@ $plan = '1..0';
 like $plan, $syntax_for{'plan'},
   'A plan  with an implied "skip all" should match its syntax';
 
+$plan =~ $syntax_for{'plan'};
 ok $plan_token = $grammar->$method( $plan ),
   '... and the handler should return a token';
 

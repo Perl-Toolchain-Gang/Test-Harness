@@ -1,5 +1,11 @@
 Revision history for TAP-Parser
 
+0.53
+    - Fixed failing t/030-grammer.t under 5.9.5. Exact cause still unknown;
+      something to do with localisation of $1 et all I think.
+    - Fixed use of three arg open in t/compat/test-harness-compat; was failing
+      on 5.6.2.
+
 0.52
     - Incorporate Schwern's investigations into TAP versions.
       Unversioned TAP is now TAP v12. The lowest explicit version number
