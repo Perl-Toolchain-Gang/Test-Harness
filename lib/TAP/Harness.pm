@@ -707,12 +707,19 @@ sub output_test_failure {
 
 sub _get_parser_args {
     my ( $self, $test ) = @_;
-    my %args = ( source => $test );
+    my %args = ();
     my @switches = $self->lib if $self->lib;
     push @switches => $self->switches if $self->switches;
     $args{switches} = \@switches;
-    $args{spool}    = $self->_open_spool($test);
+    $args{spool}    = $self->_open_spool( $test );
     $args{merge}    = $self->merge;
+    $args{exec}     = $self->exec;
+    if ( my $exec = $self->exec ) {
+        $args{exec} = [ @$exec, $test ];
+    }
+    else {
+        $args{source} = $test;
+    }
     return \%args;
 }
 

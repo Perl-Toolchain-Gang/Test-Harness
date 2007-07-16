@@ -5,6 +5,8 @@ Revision history for TAP-Parser
       something to do with localisation of $1 et all I think.
     - Fixed use of three arg open in t/compat/test-harness-compat; was failing
       on 5.6.2.
+    - Fixed runtests --exec option. T::H wasn't passing the exec option to
+      T::P.
 
 0.52
     - Incorporate Schwern's investigations into TAP versions.
