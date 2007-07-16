@@ -28,7 +28,7 @@ use TAP::Harness;
 use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 71;
+my $PLAN      = 72;
 
 if ( TAP::Harness::Color->can_color ) {
     push @HARNESSES, 'TAP::Harness::Color';
@@ -297,6 +297,41 @@ foreach my $HARNESS (@HARNESSES) {
     isa_ok $parser, 'TAP::Parser';
 }
 
+# make sure we can exec something ... anything!
+SKIP: {
+
+    my $ls = '/bin/ls';
+    unless(-e $ls) {
+        skip "no '$ls'", 1;
+    }
+
+    my @output;
+    local $^W;
+    local *TAP::Harness::_should_show_count = sub {0};
+    local *TAP::Harness::output = sub {
+        my $self = shift;
+        push @output => grep { $_ ne '' }
+          map {
+            local $_ = $_;
+            chomp;
+            trim($_)
+          } @_;
+    };
+    my $harness = TAP::Harness->new(
+        {   verbose => 1,
+            exec    => [$ls],
+        }
+    );
+
+    eval { $harness->runtests( 't/execls' ) };
+
+    chomp(@output);
+    pop @output;                              # get rid of summary line
+    my $answer = pop @output;
+    is( $answer, 'All tests successful.', 'ls speaks tap' );
+}
+
+# catches "exec accumulates arguments" issue (r77)
 {
     my @output;
     local $^W;
