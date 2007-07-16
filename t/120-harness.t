@@ -305,27 +305,19 @@ SKIP: {
         skip "no '$ls'", 1;
     }
 
-    my @output;
-    local $^W;
-    local *TAP::Harness::_should_show_count = sub {0};
-    local *TAP::Harness::output = sub {
-        my $self = shift;
-        push @output => grep { $_ ne '' }
-          map {
-            local $_ = $_;
-            chomp;
-            trim($_)
-          } @_;
-    };
+    my $output = '';
     my $harness = TAP::Harness->new(
         {   verbose => 1,
+            really_quiet => 1,
+            really_quiet => 1,
+            stdout       => \$output,
             exec    => [$ls],
         }
     );
 
     eval { $harness->runtests( 't/execls' ) };
 
-    chomp(@output);
+    my @output = split(/\n/, $output);
     pop @output;                              # get rid of summary line
     my $answer = pop @output;
     is( $answer, 'All tests successful.', 'ls speaks tap' );
@@ -333,21 +325,12 @@ SKIP: {
 
 # catches "exec accumulates arguments" issue (r77)
 {
-    my @output;
-    local $^W;
-    local *TAP::Harness::_should_show_count = sub {0};
-    local *TAP::Harness::output = sub {
-        my $self = shift;
-        push @output => grep { $_ ne '' }
-          map {
-            local $_ = $_;
-            chomp;
-            trim($_)
-          } @_;
-    };
+    my $output = '';
     my $harness = TAP::Harness->new(
-        {   verbose => 1,
-            exec    => [$^X]
+        {   verbose      => 1,
+            really_quiet => 1,
+            stdout       => \$output,
+            exec         => [$^X]
         }
     );
 
@@ -356,7 +339,7 @@ SKIP: {
         't/source_tests/harness',
     );
 
-    chomp(@output);
+    my @output = split(/\n/, $output);
     pop @output;                              # get rid of summary line
     is( $output[-1], 'All tests successful.', 'No exec accumulation' );
 }

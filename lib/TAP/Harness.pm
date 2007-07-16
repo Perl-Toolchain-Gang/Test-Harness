@@ -102,6 +102,12 @@ BEGIN {
         exec         => sub { shift; shift },
         merge        => sub { shift; shift },
         formatter    => sub { shift; shift },
+        stdout       => sub {
+            my ( $self, $ref ) = @_;
+            ((ref($ref) || '') eq 'SCALAR') or
+                die "catch_output needs a scalar reference";
+            return($ref);
+        },
     );
     my @getter_setters = qw/
       _curr_parser
@@ -249,6 +255,11 @@ true:
 
 If set to a true value, only test results with directives will be displayed.
 This overrides other settings such as C<verbose> or C<failures>.
+
+=item * C<stdout>
+
+A scalar reference (experimental) for catching standard output.  Maybe
+should be a filehandle.
 
 =back
 
@@ -530,7 +541,12 @@ like to redirect output somewhere else, just override this method.
 
 sub output {
     my $self = shift;
-    print @_;
+    if(my $out = $self->stdout) {
+        $$out .= $_ for(@_); # XXX what's $\ here?
+    }
+    else {
+        print @_;
+    }
 }
 
 ##############################################################################
