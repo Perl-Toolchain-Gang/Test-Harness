@@ -3,9 +3,12 @@ use ExtUtils::MakeMaker qw/WriteMakefile prompt/;
 use strict;
 use warnings;
 
+eval 'use ExtUtils::MakeMaker::Coverage';
+warn "Optional ExtUtils::MakeMaker::Coverage not available\n" if $@;
+
 my @program;
-if ( prompt( "Do you wish to install the 'runtests' utility?", "y" )
-    =~ /^[Yy]/ )
+if (
+    prompt( "Do you wish to install the 'runtests' utility?", "y" ) =~ /^[Yy]/ )
 {
     @program = ( EXE_FILES => ["bin/runtests"] );
 }
