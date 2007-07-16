@@ -300,9 +300,9 @@ foreach my $HARNESS (@HARNESSES) {
 # make sure we can exec something ... anything!
 SKIP: {
 
-    my $ls = '/bin/ls';
-    unless(-e $ls) {
-        skip "no '$ls'", 1;
+    my $cat = '/bin/cat';
+    unless(-e $cat) {
+        skip "no '$cat'", 1;
     }
 
     my $output = '';
@@ -311,16 +311,16 @@ SKIP: {
             really_quiet => 1,
             really_quiet => 1,
             stdout       => \$output,
-            exec    => [$ls],
+            exec    => [$cat],
         }
     );
 
-    eval { $harness->runtests( 't/execls' ) };
+    eval { $harness->runtests( 't/data/catme.1' ) };
 
     my @output = split(/\n/, $output);
     pop @output;                              # get rid of summary line
     my $answer = pop @output;
-    is( $answer, 'All tests successful.', 'ls speaks tap' );
+    is( $answer, 'All tests successful.', 'cat meows' );
 }
 
 # catches "exec accumulates arguments" issue (r77)
