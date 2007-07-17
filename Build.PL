@@ -4,11 +4,11 @@ use Module::Build;
 use 5.005;
 
 my $builder = Module::Build->new(
-    module_name       => 'TAP::Parser',
-    license           => 'perl',
-    dist_author       => 'Curtis "Ovid" Poe <ovid@cpan.org>',
+    module_name          => 'TAP::Parser',
+    license              => 'perl',
+    dist_author          => 'Curtis "Ovid" Poe <ovid@cpan.org>',
     recursive_test_files => 1,
-    requires          => {
+    requires             => {
         'Test::More' => 0,
         'Pod::Usage' => 0,    # for 'runtests'
     },
