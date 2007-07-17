@@ -1417,10 +1417,13 @@ just words of encouragement have all been forthcoming.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Curtis "Ovid" Poe, C<< <ovid@cpan.org> >>
-Andy Armstong, C<< <andy@hexten.net> >>
+Curtis "Ovid" Poe <ovid@cpan.org>
+
+Andy Armstong <andy@hexten.net>
+
+Eric Wilhelm @ <ewilhelm at cpan dot org>
 
 =head1 BUGS
 
