@@ -8,8 +8,7 @@ use TAP::Parser::Grammar;
 use TAP::Parser::Result;
 use TAP::Parser::Source;
 use TAP::Parser::Source::Perl;
-use TAP::Parser::Iterator::Array;
-use TAP::Parser::Iterator::Stream;
+use TAP::Parser::Iterator;
 
 @ISA = qw(TAP::Base);
 
@@ -331,7 +330,7 @@ sub run {
         }
         if ($tap) {
             $stream
-              = TAP::Parser::Iterator::Array->new( [ split "\n" => $tap ] );
+              = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
             my $source = TAP::Parser::Source->new;
