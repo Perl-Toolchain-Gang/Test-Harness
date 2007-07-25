@@ -36,6 +36,7 @@ GetOptions(
     'directives'  => \my $DIRECTIVES,
     'h|help|?'    => sub { pod2usage( { -verbose => 1 } ); exit },
     'H|man'       => sub { pod2usage( { -verbose => 2 } ); exit },
+    'V|version'   => sub { print_version(); exit },
 
     #'x|xtension=s' => \my $EXTENSION,
     'T' => \my $TAINT_FAIL,
@@ -192,6 +193,9 @@ sub shuffle {
     }
 }
 
+sub print_version {
+    printf( "TAP::Harness v%s and Perl v%vd\n", $TAP::Harness::VERSION, $^V );
+}
 __END__
 
 =head1 NAME

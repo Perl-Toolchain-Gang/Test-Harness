@@ -1,6 +1,8 @@
 Revision history for TAP-Parser
 
 0.53
+    - Added -V (--version) switch to runtests.  Suggested by markjugg on
+      Perlmonks.
     - Fixed failing t/030-grammer.t under 5.9.5. Exact cause still unknown;
       something to do with localisation of $1 et all I think.
     - Fixed use of three arg open in t/compat/test-harness-compat; was failing
