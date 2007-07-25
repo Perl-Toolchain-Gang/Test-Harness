@@ -2,7 +2,6 @@ TODO:
 
     - Add --start and --end switches to runtests.
     - Clear all known T::H bugs, if possible.
-    - Eliminate execrc
     - T:H to separate distro when we're ready to have do the switch.
     - Make Harness capable of running multiple tests in parallel.
     - Investigate compatibility with Test::TAP::Model (which uses Test::Harness::Straps)

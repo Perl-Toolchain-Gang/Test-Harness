@@ -78,19 +78,6 @@ BEGIN {
     }
 }
 
-##############################################################################
-
-=head3 C<good_plan>
-
-Deprecated.  Use C<is_good_plan> instead.
-
-=cut
-
-sub good_plan {
-    warn 'good_plan() is deprecated.  Please use "is_good_plan()"';
-    goto &is_good_plan;
-}
-
 =head1 SYNOPSIS
 
     use TAP::Parser;
@@ -714,7 +701,7 @@ sub passed { @{ shift->{passed} } }
  my $failed = $parser->failed; # the number of tests which failed
 
 This method lets you know which (or how many) tests failed.  If a test passed
-but had a TODO directive, it will be counted as a failed test.
+but had a TODO directive, it will B<NOT> be counted as a failed test.
 
 =cut
 
@@ -744,6 +731,7 @@ This method is a synonym for C<actual_passed>.
 
  # the test numbers which actually failed
  my @actual_failed = $parser->actual_failed;
+
  # the number of tests which actually failed
  my $actual_failed = $parser->actual_failed;
 
@@ -771,6 +759,7 @@ sub todo { @{ shift->{todo} } }
 
  # the test numbers which unexpectedly succeeded
  my @todo_passed = $parser->todo_passed;
+
  # the number of tests which unexpectedly succeeded 
  my $todo_passed = $parser->todo_passed;
 
@@ -818,7 +807,7 @@ sub skipped { @{ shift->{skipped} } }
   }
 
 This is a 'catch-all' method which returns true if any tests have currently
-failed, any TODO tests unexpectedly succeeded, or any parse errors.
+failed, any TODO tests unexpectedly succeeded, or any parse errors occurred.
 
 =cut
 
@@ -829,6 +818,19 @@ sub has_problems {
       || $self->parse_errors
       || $self->wait
       || $self->exit;
+}
+
+##############################################################################
+
+=head3 C<good_plan>
+
+Deprecated.  Use C<is_good_plan> instead.
+
+=cut
+
+sub good_plan {
+    warn 'good_plan() is deprecated.  Please use "is_good_plan()"';
+    goto &is_good_plan;
 }
 
 ##############################################################################
@@ -1282,15 +1284,14 @@ Invoked if C<< $result->is_unknown >> returns true.
 =item 7 C<ELSE>
 
 If a result does not have a callback defined for it, this callback will be
-invoked.  Thus, if all five of the previous result types are specified as
-callbacks, this callback will I<never> be invoked.
+invoked.  Thus, if all of the previous result types are specified as callbacks,
+this callback will I<never> be invoked.
 
 =item 8 C<ALL>
 
-This callback will always be invoked and this will happen for each result
-after one of the above six callbacks is invoked.  For example, if
-C<Term::ANSIColor> is loaded, you could use the following to color your test
-output:
+This callback will always be invoked and this will happen for each result after
+one of the above callbacks is invoked.  For example, if C<Term::ANSIColor> is
+loaded, you could use the following to color your test output:
 
  my %callbacks = (
      test => sub {
@@ -1321,8 +1322,6 @@ output:
          print "\n";
      },
  );
-
-See C<examples/tprove_color> for an example of this.
 
 =back
 

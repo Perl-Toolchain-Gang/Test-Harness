@@ -1,6 +1,7 @@
 Revision history for TAP-Parser
 
 0.53
+    - Fixed a few docs nits.
     - Added -V (--version) switch to runtests.  Suggested by markjugg on
       Perlmonks.
     - Fixed failing t/030-grammer.t under 5.9.5. Exact cause still unknown;
@@ -10,7 +11,7 @@ Revision history for TAP-Parser
     - Fixed runtests --exec option. T::H wasn't passing the exec option to
       T::P.
 
-0.52
+0.52  14 July 2007
     - Incorporate Schwern's investigations into TAP versions.
       Unversioned TAP is now TAP v12. The lowest explicit version number
       that can be specified is 13.
