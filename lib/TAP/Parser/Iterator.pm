@@ -35,15 +35,26 @@ B<FOR INTERNAL USE ONLY!>
 
 This is a simple iterator wrapper for arrays and filehandles.
 
-=head2 new()
+=head2 Class Methods
+
+=head3 C<new>
+
+ my $iter = TAP::Parser::Iterator->new( $array_reference );
+ my $iter = TAP::Parser::Iterator->new( $filehandle );
 
 Create an iterator.
 
-=head2 next()
+=head2 Instance Methods
+
+=head3 C<next>
+
+ while ( my $item = $iter->next ) { ... }
 
 Iterate through it, of course.
 
-=head2 next_raw()
+=head3 C<next_raw>
+
+ while ( my $item = $iter->next_raw ) { ... }
 
 Iterate raw input without applying any fixes for quirky input syntax.
 

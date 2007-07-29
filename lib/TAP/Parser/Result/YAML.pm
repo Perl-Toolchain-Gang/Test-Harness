@@ -45,7 +45,7 @@ They keep me awake at night.
 
 ##############################################################################
 
-=head2 Instance methods
+=head2 Instance Methods
 
 =head3 C<data> 
 

@@ -29,11 +29,6 @@ here to ensure that we will be able to have pluggable grammars when TAP is
 expanded at some future date (plus, this stuff was really cluttering the
 parser).
 
-Note that currently all methods are class methods.  It's intended that this
-will eventually support C<TAP 2.0> and beyond which will necessitate actual
-instance data, but for now, we don't need this.  Hence, the curious decision
-to use a class where one doesn't apparently need one.
-
 =cut
 
 ##############################################################################
@@ -144,6 +139,8 @@ my %token_for = (
 
 ##############################################################################
 
+=head2 Instance Methods
+
 =head3 C<set_version>
 
   $grammar->set_version(13);
@@ -198,8 +195,6 @@ sub tokenize {
 }
 
 ##############################################################################
-
-=head2 Class methods
 
 =head3 C<token_types>
 

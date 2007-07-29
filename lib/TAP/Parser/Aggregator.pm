@@ -40,7 +40,7 @@ allows reporting of aggregate results.
 
 =head1 METHODS
 
-=head2 Class methods
+=head2 Class Methods
 
 =head3 C<new>
 
@@ -99,7 +99,7 @@ sub _initialize {
 
 ##############################################################################
 
-=head2 Instance methods
+=head2 Instance Methods
 
 =head3 C<add>
 

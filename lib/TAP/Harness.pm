@@ -149,7 +149,7 @@ BEGIN {
 
 =head1 METHODS
 
-=head2 Class methods
+=head2 Class Methods
 
 =head3 C<new>
 

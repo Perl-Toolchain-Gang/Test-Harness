@@ -32,7 +32,7 @@ Takes a command and hopefully returns a stream from it.
 
 =head1 METHODS
 
-=head2 Class methods
+=head2 Class Methods
 
 =head3 C<new>
 
@@ -51,7 +51,7 @@ sub new {
 
 ##############################################################################
 
-=head2 Instance methods
+=head2 Instance Methods
 
 =head3 C<source>
 

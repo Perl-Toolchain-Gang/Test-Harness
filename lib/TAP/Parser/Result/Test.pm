@@ -34,7 +34,7 @@ This class is the workhorse of the TAP::Parser system.  Most TAP lines will
 be test lines and if C<< $result->is_test >>, then you have a bunch of methods
 at your disposal.
 
-=head2 Instance methods
+=head2 Instance Methods
 
 =cut
 

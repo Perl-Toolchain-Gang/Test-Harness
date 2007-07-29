@@ -44,7 +44,7 @@ Note that this method merely returns the comment preceded by a '# '.
 
 ##############################################################################
 
-=head2 Instance methods
+=head2 Instance Methods
 
 =head3 C<comment> 
 

@@ -114,7 +114,7 @@ under Windows) tests will be run without color.
 
 =head1 METHODS
 
-=head2 Class methods
+=head2 Class Methods
 
 =head3 C<new>
 

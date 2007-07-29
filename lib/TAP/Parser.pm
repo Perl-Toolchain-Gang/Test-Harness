@@ -98,7 +98,7 @@ harnesses C<examples/>.
 
 =head1 METHODS
 
-=head2 Class methods
+=head2 Class Methods
 
 =head3 C<new>
 
@@ -205,7 +205,7 @@ not captured.
 
 ##############################################################################
 
-=head2 Instance methods
+=head2 Instance Methods
 
 =head3 C<next>
 
