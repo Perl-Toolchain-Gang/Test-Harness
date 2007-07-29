@@ -280,21 +280,29 @@ permission of Adam Kennedy.
 
 =head1 METHODS
 
-=over
+=head2 Class Methods
 
-=item C<< new >>
+=head3 C<new>
 
-The constructor C<new> creates and returns an empty C<TAP::Parser::YAMLish::Reader> object.
+The constructor C<new> creates and returns an empty
+C<TAP::Parser::YAMLish::Reader> object.
 
-=item C<< read( $stream ) >>
+ my $reader = TAP::Parser::YAMLish::Reader->new; 
 
-Read YAMLish from a TAP::Parser::Iterator and return the data structure it represents.
+=head2 Instance Methods
 
-=item C<< get_raw >>
+=head3 C<read>
+
+ my $got = $reader->read($stream);
+
+Read YAMLish from a TAP::Parser::Iterator and return the data structure it
+represents.
+
+=head3 C<get_raw>
+
+ my $source = $reader->get_source;
 
 Return the raw YAMLish source from the most recent C<read>.
-
-=back
 
 =head1 AUTHOR
 

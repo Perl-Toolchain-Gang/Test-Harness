@@ -676,11 +676,9 @@ TODO test is returned.
 After parsing the TAP, there are many methods available to let you dig through
 the results and determine what is meaningful to you.
 
-=head3 C<plan>
+=head2 Individual Results
 
- my $plan = $parser->plan;
-
-Returns the test plan, if found.
+These results refer to individual tests which are run.
 
 =head3 C<passed>
 
@@ -797,29 +795,16 @@ This method lets you know which (or how many) tests had SKIP directives.
 
 sub skipped { @{ shift->{skipped} } }
 
-##############################################################################
+=head2 Summary Results
 
-=head3 C<has_problems>
+These results are "meta" information about the total results of an individual
+test program.
 
-  if ( $parser->has_problems ) {
-      ...
-  }
+=head3 C<plan>
 
-This is a 'catch-all' method which returns true if any tests have currently
-failed, any TODO tests unexpectedly succeeded, or any parse errors occurred.
+ my $plan = $parser->plan;
 
-=cut
-
-sub has_problems {
-    my $self = shift;
-    return $self->failed
-      || $self->todo_passed
-      || $self->parse_errors
-      || $self->wait
-      || $self->exit;
-}
-
-##############################################################################
+Returns the test plan, if found.
 
 =head3 C<good_plan>
 
@@ -859,6 +844,26 @@ plan of '1..17' will mean that 17 tests were planned.
 
 Returns the number of tests which actually were run.  Hopefully this will
 match the number of C<< $parser->tests_planned >>.
+
+=head3 C<has_problems>
+
+  if ( $parser->has_problems ) {
+      ...
+  }
+
+This is a 'catch-all' method which returns true if any tests have currently
+failed, any TODO tests unexpectedly succeeded, or any parse errors occurred.
+
+=cut
+
+sub has_problems {
+    my $self = shift;
+    return $self->failed
+      || $self->todo_passed
+      || $self->parse_errors
+      || $self->wait
+      || $self->exit;
+}
 
 =head3 C<version>
 
@@ -1213,7 +1218,7 @@ sub _finish {
 
 ##############################################################################
 
-=head2 CALLBACKS
+=head1 CALLBACKS
 
 As mentioned earlier, a "callback" key may be added to the
 C<TAP::Parser> constructor. If present, each callback corresponding to a
@@ -1252,41 +1257,41 @@ are case-sensitive.
 
 =over 4
 
-=item 1 C<test>
+=item * C<test>
 
 Invoked if C<< $result->is_test >> returns true.
 
-=item 2 C<version>
+=item * C<version>
 
 Invoked if C<< $result->is_version >> returns true.
 
-=item 3 C<plan>
+=item * C<plan>
 
 Invoked if C<< $result->is_plan >> returns true.
 
-=item 4 C<comment>
+=item * C<comment>
 
 Invoked if C<< $result->is_comment >> returns true.
 
-=item 5 C<bailout>
+=item * C<bailout>
 
 Invoked if C<< $result->is_unknown >> returns true.
 
-=item 6 C<yaml>
+=item * C<yaml>
 
 Invoked if C<< $result->is_yaml >> returns true.
 
-=item 6 C<unknown>
+=item * C<unknown>
 
 Invoked if C<< $result->is_unknown >> returns true.
 
-=item 7 C<ELSE>
+=item * C<ELSE>
 
 If a result does not have a callback defined for it, this callback will be
 invoked.  Thus, if all of the previous result types are specified as callbacks,
 this callback will I<never> be invoked.
 
-=item 8 C<ALL>
+=item * C<ALL>
 
 This callback will always be invoked and this will happen for each result after
 one of the above callbacks is invoked.  For example, if C<Term::ANSIColor> is
