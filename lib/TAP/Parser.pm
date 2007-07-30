@@ -193,9 +193,15 @@ If passed a filehandle will write a copy of all parsed TAP to that handle.
 
 =item * C<merge>
 
-If exec is used to specify a process to run this flag determines
-whether STDOUT and STDERR of the process are merged. If false STDOUT is
-not captured.
+If false, STDERR is not captured (though it is 'relayed' to keep it
+somewhat synchronized with STDOUT.)
+
+If true, STDERR and STDOUT are the same filehandle.  This may cause
+breakage if STDERR contains anything resembling TAP format, but does
+allow exact synchronization.
+
+Subtleties of this behavior may be platform-dependent and may change in
+the future.
 
 =back
 
@@ -313,6 +319,7 @@ sub run {
 
         $self->SUPER::_initialize( $arg_for, \@legal_callback );
 
+        # XXX why delete() ?
         my $stream = delete $arg_for->{stream};
         my $tap    = delete $arg_for->{tap};
         my $source = delete $arg_for->{source};
@@ -335,6 +342,7 @@ sub run {
         elsif ($exec) {
             my $source = TAP::Parser::Source->new;
             $source->source($exec);
+            $source->merge($merge); # XXX should just be arguments?
             $stream = $source->get_stream;
             if ( defined $stream ) {
                 if ( defined $stream->exit ) {
@@ -356,7 +364,7 @@ sub run {
                 $perl->switches( $arg_for->{switches} )
                   if $arg_for->{switches};
 
-                $perl->merge($merge);
+                $perl->merge($merge); # XXX args to new()?
 
                 $stream = $perl->source($source)->get_stream;
                 if ( defined $stream ) {
