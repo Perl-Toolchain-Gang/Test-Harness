@@ -10,6 +10,7 @@ Revision history for TAP-Parser
       on 5.6.2.
     - Fixed runtests --exec option. T::H wasn't passing the exec option to
       T::P.
+    - Merged Leif Eriksen's coverage enhancing changes to t/080-aggregator.t
 
 0.52  14 July 2007
     - Incorporate Schwern's investigations into TAP versions.
