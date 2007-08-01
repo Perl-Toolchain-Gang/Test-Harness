@@ -134,8 +134,9 @@ is @$gp, 2,
 isa_ok( $_, 'TAP::Parser' ) foreach (@$gp);
 
 # _get_parsers
-# todo_failed - this is a deprecated method, so it  (and these tests) can be removed eventually
-# however it is showing up in the coverage as never tested.
+# todo_failed - this is a deprecated method, so it  (and these tests)
+# can be removed eventually.  However, it is showing up in the coverage
+# as never tested.
 my @warn;
 
 eval {
@@ -144,24 +145,29 @@ eval {
     $agg->todo_failed();
 };
 
-# check the warning, making sure to capture the fullstops correctly (not as "any char" matches)
+# check the warning, making sure to capture the fullstops correctly (not
+# as "any char" matches)
 is @warn, 1,
-  'overage tests for depricated todo_failed... and just one warning caught';
+  'coverage tests for deprecated todo_failed... and just one warning caught';
 like pop(@warn),
   qr/^"todo_failed" is deprecated[.]  Please use "todo_passed"[.]  See the docs[.] at/,
   '... and it was the expected warning';
 
 # has_problems
-# this has a large number of conditions 'OR'd together, so the tests get a little complicated here
+# this has a large number of conditions 'OR'd together, so the tests get
+# a little complicated here
 
-# currently, we have covered the cases of failed() being true and none of the summary methods failing
+# currently, we have covered the cases of failed() being true and none
+# of the summary methods failing
+
 # we need to set up test cases for
 # 1. !failed && todo_passed
 # 2. !failed && !todo_passed && parse_errors
 # 3. !failed && !todo_passed && !parse_errors && exit
 # 4. !failed && !todo_passed && !parse_errors && !exit && wait
 
-# note there is nothing wrong per se with the has_problems logic, these are simply coverage tests
+# note there is nothing wrong per se with the has_problems logic, these
+# are simply coverage tests
 
 # 1. !failed && todo_passed
 
