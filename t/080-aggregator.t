@@ -26,7 +26,7 @@ $parser1->run;
 
 $tap = <<'END_TAP';
 1..7
-ok 1 - gentleman, start your engines
+ok 1 - gentlemen, start your engines
 not ok first line of the input valid # todo some data
 # this is a comment
 ok 3 - read the rest of the file
@@ -134,7 +134,7 @@ is @$gp, 2,
 isa_ok( $_, 'TAP::Parser' ) foreach (@$gp);
 
 # _get_parsers
-# todo_failed - this is a depricated method, so it  (and these tests) can be removed eventually
+# todo_failed - this is a deprecated method, so it  (and these tests) can be removed eventually
 # however it is showing up in the coverage as never tested.
 my @warn;
 
