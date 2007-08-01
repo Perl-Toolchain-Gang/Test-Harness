@@ -28,3 +28,4 @@ TODO:
       support for subclassing.
     - Horrible idea:  have Mac's voice synthesis tell you when tests fail :)
     - Or better yet use Growl :)
+    - YAML test summary output for Test::Reporter et al.
