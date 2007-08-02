@@ -3,7 +3,19 @@ use warnings;
 use Module::Build;
 use 5.005;
 
-my $builder = Module::Build->new(
+# NOTE: make this actually be inc/MyBuilder.pm if it gets any bigger
+my $build_class = Module::Build->subclass(
+    class => 'inc::MyBuilder',
+    code => <<'    SUBCLASS',
+      sub ACTION_testruntests {
+          my $self = shift;
+          $self->depends_on('code');
+          exec($^X, '-Iblib/lib', 'bin/runtests', '-Iblib/lib');
+      }
+    SUBCLASS
+);
+
+my $builder = $build_class->new(
     module_name          => 'TAP::Parser',
     license              => 'perl',
     meta_merge           => {
