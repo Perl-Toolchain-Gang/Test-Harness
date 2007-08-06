@@ -190,8 +190,10 @@ sub tokenize {
             last;
         }
     }
-    $token ||= $self->_make_unknown_token( $line );
-    return defined $token ? TAP::Parser::Result->new( $token ) : ();
+
+    $token = $self->_make_unknown_token( $line ) unless $token;
+
+    return TAP::Parser::Result->new( $token );
 }
 
 ##############################################################################
@@ -269,9 +271,7 @@ sub _make_version_token {
 
 sub _make_plan_token {
     my ( $self, $line, $tests_planned, $skip, $explanation ) = @_;
-    if ( 0 == $tests_planned ) {
-        $skip ||= 'SKIP';
-    }
+
     if ( $skip && 0 != $tests_planned ) {
         warn "Specified SKIP directive in plan but more than 0 tests ($line)\n";
     }

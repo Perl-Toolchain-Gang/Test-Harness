@@ -50,7 +50,7 @@ sub read {
     # Which might not be a bad idea.
     my $dots = $self->_peek;
     die "Missing '...' at end of YAMLish"
-      unless $dots =~ $IS_END_YAML;
+      unless defined $dots and $dots =~ $IS_END_YAML;
 
     delete $self->{reader};
     delete $self->{next};

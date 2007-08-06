@@ -6,7 +6,7 @@ use lib 'lib';
 use TAP::Parser::Grammar;
 use TAP::Parser::Iterator::Array;
 
-use Test::More tests => 69;
+use Test::More tests => 76;
 
 my $GRAMMAR = 'TAP::Parser::Grammar';
 
@@ -258,3 +258,116 @@ $expected = {
 };
 is_deeply $token, $expected,
   '... and the token should contain the correct data';
+
+# coverage tests
+
+# set_version
+
+{
+    my @die;
+
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
+
+        $grammar->set_version( 'no_such_version' );
+    };
+
+    is @die, 1, 'set_version with bad version';
+
+    like pop @die, qr/^Unsupported syntax version: no_such_version at /,
+      '... and got expected message';
+}
+
+# tokenize
+{
+    my $stream = SS->new;
+
+    my $grammar = $GRAMMAR->new( $stream );
+
+    my $plan = '';
+
+    $stream->put( $plan );
+
+    my $result = $grammar->tokenize();
+
+    isa_ok $result, 'TAP::Parser::Result::Unknown';
+}
+
+# _make_plan_token
+
+{
+    my $grammar = $GRAMMAR->new;
+
+    my $plan
+      = '1..1 # SKIP with explanation';    # trigger warning in _make_plan_token
+
+    my $method = $handler_for{'plan'};
+
+    $plan =~ $syntax_for{'plan'};          # perform regex to populate $1, $2
+
+    my @warn;
+
+    eval {
+        local $SIG{__WARN__} = sub { push @warn, @_ };
+
+        $grammar->$method( $plan );
+    };
+
+    is @warn, 1, 'catch warning on inconsistent plan';
+
+    like pop @warn,
+      qr/^Specified SKIP directive in plan but more than 0 tests [(]1\.\.1 # SKIP with explanation[)]/,
+      '... and its what we expect';
+}
+
+# _make_yaml_token
+
+{
+    my $stream = SS->new;
+
+    my $grammar = $GRAMMAR->new( $stream );
+
+    $grammar->set_version( 13 );
+
+    # now this is badly formed YAML that is missing the
+    # leader padding - this is done for coverage testing
+    # the $reader code sub in _make_yaml_token, that is
+    # passed as the yaml consumer to T::P::YAMLish::Reader.
+
+    # because it isnt valid yaml, the yaml document is
+    # not done, and the _peek in the YAMLish::Reader
+    # code doesnt find the terminating '...' pattern.
+    # but we dont care as this is coverage testing, so
+    # if thats what we have to do to exercise that code,
+    # so be it.
+    my $yaml = [ '  ...  ', '- 2', '  ---  ', ];
+
+    sub iter {
+        my $ar = shift;
+        return sub {
+            return shift @$ar;
+        };
+    }
+
+    my $iter = iter( $yaml );
+
+    while ( my $line = $iter->() ) {
+        $stream->put( $line );
+    }
+
+    # pad == '   ', marker == '--- '
+    # length $pad == 3
+    # strip == pad
+
+    my @die;
+
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
+        $grammar->tokenize;
+    };
+
+    is @die, 1, 'checking badly formed yaml for coverage testing';
+
+    like pop @die, qr/^Missing '[.][.][.]' at end of YAMLish/,
+      '...and it died like we expect';
+}
