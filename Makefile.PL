@@ -1,7 +1,6 @@
 use ExtUtils::MakeMaker qw/WriteMakefile prompt/;
 
 use strict;
-use warnings;
 
 eval 'use ExtUtils::MakeMaker::Coverage';
 warn "Optional ExtUtils::MakeMaker::Coverage not available\n" if $@;

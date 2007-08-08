@@ -3030,21 +3030,21 @@ foreach my $test ( sort keys %samples ) {
     else {
         while ( my ( $method, $answer ) = each %$details ) {
             if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
-                ok $handler->( $parser->$method ),
+                ok $handler->( $parser->$method() ),
                   "... and $method should return a reasonable value ($test)";
             }
             elsif ( !ref $answer ) {
                 local $^W;    # uninit warnings
-                is $parser->$method, $answer,
+                is $parser->$method(), $answer,
                   "... and $method should equal $answer ($test)";
             }
             else {
-                is scalar $parser->$method, scalar @$answer,
+                is scalar $parser->$method(), scalar @$answer,
                   "... and $method should be the correct amount ($test)";
-                is_deeply [ $parser->$method ], $answer,
+                is_deeply [ $parser->$method() ], $answer,
                   "...... and the correct values ($test)"
                   or
-                  diag +Data::Dumper->Dump( [ [ $parser->$method ], $answer ],
+                  diag +Data::Dumper->Dump( [ [ $parser->$method() ], $answer ],
                     [ '*got', '*expected' ] );
             }
         }
@@ -3068,15 +3068,15 @@ sub analyze_test {
         $count++;
         while ( my ( $method, $answer ) = each %$expected ) {
             if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
-                ok $handler->( $result->$method ),
+                ok $handler->( $result->$method() ),
                   "... and $method should return a reasonable value ($test)";
             }
             elsif ( ref $answer ) {
-                is_deeply $result->$method, $answer,
+                is_deeply $result->$method(), $answer,
                   "... and $method should return the correct answer ($test)";
             }
             else {
-                is $result->$method, $answer,
+                is $result->$method(), $answer,
                   "... and $method should return the correct answer ($test)";
             }
         }

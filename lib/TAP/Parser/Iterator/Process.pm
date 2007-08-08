@@ -9,9 +9,9 @@ use IPC::Open3;
 use IO::Select;
 use IO::Handle;
 
-use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
-use constant IS_MACOS => ( $^O eq 'MacOS' );
-use constant IS_VMS   => ( $^O eq 'VMS' );
+my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
+my $IS_MACOS = ( $^O eq 'MacOS' );
+my $IS_VMS   = ( $^O eq 'VMS' );
 
 =head1 NAME
 
@@ -89,18 +89,24 @@ sub new {
 
     my $out = IO::Handle->new;
 
-    if (IS_WIN32) {
+    if ($IS_WIN32) {
         eval {
-            $pid = open3( undef, $out, $merge ? undef: '>&STDERR', @command );
+            $pid
+              = open3( undef, $out, $merge ? undef : '>&STDERR', @command );
         };
         die "Could not execute (@command): $@" if $@;
-        binmode $out, ':crlf';
+        if ( $] >= 5.006 ) {
+            # Kludge to avoid warning under 5.0.5
+            my @a = ( $out, ':crlf' );
+            binmode @a;
+        }
     }
     else {
-        $err = $merge ? undef: IO::Handle->new;
-        eval { $pid = open3( undef, $out, $err, @command ); };
+        $err = $merge ? undef : IO::Handle->new;
+        my $wtr = IO::Handle->new;
+        eval { $pid = open3( $wtr, $out, $err, @command ); };
         die "Could not execute (@command): $@" if $@;
-        $sel = $merge ? undef: IO::Select->new( $out, $err );
+        $sel = $merge ? undef : IO::Select->new( $out, $err );
     }
 
     my $self = bless {

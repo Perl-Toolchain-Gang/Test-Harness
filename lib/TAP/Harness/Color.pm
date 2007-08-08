@@ -1,7 +1,6 @@
 package TAP::Harness::Color;
 
 use strict;
-use warnings;
 
 use TAP::Parser;
 use TAP::Harness;

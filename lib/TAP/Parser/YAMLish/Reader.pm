@@ -1,7 +1,6 @@
 package TAP::Parser::YAMLish::Reader;
 
 use strict;
-use warnings;
 
 use vars qw{$VERSION};
 

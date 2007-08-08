@@ -1,7 +1,6 @@
 package TAP::Harness;
 
 use strict;
-use warnings;
 use Benchmark;
 use File::Spec;
 use File::Path;
@@ -503,10 +502,10 @@ sub _output_summary_failure {
     my $output = $method eq 'failed' ? 'failure_output' : 'output';
     my $test   = $self->_curr_test;
     my $parser = $self->_curr_parser;
-    if ( $parser->$method ) {
+    if ( $parser->$method() ) {
         $self->_summary_test_header( $test, $parser );
         $self->$output($name);
-        my @results = $self->balanced_range( 40, $parser->$method );
+        my @results = $self->balanced_range( 40, $parser->$method() );
         $self->$output( sprintf "%s\n" => shift @results );
         my $spaces = ' ' x 16;
         while (@results) {
@@ -803,7 +802,7 @@ sub _open_spool {
         eval { mkpath($path) };
         $self->_croak($@) if $@;
 
-        open( my $spool_handle, '>', $spool )
+        open( my $spool_handle, ">$spool" )
           or $self->_croak(" Can't write $spool ( $! ) ");
         return $self->{spool} = $spool_handle;
     }
