@@ -121,8 +121,7 @@ sub add {
     $self->{parser_for}{$description} = $parser;
 
     while ( my ( $summary, $method ) = each %SUMMARY_METHOD_FOR ) {
-        my $count = $parser->$method();
-        if ( $count ) {
+        if ( my $count = $parser->$method() ) {
             $self->{$summary} += $count;
             push @{ $self->{"descriptions_for_$summary"} } => $description;
         }
