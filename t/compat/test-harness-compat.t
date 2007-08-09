@@ -746,15 +746,6 @@ my $num_tests = ( keys %$results ) * $PER_LOOP;
 
 plan tests => $num_tests;
 
-sub is_deeply_dump($$$) {
-    my ( $got, $expect, $msg ) = @_;
-    use Data::Dumper;
-    unless ( is_deeply $got, $expect, $msg ) {
-        diag( Data::Dumper->Dump( [$got],    ['$got'] ) );
-        diag( Data::Dumper->Dump( [$expect], ['$expect'] ) );
-    }
-}
-
 sub local_name {
     my $name = shift;
     return File::Spec->catfile( split /\//, $name );
@@ -812,9 +803,9 @@ for my $test_key ( sort keys %$results ) {
         my $lfailed = local_result( $result->{failed} );
         my $ltodo   = local_result( $result->{todo} );
 
-        is_deeply_dump $tot, $result->{totals}, "totals match for $test_key";
-        is_deeply_dump $fail, $lfailed,
+        is_deeply $tot, $result->{totals}, "totals match for $test_key";
+        is_deeply $fail, $lfailed,
           "failure summary matches for $test_key";
-        is_deeply_dump $todo, $ltodo, "todo summary matches for $test_key";
+        is_deeply $todo, $ltodo, "todo summary matches for $test_key";
     }
 }

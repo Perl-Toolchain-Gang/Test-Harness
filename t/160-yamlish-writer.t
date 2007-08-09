@@ -2,7 +2,6 @@
 
 use strict;
 use Test::More;
-use Data::Dumper;
 use TAP::Parser::YAMLish::Reader;
 use TAP::Parser::YAMLish::Writer;
 
@@ -209,11 +208,7 @@ for my $test (@SCHEDULE) {
         unless ( ok !$@, "$name: No error" ) {
             diag "Error: $@\n";
         }
-        unless ( is_deeply $got, $want, "$name: Result matches" ) {
-            local $Data::Dumper::Useqq = $Data::Dumper::Useqq = 1;
-            diag( Data::Dumper->Dump( [$got],  ['$got'] ) );
-            diag( Data::Dumper->Dump( [$want], ['$expected'] ) );
-        }
+        is_deeply $got, $want, "$name: Result matches";
 
         my $yr = TAP::Parser::YAMLish::Reader->new;
 
@@ -221,11 +216,7 @@ for my $test (@SCHEDULE) {
         my $reader = sub { shift @$got };
         my $parsed = $yr->read($reader);
 
-        unless ( is_deeply $parsed, $data, "$name: Reparse OK" ) {
-            local $Data::Dumper::Useqq = $Data::Dumper::Useqq = 1;
-            diag( Data::Dumper->Dump( [$parsed], ['$parsed'] ) );
-            diag( Data::Dumper->Dump( [$data],   ['$data'] ) );
-        }
+        is_deeply $parsed, $data, "$name: Reparse OK";
     }
 }
 

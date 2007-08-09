@@ -1,6 +1,5 @@
 use strict;
 use Test::More;
-use Data::Dumper;
 
 use TAP::Parser::YAMLish::Reader;
 
@@ -485,16 +484,6 @@ for my $test (@SCHEDULE) {
     ok my $yaml = TAP::Parser::YAMLish::Reader->new, "$name: Created";
     isa_ok $yaml, 'TAP::Parser::YAMLish::Reader';
 
-    #     diag "$name\n";
-
-    # unless ( $test->{in} ) {
-    #     pass for 1 .. 2;
-    #     use YAML;
-    #     diag "Input for test:\n";
-    #     diag( Dump( $test->{out} ) );
-    #     next;
-    # }
-
     my $source = join( "\n", @{ $test->{in} } ) . "\n";
 
     my $iter = iter( $test->{in} );
@@ -514,11 +503,7 @@ for my $test (@SCHEDULE) {
         unless ( ok !$@, "$name: No error" ) {
             diag "Error: $@\n";
         }
-        unless ( is_deeply $got, $want, "$name: Result matches" ) {
-            local $Data::Dumper::Useqq = $Data::Dumper::Useqq = 1;
-            diag( Data::Dumper->Dump( [$got],  ['$got'] ) );
-            diag( Data::Dumper->Dump( [$want], ['$expected'] ) );
-        }
+        is_deeply $got, $want, "$name: Result matches";
         is $raw, $source, "$name: Captured source matches";
     }
 }

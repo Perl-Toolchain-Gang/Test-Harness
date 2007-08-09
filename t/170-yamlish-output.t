@@ -1,6 +1,5 @@
 use strict;
 use Test::More tests => 9;
-use Data::Dumper;
 
 use TAP::Parser::YAMLish::Writer;
 
@@ -98,9 +97,5 @@ for my $dest ( @destination ) {
 
     $yaml->write($in, $dest->{destination});
     my $got = $dest->{normalise}->();
-    unless ( is_deeply $got, $out, "$name: Result matches" ) {
-        local $Data::Dumper::Useqq = $Data::Dumper::Useqq = 1;
-        diag( Data::Dumper->Dump( [$got], ['$got'] ) );
-        diag( Data::Dumper->Dump( [$out], ['$expected'] ) );
-    }
+    is_deeply $got, $out, "$name: Result matches";
 }

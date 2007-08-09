@@ -7,7 +7,6 @@ use strict;
 #use Test::More tests => 2567;
 use Test::More 'no_plan';
 use File::Spec;
-use Data::Dumper;
 
 use constant TRUE  => "__TRUE__";
 use constant FALSE => "__FALSE__";
@@ -3042,10 +3041,7 @@ foreach my $test ( sort keys %samples ) {
                 is scalar $parser->$method(), scalar @$answer,
                   "... and $method should be the correct amount ($test)";
                 is_deeply [ $parser->$method() ], $answer,
-                  "...... and the correct values ($test)"
-                  or
-                  diag +Data::Dumper->Dump( [ [ $parser->$method() ], $answer ],
-                    [ '*got', '*expected' ] );
+                  "...... and the correct values ($test)";
             }
         }
     }
