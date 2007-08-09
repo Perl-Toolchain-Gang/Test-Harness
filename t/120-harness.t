@@ -19,8 +19,9 @@ END {
       '... and loading it on windows should succeed';
     isa_ok $harness, 'TAP::Harness', '... but the object it returns';
 
-    ok grep( {qr/^Color test output disabled on Windows/} @warnings ),
-      'Using TAP::Harness::Color on Windows should disable colored output';
+    ok( grep( qr/^Color test output disabled on Windows/, @warnings ),
+        'Using TAP::Harness::Color on Windows should disable colored output'
+    );
 
 }
 
@@ -76,7 +77,7 @@ foreach my $HARNESS (@HARNESSES) {
         while ( my ( $property, $test ) = each %$test_args ) {
             my $value = $test->{out};
             can_ok $harness, $property;
-            is_deeply scalar $harness->$property, $value, $test->{test_name};
+            is_deeply scalar $harness->$property(), $value, $test->{test_name};
         }
     }
     foreach my $method_data ( harness_methods() ) {
@@ -301,31 +302,31 @@ foreach my $HARNESS (@HARNESSES) {
 SKIP: {
 
     my $cat = '/bin/cat';
-    unless(-e $cat) {
+    unless ( -e $cat ) {
         skip "no '$cat'", 1;
     }
 
-    my $output = '';
+    my $output  = '';
     my $harness = TAP::Harness->new(
-        {   verbose => 1,
+        {   verbose      => 1,
             really_quiet => 1,
             really_quiet => 1,
             stdout       => \$output,
-            exec    => [$cat],
+            exec         => [$cat],
         }
     );
 
-    eval { $harness->runtests( 't/data/catme.1' ) };
+    eval { $harness->runtests('t/data/catme.1') };
 
-    my @output = split(/\n/, $output);
-    pop @output;                              # get rid of summary line
+    my @output = split( /\n/, $output );
+    pop @output;    # get rid of summary line
     my $answer = pop @output;
     is( $answer, 'All tests successful.', 'cat meows' );
 }
 
 # catches "exec accumulates arguments" issue (r77)
 {
-    my $output = '';
+    my $output  = '';
     my $harness = TAP::Harness->new(
         {   verbose      => 1,
             really_quiet => 1,
@@ -339,7 +340,7 @@ SKIP: {
         't/source_tests/harness',
     );
 
-    my @output = split(/\n/, $output);
+    my @output = split( /\n/, $output );
     pop @output;                              # get rid of summary line
     is( $output[-1], 'All tests successful.', 'No exec accumulation' );
 }

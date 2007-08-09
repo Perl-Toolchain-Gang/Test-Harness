@@ -14,8 +14,7 @@ my $test = File::Spec->catfile( 't', 'source_tests', 'source' );
 my $perl = $^X;
 
 can_ok 'TAP::Parser::Source', 'new';
-ok my $source = TAP::Parser::Source->new,
-  '... and calling it should succeed';
+ok my $source = TAP::Parser::Source->new, '... and calling it should succeed';
 isa_ok $source, 'TAP::Parser::Source', '... and the object it returns';
 
 can_ok $source, 'source';
@@ -29,7 +28,8 @@ ok $source->source( [ $perl, '-T', $test ] ),
 can_ok $source, 'get_stream';
 ok my $stream = $source->get_stream, '... and calling it should succeed';
 
-isa_ok $stream, 'TAP::Parser::Iterator::Process', '... and the object it returns';
+isa_ok $stream, 'TAP::Parser::Iterator::Process',
+  '... and the object it returns';
 can_ok $stream, 'next';
 is $stream->next, '1..1', '... and the first line should be correct';
 is $stream->next, 'ok 1', '... as should the second';
@@ -47,7 +47,8 @@ ok $source->source($test),
 can_ok $source, 'get_stream';
 ok $stream = $source->get_stream, '... and calling it should succeed';
 
-isa_ok $stream, 'TAP::Parser::Iterator::Process', '... and the object it returns';
+isa_ok $stream, 'TAP::Parser::Iterator::Process',
+  '... and the object it returns';
 can_ok $stream, 'next';
 is $stream->next, '1..1', '... and the first line should be correct';
 is $stream->next, 'ok 1', '... as should the second';
@@ -56,5 +57,5 @@ ok !$stream->next, '... and we should have no more results';
 # internals tests!
 
 can_ok $source, '_switches';
-ok grep( { $_ eq '-T' } $source->_switches ),
-  '... and it should find the taint switch';
+ok( grep( $_ eq '-T', $source->_switches ),
+    '... and it should find the taint switch' );

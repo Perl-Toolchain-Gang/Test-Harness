@@ -91,20 +91,22 @@ sub new {
 
     if ($IS_WIN32) {
         eval {
-            $pid
-              = open3( undef, $out, $merge ? undef : '>&STDERR', @command );
+            $pid = open3(
+                \*STDIN, $out,
+                $merge ? '' : '>&STDERR', @command
+            );
         };
         die "Could not execute (@command): $@" if $@;
         if ( $] >= 5.006 ) {
+
             # Kludge to avoid warning under 5.0.5
             my @a = ( $out, ':crlf' );
             binmode @a;
         }
     }
     else {
-        $err = $merge ? undef : IO::Handle->new;
-        my $wtr = IO::Handle->new;
-        eval { $pid = open3( $wtr, $out, $err, @command ); };
+        $err = $merge ? '' : IO::Handle->new;
+        eval { $pid = open3( \*STDIN, $out, $err, @command ); };
         die "Could not execute (@command): $@" if $@;
         $sel = $merge ? undef : IO::Select->new( $out, $err );
     }

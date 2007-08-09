@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
 use strict;
-use warnings;
 use Test::More;
 use Data::Dumper;
 use TAP::Parser::YAMLish::Reader;

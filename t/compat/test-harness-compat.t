@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
 use strict;
-use warnings;
 use Test::More;
 use TAP::Harness;
 use TAP::Harness::Compatible qw(execute_tests);
@@ -769,15 +768,13 @@ sub local_result {
         if ( exists $want->{name} ) {
             $want->{name} = local_name( $want->{name} );
         }
-        $new->{ local_name( $file ) } = $want;
+        $new->{ local_name($file) } = $want;
     }
     return $new;
 }
 
 {
-
-    # Suppress subroutine redefined warning
-    no warnings 'redefine';
+    local $^W = 0;
 
     # Silence harness output
     *TAP::Harness::output = sub {
@@ -800,7 +797,8 @@ for my $test_key ( sort keys %$results ) {
         # results. Should probably capture and analyse it.
         local *OLDERR;
         open OLDERR, '>&STDERR' or die $!;
-        open STDERR, '>', File::Spec->devnull or die $!;
+        my $devnull = File::Spec->devnull;
+        open STDERR, ">$devnull" or die $!;
 
         my ( $tot, $fail, $todo, $harness, $aggregate )
           = execute_tests( tests => \@test_files );
@@ -815,7 +813,8 @@ for my $test_key ( sort keys %$results ) {
         my $ltodo   = local_result( $result->{todo} );
 
         is_deeply_dump $tot, $result->{totals}, "totals match for $test_key";
-        is_deeply_dump $fail, $lfailed, "failure summary matches for $test_key";
-        is_deeply_dump $todo, $ltodo,   "todo summary matches for $test_key";
+        is_deeply_dump $fail, $lfailed,
+          "failure summary matches for $test_key";
+        is_deeply_dump $todo, $ltodo, "todo summary matches for $test_key";
     }
 }
