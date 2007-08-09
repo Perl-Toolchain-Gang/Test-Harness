@@ -71,13 +71,9 @@ sub new {
     return bless $token => $class_for{$type}
       if exists $class_for{$type};
     require Carp;
-    require Data::Dumper;
-    $Data::Dumper::Indent = 1;
-    $Data::Dumper::Terse  = 1;
-    $token                = Data::Dumper::Dumper($token);
 
     # this should never happen!
-    Carp::croak("Could not determine class for\n$token");
+    Carp::croak("Could not determine class for\n$token->{type}");
 }
 
 =head2 Boolean methods
@@ -210,7 +206,7 @@ Indicates whether or not the given result has a TODO or SKIP directive.
 
 sub has_directive {
     my $self = shift;
-    return ($self->has_todo || $self->has_skip) || '';
+    return ( $self->has_todo || $self->has_skip ) || '';
 }
 
 ##############################################################################
@@ -225,7 +221,7 @@ Indicates whether or not the given result has a TODO directive.
 
 =cut
 
-sub has_todo { 'TODO' eq (shift->{directive} || '') }
+sub has_todo { 'TODO' eq ( shift->{directive} || '' ) }
 
 ##############################################################################
 
@@ -239,6 +235,6 @@ Indicates whether or not the given result has a SKIP directive.
 
 =cut
 
-sub has_skip { 'SKIP' eq (shift->{directive} || '') }
+sub has_skip { 'SKIP' eq ( shift->{directive} || '' ) }
 
 1;
