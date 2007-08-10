@@ -3061,6 +3061,7 @@ sub analyze_test {
           : $result->raw;
         $desc = $result->plan if $result->is_plan && $desc =~ /SKIP/i;
         $desc =~ s/#/<hash>/g;
+        $desc =~ s/\s+/ /g; # Drop newlines
         ok defined $expected, "$test $count We should have a result for $desc";
         $count++;
         while ( my ( $method, $answer ) = each %$expected ) {
