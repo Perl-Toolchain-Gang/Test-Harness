@@ -35,10 +35,10 @@ my @CONFIG = (
         script => [
             'yes n | %PERL% Makefile.PL',
             'make',
-            [ 'make test', \&check_test ],
+            'make test',
 
             # Dogfood
-            [ '%PERL% -Ilib bin/runtests -b t/*.t t/compat/*.t', \&check_test ],
+            '%PERL% -Ilib bin/runtests t/*.t t/compat/*.t',
         ],
 
         mailto => 'tapx-dev@hexten.net',
@@ -206,8 +206,8 @@ sub run_commands {
         my $results = capture_command($cooked);
 
         my $status
-          = $check->($results)
-          ? ( $results->{status} ? 'died' : 'passed' )
+          = ( $results->{status} == 0 && $check->{$results} )
+          ? 'passed'
           : 'failed';
 
         return unless $feedback->( $status, $cooked, $results );
@@ -263,7 +263,8 @@ sub capture_command {
 }
 
 # Scan test output. Should work with both runtests (TAP::Parser) and
-# prove (Test::Harness)
+# prove (Test::Harness).
+# Not currently used. We probably don't need to parse the test output.
 sub check_test {
     my $results = shift;
 
