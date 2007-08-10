@@ -15,21 +15,28 @@ use constant SVN    => '/usr/bin/svn';
 use constant STATUS => '/home/andy/.smoke-tapx';
 use constant WORK   => '/home/andy/.smoke-work';
 
-GetOptions( 'v|verbose' => \my $VERBOSE );
-
-my %PERLS = (
-    '5.0.5' => '/home/andy/Works/Perl/versions/5.0.5',
-    '5.6.1' => '/home/andy/Works/Perl/versions/5.6.1',
-    '5.6.2' => '/home/andy/Works/Perl/versions/5.6.2',
-    '5.8.5' => '/home/andy/Works/Perl/versions/5.8.5',
-    '5.8.6' => '/home/andy/Works/Perl/versions/5.8.6',
-    '5.8.7' => '/home/andy/Works/Perl/versions/5.8.7',
-    '5.8.8' => '/usr',
-    '5.9.5' => '/home/andy/Works/Perl/versions/5.9.5',
+GetOptions(
+    'v|verbose' => \my $VERBOSE,
+    'force'     => \my $FORCE
 );
 
+my @PERLS = (
+    '/home/andy/Works/Perl/versions/5.0.5/bin/perl',
+    '/home/andy/Works/Perl/versions/5.6.1/bin/perl',
+    '/home/andy/Works/Perl/versions/5.6.2/bin/perl',
+    '/home/andy/Works/Perl/versions/5.8.5/bin/perl',
+    '/home/andy/Works/Perl/versions/5.8.6/bin/perl',
+    '/home/andy/Works/Perl/versions/5.8.7/bin/perl',
+    '/usr/bin/perl',
+    '/home/andy/Works/Perl/versions/5.9.5/bin/perl5.9.5',
+);
+
+# Kludge for blead
+push @PERLS, glob( '/home/andy/Works/Perl/versions/blead/bin/perl5.*' );
+
 my @CONFIG = (
-    {   name   => 'TAP::Parser',
+    {
+        name   => 'TAP::Parser',
         svn    => 'http://svn.hexten.net/tapx/trunk',
         subdir => 'trunk',
         script => [
@@ -38,17 +45,17 @@ my @CONFIG = (
             'make test',
 
             # Dogfood
-            '%PERL% -Ilib bin/runtests t/*.t t/compat/*.t',
+            '%PERL% -Ilib bin/runtests -b t/*.t t/compat/*.t',
         ],
 
         mailto => 'tapx-dev@hexten.net',
     }
 );
 
-my $Status = -f STATUS ? LoadFile(STATUS) : {};
+my $Status = -f STATUS ? LoadFile( STATUS ) : {};
 
-for my $repo (@CONFIG) {
-    test_and_report($repo);
+for my $repo ( @CONFIG ) {
+    test_and_report( $repo );
 }
 
 sub mention {
@@ -62,9 +69,9 @@ sub get_revision {
     my $cmd  = join( ' ', @cmd );
     my $rev  = undef;
     open my $svn, '-|', @cmd or die "Can't $cmd ($!)\n";
-    LINE: while (<$svn>) {
+    LINE: while ( <$svn> ) {
         chomp;
-        if (/^Revision:\s+(\d+)/) {
+        if ( /^Revision:\s+(\d+)/ ) {
             $rev = $1;
             last LINE;
         }
@@ -73,12 +80,23 @@ sub get_revision {
     return $rev;
 }
 
+sub perl_version {
+    my $interp = shift;
+    my @cmd    = ( $interp, '-MConfig', '-e', 'print $Config{version}' );
+    my $cmd    = join( ' ', @cmd );
+    my $ver    = undef;
+    open my $perl, '-|', @cmd or die "Can't $cmd ($!)\n";
+    $ver = <$perl>;
+    close $perl or die "Can't $cmd ($!)\n";
+    return $ver;
+}
+
 sub test_and_report {
     my $repo   = shift;
     my $name   = $repo->{name};
     my $Status = $Status->{$name} ||= {};
 
-    mention("Checking $name");
+    mention( "Checking $name" );
 
     my $cur_rev = get_revision( $repo->{svn} );
 
@@ -86,42 +104,39 @@ sub test_and_report {
       if exists $Status->{revision};
     mention( "Current:     ", $cur_rev );
 
-    return if exists $Status->{revision} && $Status->{revision} == $cur_rev;
+    return
+      if !$FORCE
+          && exists $Status->{revision}
+          && $Status->{revision} == $cur_rev;
 
     my $mailto = $repo->{mailto};
     my @mailto = 'ARRAY' eq ref $mailto ? @$mailto : $mailto;
 
     my $msg = Mail::Send->new;
-    $msg->to(@mailto);
-    $msg->subject("Automated test report for $repo->{name} r$cur_rev");
+    $msg->to( @mailto );
+    $msg->subject( "Automated test report for $repo->{name} r$cur_rev" );
 
     my $fh = $msg->open;
 
     print $fh "To obtain this release use the following command:\n\n";
     print $fh "  svn checkout -r$cur_rev $repo->{svn}\n";
 
-    for my $version ( sort keys %PERLS ) {
-        my $path = $PERLS{$version};
-        my $chunk = test_against_perl( $version, $path, $repo, $Status );
-        print $fh "\n$chunk" if $chunk;
+    for my $interp ( @PERLS ) {
+        my $version = perl_version( $interp );
+        if ( defined $version ) {
+            my $chunk = test_against_perl( $version, $interp, $repo, $Status );
+            print $fh "\n$chunk" if $chunk;
+        }
+        else {
+            print $fh "Can't get version of $interp\n";
+        }
     }
 
     $fh->close;
 
-    $Status->{revision} = $cur_rev;
-}
+    mention( "Mail sent to ", join( ', ', @mailto ) );
 
-sub find_perl {
-    my ( $version, $path ) = @_;
-    my @try = ( 'bin/perl', "bin/perl$version" );
-    for my $try (@try) {
-        my $interp = File::Spec->catfile(
-            $path,
-            split '/', $try
-        );
-        return $interp if -x $interp;
-    }
-    return;
+    $Status->{revision} = $cur_rev;
 }
 
 sub work_dir {
@@ -133,7 +148,7 @@ sub work_dir {
 sub checkout {
     my $repo   = shift;
     my @svn    = ( SVN, 'checkout', $repo->{svn} );
-    my $result = capture_command(@svn);
+    my $result = capture_command( @svn );
     die join( ' ', @svn ), " failed: $result->{status}" if $result->{status};
 }
 
@@ -144,20 +159,19 @@ sub expand {
 }
 
 sub test_against_perl {
-    my ( $version, $path, $repo, $Status ) = @_;
-    my $interp = find_perl( $version, $path );
-    my $work   = work_dir( $repo,     $version );
+    my ( $version, $interp, $repo, $Status ) = @_;
+    my $work = work_dir( $repo, $version );
 
     my @out = ( "=== Test against perl $version ===", '' );
 
-    rmtree($work) if -d $work;
-    mkpath($work);
+    rmtree( $work ) if -d $work;
+    mkpath( $work );
 
-    chdir($work);
-    checkout($repo);
+    chdir( $work );
+    checkout( $repo );
 
     my $build_dir = File::Spec->catdir( $work, $repo->{subdir} );
-    chdir($build_dir);
+    chdir( $build_dir );
 
     my $bind = { PERL => $interp };
 
@@ -179,12 +193,12 @@ sub test_against_perl {
         }
     );
 
-    unless ($ok) {
+    unless ( $ok ) {
         push @out, '' if $out[-1];
         for my $cmd ( 'uname -a', '%PERL% -V' ) {
             my $cooked = expand( $cmd, $bind );
             push @out, $cooked;
-            my $results = capture_command($cooked);
+            my $results = capture_command( $cooked );
             push @out, @{ $results->{output} };
             push @out, '';
         }
@@ -195,18 +209,18 @@ sub test_against_perl {
 
 sub run_commands {
     my ( $commands, $bind, $feedback ) = @_;
-    for my $step (@$commands) {
+    for my $step ( @$commands ) {
 
         my ( $cmd, $check )
           = 'ARRAY' eq ref $step
           ? @$step
-          : ( $step, sub {1} );
+          : ( $step, sub { 1 } );
 
         my $cooked = expand( $cmd, $bind );
-        my $results = capture_command($cooked);
+        my $results = capture_command( $cooked );
 
         my $status
-          = ( $results->{status} == 0 && $check->($results) )
+          = ( $results->{status} == 0 && $check->( $results ) )
           ? 'passed'
           : 'failed';
 
@@ -220,7 +234,7 @@ sub capture_command {
     my @cmd = @_;
     my $cmd = join ' ', @cmd;
 
-    mention($cmd);
+    mention( $cmd );
 
     my $out = IO::Handle->new;
     my $err = IO::Handle->new;
@@ -239,14 +253,15 @@ sub capture_command {
         @ready = reverse @ready if $flip;
         $flip = !$flip;
 
-        for my $fh (@ready) {
+        for my $fh ( @ready ) {
             if ( defined( my $line = <$fh> ) ) {
                 my $pfx = $fh == $err ? 'E' : 'O';
                 chomp $line;
                 push @lines, "$pfx| $line";
+                mention( "$pfx| $line" );
             }
             else {
-                $sel->remove($fh);
+                $sel->remove( $fh );
             }
         }
     }
