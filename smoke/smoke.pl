@@ -8,11 +8,14 @@ use IO::Handle;
 use IPC::Open3;
 use IO::Select;
 use Mail::Send;
+use Getopt::Long;
 use YAML qw< DumpFile LoadFile >;
 
 use constant SVN    => '/usr/bin/svn';
 use constant STATUS => '/home/andy/.smoke-tapx';
 use constant WORK   => '/home/andy/.smoke-work';
+
+GetOptions( 'v|verbose' => \my $VERBOSE );
 
 my %PERLS = (
     '5.0.5' => '/home/andy/Works/Perl/versions/5.0.5',
@@ -33,9 +36,11 @@ my @CONFIG = (
             'yes n | %PERL% Makefile.PL',
             'make',
             [ 'make test', \&check_test ],
+
             # Dogfood
             [ '%PERL% -Ilib bin/runtests t/*.t t/compat/*.t', \&check_test ],
         ],
+
         mailto => 'tapx-dev@hexten.net',
     }
 );
@@ -44,6 +49,11 @@ my $Status = -f STATUS ? LoadFile(STATUS) : {};
 
 for my $repo (@CONFIG) {
     test_and_report($repo);
+}
+
+sub mention {
+    return unless $VERBOSE;
+    print join( '', @_ ), "\n";
 }
 
 sub get_revision {
@@ -64,10 +74,17 @@ sub get_revision {
 }
 
 sub test_and_report {
-    my $repo    = shift;
-    my $name    = $repo->{name};
-    my $Status  = $Status->{$name} ||= {};
+    my $repo   = shift;
+    my $name   = $repo->{name};
+    my $Status = $Status->{$name} ||= {};
+
+    mention("Checking $name");
+
     my $cur_rev = get_revision( $repo->{svn} );
+
+    mention( "Last tested: ", $Status->{revision} )
+      if exists $Status->{revision};
+    mention( "Current:     ", $cur_rev );
 
     return if exists $Status->{revision} && $Status->{revision} == $cur_rev;
 
@@ -189,7 +206,7 @@ sub run_commands {
         my $results = capture_command($cooked);
 
         my $status
-          = $check->{$results}
+          = $check->($results)
           ? ( $results->{status} ? 'died' : 'passed' )
           : 'failed';
 
@@ -202,6 +219,9 @@ sub run_commands {
 sub capture_command {
     my @cmd = @_;
     my $cmd = join ' ', @cmd;
+
+    mention($cmd);
+
     my $out = IO::Handle->new;
     my $err = IO::Handle->new;
 
