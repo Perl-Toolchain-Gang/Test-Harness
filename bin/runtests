@@ -15,6 +15,7 @@ my $DEFAULT_FORMATTER = 'TAP::Harness::Formatter::Basic';
 # Allow cuddling the paths with the -I
 @ARGV = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @ARGV;
 my $color_default = -t STDOUT && !( $^O =~ /MSWin32/ );
+my $COLOR;
 
 Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
 GetOptions(
@@ -23,7 +24,8 @@ GetOptions(
     'l|lib'       => \my $LIB,
     'b|blib'      => \my $BLIB,
     's|shuffle'   => \my $SHUFFLE,
-    'c|color!'    => \my $COLOR,
+    'color!'      => \$COLOR,
+    'c'           => \$COLOR,
     'harness=s'   => \my $HARNESS,
     'formatter=s' => \my $FORMATTER,
     'r|recurse'   => \my $RECURSE,
