@@ -30,9 +30,11 @@ my @CONFIG = (
         svn    => 'http://svn.hexten.net/tapx/trunk',
         subdir => 'trunk',
         script => [
-            'yes | %PERL% Makefile.PL',
+            'yes n | %PERL% Makefile.PL',
             'make',
             [ 'make test', \&check_test ],
+            # Dogfood
+            [ '%PERL% -Ilib bin/runtests t/*.t t/compat/*.t', \&check_test ],
         ],
         mailto => 'tapx-dev@hexten.net',
     }
@@ -142,11 +144,10 @@ sub test_against_perl {
 
     my $bind = { PERL => $interp };
 
+    # Doesn't work in 5.0.5
     local $ENV{PERL_MM_USE_DEFAULT} = 1;
 
-    my $failed = 0;
-
-    run_commands(
+    my $ok = run_commands(
         $repo->{script},
         $bind,
         sub {
@@ -155,12 +156,13 @@ sub test_against_perl {
             unless ( $type eq 'passed' ) {
                 push @out, @{ $results->{output} };
                 push @out, "Exit status: $results->{status}", '';
-                $failed++;
+                return 0;
             }
+            return 1;
         }
     );
 
-    if ($failed) {
+    unless ($ok) {
         push @out, '' if $out[-1];
         for my $cmd ( 'uname -a', '%PERL% -V' ) {
             my $cooked = expand( $cmd, $bind );
@@ -177,22 +179,24 @@ sub test_against_perl {
 sub run_commands {
     my ( $commands, $bind, $feedback ) = @_;
     for my $step (@$commands) {
+
         my ( $cmd, $check )
           = 'ARRAY' eq ref $step
           ? @$step
           : ( $step, sub {1} );
+
         my $cooked = expand( $cmd, $bind );
         my $results = capture_command($cooked);
-        if ( !$check->($results) ) {
-            $feedback->( 'failed', $cooked, $results );
-        }
-        elsif ( $results->{status} ) {
-            $feedback->( 'died', $cooked, $results );
-        }
-        else {
-            $feedback->( 'passed', $cooked, $results );
-        }
+
+        my $status
+          = $check->{$results}
+          ? ( $results->{status} ? 'died' : 'passed' )
+          : 'failed';
+
+        return unless $feedback->( $status, $cooked, $results );
     }
+
+    return 1;
 }
 
 sub capture_command {
@@ -227,13 +231,13 @@ sub capture_command {
         }
     }
 
-    my $Status = undef;
+    my $status = undef;
     if ( $pid == waitpid( $pid, 0 ) ) {
-        $Status = $?;
+        $status = $?;
     }
 
     return {
-        status => $Status,
+        status => $status,
         output => \@lines,
     };
 }
