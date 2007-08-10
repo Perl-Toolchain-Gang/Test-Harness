@@ -206,7 +206,7 @@ sub run_commands {
         my $results = capture_command($cooked);
 
         my $status
-          = ( $results->{status} == 0 && $check->{$results} )
+          = ( $results->{status} == 0 && $check->($results) )
           ? 'passed'
           : 'failed';
 
