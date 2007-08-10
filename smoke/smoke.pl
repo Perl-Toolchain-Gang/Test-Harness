@@ -22,6 +22,7 @@ my %PERLS = (
     '5.8.6' => '/home/andy/Works/Perl/versions/5.8.6',
     '5.8.7' => '/home/andy/Works/Perl/versions/5.8.7',
     '5.8.8' => '/usr',
+    '5.9.5' => '/home/andy/Works/Perl/versions/5.9.5',
 );
 
 my @CONFIG = (
@@ -76,6 +77,9 @@ sub test_and_report {
     $msg->subject("Automated test report for $repo->{name} r$cur_rev");
 
     my $fh = $msg->open;
+
+    print $fh "To obtain this release use the following command:\n\n";
+    print $fh "  svn checkout -r$cur_rev $repo->{svn}\n";
 
     for my $version ( sort keys %PERLS ) {
         my $path = $PERLS{$version};
