@@ -38,7 +38,7 @@ my @CONFIG = (
             [ 'make test', \&check_test ],
 
             # Dogfood
-            [ '%PERL% -Ilib bin/runtests t/*.t t/compat/*.t', \&check_test ],
+            [ '%PERL% -Ilib bin/runtests -b t/*.t t/compat/*.t', \&check_test ],
         ],
 
         mailto => 'tapx-dev@hexten.net',
