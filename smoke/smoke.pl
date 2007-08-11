@@ -11,51 +11,29 @@ use Mail::Send;
 use Getopt::Long;
 use YAML qw< DumpFile LoadFile >;
 
-use constant SVN    => '/usr/bin/svn';
-use constant STATUS => '/home/andy/.smoke-tapx';
-use constant WORK   => '/home/andy/.smoke-work';
-
 GetOptions(
     'v|verbose' => \my $VERBOSE,
     'force'     => \my $FORCE
 );
 
-my @PERLS = (
-    '/home/andy/Works/Perl/versions/5.0.5/bin/perl',
-    '/home/andy/Works/Perl/versions/5.6.1/bin/perl',
-    '/home/andy/Works/Perl/versions/5.6.2/bin/perl',
-    '/home/andy/Works/Perl/versions/5.8.5/bin/perl',
-    '/home/andy/Works/Perl/versions/5.8.6/bin/perl',
-    '/home/andy/Works/Perl/versions/5.8.7/bin/perl',
-    '/usr/bin/perl',
-    '/home/andy/Works/Perl/versions/5.9.5/bin/perl5.9.5',
-);
+die "smoke.pl [-v] [--force] config\n" unless @ARGV == 1;
+my $config = shift;
+die "No file $config\n" unless -f $config;
+my $Config = load_config($config);
+my $Status = load_config( $Config->{global}->{status} );
 
-# Kludge for blead
-push @PERLS, glob( '/home/andy/Works/Perl/versions/blead/bin/perl5.*' );
+for my $task ( @{ $Config->{tasks} } ) {
+    test_and_report($task);
+}
 
-my @CONFIG = (
-    {
-        name   => 'TAP::Parser',
-        svn    => 'http://svn.hexten.net/tapx/trunk',
-        subdir => 'trunk',
-        script => [
-            'yes n | %PERL% Makefile.PL',
-            'make',
-            'make test',
+sub load_config {
+    my ($name) = @_;
+    return -f $name ? LoadFile($name) : {};
+}
 
-            # Dogfood
-            '%PERL% -Ilib bin/runtests -b t/*.t t/compat/*.t',
-        ],
-
-        mailto => 'tapx-dev@hexten.net',
-    }
-);
-
-my $Status = -f STATUS ? LoadFile( STATUS ) : {};
-
-for my $repo ( @CONFIG ) {
-    test_and_report( $repo );
+sub save_config {
+    my ( $name, $config ) = @_;
+    DumpFile( $name, $config );
 }
 
 sub mention {
@@ -64,14 +42,14 @@ sub mention {
 }
 
 sub get_revision {
-    my $repo = shift;
-    my @cmd  = ( SVN, 'info', $repo );
+    my $task = shift;
+    my @cmd  = ( $Config->{global}->{svn}, 'info', $task );
     my $cmd  = join( ' ', @cmd );
     my $rev  = undef;
     open my $svn, '-|', @cmd or die "Can't $cmd ($!)\n";
-    LINE: while ( <$svn> ) {
+    LINE: while (<$svn>) {
         chomp;
-        if ( /^Revision:\s+(\d+)/ ) {
+        if (/^Revision:\s+(\d+)/) {
             $rev = $1;
             last LINE;
         }
@@ -82,9 +60,10 @@ sub get_revision {
 
 sub perl_version {
     my $interp = shift;
-    my @cmd    = ( $interp, '-MConfig', '-e', 'print $Config{version}' );
-    my $cmd    = join( ' ', @cmd );
-    my $ver    = undef;
+    return unless defined $interp;
+    my @cmd = ( $interp, '-MConfig', '-e', 'print $Config{version}' );
+    my $cmd = join( ' ', @cmd );
+    my $ver = undef;
     open my $perl, '-|', @cmd or die "Can't $cmd ($!)\n";
     $ver = <$perl>;
     close $perl or die "Can't $cmd ($!)\n";
@@ -92,13 +71,13 @@ sub perl_version {
 }
 
 sub test_and_report {
-    my $repo   = shift;
-    my $name   = $repo->{name};
+    my $task   = shift;
+    my $name   = $task->{name};
     my $Status = $Status->{$name} ||= {};
 
-    mention( "Checking $name" );
+    mention("Checking $name");
 
-    my $cur_rev = get_revision( $repo->{svn} );
+    my $cur_rev = get_revision( $task->{svn} );
 
     mention( "Last tested: ", $Status->{revision} )
       if exists $Status->{revision};
@@ -109,22 +88,23 @@ sub test_and_report {
           && exists $Status->{revision}
           && $Status->{revision} == $cur_rev;
 
-    my $mailto = $repo->{mailto};
+    my $mailto = $task->{mailto};
     my @mailto = 'ARRAY' eq ref $mailto ? @$mailto : $mailto;
 
     my $msg = Mail::Send->new;
-    $msg->to( @mailto );
-    $msg->subject( "Automated test report for $repo->{name} r$cur_rev" );
+    $msg->to(@mailto);
+    $msg->subject("Automated test report for $task->{name} r$cur_rev");
 
     my $fh = $msg->open;
 
     print $fh "To obtain this release use the following command:\n\n";
-    print $fh "  svn checkout -r$cur_rev $repo->{svn}\n";
+    print $fh "  svn checkout -r$cur_rev $task->{svn}\n";
 
-    for my $interp ( @PERLS ) {
-        my $version = perl_version( $interp );
+    for my $interp ( map glob, @{ $Config->{global}->{perls} } ) {
+        my $version = perl_version($interp);
         if ( defined $version ) {
-            my $chunk = test_against_perl( $version, $interp, $repo, $Status );
+            mention("Testing against $interp ($version)");
+            my $chunk = test_against_perl( $version, $interp, $task );
             print $fh "\n$chunk" if $chunk;
         }
         else {
@@ -140,15 +120,18 @@ sub test_and_report {
 }
 
 sub work_dir {
-    my ( $repo, $version ) = @_;
-    my $name = $repo->{name};
-    return File::Spec->catdir( WORK, $version, split /::/, $name );
+    my ( $task, $version ) = @_;
+    my $name = $task->{name};
+    return File::Spec->catdir(
+        $Config->{global}->{work}, $version,
+        split /::/,                $name
+    );
 }
 
 sub checkout {
-    my $repo   = shift;
-    my @svn    = ( SVN, 'checkout', $repo->{svn} );
-    my $result = capture_command( @svn );
+    my $task   = shift;
+    my @svn    = ( $Config->{global}->{svn}, 'checkout', $task->{svn} );
+    my $result = capture_command(@svn);
     die join( ' ', @svn ), " failed: $result->{status}" if $result->{status};
 }
 
@@ -159,19 +142,19 @@ sub expand {
 }
 
 sub test_against_perl {
-    my ( $version, $interp, $repo, $Status ) = @_;
-    my $work = work_dir( $repo, $version );
+    my ( $version, $interp, $task ) = @_;
+    my $work = work_dir( $task, $version );
 
     my @out = ( "=== Test against perl $version ===", '' );
 
-    rmtree( $work ) if -d $work;
-    mkpath( $work );
+    rmtree($work) if -d $work;
+    mkpath($work);
 
-    chdir( $work );
-    checkout( $repo );
+    chdir($work);
+    checkout($task);
 
-    my $build_dir = File::Spec->catdir( $work, $repo->{subdir} );
-    chdir( $build_dir );
+    my $build_dir = File::Spec->catdir( $work, $task->{subdir} );
+    chdir($build_dir);
 
     my $bind = { PERL => $interp };
 
@@ -179,7 +162,7 @@ sub test_against_perl {
     local $ENV{PERL_MM_USE_DEFAULT} = 1;
 
     my $ok = run_commands(
-        $repo->{script},
+        $task->{script},
         $bind,
         sub {
             my ( $type, $cmd, $results ) = @_;
@@ -193,12 +176,12 @@ sub test_against_perl {
         }
     );
 
-    unless ( $ok ) {
+    unless ($ok) {
         push @out, '' if $out[-1];
         for my $cmd ( 'uname -a', '%PERL% -V' ) {
             my $cooked = expand( $cmd, $bind );
             push @out, $cooked;
-            my $results = capture_command( $cooked );
+            my $results = capture_command($cooked);
             push @out, @{ $results->{output} };
             push @out, '';
         }
@@ -209,18 +192,18 @@ sub test_against_perl {
 
 sub run_commands {
     my ( $commands, $bind, $feedback ) = @_;
-    for my $step ( @$commands ) {
+    for my $step (@$commands) {
 
         my ( $cmd, $check )
           = 'ARRAY' eq ref $step
           ? @$step
-          : ( $step, sub { 1 } );
+          : ( $step, sub {1} );
 
         my $cooked = expand( $cmd, $bind );
-        my $results = capture_command( $cooked );
+        my $results = capture_command($cooked);
 
         my $status
-          = ( $results->{status} == 0 && $check->( $results ) )
+          = ( $results->{status} == 0 && $check->($results) )
           ? 'passed'
           : 'failed';
 
@@ -234,7 +217,7 @@ sub capture_command {
     my @cmd = @_;
     my $cmd = join ' ', @cmd;
 
-    mention( $cmd );
+    mention($cmd);
 
     my $out = IO::Handle->new;
     my $err = IO::Handle->new;
@@ -253,15 +236,15 @@ sub capture_command {
         @ready = reverse @ready if $flip;
         $flip = !$flip;
 
-        for my $fh ( @ready ) {
+        for my $fh (@ready) {
             if ( defined( my $line = <$fh> ) ) {
                 my $pfx = $fh == $err ? 'E' : 'O';
                 chomp $line;
                 push @lines, "$pfx| $line";
-                mention( "$pfx| $line" );
+                mention("$pfx| $line");
             }
             else {
-                $sel->remove( $fh );
+                $sel->remove($fh);
             }
         }
     }
@@ -295,6 +278,6 @@ sub check_test {
 
 END {
     if ( defined $Status ) {
-        DumpFile( STATUS, $Status );
+        save_config( $Config->{global}->{status}, $Status );
     }
 }

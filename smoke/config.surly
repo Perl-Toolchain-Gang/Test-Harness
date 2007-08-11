@@ -1,0 +1,25 @@
+---
+global:
+  perls:
+    - /home/andy/Works/Perl/versions/5.0.5/bin/perl
+    - /home/andy/Works/Perl/versions/5.6.1/bin/perl
+    - /home/andy/Works/Perl/versions/5.6.2/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.5/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.6/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.7/bin/perl
+    - /usr/bin/perl
+    - /home/andy/Works/Perl/versions/5.9.5/bin/perl5.9.5
+    - /home/andy/Works/Perl/versions/blead/bin/perl5.*
+  status: /home/andy/.smoke-tapx
+  svn: /usr/bin/svn
+  work: /home/andy/.smoke-work
+tasks:
+  - mailto: tapx-dev@hexten.net
+    name: TAP::Parser
+    script:
+      - yes n | %PERL% Makefile.PL
+      - make
+      - make test
+      - '%PERL% -Ilib bin/runtests -b t/*.t t/compat/*.t'
+    subdir: trunk
+    svn: http://svn.hexten.net/tapx/trunk
