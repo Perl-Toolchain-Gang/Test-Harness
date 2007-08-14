@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 21;
+use Test::More tests => 23;
 use TAP::Parser;
 
 my $plan_line = 'TAP::Parser::Result::Plan';
@@ -161,3 +161,22 @@ END_TAP
 
 ok $parser->is_good_plan,
   '... and it should return true if the plan is correct';
+
+# TAP::Parser coverage tests
+{
+  # good_plan coverage
+
+  my @warn;
+
+  eval {
+    local $SIG{__WARN__} = sub {push @warn, @_};
+
+    $parser->good_plan;
+  };
+
+  is @warn, 1,
+    'coverage testing of good_plan';
+
+  like pop @warn, qr/good_plan[(][)] is deprecated.  Please use "is_good_plan[(][)]"/,
+    '...and it fell-back like we expected';
+}

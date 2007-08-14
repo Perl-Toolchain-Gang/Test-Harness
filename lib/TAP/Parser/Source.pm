@@ -99,7 +99,7 @@ sub get_stream {
     );
 }
 
-sub _get_command { @{ shift->source } }
+sub _get_command { return @{ shift->source || [] } }
 
 ##############################################################################
 

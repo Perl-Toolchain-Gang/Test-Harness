@@ -4,7 +4,8 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 28;
+use Test::More tests => 34;
+
 use TAP::Parser::Source;
 use TAP::Parser::Source::Perl;
 use File::Spec;
@@ -59,3 +60,61 @@ ok !$stream->next, '... and we should have no more results';
 can_ok $source, '_switches';
 ok( grep( $_ eq '-T', $source->_switches ),
     '... and it should find the taint switch' );
+
+# coverage test for TAP::PArser::Source
+
+{
+  # coverage for method get_steam
+
+  my $source = TAP::Parser::Source->new();
+
+  my @die;
+
+  eval {
+    local $SIG{__DIE__} = sub {push @die, @_};
+
+    $source->get_stream;
+  };
+
+  is @die, 1,
+    'coverage testing of get_stream';
+
+  like pop @die, qr/No command found!/,
+    '...and it failed as expect';
+}
+
+{
+  # coverage testing for error
+
+  my $source = TAP::Parser::Source->new();
+
+  my $error = $source->error;
+
+  is $error, undef,
+    'coverage testing for error()';
+
+  $source->error('save me');
+
+  $error = $source->error;
+
+  is $error, 'save me',
+    '...and we got the expected message';
+}
+
+{
+  # coverage testing for exit
+
+  my $source = TAP::Parser::Source->new();
+
+  my $exit = $source->exit;
+
+  is $exit, undef,
+     'coverage testing for exit()';
+
+  $source->exit('save me');
+
+  $exit = $source->exit;
+
+  is $exit, 'save me',
+    '...and we got the expected message';
+}

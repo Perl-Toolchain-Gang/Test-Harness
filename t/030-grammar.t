@@ -6,7 +6,7 @@ use lib 'lib';
 use TAP::Parser::Grammar;
 use TAP::Parser::Iterator::Array;
 
-use Test::More tests => 76;
+use Test::More tests => 78;
 
 my $GRAMMAR = 'TAP::Parser::Grammar';
 
@@ -370,4 +370,20 @@ is_deeply $token, $expected,
 
     like pop @die, qr/^Missing '[.][.][.]' at end of YAMLish/,
       '...and it died like we expect';
+}
+
+{
+  # coverage testing for TAP::Parser::Iterator::Array
+
+  my $source = [ qw( a b c ) ];
+
+  my $aiter = TAP::Parser::Iterator::Array->new($source);
+
+  my $first = $aiter->next_raw;
+
+  is $first, 'a',
+    'access raw iterator';
+
+  is $aiter->exit, undef,
+    '... and note we didnt exhaust the source';
 }

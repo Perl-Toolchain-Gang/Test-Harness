@@ -9,6 +9,7 @@ use TAP::Parser::Result;
 use TAP::Parser::Source;
 use TAP::Parser::Source::Perl;
 use TAP::Parser::Iterator;
+use Carp;
 
 @ISA = qw(TAP::Base);
 
@@ -62,7 +63,7 @@ BEGIN {
                 my $self = shift;
                 return $self->{$method} unless @_;
                 unless ( ( ref $self ) =~ /^TAP::Parser/ ) { # trusted methods
-                    $self->_croak("$method() may not be set externally");
+                    Carp::croak("$method() may not be set externally");
                 }
                 $self->{$method} = shift;
             };

@@ -4,7 +4,8 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 209;
+use Test::More tests => 220;
+
 use TAP::Parser;
 use TAP::Parser::Iterator;
 
@@ -424,3 +425,169 @@ is $test->raw, 'ok 2 - read the rest of the file',
 
 is scalar $parser->passed, 2,
   'Empty junk lines should not affect the correct number of tests passed';
+
+# coverage tests
+{
+  # calling a TAP::Parser internal method with a 'foreign' class
+
+  my $foreigner = bless {}, 'Foreigner';
+
+  my @die;
+
+  eval {
+    local $SIG{__DIE__} = sub {push @die, @_};
+
+    TAP::Parser::_stream $foreigner, qw(a b c);
+  };
+
+  is @die, 1,
+    'coverage testing for TAP::Parser accessors';
+
+  like pop @die, qr/_stream[(][)] may not be set externally/,
+    '... and we died with expected message';
+}
+
+{
+  # set a spool to write to
+  package Capture;
+
+  sub TIEHANDLE {
+    return bless[], __PACKAGE__;
+  }
+
+  sub PRINT {
+    my $self = shift;
+
+    push @$self, @_;
+  }
+
+  sub dump {
+    my $self = shift;
+    return @$self;
+  }
+
+  package main;
+
+  tie local *STDOUT, 'Capture';
+
+  my $tap = <<'END_TAP';
+TAP version 13
+1..7
+ok 1 - input file opened
+... this is junk
+not ok first line of the input valid # todo some data
+# this is a comment
+ok 3 - read the rest of the file
+not ok 4 - this is a real failure
+  --- YAML!
+  ...
+ok 5 # skip we have no description
+ok 6 - you shall not pass! # TODO should have failed
+not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
+END_TAP
+
+  my $parser = $PARSER->new( { tap   => $tap,
+			       spool => *STDOUT,
+			     } );
+
+  _get_results($parser);
+
+  my @spooled = tied(*STDOUT)->dump();
+
+  is @spooled, 24,
+    'coverage testing for spool attribute of parser';
+}
+
+{
+  # _initialize coverage
+
+  my $x = bless[], 'kjsfhkjsdhf';
+
+  my @die;
+
+  eval {
+    local $SIG{__DIE__} = sub {push @die, @_};
+
+    $PARSER->new();
+  };
+
+  is @die, 1,
+    'coverage testing for _initialize';
+
+  like pop @die, qr/PANIC:  could not determine stream at/,
+    '...and it failed as expected';
+
+
+  @die = ();
+
+  eval {
+    local $SIG{__DIE__} = sub {push @die, @_};
+
+    $PARSER->new({
+		  stream => 'stream',
+		  tap    => 'tap',
+		  source => 'source', # only one of these is allowed
+		 });
+  };
+
+  is @die, 1,
+    'coverage testing for _initialize';
+
+  like pop @die, qr/You may only choose one of 'stream', 'tap', or 'source'/,
+    '...and it failed as expected';
+
+  @die = ();
+
+  eval {
+    local $SIG{__DIE__} = sub {push @die, @_};
+
+    $PARSER->new({
+		  source => 'source', # only one of these is allowed
+		  exec   => 'exec'
+		 });
+  };
+
+  is @die, 1,
+    'coverage testing for _initialize';
+
+  like pop @die, qr/"source" and "exec" are mutually exclusive options/,
+    '...and it failed as expected';
+}
+
+{
+  # coverage of todo_failed
+
+  my $tap = <<'END_TAP';
+TAP version 13
+1..7
+ok 1 - input file opened
+... this is junk
+not ok first line of the input valid # todo some data
+# this is a comment
+ok 3 - read the rest of the file
+not ok 4 - this is a real failure
+  --- YAML!
+  ...
+ok 5 # skip we have no description
+ok 6 - you shall not pass! # TODO should have failed
+not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
+END_TAP
+
+  my $parser = $PARSER->new( { tap => $tap } );
+
+  _get_results($parser);
+
+  my @warn;
+
+  eval {
+    local $SIG{__WARN__} = sub {push @warn, @_};
+
+    $parser->todo_failed;
+  };
+
+  is @warn, 1,
+    'coverage testing of todo_failed';
+
+  like pop @warn, qr/"todo_failed" is deprecated.  Please use "todo_passed".  See the docs[.]/,
+    '..and failed as expected'
+}
