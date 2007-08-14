@@ -41,8 +41,8 @@ ok $source = TAP::Parser::Source::Perl->new,
   '... and calling it should succeed';
 isa_ok $source, 'TAP::Parser::Source::Perl', '... and the object it returns';
 
-can_ok $source, 'source';
-ok $source->source($test),
+can_ok $source, 'source_file';
+ok $source->source_file($test),
   '... and calling it with valid args should succeed';
 
 can_ok $source, 'get_stream';

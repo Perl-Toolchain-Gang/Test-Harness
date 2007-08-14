@@ -367,7 +367,7 @@ sub run {
 
                 $perl->merge($merge); # XXX args to new()?
 
-                $stream = $perl->source($source)->get_stream;
+                $stream = $perl->source_file($source)->get_stream;
                 if ( defined $stream ) {
                     if ( defined $stream->exit ) {
                         $self->exit( $stream->exit );
