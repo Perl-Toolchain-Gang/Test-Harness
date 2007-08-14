@@ -487,7 +487,7 @@ not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
 END_TAP
 
   my $parser = $PARSER->new( { tap   => $tap,
-			       spool => *STDOUT,
+			       spool => \*STDOUT,
 			     } );
 
   _get_results($parser);
