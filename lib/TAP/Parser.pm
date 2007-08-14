@@ -329,7 +329,7 @@ sub run {
 
         if ( 1 < grep {defined} $stream, $tap, $source ) {
             $self->_croak(
-                "You may only choose one of 'stream', 'tap', or'source'");
+                "You may only choose one of 'stream', 'tap', or 'source'");
         }
         if ( $source && $exec ) {
             $self->_croak(
