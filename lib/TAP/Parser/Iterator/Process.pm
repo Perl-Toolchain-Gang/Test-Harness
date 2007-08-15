@@ -1,8 +1,11 @@
 package TAP::Parser::Iterator::Process;
 
 use strict;
+
 use TAP::Parser::Iterator;
+
 use vars qw($VERSION @ISA);
+
 @ISA = 'TAP::Parser::Iterator';
 
 use IPC::Open3;
@@ -78,8 +81,9 @@ sub new {
     my $class = shift;
     my $args  = shift;
 
-    my @command = @{ delete $args->{command} }
+    my @command = @{ delete $args->{command} || [] }
       or die "Must supply a command to execute";
+
     my $merge = delete $args->{merge};
     my ( $pid, $err, $sel );
 

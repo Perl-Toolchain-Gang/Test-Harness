@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 58;
+use Test::More tests => 62;
 
 use File::Spec;
 use TAP::Parser;
@@ -123,6 +123,40 @@ for my $test (@schedule) {
     'coverage of VMS line-splitting case';
 }
 
+{
+  # coverage testing for TAP::Parser::Iterator::Process ctor
+
+  my @die;
+
+  eval {
+    local $SIG{__DIE__} = sub {push @die, @_};
+
+    TAP::Parser::Iterator->new( {} );
+  };
+
+  is @die, 1,
+    'coverage testing for TPI::Process';
+
+  like pop @die, qr/Must supply a command to execute/,
+    '...and we died as expected';
+
+
+  my $parser = TAP::Parser::Iterator->new(
+					  {
+					   command => [
+						       $^X,
+						       File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' )
+						      ],
+					   merge    => 1,
+					  }
+					 );
+
+  is $parser->{err}, '',
+    'confirm we set err to empty string';
+
+  is $parser->{sel}, undef,
+    '...and selector to undef';
+}
 __DATA__
 one
 two
