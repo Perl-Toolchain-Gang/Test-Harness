@@ -78,11 +78,9 @@ sub exit {
     return;
 }
 
-sub next {
+sub next_raw {
     my $self = shift;
     return $self->{array}->[ $self->{idx}++ ];
 }
-
-sub next_raw { shift->next }
 
 1;

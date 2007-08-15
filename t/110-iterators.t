@@ -2,8 +2,8 @@
 
 use strict;
 
-#use Test::More 'no_plan';
-use Test::More tests => 54;
+use Test::More tests => 58;
+
 use File::Spec;
 use TAP::Parser;
 
@@ -83,6 +83,44 @@ for my $test (@schedule) {
     if ( my $after = $test->{after} ) {
         $after->();
     }
+}
+
+{
+  # coverage tests for the ctor
+
+  use IO::Handle;
+
+  my $stream = TAP::Parser::Iterator->new( IO::Handle->new );
+
+  isa_ok $stream, 'TAP::Parser::Iterator::Stream';
+
+  my @die;
+
+  eval {
+    local $SIG{__DIE__} = sub {push @die, @_};
+
+    TAP::Parser::Iterator->new( sub {} );
+  };
+
+  is @die, 1,
+    'coverage of error case';
+
+  like pop @die, qr/Can't iterate with a CODE/,
+    '...and we died as expected';
+}
+
+{
+  # coverage test for VMS case
+
+  my $stream = TAP::Parser::Iterator->new(
+					  [
+					   'not ',
+					   'ok 1 - I hate VMS',
+					  ]
+					 );
+
+  is $stream->next, 'not ok 1 - I hate VMS',
+    'coverage of VMS line-splitting case';
 }
 
 __DATA__
