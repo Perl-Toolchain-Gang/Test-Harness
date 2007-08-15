@@ -248,6 +248,12 @@ sub next {
         # Echo TAP to spool file
         $self->_write_to_spool($result);
     }
+    else {
+        my $code;
+        if ( $code = $self->_callback_for('EOF') ) {
+            $code->($self);
+        }
+    }
 
     return $result;
 }
@@ -309,6 +315,7 @@ sub run {
       yaml
       ALL
       ELSE
+      EOF
     );
 
     sub _initialize {
@@ -337,13 +344,12 @@ sub run {
                 '"source" and "exec" are mutually exclusive options');
         }
         if ($tap) {
-            $stream
-              = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
+            $stream = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
             my $source = TAP::Parser::Source->new;
             $source->source($exec);
-            $source->merge($merge); # XXX should just be arguments?
+            $source->merge($merge);    # XXX should just be arguments?
             $stream = $source->get_stream;
             if ( defined $stream ) {
                 if ( defined $stream->exit ) {
@@ -365,7 +371,7 @@ sub run {
                 $perl->switches( $arg_for->{switches} )
                   if $arg_for->{switches};
 
-                $perl->merge($merge); # XXX args to new()?
+                $perl->merge($merge);    # XXX args to new()?
 
                 $stream = $perl->source_file($source)->get_stream;
                 if ( defined $stream ) {
@@ -1261,7 +1267,7 @@ Callbacks may also be added like this:
  $parser->callback( test => \&test_callback );
  $parser->callback( plan => \&plan_callback );
 
-There are, at the present time, nine keys allowed for callbacks.  These keys
+There are, at the present time, ten keys allowed for callbacks.  These keys
 are case-sensitive.
 
 =over 4
@@ -1302,9 +1308,10 @@ this callback will I<never> be invoked.
 
 =item * C<ALL>
 
-This callback will always be invoked and this will happen for each result after
-one of the above callbacks is invoked.  For example, if C<Term::ANSIColor> is
-loaded, you could use the following to color your test output:
+This callback will always be invoked and this will happen for each
+result after one of the above callbacks is invoked.  For example, if
+C<Term::ANSIColor> is loaded, you could use the following to color your
+test output:
 
  my %callbacks = (
      test => sub {
@@ -1335,6 +1342,12 @@ loaded, you could use the following to color your test output:
          print "\n";
      },
  );
+
+=item * C<EOF>
+
+Invoked when there are no more lines to be parsed.  Since there is
+no accompanying TAP::Parser::Result object the TAP::Parser object is
+passed instead.
 
 =back
 

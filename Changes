@@ -13,6 +13,8 @@ Revision history for TAP-Parser
     - Merged Leif Eriksen's coverage enhancing changes to 
       t/080-aggregator.t, t/030-grammar.t
     - Made various changes so that we test cleanly on 5.0.5.
+    - Many more coverage enhancements by Leif.
+    - Applied Michael Peters' patch to add an EOF callback to TAP::Parser
 
 0.52  14 July 2007
     - Incorporate Schwern's investigations into TAP versions.

@@ -6,7 +6,7 @@ use lib 'lib';
 use TAP::Parser;
 use TAP::Parser::Iterator;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 my $tap = <<'END_TAP';
 1..5
@@ -54,6 +54,7 @@ $todo        = 0;
 $skip        = 0;
 my $else = 0;
 my $all  = 0;
+my $end  = 0;
 %callbacks = (
     test => sub {
         my $test = shift;
@@ -64,6 +65,9 @@ my $all  = 0;
     plan => sub {
         my $plan = shift;
         $plan_output = $plan->as_string;
+    },
+    EOF => sub {
+        $end = 1 if $all == 8;
     },
     ELSE => sub {
         $else++;
@@ -86,6 +90,7 @@ is $plan_output, '1..5', 'Plan callbacks should succeed';
 is scalar @tests, $parser->tests_run, '... as should the test callbacks';
 is $else, 2, '... and the correct number of "ELSE" lines should be seen';
 is $all,  8, '... and the correct total number of lines should be seen';
+is $end,  1, 'END callback correctly called';
 
 # Check callback name policing
 
