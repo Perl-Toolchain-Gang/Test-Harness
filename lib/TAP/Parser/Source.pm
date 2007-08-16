@@ -62,7 +62,7 @@ sub new {
  $source->source(['/usr/bin/ruby', 't/ruby_test.rb']);
 
 Getter/setter for the source.  The source should generally consist of an array
-reference of strings which, when executed via C<&IPC::Open3::open3>, should
+reference of strings which, when executed via L<&IPC::Open3::open3|IPC::Open3>, should
 return a filehandle which returns successive rows of TAP.
 
 =cut

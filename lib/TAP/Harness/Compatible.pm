@@ -76,7 +76,7 @@ $Timer = $ENV{HARNESS_TIMER} || 0;
 
 =head1 DESCRIPTION
 
-This module exists to provide TAP::Harness with an interface that is
+This module exists to provide L<TAP::Harness> with an interface that is
 somewhat backwards compatible with L<Test::Harness>. If you're writing new
 code consider using L<TAP::Harness> directly instead.
 
@@ -328,14 +328,14 @@ __END__
 
 =head1 EXPORT
 
-C<&runtests> is exported by TAP::Harness::Compatible by default.
+C<&runtests> is exported by C<TAP::Harness::Compatible> by default.
 
 C<&execute_tests>, C<$verbose>, C<$switches> and C<$debug> are
 exported upon request.
 
 =head1 ENVIRONMENT VARIABLES THAT TAP::HARNESS::COMPATIBLE SETS
 
-TAP::Harness::Compatible sets these before executing the individual tests.
+C<TAP::Harness::Compatible> sets these before executing the individual tests.
 
 =over 4
 
@@ -346,7 +346,7 @@ are being executed through the harness or by any other means.
 
 =item C<HARNESS_VERSION>
 
-This is the version of TAP::Harness::Compatible.
+This is the version of C<TAP::Harness::Compatible>.
 
 =back
 
@@ -362,11 +362,11 @@ switch.
 
 =item C<HARNESS_VERBOSE>
 
-If true, TAP::Harness::Compatible will output the verbose results of running
+If true, C<TAP::Harness::Compatible> will output the verbose results of running
 its tests.  Setting C<$TAP::Harness::Compatible::verbose> will override this,
 or you can use the C<-v> switch in the F<prove> utility.
 
-If true, TAP::Harness::Compatible will output the verbose results of running
+If true, C<TAP::Harness::Compatible> will output the verbose results of running
 its tests.  Setting C<$TAP::Harness::Compatible::verbose> will override this,
 or you can use the C<-v> switch in the F<prove> utility.
 

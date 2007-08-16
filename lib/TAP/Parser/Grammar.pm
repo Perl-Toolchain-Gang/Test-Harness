@@ -169,7 +169,7 @@ sub set_version {
 
   my $token = $grammar->tokenize;
 
-This method will return a C<TAP::Parser::Result> object representing the
+This method will return a L<TAP::Parser::Result> object representing the
 current line of TAP.
 
 =cut
@@ -364,7 +364,7 @@ sub _trim {
 B<NOTE:>  This grammar is slightly out of date.  There's still some discussion
 about it and a new one will be provided when we have things better defined.
 
-The C<TAP::Parser> does not use a formal grammar because TAP is essentially a
+The L<TAP::Parser> does not use a formal grammar because TAP is essentially a
 stream-based protocol.  In fact, it's quite legal to have an infinite stream.
 For the same reason that we don't apply regexes to streams, we're not using a
 formal grammar here.  Instead, we parse the TAP in lines.

@@ -22,7 +22,7 @@ $VERSION = '0.53';
 
 =head1 DESCRIPTION
 
-This is a subclass of C<TAP::Parser::Result>.  A token of this class will be
+This is a subclass of L<TAP::Parser::Result>.  A token of this class will be
 returned if the parser does not recognize the token line.  For example:
 
  1..5

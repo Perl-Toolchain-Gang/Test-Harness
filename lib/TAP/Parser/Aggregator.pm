@@ -106,7 +106,7 @@ sub _initialize {
   $aggregate->add( $description, $parser );
 
 Takes two arguments, the description of the TAP source (usually a test file
-name, but it doesn't have to be) and a C<TAP::Parser> object.
+name, but it doesn't have to be) and a L<TAP::Parser> object.
 
 Trying to reuse a description is a fatal error.
 

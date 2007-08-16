@@ -120,7 +120,7 @@ If the source contains a newline, it's assumed to be a string of raw TAP
 output.
 
 If the source is a reference, it's assumed to be something to pass to
-the C<TAP::Parser::Iterator::Stream> constructor. This is used
+the L<TAP::Parser::Iterator::Stream> constructor. This is used
 internally and you should not use it.
 
 Otherwise, the parser does a C<-e> check to see if the source exists.  If so,
@@ -139,9 +139,9 @@ The value should be the complete TAP output.
 =item * C<exec>
 
 If passed an array reference, will attempt to create the iterator by
-passing a C<TAP::Parser::Source> object to
-C<TAP::Parser::Iterator::Source>, using the array reference strings as
-the command arguments to C<&IPC::Open3::open3>:
+passing a L<TAP::Parser::Source> object to
+L<TAP::Parser::Iterator::Source>, using the array reference strings as
+the command arguments to L<IPC::Open3::open3|IPC::Open3>:
 
  exec => [ '/usr/bin/ruby', 't/my_test.rb' ]
 
@@ -226,7 +226,7 @@ that it is destructive.  You can't rewind and examine previous results.
 
 If callbacks are used, they will be issued before this call returns.
 
-Each result returned is a subclass of C<TAP::Parser::Result>.  See that
+Each result returned is a subclass of L<TAP::Parser::Result>.  See that
 module and related classes for more information on how to use them.
 
 =cut
@@ -414,7 +414,7 @@ If you've read this far in the docs, you've seen this:
         print $result->as_string;
     }
 
-Each result returned is a C<TAP::Parser::Result> subclass, referred to as
+Each result returned is a L<TAP::Parser::Result> subclass, referred to as
 I<result types>.
 
 =head2 Result types
@@ -1309,7 +1309,7 @@ this callback will I<never> be invoked.
 
 This callback will always be invoked and this will happen for each
 result after one of the above callbacks is invoked.  For example, if
-C<Term::ANSIColor> is loaded, you could use the following to color your
+L<Term::ANSIColor> is loaded, you could use the following to color your
 test output:
 
  my %callbacks = (
@@ -1345,7 +1345,7 @@ test output:
 =item * C<EOF>
 
 Invoked when there are no more lines to be parsed.  Since there is
-no accompanying TAP::Parser::Result object the TAP::Parser object is
+no accompanying L<TAP::Parser::Result> object the C<TAP::Parser> object is
 passed instead.
 
 =back
@@ -1365,7 +1365,7 @@ L<Test::Harness>.  However, there are some minor differences.
 
 =item * TODO plans
 
-A little-known feature of C<Test::Harness> is that it supported TODO lists in
+A little-known feature of L<Test::Harness> is that it supported TODO lists in
 the plan:
 
  1..2 todo 2

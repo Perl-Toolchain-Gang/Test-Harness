@@ -24,7 +24,7 @@ $VERSION = '0.53';
 
   my $line = $it->next;
 
-Originally ripped off from C<Test::Harness>.
+Originally ripped off from L<Test::Harness>.
 
 =head1 DESCRIPTION
 

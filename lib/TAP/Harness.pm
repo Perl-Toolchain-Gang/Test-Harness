@@ -169,7 +169,7 @@ Print individual test results to STDOUT.
 
 =item * C<timer>
 
-Append run time for each test to output. Uses Time::HiRes if available.
+Append run time for each test to output. Uses L<Time::HiRes> if available.
 
 =item * C<failures>
 
@@ -308,7 +308,7 @@ should be a filehandle.
 
 Accepts and array of C<@tests> to be run.  This should generally be the names
 of test files, but this is not required.  Each element in C<@tests> will be
-passed to C<TAP::Parser::new()> as a C<source>.  See C<TAP::Parser> for more
+passed to C<TAP::Parser::new()> as a C<source>.  See L<TAP::Parser> for more
 information.
 
 Tests will be run in the order found.
@@ -318,7 +318,7 @@ should name a directory into which a copy of the raw TAP for each test
 will be written. TAP is written to files named for each test.
 Subdirectories will be created as needed.
 
-Returns a TAP::Parser::Aggregator containing the test results.
+Returns a L<TAP::Parser::Aggregator> containing the test results.
 
 =cut
 
@@ -411,7 +411,7 @@ You can print a useful summary time, if desired, with:
 
 =item * C<tests>
 
-This is an array reference of all test names.  To get the C<TAP::Parser>
+This is an array reference of all test names.  To get the L<TAP::Parser>
 object for individual tests:
 
  my $aggregate = $args->{aggregate};
