@@ -104,8 +104,7 @@ sub new {
         if ( $] >= 5.006 ) {
 
             # Kludge to avoid warning under 5.0.5
-            my @a = ( $out, ':crlf' );
-            binmode @a;
+            eval 'binmode($out, ":crlf")';
         }
     }
     else {
