@@ -108,8 +108,10 @@ if ($formatter_class) {
     $args{formatter} = $formatter_class->new;
 }
 
-my $harness = $harness_class->new( \%args );
-$harness->runtests(@tests);
+my $harness    = $harness_class->new( \%args );
+my $aggregator = $harness->runtests(@tests);
+
+exit $aggregator->has_problems ? 1 : 0;
 
 sub get_switches {
     my @switches;
