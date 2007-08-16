@@ -28,7 +28,7 @@ my %deprecated = map { $_ => 1 } qw(
 );
 $SIG{__WARN__} = sub {
     if ( $_[0] =~ /is deprecated/ ) {
-        my @caller = caller( 1 );
+        my @caller = caller(1);
         my $sub    = $caller[3];
         ok exists $deprecated{$sub},
           "... we should get a deprecated warning for $sub";
@@ -42,15 +42,13 @@ $SIG{__WARN__} = sub {
 my %samples = (
     descriptive => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 description   => "Interlock activated",
                 passed        => TRUE,
@@ -61,8 +59,7 @@ my %samples = (
                 number        => 1,
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -73,8 +70,7 @@ my %samples = (
                 description   => "Megathrusters are go",
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -85,8 +81,7 @@ my %samples = (
                 description   => "Head formed",
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -97,8 +92,7 @@ my %samples = (
                 description   => "Blazing sword formed",
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -129,8 +123,7 @@ my %samples = (
     },
     descriptive_trailing => {
         results => [
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 description   => "Interlock activated",
                 passed        => TRUE,
@@ -141,8 +134,7 @@ my %samples = (
                 number        => 1,
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -153,8 +145,7 @@ my %samples = (
                 description   => "Megathrusters are go",
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -165,8 +156,7 @@ my %samples = (
                 description   => "Head formed",
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -177,8 +167,7 @@ my %samples = (
                 description   => "Blazing sword formed",
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -189,8 +178,7 @@ my %samples = (
                 description   => "Robeast destroyed",
                 is_unplanned  => FALSE,
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
@@ -216,15 +204,13 @@ my %samples = (
     },
     simple => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -234,8 +220,7 @@ my %samples = (
                 number        => 1,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -245,8 +230,7 @@ my %samples = (
                 number        => 2,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -256,8 +240,7 @@ my %samples = (
                 number        => 3,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -267,8 +250,7 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -298,19 +280,16 @@ my %samples = (
     },
     simple_yaml => {
         results => [
-            {
-                is_version => TRUE,
+            {   is_version => TRUE,
                 raw        => 'TAP version 13',
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -320,8 +299,7 @@ my %samples = (
                 number        => 1,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -331,8 +309,7 @@ my %samples = (
                 number        => 2,
                 description   => "",
             },
-            {
-                is_yaml => TRUE,
+            {   is_yaml => TRUE,
                 data    => [
                     { 'fnurk' => 'skib', 'ponk' => 'gleeb' },
                     { 'bar'   => 'krup', 'foo'  => 'plink' }
@@ -340,8 +317,7 @@ my %samples = (
                 raw =>
                   "---\n-\n  fnurk: skib\n  ponk: gleeb\n-\n  bar: krup\n  foo: plink\n...\n",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -351,8 +327,7 @@ my %samples = (
                 number        => 3,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -362,8 +337,7 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                is_yaml => TRUE,
+            {   is_yaml => TRUE,
                 data    => {
                     'got'      => [ '1', 'pong', '4' ],
                     'expected' => [ '1', '2',    '4' ]
@@ -371,8 +345,7 @@ my %samples = (
                 raw =>
                   "---\nexpected:\n  - 1\n  - 2\n  - 4\ngot:\n  - 1\n  - pong\n  - 4\n...\n",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -402,15 +375,13 @@ my %samples = (
     },
     simple_fail => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -420,8 +391,7 @@ my %samples = (
                 number        => 1,
                 description   => "",
             },
-            {
-                actual_passed => FALSE,
+            {   actual_passed => FALSE,
                 is_actual_ok  => FALSE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -431,8 +401,7 @@ my %samples = (
                 number        => 2,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -442,8 +411,7 @@ my %samples = (
                 number        => 3,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -453,8 +421,7 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                actual_passed => FALSE,
+            {   actual_passed => FALSE,
                 is_actual_ok  => FALSE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -484,15 +451,13 @@ my %samples = (
     },
     skip => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -502,8 +467,7 @@ my %samples = (
                 number        => 1,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -514,8 +478,7 @@ my %samples = (
                 description   => "",
                 explanation   => 'rain delay',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -525,8 +488,7 @@ my %samples = (
                 number        => 3,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -536,8 +498,7 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -567,15 +528,13 @@ my %samples = (
     },
     skip_nomsg => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..1',
                 tests_planned => 1,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -606,15 +565,13 @@ my %samples = (
     },
     todo_inline => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..3',
                 tests_planned => 3,
             },
-            {
-                actual_passed => FALSE,
+            {   actual_passed => FALSE,
                 is_actual_ok  => FALSE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -625,8 +582,7 @@ my %samples = (
                 description   => "- Foo",
                 explanation   => 'Just testing the todo interface.',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -637,8 +593,7 @@ my %samples = (
                 description   => "- Unexpected success",
                 explanation   => 'Just testing the todo interface.',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -669,15 +624,13 @@ my %samples = (
     },
     duplicates => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..10',
                 tests_planned => 10,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -689,8 +642,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -702,8 +654,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -715,8 +666,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -728,8 +678,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -741,8 +690,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -754,8 +702,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -767,8 +714,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -780,8 +726,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -793,8 +738,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -806,8 +750,7 @@ my %samples = (
                 explanation   => '',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -846,15 +789,13 @@ my %samples = (
     },
     no_nums => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 description   => "",
                 passed        => TRUE,
@@ -864,8 +805,7 @@ my %samples = (
                 has_todo      => FALSE,
                 number        => 1,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -875,8 +815,7 @@ my %samples = (
                 number        => 2,
                 description   => "",
             },
-            {
-                actual_passed => FALSE,
+            {   actual_passed => FALSE,
                 is_actual_ok  => FALSE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -886,8 +825,7 @@ my %samples = (
                 number        => 3,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -897,8 +835,7 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -928,15 +865,13 @@ my %samples = (
     },
     bailout => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 description   => "",
                 passed        => TRUE,
@@ -946,8 +881,7 @@ my %samples = (
                 has_todo      => FALSE,
                 number        => 1,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -957,8 +891,7 @@ my %samples = (
                 number        => 2,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -968,12 +901,10 @@ my %samples = (
                 number        => 3,
                 description   => "",
             },
-            {
-                is_bailout  => TRUE,
+            {   is_bailout  => TRUE,
                 explanation => "GERONIMMMOOOOOO!!!",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -983,8 +914,7 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1031,15 +961,13 @@ my %samples = (
     },
     too_many => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..3',
                 tests_planned => 3,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 description   => "",
                 passed        => TRUE,
@@ -1050,8 +978,7 @@ my %samples = (
                 number        => 1,
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1062,8 +989,7 @@ my %samples = (
                 description   => "",
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1074,8 +1000,7 @@ my %samples = (
                 description   => "",
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1086,8 +1011,7 @@ my %samples = (
                 description   => "",
                 is_unplanned  => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1098,8 +1022,7 @@ my %samples = (
                 description   => "",
                 is_unplanned  => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1110,8 +1033,7 @@ my %samples = (
                 description   => "",
                 is_unplanned  => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1140,15 +1062,13 @@ my %samples = (
     },
     taint => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..1',
                 tests_planned => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 description   => "- -T honored",
                 passed        => TRUE,
@@ -1195,8 +1115,7 @@ my %samples = (
     },
     die_head_end => {
         results => [
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1207,8 +1126,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1219,8 +1137,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1231,8 +1148,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1261,8 +1177,7 @@ my %samples = (
     },
     die_last_minute => {
         results => [
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1273,8 +1188,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1285,8 +1199,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1297,8 +1210,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1309,8 +1221,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..4',
@@ -1335,15 +1246,13 @@ my %samples = (
     },
     bignum => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..2',
                 tests_planned => 2,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1354,8 +1263,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1366,8 +1274,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1378,8 +1285,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1412,15 +1318,13 @@ my %samples = (
     },
     bignum_many => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..2',
                 tests_planned => 2,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1431,8 +1335,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1443,8 +1346,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1455,8 +1357,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1467,8 +1368,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1479,8 +1379,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1491,8 +1390,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1503,8 +1401,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1515,8 +1412,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1527,8 +1423,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1539,8 +1434,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1580,15 +1474,13 @@ my %samples = (
     },
     combined => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..10',
                 tests_planned => 10,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1599,8 +1491,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1611,8 +1502,7 @@ my %samples = (
                 description   => 'basset hounds got long ears',
                 explanation   => '',
             },
-            {
-                actual_passed => FALSE,
+            {   actual_passed => FALSE,
                 is_actual_ok  => FALSE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1623,8 +1513,7 @@ my %samples = (
                 description   => 'all hell broke loose',
                 explanation   => '',
             },
-            {
-                actual_passed => FALSE,
+            {   actual_passed => FALSE,
                 is_actual_ok  => FALSE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1635,8 +1524,7 @@ my %samples = (
                 description   => '',
                 explanation   => 'if I heard a voice from heaven ...',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1647,8 +1535,7 @@ my %samples = (
                 description   => 'say "live without loving",',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1659,8 +1546,7 @@ my %samples = (
                 description   => "I'd beg off.",
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1671,8 +1557,7 @@ my %samples = (
                 description   => '',
                 explanation   => 'contract negotiations',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1683,8 +1568,7 @@ my %samples = (
                 description   => 'Girls are such exquisite hell',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1695,8 +1579,7 @@ my %samples = (
                 description   => 'Elegy 9B',
                 explanation   => '',
             },
-            {
-                actual_passed => FALSE,
+            {   actual_passed => FALSE,
                 is_actual_ok  => FALSE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1727,14 +1610,12 @@ my %samples = (
     },
     head_end => {
         results => [
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'comments',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1745,8 +1626,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1757,8 +1637,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1769,8 +1648,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1781,27 +1659,23 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'comment',
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..4',
                 tests_planned => 4,
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'more ignored stuff',
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'and yet more',
@@ -1826,14 +1700,12 @@ my %samples = (
     },
     head_fail => {
         results => [
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'comments',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1844,8 +1716,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => FALSE,
+            {   actual_passed => FALSE,
                 is_actual_ok  => FALSE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -1856,8 +1727,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1868,8 +1738,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1880,27 +1749,23 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'comment',
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..4',
                 tests_planned => 4,
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'more ignored stuff',
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'and yet more',
@@ -1925,8 +1790,7 @@ my %samples = (
     },
     out_of_order => {
         results => [
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1937,8 +1801,7 @@ my %samples = (
                 description   => '- Test that argument passing works',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1950,8 +1813,7 @@ my %samples = (
                   '- Test that passing arguments as references work',
                 explanation => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1962,8 +1824,7 @@ my %samples = (
                 description   => '- Test a normal sub',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1974,8 +1835,7 @@ my %samples = (
                 description   => '- Detach test',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1986,8 +1846,7 @@ my %samples = (
                 description   => '- Nested thread test',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -1998,8 +1857,7 @@ my %samples = (
                 description   => '- Nested thread test',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2010,8 +1868,7 @@ my %samples = (
                 description   => '- Wanted 7, got 7',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2022,8 +1879,7 @@ my %samples = (
                 description   => '- Wanted 7, got 7',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2034,8 +1890,7 @@ my %samples = (
                 description   => '- Wanted 8, got 8',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2046,15 +1901,13 @@ my %samples = (
                 description   => '- Wanted 8, got 8',
                 explanation   => '',
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..15',
                 tests_planned => 15,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2065,8 +1918,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2077,8 +1929,7 @@ my %samples = (
                 description   => '- Check that Config::threads is true',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2089,8 +1940,7 @@ my %samples = (
                 description   => '- Detach test',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2102,8 +1952,7 @@ my %samples = (
                   '- Check so that tid for threads work for main thread',
                 explanation => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2150,8 +1999,7 @@ my %samples = (
     },
     skipall => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..0 # skip: rope',
                 tests_planned => 0,
                 passed        => TRUE,
@@ -2179,8 +2027,7 @@ my %samples = (
     },
     skipall_nomsg => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..0',
                 tests_planned => 0,
                 passed        => TRUE,
@@ -2208,15 +2055,13 @@ my %samples = (
     },
     todo_misparse => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..1',
                 tests_planned => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => FALSE,
+            {   actual_passed => FALSE,
                 is_actual_ok  => FALSE,
                 passed        => FALSE,
                 is_ok         => FALSE,
@@ -2247,15 +2092,13 @@ my %samples = (
     },
     shbang_misparse => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..2',
                 tests_planned => 2,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 description   => "",
                 passed        => TRUE,
@@ -2265,8 +2108,7 @@ my %samples = (
                 has_todo      => FALSE,
                 number        => 1,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2296,15 +2138,13 @@ my %samples = (
     },
     switches => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..1',
                 tests_planned => 1,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2336,15 +2176,13 @@ my %samples = (
     },
     inc_taint => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..1',
                 tests_planned => 1,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2376,15 +2214,13 @@ my %samples = (
     },
     sequence_misparse => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2394,8 +2230,7 @@ my %samples = (
                 number        => 1,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2405,8 +2240,7 @@ my %samples = (
                 number        => 2,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2416,12 +2250,10 @@ my %samples = (
                 number        => 3,
                 description   => "\# skipped on foobar system",
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 comment    => '1234567890123456789012345678901234567890',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2431,12 +2263,10 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 comment    => '1234567890123456789012345678901234567890',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2467,14 +2297,12 @@ my %samples = (
 
     stdout_stderr => {
         results => [
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'comments',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2485,8 +2313,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2497,8 +2324,7 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2509,14 +2335,12 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'comment',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2527,20 +2351,17 @@ my %samples = (
                 description   => '',
                 explanation   => '',
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'more ignored stuff',
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 passed     => TRUE,
                 is_ok      => TRUE,
                 comment    => 'and yet more',
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..4',
@@ -2567,23 +2388,19 @@ my %samples = (
 
     junk_before_plan => {
         results => [
-            {
-                is_unknown => TRUE,
+            {   is_unknown => TRUE,
                 raw        => 'this is junk',
             },
-            {
-                is_comment => TRUE,
+            {   is_comment => TRUE,
                 comment    => "this is a comment",
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
                 raw           => '1..1',
                 tests_planned => 1,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2612,19 +2429,16 @@ my %samples = (
     },
     version_good => {
         results => [
-            {
-                is_version => TRUE,
+            {   is_version => TRUE,
                 raw        => 'TAP version 13',
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2634,8 +2448,7 @@ my %samples = (
                 number        => 1,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2645,8 +2458,7 @@ my %samples = (
                 number        => 2,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2656,8 +2468,7 @@ my %samples = (
                 number        => 3,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2667,8 +2478,7 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2698,19 +2508,16 @@ my %samples = (
     },
     version_old => {
         results => [
-            {
-                is_version => TRUE,
+            {   is_version => TRUE,
                 raw        => 'TAP version 12',
             },
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2720,8 +2527,7 @@ my %samples = (
                 number        => 1,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2731,8 +2537,7 @@ my %samples = (
                 number        => 2,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2742,8 +2547,7 @@ my %samples = (
                 number        => 3,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2753,8 +2557,7 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2785,19 +2588,16 @@ my %samples = (
     },
     version_late => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..5',
                 tests_planned => 5,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                is_version => TRUE,
+            {   is_version => TRUE,
                 raw        => 'TAP version 13',
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2807,8 +2607,7 @@ my %samples = (
                 number        => 1,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2818,8 +2617,7 @@ my %samples = (
                 number        => 2,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2829,8 +2627,7 @@ my %samples = (
                 number        => 3,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2840,8 +2637,7 @@ my %samples = (
                 number        => 4,
                 description   => "",
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2873,15 +2669,13 @@ my %samples = (
 
     escape_eol => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..2',
                 tests_planned => 2,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 description   => 'Should parse as literal backslash --> \\',
                 passed        => TRUE,
@@ -2892,8 +2686,7 @@ my %samples = (
                 number        => 1,
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2925,15 +2718,13 @@ my %samples = (
 
     escape_hash => {
         results => [
-            {
-                is_plan       => TRUE,
+            {   is_plan       => TRUE,
                 raw           => '1..3',
                 tests_planned => 3,
                 passed        => TRUE,
                 is_ok         => TRUE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 description   => 'Not a \\# TODO',
                 passed        => TRUE,
@@ -2944,8 +2735,7 @@ my %samples = (
                 number        => 1,
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2956,8 +2746,7 @@ my %samples = (
                 description   => 'Not a \\# SKIP',
                 is_unplanned  => FALSE,
             },
-            {
-                actual_passed => TRUE,
+            {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -3017,7 +2806,7 @@ foreach my $test ( sort keys %samples ) {
     my $error = $@;
     ok !$error, "'$test' should parse successfully" or diag $error;
 
-    if ( $error ) {
+    if ($error) {
         my $tests = 0;
         while ( my ( $method, $answer ) = each %$details ) {
             $tests += ref $answer ? 2 : 1;
@@ -3050,7 +2839,7 @@ foreach my $test ( sort keys %samples ) {
 sub analyze_test {
     my ( $test, $results, $args ) = @_;
 
-    my $parser = TAP::Parser->new( $args );
+    my $parser = TAP::Parser->new($args);
     my $count  = 1;
     while ( defined( my $result = $parser->next ) ) {
 
@@ -3061,10 +2850,12 @@ sub analyze_test {
           : $result->raw;
         $desc = $result->plan if $result->is_plan && $desc =~ /SKIP/i;
         $desc =~ s/#/<hash>/g;
-        $desc =~ s/\s+/ /g; # Drop newlines
-        ok defined $expected, "$test $count We should have a result for $desc";
+        $desc =~ s/\s+/ /g;      # Drop newlines
+        ok defined $expected,
+          "$test $count We should have a result for $desc";
         $count++;
         while ( my ( $method, $answer ) = each %$expected ) {
+
             if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
                 ok $handler->( $result->$method() ),
                   "... and $method should return a reasonable value ($test)";

@@ -256,7 +256,8 @@ sub run_method_tests {
     while ( my ( $method, $default ) = each %inherited_methods ) {
         can_ok $result, $method;
         if ( defined( my $value = delete $value_for->{$method} ) ) {
-            is $result->$method(), $value, "... and $method should be correct";
+            is $result->$method(), $value,
+              "... and $method should be correct";
         }
         else {
             is $result->$method(), $default,

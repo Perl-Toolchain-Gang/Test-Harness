@@ -27,16 +27,6 @@ my $setup    = sub { $did_setup++ };
 my $teardown = sub { $did_teardown++ };
 
 my @schedule = (
-    {   subclass => 'TAP::Parser::Iterator::Array',
-        source   => array_ref_from($tap),
-    },
-    {   subclass => 'TAP::Parser::Iterator::Stream',
-        source   => \*DATA,
-    },
-    {   subclass => 'TAP::Parser::Iterator::Process',
-        source =>
-          { command => [ $^X, '-e', 'print qq/one\ntwo\n\nthree\n/' ] },
-    },
     {   subclass => 'TAP::Parser::Iterator::Process',
         source   => {
             command => [
@@ -50,6 +40,16 @@ my @schedule = (
             is $did_setup,    1, "setup called";
             is $did_teardown, 1, "teardown called";
           }
+    },
+    {   subclass => 'TAP::Parser::Iterator::Array',
+        source   => array_ref_from($tap),
+    },
+    {   subclass => 'TAP::Parser::Iterator::Stream',
+        source   => \*DATA,
+    },
+    {   subclass => 'TAP::Parser::Iterator::Process',
+        source =>
+          { command => [ $^X, '-e', 'print qq/one\ntwo\n\nthree\n/' ] },
     },
 );
 
@@ -86,76 +86,72 @@ for my $test (@schedule) {
 }
 
 {
-  # coverage tests for the ctor
 
-  use IO::Handle;
+    # coverage tests for the ctor
 
-  my $stream = TAP::Parser::Iterator->new( IO::Handle->new );
+    use IO::Handle;
 
-  isa_ok $stream, 'TAP::Parser::Iterator::Stream';
+    my $stream = TAP::Parser::Iterator->new( IO::Handle->new );
 
-  my @die;
+    isa_ok $stream, 'TAP::Parser::Iterator::Stream';
 
-  eval {
-    local $SIG{__DIE__} = sub {push @die, @_};
+    my @die;
 
-    TAP::Parser::Iterator->new( sub {} );
-  };
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
 
-  is @die, 1,
-    'coverage of error case';
+        TAP::Parser::Iterator->new( sub { } );
+    };
 
-  like pop @die, qr/Can't iterate with a CODE/,
-    '...and we died as expected';
+    is @die, 1, 'coverage of error case';
+
+    like pop @die, qr/Can't iterate with a CODE/,
+      '...and we died as expected';
 }
 
 {
-  # coverage test for VMS case
 
-  my $stream = TAP::Parser::Iterator->new(
-					  [
-					   'not ',
-					   'ok 1 - I hate VMS',
-					  ]
-					 );
+    # coverage test for VMS case
 
-  is $stream->next, 'not ok 1 - I hate VMS',
-    'coverage of VMS line-splitting case';
+    my $stream = TAP::Parser::Iterator->new(
+        [   'not ',
+            'ok 1 - I hate VMS',
+        ]
+    );
+
+    is $stream->next, 'not ok 1 - I hate VMS',
+      'coverage of VMS line-splitting case';
 }
 
 {
-  # coverage testing for TAP::Parser::Iterator::Process ctor
 
-  my @die;
+    # coverage testing for TAP::Parser::Iterator::Process ctor
 
-  eval {
-    local $SIG{__DIE__} = sub {push @die, @_};
+    my @die;
 
-    TAP::Parser::Iterator->new( {} );
-  };
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
 
-  is @die, 1,
-    'coverage testing for TPI::Process';
+        TAP::Parser::Iterator->new( {} );
+    };
 
-  like pop @die, qr/Must supply a command to execute/,
-    '...and we died as expected';
+    is @die, 1, 'coverage testing for TPI::Process';
 
+    like pop @die, qr/Must supply a command to execute/,
+      '...and we died as expected';
 
-  my $parser = TAP::Parser::Iterator->new(
-					  {
-					   command => [
-						       $^X,
-						       File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' )
-						      ],
-					   merge    => 1,
-					  }
-					 );
+    my $parser = TAP::Parser::Iterator->new(
+        {   command => [
+                $^X,
+                File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' )
+            ],
+            merge => 1,
+        }
+    );
 
-  is $parser->{err}, '',
-    'confirm we set err to empty string';
+    is $parser->{err}, '', 'confirm we set err to empty string';
 
-  is $parser->{sel}, undef,
-    '...and selector to undef';
+    is $parser->{sel}, undef, '...and selector to undef';
 }
 __DATA__
 one

@@ -428,49 +428,50 @@ is scalar $parser->passed, 2,
 
 # coverage tests
 {
-  # calling a TAP::Parser internal method with a 'foreign' class
 
-  my $foreigner = bless {}, 'Foreigner';
+    # calling a TAP::Parser internal method with a 'foreign' class
 
-  my @die;
+    my $foreigner = bless {}, 'Foreigner';
 
-  eval {
-    local $SIG{__DIE__} = sub {push @die, @_};
+    my @die;
 
-    TAP::Parser::_stream $foreigner, qw(a b c);
-  };
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
 
-  is @die, 1,
-    'coverage testing for TAP::Parser accessors';
+        TAP::Parser::_stream $foreigner, qw(a b c);
+    };
 
-  like pop @die, qr/_stream[(][)] may not be set externally/,
-    '... and we died with expected message';
+    is @die, 1, 'coverage testing for TAP::Parser accessors';
+
+    like pop @die, qr/_stream[(][)] may not be set externally/,
+      '... and we died with expected message';
 }
 
 {
-  # set a spool to write to
-  package Capture;
 
-  sub TIEHANDLE {
-    return bless[], __PACKAGE__;
-  }
+    # set a spool to write to
+    package Capture;
 
-  sub PRINT {
-    my $self = shift;
+    sub TIEHANDLE {
+        return bless [], __PACKAGE__;
+    }
 
-    push @$self, @_;
-  }
+    sub PRINT {
+        my $self = shift;
 
-  sub dump {
-    my $self = shift;
-    return @$self;
-  }
+        push @$self, @_;
+    }
 
-  package main;
+    sub dump {
+        my $self = shift;
+        return @$self;
+    }
 
-  tie local *STDOUT, 'Capture';
+    package main;
 
-  my $tap = <<'END_TAP';
+    tie local *STDOUT, 'Capture';
+
+    my $tap = <<'END_TAP';
 TAP version 13
 1..7
 ok 1 - input file opened
@@ -486,78 +487,80 @@ ok 6 - you shall not pass! # TODO should have failed
 not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
 END_TAP
 
-  my $parser = $PARSER->new( { tap   => $tap,
-			       spool => \*STDOUT,
-			     } );
+    my $parser = $PARSER->new(
+        {   tap   => $tap,
+            spool => \*STDOUT,
+        }
+    );
 
-  _get_results($parser);
+    _get_results($parser);
 
-  my @spooled = tied(*STDOUT)->dump();
+    my @spooled = tied(*STDOUT)->dump();
 
-  is @spooled, 24,
-    'coverage testing for spool attribute of parser';
+    is @spooled, 24, 'coverage testing for spool attribute of parser';
 }
 
 {
-  # _initialize coverage
 
-  my $x = bless[], 'kjsfhkjsdhf';
+    # _initialize coverage
 
-  my @die;
+    my $x = bless [], 'kjsfhkjsdhf';
 
-  eval {
-    local $SIG{__DIE__} = sub {push @die, @_};
+    my @die;
 
-    $PARSER->new();
-  };
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
 
-  is @die, 1,
-    'coverage testing for _initialize';
+        $PARSER->new();
+    };
 
-  like pop @die, qr/PANIC:  could not determine stream at/,
-    '...and it failed as expected';
+    is @die, 1, 'coverage testing for _initialize';
 
+    like pop @die, qr/PANIC:  could not determine stream at/,
+      '...and it failed as expected';
 
-  @die = ();
+    @die = ();
 
-  eval {
-    local $SIG{__DIE__} = sub {push @die, @_};
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
 
-    $PARSER->new({
-		  stream => 'stream',
-		  tap    => 'tap',
-		  source => 'source', # only one of these is allowed
-		 });
-  };
+        $PARSER->new(
+            {   stream => 'stream',
+                tap    => 'tap',
+                source => 'source',    # only one of these is allowed
+            }
+        );
+    };
 
-  is @die, 1,
-    'coverage testing for _initialize';
+    is @die, 1, 'coverage testing for _initialize';
 
-  like pop @die, qr/You may only choose one of 'stream', 'tap', or 'source'/,
-    '...and it failed as expected';
+    like pop @die,
+      qr/You may only choose one of 'stream', 'tap', or 'source'/,
+      '...and it failed as expected';
 
-  @die = ();
+    @die = ();
 
-  eval {
-    local $SIG{__DIE__} = sub {push @die, @_};
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
 
-    $PARSER->new({
-		  source => 'source', # only one of these is allowed
-		  exec   => 'exec'
-		 });
-  };
+        $PARSER->new(
+            {   source => 'source',    # only one of these is allowed
+                exec   => 'exec'
+            }
+        );
+    };
 
-  is @die, 1,
-    'coverage testing for _initialize';
+    is @die, 1, 'coverage testing for _initialize';
 
-  like pop @die, qr/"source" and "exec" are mutually exclusive options/,
-    '...and it failed as expected';
+    like pop @die, qr/"source" and "exec" are mutually exclusive options/,
+      '...and it failed as expected';
 }
 
 {
-  # coverage of todo_failed
 
-  my $tap = <<'END_TAP';
+    # coverage of todo_failed
+
+    my $tap = <<'END_TAP';
 TAP version 13
 1..7
 ok 1 - input file opened
@@ -573,21 +576,21 @@ ok 6 - you shall not pass! # TODO should have failed
 not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
 END_TAP
 
-  my $parser = $PARSER->new( { tap => $tap } );
+    my $parser = $PARSER->new( { tap => $tap } );
 
-  _get_results($parser);
+    _get_results($parser);
 
-  my @warn;
+    my @warn;
 
-  eval {
-    local $SIG{__WARN__} = sub {push @warn, @_};
+    eval {
+        local $SIG{__WARN__} = sub { push @warn, @_ };
 
-    $parser->todo_failed;
-  };
+        $parser->todo_failed;
+    };
 
-  is @warn, 1,
-    'coverage testing of todo_failed';
+    is @warn, 1, 'coverage testing of todo_failed';
 
-  like pop @warn, qr/"todo_failed" is deprecated.  Please use "todo_passed".  See the docs[.]/,
-    '..and failed as expected'
+    like pop @warn,
+      qr/"todo_failed" is deprecated.  Please use "todo_passed".  See the docs[.]/,
+      '..and failed as expected'
 }

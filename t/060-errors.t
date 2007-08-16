@@ -164,19 +164,20 @@ ok $parser->is_good_plan,
 
 # TAP::Parser coverage tests
 {
-  # good_plan coverage
 
-  my @warn;
+    # good_plan coverage
 
-  eval {
-    local $SIG{__WARN__} = sub {push @warn, @_};
+    my @warn;
 
-    $parser->good_plan;
-  };
+    eval {
+        local $SIG{__WARN__} = sub { push @warn, @_ };
 
-  is @warn, 1,
-    'coverage testing of good_plan';
+        $parser->good_plan;
+    };
 
-  like pop @warn, qr/good_plan[(][)] is deprecated.  Please use "is_good_plan[(][)]"/,
-    '...and it fell-back like we expected';
+    is @warn, 1, 'coverage testing of good_plan';
+
+    like pop @warn,
+      qr/good_plan[(][)] is deprecated.  Please use "is_good_plan[(][)]"/,
+      '...and it fell-back like we expected';
 }

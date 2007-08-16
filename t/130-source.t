@@ -59,62 +59,60 @@ ok !$stream->next, '... and we should have no more results';
 
 can_ok $source, '_switches';
 ok( grep( $_ eq '-T', $source->_switches ),
-    '... and it should find the taint switch' );
+    '... and it should find the taint switch'
+);
 
 # coverage test for TAP::PArser::Source
 
 {
-  # coverage for method get_steam
 
-  my $source = TAP::Parser::Source->new();
+    # coverage for method get_steam
 
-  my @die;
+    my $source = TAP::Parser::Source->new();
 
-  eval {
-    local $SIG{__DIE__} = sub {push @die, @_};
+    my @die;
 
-    $source->get_stream;
-  };
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
 
-  is @die, 1,
-    'coverage testing of get_stream';
+        $source->get_stream;
+    };
 
-  like pop @die, qr/No command found!/,
-    '...and it failed as expect';
+    is @die, 1, 'coverage testing of get_stream';
+
+    like pop @die, qr/No command found!/, '...and it failed as expect';
 }
 
 {
-  # coverage testing for error
 
-  my $source = TAP::Parser::Source->new();
+    # coverage testing for error
 
-  my $error = $source->error;
+    my $source = TAP::Parser::Source->new();
 
-  is $error, undef,
-    'coverage testing for error()';
+    my $error = $source->error;
 
-  $source->error('save me');
+    is $error, undef, 'coverage testing for error()';
 
-  $error = $source->error;
+    $source->error('save me');
 
-  is $error, 'save me',
-    '...and we got the expected message';
+    $error = $source->error;
+
+    is $error, 'save me', '...and we got the expected message';
 }
 
 {
-  # coverage testing for exit
 
-  my $source = TAP::Parser::Source->new();
+    # coverage testing for exit
 
-  my $exit = $source->exit;
+    my $source = TAP::Parser::Source->new();
 
-  is $exit, undef,
-     'coverage testing for exit()';
+    my $exit = $source->exit;
 
-  $source->exit('save me');
+    is $exit, undef, 'coverage testing for exit()';
 
-  $exit = $source->exit;
+    $source->exit('save me');
 
-  is $exit, 'save me',
-    '...and we got the expected message';
+    $exit = $source->exit;
+
+    is $exit, 'save me', '...and we got the expected message';
 }

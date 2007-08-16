@@ -77,7 +77,8 @@ foreach my $HARNESS (@HARNESSES) {
         while ( my ( $property, $test ) = each %$test_args ) {
             my $value = $test->{out};
             can_ok $harness, $property;
-            is_deeply scalar $harness->$property(), $value, $test->{test_name};
+            is_deeply scalar $harness->$property(), $value,
+              $test->{test_name};
         }
     }
     foreach my $method_data ( harness_methods() ) {

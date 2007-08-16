@@ -503,7 +503,7 @@ for my $test (@SCHEDULE) {
         unless ( ok !$@, "$name: No error" ) {
             diag "Error: $@\n";
         }
-        is_deeply $got, $want, "$name: Result matches";
-        is $raw, $source, "$name: Captured source matches";
+        is_deeply $got, $want,   "$name: Result matches";
+        is $raw,        $source, "$name: Captured source matches";
     }
 }
