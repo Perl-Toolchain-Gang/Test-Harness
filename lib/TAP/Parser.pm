@@ -1267,8 +1267,7 @@ Callbacks may also be added like this:
  $parser->callback( test => \&test_callback );
  $parser->callback( plan => \&plan_callback );
 
-There are, at the present time, ten keys allowed for callbacks.  These keys
-are case-sensitive.
+The following keys allowed for callbacks. These keys are case-sensitive.
 
 =over 4
 
