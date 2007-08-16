@@ -29,6 +29,7 @@ GetOptions(
     'harness=s'   => \my $HARNESS,
     'formatter=s' => \my $FORMATTER,
     'r|recurse'   => \my $RECURSE,
+    'reverse'     => \my $REVERSE,
     'p|parse'     => \my $PARSE,
     'q|quiet'     => \my $QUIET,
     'Q|QUIET'     => \my $REALLY_QUIET,
@@ -38,7 +39,7 @@ GetOptions(
     'directives'  => \my $DIRECTIVES,
     'h|help|?'    => sub { pod2usage( { -verbose => 1 } ); exit },
     'H|man'       => sub { pod2usage( { -verbose => 2 } ); exit },
-    'V|version'   => sub { print_version(); exit },
+    'V|version' => sub { print_version(); exit },
 
     #'x|xtension=s' => \my $EXTENSION,
     'T' => \my $TAINT_FAIL,
@@ -81,6 +82,7 @@ unless ($formatter_class) {
 my @tests = get_tests(@ARGV);
 
 shuffle(@tests) if $SHUFFLE;
+@tests = reverse @tests if $REVERSE;
 
 if ( $TAINT_FAIL && $TAINT_WARN ) {
     die "-t and -T are mutually exclusive";
@@ -221,6 +223,7 @@ Boolean options
  -f,  --failures    Only show failed tests.
  -m,  --merge       Merge test scripts' STDERR with their STDOUT.
  -r,  --recurse     Recursively descend into directories.
+      --reverse     Run the tests in reverse order.
  -q,  --quiet       Suppress some test output while running tests.
  -Q,  --QUIET       Only print summary results.
  -p,  --parse       Show full list of TAP parse errors, if any.
