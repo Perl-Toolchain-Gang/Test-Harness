@@ -94,10 +94,11 @@ sub new {
     my $out = IO::Handle->new;
 
     if ($IS_WIN32) {
+        $err = $merge ? '' : '>&STDERR';
         eval {
             $pid = open3(
                 \*STDIN, $out,
-                $merge ? '' : '>&STDERR', @command
+                $merge ? '' : $err, @command
             );
         };
         die "Could not execute (@command): $@" if $@;
@@ -141,10 +142,9 @@ sub next_raw {
 
     if ( my $out = $self->{out} ) {
 
-        # If we also have an error handle we need to do the while
-        # select dance.
-        if ( my $err = $self->{err} ) {
-            my $sel  = $self->{sel};
+        # If we have an IO::Select we need to poll it.
+        if ( my $sel = $self->{sel} ) {
+            my $err = $self->{err};
             my $flip = 0;
 
             # Loops forever while we're reading from STDERR
@@ -199,8 +199,12 @@ sub _finish {
     }
 
     ( delete $self->{out} )->close if $self->{out};
-    ( delete $self->{err} )->close if $self->{err};
-    delete $self->{sel}            if $self->{sel};
+
+    # If we have an IO::Select we also have an error handle to close.
+    if ( $self->{sel} ) {
+        ( delete $self->{err} )->close;
+        delete $self->{sel};
+    }
 
     $self->{wait} = $status;
     $self->{exit} = $self->_wait2exit($status);
