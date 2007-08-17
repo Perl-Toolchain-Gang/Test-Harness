@@ -797,8 +797,8 @@ sub _open_spool {
         my $spool = File::Spec->catfile( $spool_dir, $test );
 
         # Make the directory
-        my ( $vol, $dir, $file ) = File::Spec->splitpath($spool);
-        my $path = File::Spec->catdir( $vol, $dir );
+        my ( $vol, $dir, undef ) = File::Spec->splitpath($spool);
+        my $path = File::Spec->catpath( $vol, $dir, '' );
         eval { mkpath($path) };
         $self->_croak($@) if $@;
 
