@@ -19,6 +19,9 @@ use TAP::Harness::Compatible;
 use Test::More tests => 1;
 use Dev::Null;
 
+my $old_val = $ENV{PERL_TEST_HARNESS_DUMP_TAP};
+$ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
+
 push @INC, 'we_added_this_lib';
 
 tie *NULL, 'Dev::Null' or die $!;
@@ -33,3 +36,5 @@ my ( $tot, $failed ) = TAP::Harness::Compatible::execute_tests(
 select STDOUT;
 
 ok( _all_ok($tot), 'tests with taint on preserve @INC' );
+
+$ENV{PERL_TEST_HARNESS_DUMP_TAP} = $old_val;

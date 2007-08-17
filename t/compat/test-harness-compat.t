@@ -6,6 +6,11 @@ use TAP::Harness;
 use TAP::Harness::Compatible qw(execute_tests);
 use File::Spec;
 
+# if the harness wants to save the resulting TAP we shouldn't
+# do it for our internal calls
+my $old_env_val = $ENV{PERL_TEST_HARNESS_DUMP_TAP};
+$ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
+
 my $TEST_DIR = 't/sample-tests';
 my $PER_LOOP = 4;
 
@@ -809,3 +814,5 @@ for my $test_key ( sort keys %$results ) {
         is_deeply $todo, $ltodo, "todo summary matches for $test_key";
     }
 }
+
+$ENV{PERL_TEST_HARNESS_DUMP_TAP} = $old_env_val;

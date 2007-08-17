@@ -35,7 +35,7 @@ TODO: {
     PASSING: {
         local $SIG{__DIE__} = \&signal_death;
         prepare_for_death();
-        eval { runtests( File::Spec->catfile( $SAMPLE_TESTS, "simple" ) ) };
+        eval { _runtests( File::Spec->catfile( $SAMPLE_TESTS, "simple" ) ) };
         ok( !$@, "simple lives" );
         is( $died, 0, "Death never happened" );
     }
@@ -43,9 +43,17 @@ TODO: {
     FAILING: {
         local $SIG{__DIE__} = \&signal_death;
         prepare_for_death();
-        eval { runtests( File::Spec->catfile( $SAMPLE_TESTS, "too_many" ) ) };
+        eval { _runtests( File::Spec->catfile( $SAMPLE_TESTS, "too_many" ) ) };
         ok( $@, "$@" );
         ok( $@ =~ m[Failed 1/1], "too_many dies" );
         is( $died, 1, "Death happened" );
     }
+}
+
+sub _runtests {
+    my (@tests) = @_;
+    my $old_val = $ENV{PERL_TEST_HARNESS_DUMP_TAP};
+    $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
+    runtests(@tests);
+    $ENV{PERL_TEST_HARNESS_DUMP_TAP} = $old_val;
 }
