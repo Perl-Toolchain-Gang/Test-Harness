@@ -39,7 +39,8 @@ GetOptions(
     'directives'  => \my $DIRECTIVES,
     'h|help|?'    => sub { pod2usage( { -verbose => 1 } ); exit },
     'H|man'       => sub { pod2usage( { -verbose => 2 } ); exit },
-    'V|version' => sub { print_version(); exit },
+    'V|version'   => sub { print_version(); exit },
+    'a|archive=s' => \my $ARCHIVE,
 
     #'x|xtension=s' => \my $EXTENSION,
     'T' => \my $TAINT_FAIL,
@@ -57,10 +58,20 @@ if ( !defined $COLOR ) {
 #$MERGE = 1 if $FAILURES || $QUIET || $REALLY_QUIET;
 
 my $harness_class = 'TAP::Harness';
+my %args;
+
 if ($COLOR) {
     require TAP::Harness::Color;
     $harness_class = 'TAP::Harness::Color';
 }
+
+if ($ARCHIVE) {
+    eval { require TAP::Harness::Archive };
+    die "TAP::Harness::Archive is required to use the --archive feature: $@" if $@;
+    $harness_class = 'TAP::Harness::Archive';
+    $args{archive} = $ARCHIVE;
+}
+
 if ($HARNESS) {
     eval "use $HARNESS";
     die "Cannot use harness ($HARNESS): $@" if $@;
@@ -91,7 +102,6 @@ if ( $WARNINGS_FAIL && $WARNINGS_WARN ) {
     die "-w and -W are mutually exclusive";
 }
 
-my %args;
 $args{lib}          = get_libs();
 $args{switches}     = get_switches();
 $args{merge}        = $MERGE if $MERGE;
