@@ -447,9 +447,7 @@ sub harness_methods {
 
 sub _runtests {
     my ($harness, @tests) = @_;
-    my $old_val = $ENV{PERL_TEST_HARNESS_DUMP_TAP};
-    $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
+    local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
     my $aggregate = $harness->runtests(@tests);
-    $ENV{PERL_TEST_HARNESS_DUMP_TAP} = $old_val;
     return $aggregate;
 }
