@@ -20,6 +20,11 @@ tasks:
       - yes n | %PERL% Makefile.PL
       - make
       - make test
+      - make distclean
+      - yes n | %PERL% Build.PL
+      - ./Build
+      - ./Build test
       - '%PERL% -Ilib bin/runtests -b t/*.t t/compat/*.t'
+      - ./Build distclean
     subdir: trunk
     svn: http://svn.hexten.net/tapx/trunk
