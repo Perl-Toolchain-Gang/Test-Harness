@@ -81,6 +81,8 @@ sub new {
     my $class = shift;
     my $args  = shift;
 
+    local *DUMMY;
+
     my @command = @{ delete $args->{command} || [] }
       or die "Must supply a command to execute";
 
