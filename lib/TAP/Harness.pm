@@ -313,7 +313,7 @@ information.
 
 Tests will be run in the order found.
 
-If the environment variable PERL_TEST_HARNESS_DUMP_TAP is defined it
+If the environment variable C<PERL_TEST_HARNESS_DUMP_TAP> is defined it
 should name a directory into which a copy of the raw TAP for each test
 will be written. TAP is written to files named for each test.
 Subdirectories will be created as needed.
