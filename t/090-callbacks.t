@@ -90,7 +90,7 @@ is $plan_output, '1..5', 'Plan callbacks should succeed';
 is scalar @tests, $parser->tests_run, '... as should the test callbacks';
 is $else, 2, '... and the correct number of "ELSE" lines should be seen';
 is $all,  8, '... and the correct total number of lines should be seen';
-is $end,  1, 'END callback correctly called';
+is $end,  1, 'EOF callback correctly called';
 
 # Check callback name policing
 
