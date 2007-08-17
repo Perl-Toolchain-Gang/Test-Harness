@@ -97,7 +97,7 @@ sub new {
         $err = $merge ? '' : '>&STDERR';
         eval {
             $pid = open3(
-                \*STDIN, $out,
+                \*DUMMY, $out,
                 $merge ? '' : $err, @command
             );
         };
@@ -110,7 +110,7 @@ sub new {
     }
     else {
         $err = $merge ? '' : IO::Handle->new;
-        eval { $pid = open3( \*STDIN, $out, $err, @command ); };
+        eval { $pid = open3( \*DUMMY, $out, $err, @command ); };
         die "Could not execute (@command): $@" if $@;
         $sel = $merge ? undef : IO::Select->new( $out, $err );
     }
