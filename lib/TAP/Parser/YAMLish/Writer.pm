@@ -4,7 +4,7 @@ use strict;
 
 use vars qw{$VERSION};
 
-$VERSION = '0.53';
+$VERSION = '0.54';
 
 my $ESCAPE_CHAR = qr{ [ \x00-\x1f \" ] }x;
 
@@ -133,7 +133,7 @@ TAP::Parser::YAMLish::Writer - Write YAMLish data
 
 =head1 VERSION
 
-Version 0.53
+Version 0.54
 
 =head1 SYNOPSIS
 
