@@ -5,7 +5,7 @@ use 5.005;
 # NOTE: make this actually be inc/MyBuilder.pm if it gets any bigger
 my $build_class = Module::Build->subclass(
     class => 'inc::MyBuilder',
-    code => <<'    SUBCLASS',
+    code  => <<'    SUBCLASS',
       sub ACTION_testruntests {
           my $self = shift;
           $self->depends_on('code');
@@ -15,18 +15,18 @@ my $build_class = Module::Build->subclass(
 );
 
 my $builder = $build_class->new(
-    module_name          => 'TAP::Parser',
-    license              => 'perl',
-    meta_merge           => {
+    module_name => 'TAP::Parser',
+    license     => 'perl',
+    meta_merge  => {
         resources => {
             homepage => 'http://testanything.org/',
             bugtracker =>
-                'http://rt.cpan.org/Public/Dist/Display.html?Name=TAP-Parser',
+              'http://rt.cpan.org/Public/Dist/Display.html?Name=TAP-Parser',
             MailingList => 'mailto:<tapx-dev@hexten.net>',
             repository =>
-                'http://svn.hexten.net/tapx/trunk',
-         },
-         keywords => ['TAP', 'test harness', 'prove', 'runtests'],
+              'http://svn.hexten.net/tapx/trunk',
+        },
+        keywords => [ 'TAP', 'test harness', 'prove', 'runtests' ],
     },
     recursive_test_files => 1,
     requires             => {
@@ -36,8 +36,14 @@ my $builder = $build_class->new(
     add_to_cleanup => ['TAP-Parser-*'],
 );
 
-if ( $builder->prompt( "Do you wish to install the 'runtests' utility?", "y" )
-    =~ /^[Yy]/ )
+if ($builder->prompt(
+        "TAP::Parser includes \"runtests\" which is the equivalent of the\n"
+          . "TAP::Harness \"prove\". If you choose to install runtests you will be able\n"
+          . "to run a module's test suite via TAP::Parser by typing \"runtests -rb\" in\n"
+          . "the project's root directory.\n\n" 
+          . "Do you wish to install the 'runtests' utility?", "y"
+    ) =~ /^[Yy]/
+  )
 {
     $builder->script_files( ["bin/runtests"] );
 }
