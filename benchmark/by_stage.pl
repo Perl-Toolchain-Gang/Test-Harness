@@ -5,18 +5,29 @@ use warnings;
 use IPC::Open3;
 use IO::Select;
 use IO::Handle;
+use YAML qw< LoadFile DumpFile >;
+use Term::ANSIColor qw< :constants >;
+use Getopt::Long;
 
-my $TEST     = 'tmassive/huge.t';
-my $PERL     = $^X;
-my @SWITCHES = ('-I../lib');
+my $TEST          = 'tmassive/huge.t';
+my $BASELINE_FILE = 'baseline.yaml';
+my $PERL          = $^X;
+my @SWITCHES      = ('-I../lib');
 
 my %SPECIAL = (
     runtests => '../bin/runtests',
     prove    => '/opt/local/bin/prove'
 );
 
+my @STAGES = qw< source grammar parser runtests prove >;
+
+GetOptions( 'baseline' => \my $BASELINE ) or syntax();
+
+my $baseline = -f $BASELINE_FILE ? LoadFile($BASELINE_FILE) : undef;
+my $current = {};
+
 my %last = ();
-for my $stage (qw< source grammar parser runtests prove >) {
+for my $stage (@STAGES) {
     my $script = $SPECIAL{$stage} || "${stage}_only.pl";
     my @cmd = ( 'time', '-p', $PERL, @SWITCHES, $script, $TEST );
 
@@ -24,15 +35,50 @@ for my $stage (qw< source grammar parser runtests prove >) {
     print ">>> $cmd <<<\n";
 
     my ( $status, $stdout, $stderr ) = capture_command(@cmd);
-    my %result = ();
+    my $result = {};
     for (@$stderr) {
         next unless /^(\w+)\s+(\d+(?:[.]\d+)?)$/;
         print "$1 $2";
-        $result{$1} = $2;
+        $result->{$1} = $2;
         print ' ', $2 - $last{$1} if exists $last{$1};
         print "\n";
     }
-    %last = %result;
+    %last = %{ $current->{$stage} = $result };
+}
+
+if ($baseline) {
+    for my $stage (@STAGES) {
+        print "$stage\n";
+        if ( my $result = $baseline->{$stage} ) {
+            for my $type (qw< real user sys >) {
+                print "  $type ";
+                if (   ( my $base_time = $result->{$type} )
+                    && ( my $cur_time = $current->{$stage}->{$type} ) )
+                {
+                    my $delta = $cur_time - $base_time;
+                    my $color
+                      = ( abs($delta) > ( $cur_time + $base_time ) / 50 )
+                      ? ( $delta > 0 )
+                          ? RED
+                          : GREEN
+                      : '';
+                    print "$cur_time v $base_time, delta: $color$delta",
+                      RESET;
+                }
+                else {
+                    print "not available";
+                }
+                print "\n";
+            }
+        }
+        else {
+            print "  No baseline\n";
+        }
+    }
+}
+
+if ($BASELINE) {
+    DumpFile( $BASELINE_FILE, $current );
 }
 
 sub capture_command {
@@ -73,4 +119,8 @@ sub capture_command {
     }
 
     return ( $status, \@stdout, \@stderr );
+}
+
+sub syntax {
+    die "by_stage.pl [--baseline]\n";
 }
