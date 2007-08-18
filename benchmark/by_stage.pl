@@ -17,7 +17,7 @@ my @SWITCHES      = ('-I../lib');
 
 my %SPECIAL = (
     runtests => '../bin/runtests',
-    prove    => which('prove'),
+    prove    => scalar which('prove'),
 );
 
 my @STAGES = qw< source grammar parser runtests prove >;
