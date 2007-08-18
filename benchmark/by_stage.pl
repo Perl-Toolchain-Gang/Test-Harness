@@ -8,6 +8,7 @@ use IO::Handle;
 use YAML qw< LoadFile DumpFile >;
 use Term::ANSIColor qw< :constants >;
 use Getopt::Long;
+use File::Which;
 
 my $TEST          = 'tmassive/huge.t';
 my $BASELINE_FILE = 'baseline.yaml';
@@ -16,7 +17,7 @@ my @SWITCHES      = ('-I../lib');
 
 my %SPECIAL = (
     runtests => '../bin/runtests',
-    prove    => '/opt/local/bin/prove'
+    prove    => which('prove'),
 );
 
 my @STAGES = qw< source grammar parser runtests prove >;
