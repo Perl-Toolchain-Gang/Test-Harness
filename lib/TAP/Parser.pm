@@ -42,6 +42,7 @@ BEGIN {
         _stream
         _spool
         _grammar
+        _state
         exec
         exit
         is_good_plan
@@ -231,8 +232,36 @@ module and related classes for more information on how to use them.
 =cut
 
 sub next {
-    my $self = shift;
-    return ( $self->{_iter} ||= $self->_iter )->();
+    my $self   = shift;
+    my $result = $self->_next;
+
+    if ( defined $result ) {
+        my $code;
+        if ( $code = $self->_callback_for( $result->type ) ) {
+            $code->($result);
+        }
+        else {
+            $self->_make_callback( 'ELSE', $result );
+        }
+        $self->_make_callback( 'ALL', $result );
+
+        # Echo TAP to spool file
+        $self->_write_to_spool($result);
+    }
+    else {
+        my $code;
+        if ( $code = $self->_callback_for('EOF') ) {
+            $code->($self);
+        }
+    }
+
+    return $result;
+}
+
+sub _write_to_spool {
+    my ( $self, $result ) = @_;
+    my $spool = $self->_spool or return;
+    print $spool $result->raw, "\n";
 }
 
 ##############################################################################
@@ -258,6 +287,7 @@ sub run {
     # of the following, anything beginning with an underscore is strictly
     # internal and should not be exposed.
     my %initialize = (
+        _state        => 'INIT',
         version       => $DEFAULT_TAP_VERSION,
         plan          => '',                    # the test plan (e.g., 1..3)
         tap           => '',                    # the TAP
@@ -956,6 +986,25 @@ sub _aggregate_results {
     push @{ $self->{failed} }        => $num if !$test->is_ok;
 }
 
+sub _next {
+    my $self   = shift;
+    my $stream = $self->_stream;
+
+    my $result = eval { $self->_grammar->tokenize };
+    $self->_add_error($@) if $@;
+
+    if ($result) {
+        $self->_next_state($result);
+    }
+    else {
+        $self->exit( $stream->exit );
+        $self->wait( $stream->wait );
+        $self->_finish;
+    }
+
+    return $result;
+}
+
 my %states;
 
 BEGIN {
@@ -1124,92 +1173,29 @@ BEGIN {
     }
 }
 
-sub _iter {
-    my $self    = shift;
-    my $stream  = $self->_stream;
-    my $spool   = $self->_spool;
-    my $grammar = $self->_grammar;
-    my $state   = 'INIT';
+# Advance the state machine
+sub _next_state {
+    my $self  = shift;
+    my $token = shift;
 
-    # Make next_state closure
-    my $next_state = sub {
-        my $token = shift;
-        my $type  = $token->type;
+    my $state = $states{ $self->_state }
+      or die "Illegal state: ", $self->_state;
 
-        TRANS: {
-            my $state_spec = $states{$state}
-              or die "Illegal state: ", $state;
+    my $type = $token->type;
 
-            if ( my $next = $state_spec->{$type} ) {
-                if ( my $act = $next->{act} ) {
-                    $self->$act($token);
-                }
-
-                if ( my $cont = $next->{continue} ) {
-                    $state = $cont;
-                    redo TRANS;
-                }
-                elsif ( my $goto = $next->{goto} ) {
-                    $state = $goto;
-                }
-            }
+    if ( my $next = $state->{$type} ) {
+        if ( my $act = $next->{act} ) {
+            $self->$act($token);
         }
-    };
 
-    if ( $self->_has_callbacks ) {
-        return sub {
-            my $result = eval { $grammar->tokenize };
-            $self->_add_error($@) if $@;
-
-            if ( defined $result ) {
-                $next_state->($result);
-
-                if ( my $code = $self->_callback_for( $result->type ) ) {
-                    $code->($result);
-                }
-                else {
-                    $self->_make_callback( 'ELSE', $result );
-                }
-
-                $self->_make_callback( 'ALL', $result );
-
-                # Echo TAP to spool file
-                print $spool $result->raw, "\n" if $spool;
-            }
-            else {
-                $self->exit( $stream->exit );
-                $self->wait( $stream->wait );
-                $self->_finish;
-
-                if ( my $code = $self->_callback_for('EOF') ) {
-                    $code->($self);
-                }
-            }
-
-            return $result;
-        };
+        if ( my $cont = $next->{continue} ) {
+            $self->_state($cont);
+            $self->_next_state($token);
+        }
+        elsif ( my $goto = $next->{goto} ) {
+            $self->_state($goto);
+        }
     }
-    else {
-        return sub {
-            my $result = eval { $grammar->tokenize };
-            $self->_add_error($@) if $@;
-
-            if ( defined $result ) {
-                $next_state->($result);
-
-                # Echo TAP to spool file
-                print $spool $result->raw, "\n" if $spool;
-            }
-            else {
-                $self->exit( $stream->exit );
-                $self->wait( $stream->wait );
-                $self->_finish;
-            }
-
-            return $result;
-        };
-    }
-
 }
 
 sub _finish {

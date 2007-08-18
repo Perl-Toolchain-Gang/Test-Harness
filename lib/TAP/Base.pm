@@ -88,11 +88,6 @@ sub callback {
     $self->{code_for}{$event} = $callback;
 }
 
-sub _has_callbacks {
-    my $self = shift;
-    return keys %{ $self->{code_for} } != 0;
-}
-
 sub _callback_for {
     my ( $self, $event ) = @_;
     return $self->{code_for}{$event};
