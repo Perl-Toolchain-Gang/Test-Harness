@@ -1120,7 +1120,7 @@ BEGIN {
             },
         },
         PLANNED_AFTER_TEST => {
-            test => { act  => sub { }, continue => 'PLANNED' },
+            test => { goto => 'PLANNED_AFTER_TEST' },
             plan => { act  => sub { }, continue => 'PLANNED' },
             yaml => { goto => 'PLANNED' },
         },
