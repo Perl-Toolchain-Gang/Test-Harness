@@ -1,5 +1,4 @@
 .perltidyrc
-benchmark/prove_vs_runtests-raw.pl
 bin/prove
 bin/runtests
 Build.PL

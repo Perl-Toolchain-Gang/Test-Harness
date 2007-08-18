@@ -25,3 +25,5 @@
 ^TH_TODO$
 ^perltidyrc$
 ^smoke/
+^benchmark/
+
