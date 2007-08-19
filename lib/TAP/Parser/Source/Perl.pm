@@ -178,6 +178,8 @@ sub _switches {
     my $shebang = <TEST>;
     close(TEST) or print "can't close $file. $!\n";
 
+    $self->_croak("Script $file is empty") unless defined $shebang;
+
     my $taint = ( $shebang =~ /^#!.*\bperl.*\s-\w*([Tt]+)/ );
     push( @switches, "-$1" ) if $taint;
 
