@@ -1449,6 +1449,10 @@ Andy Armstong <andy@hexten.net>
 
 Eric Wilhelm @ <ewilhelm at cpan dot org>
 
+Michael Peters <mpeters at plusthree dot com>
+
+Leif Eriksen <leif dot eriksen at bigpond dot com>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to
