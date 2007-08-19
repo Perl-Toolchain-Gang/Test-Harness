@@ -2,6 +2,7 @@ Revision history for TAP-Parser
 
 0.54
     - Croak if supplied an empty (0 lines) Perl script.
+    - Made T::P::Result::YAML return literal input YAML correctly.
 
 0.53  18 August 2007
     - Fixed a few docs nits.
