@@ -24,7 +24,7 @@ tasks:
       - yes n | %PERL% Build.PL
       - ./Build
       - ./Build test
-      - '%PERL% -Ilib bin/runtests -br
+      - %PERL% -Ilib bin/runtests -br
       - ./Build distclean
     subdir: trunk
     svn: http://svn.hexten.net/tapx/trunk
