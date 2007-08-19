@@ -315,7 +315,7 @@ my %samples = (
                     { 'bar'   => 'krup', 'foo'  => 'plink' }
                 ],
                 raw =>
-                  "---\n-\n  fnurk: skib\n  ponk: gleeb\n-\n  bar: krup\n  foo: plink\n...\n",
+                  "  ---\n  -\n    fnurk: skib\n    ponk: gleeb\n  -\n    bar: krup\n    foo: plink\n  ...",
             },
             {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
@@ -343,7 +343,7 @@ my %samples = (
                     'expected' => [ '1', '2',    '4' ]
                 },
                 raw =>
-                  "---\nexpected:\n  - 1\n  - 2\n  - 4\ngot:\n  - 1\n  - pong\n  - 4\n...\n",
+                  "  ---\n  expected:\n    - 1\n    - 2\n    - 4\n  got:\n    - 1\n    - pong\n    - 4\n  ...",
             },
             {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,

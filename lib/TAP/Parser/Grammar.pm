@@ -47,7 +47,7 @@ Returns TAP grammar object that will parse the specified stream.
 sub new {
     my ( $class, $stream ) = @_;
     my $self = bless { stream => $stream }, $class;
-    $self->set_version( 12 );
+    $self->set_version(12);
     return $self;
 }
 
@@ -77,8 +77,9 @@ my %v12 = (
               ? 'SKIP'
               : '';
             $explanation = '' unless defined $explanation;
-            return $self->_make_plan_token( $line, $tests_planned, $skip,
-                _trim( $explanation ),
+            return $self->_make_plan_token(
+                $line, $tests_planned, $skip,
+                _trim($explanation),
             );
         },
     },
@@ -89,14 +90,16 @@ my %v12 = (
             local *__ANON__ = '__ANON__test_token_handler';
             my ( $ok, $num, $desc ) = ( $1, $2, $3 );
             my ( $dir, $explanation ) = ( '', '' );
-            if ( $desc
-                =~ m/^ ( [^\\\#]* (?: \\. [^\\\#]* )* ) 
+            if ($desc =~ m/^ ( [^\\\#]* (?: \\. [^\\\#]* )* ) 
                        \# \s* (SKIP|TODO) \b \s* (.*) $/ix
-              ) {
+              )
+            {
                 ( $desc, $dir, $explanation ) = ( $1, $2, $3 );
             }
-            return $self->_make_test_token( $line, $ok, $num, _trim( $desc ),
-                uc $dir, $explanation );
+            return $self->_make_test_token(
+                $line,   $ok, $num, _trim($desc),
+                uc $dir, $explanation
+            );
         },
     },
     comment => {
@@ -114,7 +117,7 @@ my %v12 = (
             my ( $self, $line ) = @_;
             local *__ANON__ = '__ANON__bailout_token_handler';
             my $explanation = $1;
-            return $self->_make_bailout_token( $line, _trim( $explanation ) );
+            return $self->_make_bailout_token( $line, _trim($explanation) );
         },
     },
 );
@@ -186,14 +189,14 @@ sub tokenize {
     foreach my $token_data ( values %{ $self->{tokens} } ) {
         if ( $line =~ $token_data->{syntax} ) {
             my $handler = $token_data->{handler};
-            $token = $self->$handler( $line );
+            $token = $self->$handler($line);
             last;
         }
     }
 
-    $token = $self->_make_unknown_token( $line ) unless $token;
+    $token = $self->_make_unknown_token($line) unless $token;
 
-    return TAP::Parser::Result->new( $token );
+    return TAP::Parser::Result->new($token);
 }
 
 ##############################################################################
@@ -273,7 +276,8 @@ sub _make_plan_token {
     my ( $self, $line, $tests_planned, $skip, $explanation ) = @_;
 
     if ( $skip && 0 != $tests_planned ) {
-        warn "Specified SKIP directive in plan but more than 0 tests ($line)\n";
+        warn
+          "Specified SKIP directive in plan but more than 0 tests ($line)\n";
     }
     return {
         type          => 'plan',
@@ -289,9 +293,9 @@ sub _make_test_token {
     my %test = (
         ok          => $ok,
         test_num    => $num,
-        description => _trim( $desc ),
-        directive   => uc( $dir ),
-        explanation => _trim( $explanation ),
+        description => _trim($desc),
+        directive   => uc($dir),
+        explanation => _trim($explanation),
         raw         => $line,
         type        => 'test',
     );
@@ -311,7 +315,7 @@ sub _make_comment_token {
     return {
         type    => 'comment',
         raw     => $line,
-        comment => _trim( $1 )
+        comment => _trim($1)
     };
 }
 
@@ -320,7 +324,7 @@ sub _make_bailout_token {
     return {
         type    => 'bailout',
         raw     => $line,
-        bailout => _trim( $1 )
+        bailout => _trim($1)
     };
 }
 
@@ -333,9 +337,9 @@ sub _make_yaml_token {
 
     # Construct a reader that reads from our input stripping leading
     # spaces from each line.
-    my $leader = length( $pad );
+    my $leader = length($pad);
     my $strip  = qr{ ^ (\s{$leader}) (.*) $ }x;
-    my @extra  = ( $marker );
+    my @extra  = ($marker);
     my $reader = sub {
         return shift @extra if @extra;
         my $line = $stream->next;
@@ -343,11 +347,16 @@ sub _make_yaml_token {
         return;
     };
 
-    my $data = $yaml->read( $reader );
+    my $data = $yaml->read($reader);
+
+    # Reconstitute input. This is convoluted. Maybe we should just
+    # record it on the way in...
+    chomp( my $raw = $yaml->get_raw );
+    $raw =~ s/^/$pad/mg;
 
     return {
         type => 'yaml',
-        raw  => $yaml->get_raw,
+        raw  => $raw,
         data => $data
     };
 }
