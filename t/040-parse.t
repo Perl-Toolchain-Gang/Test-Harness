@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 220;
+use Test::More tests => 221;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -498,6 +498,7 @@ END_TAP
     my @spooled = tied(*STDOUT)->dump();
 
     is @spooled, 24, 'coverage testing for spool attribute of parser';
+    is join('', @spooled), $tap, "spooled tap matches";
 }
 
 {
