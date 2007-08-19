@@ -173,9 +173,10 @@ sub _switches {
         $self->switches,
     );
 
-    open( my $th, $file ) or print "can't open $file. $!\n";
-    my $shebang = <$th>;
-    close $th or print "can't close $file. $!\n";
+    local *TEST;
+    open( TEST, $file ) or print "can't open $file. $!\n";
+    my $shebang = <TEST>;
+    close(TEST) or print "can't close $file. $!\n";
 
     $self->_croak("Script $file is empty") unless defined $shebang;
 
