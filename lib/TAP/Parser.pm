@@ -351,14 +351,6 @@ sub run {
             $source->source($exec);
             $source->merge($merge);    # XXX should just be arguments?
             $stream = $source->get_stream;
-            if ( defined $stream ) {
-                if ( defined $stream->exit ) {
-                    $self->exit( $stream->exit );
-                }
-                if ( defined $stream->wait ) {
-                    $self->wait( $stream->wait );
-                }
-            }
         }
         elsif ($source) {
             if ( my $ref = ref $source ) {
@@ -374,14 +366,6 @@ sub run {
                 $perl->merge($merge);    # XXX args to new()?
 
                 $stream = $perl->source_file($source)->get_stream;
-                if ( defined $stream ) {
-                    if ( defined $stream->exit ) {
-                        $self->exit( $stream->exit );
-                    }
-                    if ( defined $stream->wait ) {
-                        $self->wait( $stream->wait );
-                    }
-                }
             }
             else {
                 $self->_croak("Cannot determine source for $source");

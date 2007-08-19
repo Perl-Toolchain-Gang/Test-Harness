@@ -136,8 +136,8 @@ sub new {
 
 ##############################################################################
 
-sub wait { $_[0]->{wait} }
-sub exit { $_[0]->{exit} }
+sub wait { shift->{wait} }
+sub exit { shift->{exit} }
 
 sub next_raw {
     my $self = shift;
