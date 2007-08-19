@@ -233,9 +233,14 @@ module and related classes for more information on how to use them.
 
 sub next {
     my $self   = shift;
-    my $result = $self->_next;
+    my $stream = $self->_stream;
+
+    my $result = eval { $self->_grammar->tokenize };
+    $self->_add_error($@) if $@;
 
     if ( defined $result ) {
+        $self->_next_state($result);
+
         my $code;
         if ( $code = $self->_callback_for( $result->type ) ) {
             $code->($result);
@@ -246,9 +251,15 @@ sub next {
         $self->_make_callback( 'ALL', $result );
 
         # Echo TAP to spool file
-        $self->_write_to_spool($result);
+        if ( my $spool = $self->_spool ) {
+            print $spool $result->raw, "\n";
+        }
     }
     else {
+        $self->exit( $stream->exit );
+        $self->wait( $stream->wait );
+        $self->_finish;
+
         my $code;
         if ( $code = $self->_callback_for('EOF') ) {
             $code->($self);
@@ -256,12 +267,6 @@ sub next {
     }
 
     return $result;
-}
-
-sub _write_to_spool {
-    my ( $self, $result ) = @_;
-    my $spool = $self->_spool or return;
-    print $spool $result->raw, "\n";
 }
 
 ##############################################################################
@@ -968,25 +973,6 @@ sub _aggregate_results {
 
     push @{ $self->{actual_failed} } => $num if !$test->is_actual_ok;
     push @{ $self->{failed} }        => $num if !$test->is_ok;
-}
-
-sub _next {
-    my $self   = shift;
-    my $stream = $self->_stream;
-
-    my $result = eval { $self->_grammar->tokenize };
-    $self->_add_error($@) if $@;
-
-    if ($result) {
-        $self->_next_state($result);
-    }
-    else {
-        $self->exit( $stream->exit );
-        $self->wait( $stream->wait );
-        $self->_finish;
-    }
-
-    return $result;
 }
 
 my %states;
