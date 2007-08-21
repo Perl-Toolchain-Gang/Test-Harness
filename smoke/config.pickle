@@ -10,7 +10,7 @@ global:
   svn: /usr/local/bin/svn
   work: /home/andy/.smoke-work
 tasks:
-  - mailto: tapx-dev@hexten.net
+  - mailto: tapx-commit@hexten.net
     name: TAP::Parser
     script:
       - yes n | %PERL% Makefile.PL
