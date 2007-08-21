@@ -637,6 +637,10 @@ END_TAP
     isa_ok $parser, 'TAP::Parser';
 
     isa_ok $parser->_stream, 'TAP::Parser::Iterator::Process';
+    
+    # Workaround for Mac OS X problem wrt closing the iterator without
+    # reading from it.
+    $parser->next;
 }
 
 {
