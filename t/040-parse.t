@@ -4,10 +4,12 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 221;
+use Test::More tests => 227;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
+
+use File::Spec;
 
 sub _get_results {
     my $parser = shift;
@@ -594,4 +596,45 @@ END_TAP
     like pop @warn,
       qr/"todo_failed" is deprecated.  Please use "todo_passed".  See the docs[.]/,
       '..and failed as expected'
+}
+
+{
+  # coverage testing for T::P::_initialize
+
+  # coverage of the source argument paths
+
+  # ref argument to source
+
+  my $parser = TAP::Parser->new( { source => [ split /$/, $tap ] } );
+
+  isa_ok $parser, 'TAP::Parser';
+
+  isa_ok $parser->_stream, 'TAP::Parser::Iterator::Array';
+
+  # uncategorisable argument to source
+  my @die;
+
+  eval {
+    local $SIG{__DIE__} = sub {push @die, @_};
+
+    $parser = TAP::Parser->new( { source => 'nosuchfile' } );
+  };
+
+  is @die, 1,
+    'uncategorisable source';
+
+  like pop @die, qr/Cannot determine source for nosuchfile/,
+    '... and we died as expected';
+
+  # coverage test of perl suurce with switches
+
+  $parser = TAP::Parser->new(
+			     {
+			      source => File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' ),
+			     }
+			    );
+
+  isa_ok $parser, 'TAP::Parser';
+
+  isa_ok $parser->_stream, 'TAP::Parser::Iterator::Process';
 }
