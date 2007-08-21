@@ -787,7 +787,7 @@ END_TAP
 
     my @errors = $parser->parse_errors;
 
-    is @errors, 1, 'test too low version number';
+    is @errors, 1, 'test TAP version number in wrong place';
 
     like pop @errors,
       qr/If TAP version is present it must be the first line of output/,
