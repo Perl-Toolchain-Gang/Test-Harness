@@ -500,7 +500,7 @@ END_TAP
     my @spooled = tied(*STDOUT)->dump();
 
     is @spooled, 24, 'coverage testing for spool attribute of parser';
-    is join('', @spooled), $tap, "spooled tap matches";
+    is join( '', @spooled ), $tap, "spooled tap matches";
 }
 
 {
@@ -599,123 +599,125 @@ END_TAP
 }
 
 {
-  # coverage testing for T::P::_initialize
 
-  # coverage of the source argument paths
+    # coverage testing for T::P::_initialize
 
-  # ref argument to source
+    # coverage of the source argument paths
 
-  my $parser = TAP::Parser->new( { source => [ split /$/, $tap ] } );
+    # ref argument to source
 
-  isa_ok $parser, 'TAP::Parser';
+    my $parser = TAP::Parser->new( { source => [ split /$/, $tap ] } );
 
-  isa_ok $parser->_stream, 'TAP::Parser::Iterator::Array';
+    isa_ok $parser, 'TAP::Parser';
 
-  # uncategorisable argument to source
-  my @die;
+    isa_ok $parser->_stream, 'TAP::Parser::Iterator::Array';
 
-  eval {
-    local $SIG{__DIE__} = sub {push @die, @_};
+    # uncategorisable argument to source
+    my @die;
 
-    $parser = TAP::Parser->new( { source => 'nosuchfile' } );
-  };
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
 
-  is @die, 1,
-    'uncategorisable source';
+        $parser = TAP::Parser->new( { source => 'nosuchfile' } );
+    };
 
-  like pop @die, qr/Cannot determine source for nosuchfile/,
-    '... and we died as expected';
+    is @die, 1, 'uncategorisable source';
 
-  # coverage test of perl suurce with switches
+    like pop @die, qr/Cannot determine source for nosuchfile/,
+      '... and we died as expected';
 
-  $parser = TAP::Parser->new(
-			     {
-			      source => File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' ),
-			     }
-			    );
+    # coverage test of perl source with switches
 
-  isa_ok $parser, 'TAP::Parser';
+    $parser = TAP::Parser->new(
+        {   source =>
+              File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' ),
+        }
+    );
 
-  isa_ok $parser->_stream, 'TAP::Parser::Iterator::Process';
+    isa_ok $parser, 'TAP::Parser';
+
+    isa_ok $parser->_stream, 'TAP::Parser::Iterator::Process';
 }
 
 {
-  # coverage testing for TPA::Parser::has_problems
 
-  # we're going to need to test lots of fragments of tap
-  # to cover all the different boolean tests
+    # coverage testing for TAP::Parser::has_problems
 
-  # currently covered are no problems and failed, so lets next test
-  # todo_passed
+    # we're going to need to test lots of fragments of tap
+    # to cover all the different boolean tests
 
- my $tap = <<'END_TAP';
+    # currently covered are no problems and failed, so let's next test
+    # todo_passed
+
+    my $tap = <<'END_TAP';
 TAP version 13
 1..2
 ok 1 - input file opened
 ok 2 - Gandalf wins.  Game over.  # TODO 'bout time!
 END_TAP
 
- my $parser = TAP::Parser->new( { tap => $tap } );
+    my $parser = TAP::Parser->new( { tap => $tap } );
 
- _get_results($parser);
+    _get_results($parser);
 
- ok ! $parser->failed;
- ok $parser->todo_passed;
+    ok !$parser->failed;
+    ok $parser->todo_passed;
 
- ok $parser->has_problems;
+    ok $parser->has_problems;
 
- # now parse_errors
+    # now parse_errors
 
- $tap = <<'END_TAP';
+    $tap = <<'END_TAP';
 TAP version 13
 1..2
 SMACK
 END_TAP
 
- $parser = TAP::Parser->new( { tap => $tap } );
+    $parser = TAP::Parser->new( { tap => $tap } );
 
- _get_results($parser);
+    _get_results($parser);
 
- ok ! $parser->failed;
- ok ! $parser->todo_passed;
- ok $parser->parse_errors;
+    ok !$parser->failed;
+    ok !$parser->todo_passed;
+    ok $parser->parse_errors;
 
- ok $parser->has_problems;
+    ok $parser->has_problems;
 
- # now wait and exit are hard to do in an OS platform-independent way, so we wont even both
+    # Now wait and exit are hard to do in an OS platform-independent way, so
+    # we won't even bother
 
- $tap = <<'END_TAP';
+    $tap = <<'END_TAP';
 TAP version 13
 1..2
 ok 1 - input file opened
 ok 2 - Gandalf wins
 END_TAP
 
- $parser = TAP::Parser->new( { tap => $tap } );
+    $parser = TAP::Parser->new( { tap => $tap } );
 
- _get_results($parser);
+    _get_results($parser);
 
- $parser->wait(1);
+    $parser->wait(1);
 
- ok ! $parser->failed;
- ok ! $parser->todo_passed;
- ok ! $parser->parse_errors;
+    ok !$parser->failed;
+    ok !$parser->todo_passed;
+    ok !$parser->parse_errors;
 
- ok $parser->wait;
+    ok $parser->wait;
 
- ok $parser->has_problems;
+    ok $parser->has_problems;
 
- # and use the same for exit
+    # and use the same for exit
 
- $parser->wait(0);
- $parser->exit(1);
+    $parser->wait(0);
+    $parser->exit(1);
 
- ok ! $parser->failed;
- ok ! $parser->todo_passed;
- ok ! $parser->parse_errors;
- ok ! $parser->wait;
+    ok !$parser->failed;
+    ok !$parser->todo_passed;
+    ok !$parser->parse_errors;
+    ok !$parser->wait;
 
- ok $parser->exit;
+    ok $parser->exit;
 
- ok $parser->has_problems;
+    ok $parser->has_problems;
 }
