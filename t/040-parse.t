@@ -727,44 +727,45 @@ END_TAP
 }
 
 {
-  # coverage testing of the version states
 
- my $tap = <<'END_TAP';
+    # coverage testing of the version states
+
+    my $tap = <<'END_TAP';
 TAP version 12
 1..2
 ok 1 - input file opened
 ok 2 - Gandalf wins
 END_TAP
 
- my $parser = TAP::Parser->new( { tap => $tap } );
+    my $parser = TAP::Parser->new( { tap => $tap } );
 
- _get_results($parser);
+    _get_results($parser);
 
- my @errors = $parser->parse_errors;
+    my @errors = $parser->parse_errors;
 
- is @errors, 1,
-   'test too low version number';
+    is @errors, 1, 'test too low version number';
 
- like pop @errors, qr/Explicit TAP version must be at least 13. Got version 12/,
-   '... and trapped expected version error';
+    like pop @errors,
+      qr/Explicit TAP version must be at least 13. Got version 12/,
+      '... and trapped expected version error';
 
- # now too high a version
-$tap = <<'END_TAP';
+    # now too high a version
+    $tap = <<'END_TAP';
 TAP version 14
 1..2
 ok 1 - input file opened
 ok 2 - Gandalf wins
 END_TAP
 
- $parser = TAP::Parser->new( { tap => $tap } );
+    $parser = TAP::Parser->new( { tap => $tap } );
 
- _get_results($parser);
+    _get_results($parser);
 
- @errors = $parser->parse_errors;
+    @errors = $parser->parse_errors;
 
- is @errors, 1,
-   'test too high version number';
+    is @errors, 1, 'test too high version number';
 
- like pop @errors, qr/TAP specified version 14 but we don't about versions later than 13/,
-   '... and trapped expected version error';
+    like pop @errors,
+      qr/TAP specified version 14 but we don't about versions later than 13/,
+      '... and trapped expected version error';
 }
