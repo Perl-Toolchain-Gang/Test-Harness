@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 249;
+use Test::More tests => 251;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -768,4 +768,29 @@ END_TAP
     like pop @errors,
       qr/TAP specified version 14 but we don't about versions later than 13/,
       '... and trapped expected version error';
+}
+
+{
+
+    # coverage testing of TAP version in the wrong place
+
+    my $tap = <<'END_TAP';
+1..2
+ok 1 - input file opened
+TAP version 12
+ok 2 - Gandalf wins
+END_TAP
+
+    my $parser = TAP::Parser->new( { tap => $tap } );
+
+    _get_results($parser);
+
+    my @errors = $parser->parse_errors;
+
+    is @errors, 1, 'test too low version number';
+
+    like pop @errors,
+      qr/If TAP version is present it must be the first line of output/,
+      '... and trapped expected version error';
+
 }
