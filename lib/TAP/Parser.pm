@@ -1108,7 +1108,6 @@ BEGIN {
                 continue => 'PLANNED'
             },
             plan => {
-                act      => sub { },
                 continue => 'PLANNED'
             },
         },
