@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 227;
+use Test::More tests => 245;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -637,4 +637,85 @@ END_TAP
   isa_ok $parser, 'TAP::Parser';
 
   isa_ok $parser->_stream, 'TAP::Parser::Iterator::Process';
+}
+
+{
+  # coverage testing for TPA::Parser::has_problems
+
+  # we're going to need to test lots of fragments of tap
+  # to cover all the different boolean tests
+
+  # currently covered are no problems and failed, so lets next test
+  # todo_passed
+
+ my $tap = <<'END_TAP';
+TAP version 13
+1..2
+ok 1 - input file opened
+ok 2 - Gandalf wins.  Game over.  # TODO 'bout time!
+END_TAP
+
+ my $parser = TAP::Parser->new( { tap => $tap } );
+
+ _get_results($parser);
+
+ ok ! $parser->failed;
+ ok $parser->todo_passed;
+
+ ok $parser->has_problems;
+
+ # now parse_errors
+
+ $tap = <<'END_TAP';
+TAP version 13
+1..2
+SMACK
+END_TAP
+
+ $parser = TAP::Parser->new( { tap => $tap } );
+
+ _get_results($parser);
+
+ ok ! $parser->failed;
+ ok ! $parser->todo_passed;
+ ok $parser->parse_errors;
+
+ ok $parser->has_problems;
+
+ # now wait and exit are hard to do in an OS platform-independent way, so we wont even both
+
+ $tap = <<'END_TAP';
+TAP version 13
+1..2
+ok 1 - input file opened
+ok 2 - Gandalf wins
+END_TAP
+
+ $parser = TAP::Parser->new( { tap => $tap } );
+
+ _get_results($parser);
+
+ $parser->wait(1);
+
+ ok ! $parser->failed;
+ ok ! $parser->todo_passed;
+ ok ! $parser->parse_errors;
+
+ ok $parser->wait;
+
+ ok $parser->has_problems;
+
+ # and use the same for exit
+
+ $parser->wait(0);
+ $parser->exit(1);
+
+ ok ! $parser->failed;
+ ok ! $parser->todo_passed;
+ ok ! $parser->parse_errors;
+ ok ! $parser->wait;
+
+ ok $parser->exit;
+
+ ok $parser->has_problems;
 }
