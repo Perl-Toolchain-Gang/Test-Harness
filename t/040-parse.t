@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 245;
+use Test::More tests => 249;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -637,7 +637,7 @@ END_TAP
     isa_ok $parser, 'TAP::Parser';
 
     isa_ok $parser->_stream, 'TAP::Parser::Iterator::Process';
-    
+
     # Workaround for Mac OS X problem wrt closing the iterator without
     # reading from it.
     $parser->next;
@@ -724,4 +724,47 @@ END_TAP
     ok $parser->exit;
 
     ok $parser->has_problems;
+}
+
+{
+  # coverage testing of the version states
+
+ my $tap = <<'END_TAP';
+TAP version 12
+1..2
+ok 1 - input file opened
+ok 2 - Gandalf wins
+END_TAP
+
+ my $parser = TAP::Parser->new( { tap => $tap } );
+
+ _get_results($parser);
+
+ my @errors = $parser->parse_errors;
+
+ is @errors, 1,
+   'test too low version number';
+
+ like pop @errors, qr/Explicit TAP version must be at least 13. Got version 12/,
+   '... and trapped expected version error';
+
+ # now too high a version
+$tap = <<'END_TAP';
+TAP version 14
+1..2
+ok 1 - input file opened
+ok 2 - Gandalf wins
+END_TAP
+
+ $parser = TAP::Parser->new( { tap => $tap } );
+
+ _get_results($parser);
+
+ @errors = $parser->parse_errors;
+
+ is @errors, 1,
+   'test too high version number';
+
+ like pop @errors, qr/TAP specified version 14 but we don't about versions later than 13/,
+   '... and trapped expected version error';
 }
