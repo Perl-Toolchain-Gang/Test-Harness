@@ -6,6 +6,7 @@ use Test::More tests => 62;
 
 use File::Spec;
 use TAP::Parser;
+use IO::Handle;
 
 use TAP::Parser::Iterator;
 
@@ -100,12 +101,12 @@ for my $test (@schedule) {
     eval {
         local $SIG{__DIE__} = sub { push @die, @_ };
 
-        TAP::Parser::Iterator->new( sub { } );
+        TAP::Parser::Iterator->new( \1 ); # a ref to a scalar
     };
 
     is @die, 1, 'coverage of error case';
 
-    like pop @die, qr/Can't iterate with a CODE/,
+    like pop @die, qr/Can't iterate with a SCALAR/,
       '...and we died as expected';
 }
 
