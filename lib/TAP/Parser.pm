@@ -97,6 +97,14 @@ is still subject to change.
 For an example of how to run tests through this module, see the simple
 harnesses C<examples/>. 
 
+There's a wiki dedicated to the Test Anything Protocol:
+
+L<http://testanything.org>
+
+It includes the TAP::Parser Cookbook:
+
+L<http://testanything.org/wiki/index.php/TAP::Parser_Cookbook>
+
 =head1 METHODS
 
 =head2 Class Methods
