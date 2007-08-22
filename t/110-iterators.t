@@ -6,7 +6,6 @@ use Test::More tests => 62;
 
 use File::Spec;
 use TAP::Parser;
-use IO::Handle;
 
 use TAP::Parser::Iterator;
 
@@ -89,8 +88,6 @@ for my $test (@schedule) {
 {
 
     # coverage tests for the ctor
-
-    use IO::Handle;
 
     my $stream = TAP::Parser::Iterator->new( IO::Handle->new );
 
