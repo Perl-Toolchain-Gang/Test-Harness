@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 251;
+use Test::More tests => 254;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -793,4 +793,72 @@ END_TAP
       qr/If TAP version is present it must be the first line of output/,
       '... and trapped expected version error';
 
+}
+
+{
+
+    # we're going to bash the internals a bit (but using the API as
+    # much as possible) to force grammar->tokenise() to fail
+
+  # firstly we'll create a stream that dies when its next_raw method is called
+
+    package TAP::Parser::Iterator::Dies;
+
+    use strict;
+    use vars qw(@ISA);
+
+    @ISA = qw(TAP::Parser::Iterator);
+
+    sub new {
+        return bless {}, shift;
+    }
+
+    sub next_raw {
+        die 'this is the dying iterator';
+    }
+
+    # required as part of the TPI interface
+    sub exit { }
+    sub wait { }
+
+    package main;
+
+    # now build a standard parser
+
+    my $tap = <<'END_TAP';
+1..2
+ok 1 - input file opened
+ok 2 - Gandalf wins
+END_TAP
+
+    my $parser = TAP::Parser->new( { tap => $tap } );
+
+    # build a dying stream
+
+    my $stream = TAP::Parser::Iterator::Dies->new;
+
+    # now replace thep stream - we're forced to us an T::P intenal method for this
+
+    $parser->_stream($stream);
+
+    # build a new grammar
+
+    my $grammar = TAP::Parser::Grammar->new($stream);
+
+    # replace our grammar with this new one
+
+    $parser->_grammar($grammar);
+
+    # now call next on the parser, and the grammar should die
+
+    my $result = $parser->next; # will die in iterator
+
+    is $result, undef, 'iterator dies';
+
+    my @errors = $parser->parse_errors;
+
+    is @errors, 2, '...and caught expected errrors';
+
+    like shift @errors, qr/this is the dying iterator/,
+      '...and it was what we expected';
 }
