@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 256;
+use Test::More tests => 258;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -889,5 +889,34 @@ END_TAP
     is @die, 1, 'detect broken state machine';
 
     like pop @die, qr/Illegal state: FOO/,
+      '...and the message is as we expect';
+}
+
+{
+
+    # coverage testing of TAP::Parser::_finish
+
+    my $tap = <<'END_TAP';
+1..2
+ok 1 - input file opened
+ok 2 - Gandalf wins
+END_TAP
+
+    my $parser = TAP::Parser->new( { tap => $tap } );
+
+    $parser->tests_run(999);
+
+    my @die;
+
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
+
+        _get_results $parser;
+    };
+
+    is @die, 1, 'detect broken test counts';
+
+    like pop @die,
+      qr/Panic: planned test count [(]1001[)] did not equal sum of passed [(]0[)] and failed [(]2[)] tests!/,
       '...and the message is as we expect';
 }
