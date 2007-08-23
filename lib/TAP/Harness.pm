@@ -358,7 +358,6 @@ sub aggregate_tests {
 
     my $start_time = Benchmark->new;
 
-    my $really_quiet = $self->really_quiet;
     foreach my $test (@tests) {
         my $extra = 0;
         my $name  = $test;
