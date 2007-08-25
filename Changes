@@ -1,6 +1,7 @@
 Revision history for TAP-Parser
 
 0.54
+    - Optimized I/O for common case of 'runtests -l'
     - Croak if supplied an empty (0 lines) Perl script.
     - Made T::P::Result::YAML return literal input YAML correctly.
 
