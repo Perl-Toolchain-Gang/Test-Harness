@@ -20,7 +20,7 @@ tasks:
       - yes n | %PERL% Build.PL
       - ./Build
       - ./Build test
-      - '%PERL% -Ilib bin/prove -b t/*.t t/compat/*.t'
+      - ./Build testprove
       - ./Build distclean
     subdir: trunk
     svn: http://svn.hexten.net/tapx/trunk
