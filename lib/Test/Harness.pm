@@ -141,7 +141,7 @@ sub _new_harness {
     # This is a bit crufty. The switches have all been joined into a
     # single string so we have to try and recover them.
     my ( @lib, @switches );
-    for my $opt ( split( / \s+ (?=-) /x, $Switches ) ) {
+    for my $opt ( split( /\s+(?=-)/, $Switches ) ) {
         if ( $opt =~ /^ -I (.*) $ /x ) {
             push @lib, $1;
         }
