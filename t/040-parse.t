@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 258;
+use Test::More tests => 261;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -831,36 +831,65 @@ ok 1 - input file opened
 ok 2 - Gandalf wins
 END_TAP
 
-    my $parser = TAP::Parser->new( { tap => $tap } );
+    {
+        my $parser = TAP::Parser->new( { tap => $tap } );
 
-    # build a dying stream
+        # build a dying stream
+        my $stream = TAP::Parser::Iterator::Dies->new;
 
-    my $stream = TAP::Parser::Iterator::Dies->new;
+        # now replace the stream - we're forced to us an T::P intenal
+        # method for this
+        $parser->_stream($stream);
 
-# now replace thep stream - we're forced to us an T::P intenal method for this
+        # build a new grammar
+        my $grammar = TAP::Parser::Grammar->new($stream);
 
-    $parser->_stream($stream);
+        # replace our grammar with this new one
+        $parser->_grammar($grammar);
 
-    # build a new grammar
+        # now call next on the parser, and the grammar should die
+        my $result = $parser->next;    # will die in iterator
 
-    my $grammar = TAP::Parser::Grammar->new($stream);
+        is $result, undef, 'iterator dies';
 
-    # replace our grammar with this new one
+        my @errors = $parser->parse_errors;
+        is @errors, 2, '...and caught expected errrors';
 
-    $parser->_grammar($grammar);
+        like shift @errors, qr/this is the dying iterator/,
+          '...and it was what we expected';
+    }
 
-    # now call next on the parser, and the grammar should die
+    # Do it all again with callbacks to exercise the other code path in
+    # the unrolled iterator
+    {
+        my $parser = TAP::Parser->new( { tap => $tap } );
 
-    my $result = $parser->next;    # will die in iterator
+        $parser->callback( 'ALL', sub { } );
 
-    is $result, undef, 'iterator dies';
+        # build a dying stream
+        my $stream = TAP::Parser::Iterator::Dies->new;
 
-    my @errors = $parser->parse_errors;
+        # now replace the stream - we're forced to us an T::P intenal
+        # method for this
+        $parser->_stream($stream);
 
-    is @errors, 2, '...and caught expected errrors';
+        # build a new grammar
+        my $grammar = TAP::Parser::Grammar->new($stream);
 
-    like shift @errors, qr/this is the dying iterator/,
-      '...and it was what we expected';
+        # replace our grammar with this new one
+        $parser->_grammar($grammar);
+
+        # now call next on the parser, and the grammar should die
+        my $result = $parser->next;    # will die in iterator
+
+        is $result, undef, 'iterator dies';
+
+        my @errors = $parser->parse_errors;
+        is @errors, 2, '...and caught expected errrors';
+
+        like shift @errors, qr/this is the dying iterator/,
+          '...and it was what we expected';
+    }
 }
 
 {
@@ -868,8 +897,9 @@ END_TAP
     # coverage testing of TAP::Parser::_next_state
 
     package TAP::Parser::WithBrokenState;
+    use vars qw(@ISA);
 
-    our @ISA = qw< TAP::Parser >;
+    @ISA = qw< TAP::Parser >;
 
     sub _make_state_table {
         return { INIT => { plan => { goto => 'FOO' } } };
