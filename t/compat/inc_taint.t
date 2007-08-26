@@ -22,7 +22,7 @@ use Dev::Null;
 {
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
 
-    push @INC, 'we_added_this_lib';
+    push @INC, 'examples';
 
     tie *NULL, 'Dev::Null' or die $!;
     select NULL;

@@ -101,11 +101,11 @@ BEGIN {
         exec         => sub { shift; shift },
         merge        => sub { shift; shift },
         formatter    => sub { shift; shift },
-        stdout       => sub {
+        stdout => sub {
             my ( $self, $ref ) = @_;
-            ((ref($ref) || '') eq 'SCALAR') or
-                die "catch_output needs a scalar reference";
-            return($ref);
+            ( ( ref($ref) || '' ) eq 'SCALAR' )
+              or die "catch_output needs a scalar reference";
+            return ($ref);
         },
     );
     my @getter_setters = qw/
@@ -274,6 +274,7 @@ should be a filehandle.
     sub _initialize {
         my ( $self, $arg_for ) = @_;
         $arg_for ||= {};
+
         $self->SUPER::_initialize( $arg_for, \@legal_callback );
         my %arg_for = %$arg_for;    # force a shallow copy
 
@@ -330,7 +331,7 @@ sub runtests {
     my $results = $self->aggregate_tests( $aggregate, @tests );
 
     $self->summary($results);
-    
+
     return $aggregate;
 }
 
@@ -471,7 +472,8 @@ sub summary {
             if ( my @errors = $parser->parse_errors ) {
                 my $explain;
                 if ( @errors > $MAX_ERRORS && !$self->errors ) {
-                    $explain = "Displayed the first $MAX_ERRORS of "
+                    $explain
+                      = "Displayed the first $MAX_ERRORS of "
                       . scalar(@errors)
                       . " TAP syntax errors.\n"
                       . "Re-run prove with the -p option to see them all.\n";
@@ -539,8 +541,8 @@ like to redirect output somewhere else, just override this method.
 
 sub output {
     my $self = shift;
-    if(my $out = $self->stdout) {
-        $$out .= $_ for(@_); # XXX what's $\ here?
+    if ( my $out = $self->stdout ) {
+        $$out .= $_ for (@_);    # XXX what's $\ here?
     }
     else {
         print @_;
@@ -658,8 +660,8 @@ sub output_test_failure {
     my $tests_run     = $parser->tests_run;
     my $tests_planned = $parser->tests_planned;
 
-    my $total =
-      defined $tests_planned
+    my $total
+      = defined $tests_planned
       ? $tests_planned
       : $tests_run;
 
@@ -709,7 +711,7 @@ sub _get_parser_args {
     my @switches = $self->lib if $self->lib;
     push @switches => $self->switches if $self->switches;
     $args{switches} = \@switches;
-    $args{spool}    = $self->_open_spool( $test );
+    $args{spool}    = $self->_open_spool($test);
     $args{merge}    = $self->merge;
     $args{exec}     = $self->exec;
     if ( my $exec = $self->exec ) {
@@ -772,9 +774,11 @@ sub _runtest {
     $self->_close_spool;
 
     if ($show_count) {
-        my $spaces = ' ' x (
-            1 + length($leader) + length($plan) + length( $parser->tests_run )
-        );
+        my $spaces
+          = ' ' x ( 1 
+              + length($leader) 
+              + length($plan)
+              + length( $parser->tests_run ) );
         $self->$output("\r$spaces\r$leader") unless $really_quiet;
     }
     if ( !$parser->has_problems ) {
@@ -782,7 +786,8 @@ sub _runtest {
             my $time_report = '';
             if ( $self->timer ) {
                 my $elapsed = time - $start_time;
-                $time_report = $TIME_HIRES
+                $time_report
+                  = $TIME_HIRES
                   ? sprintf( ' %8d ms', $elapsed * 1000 )
                   : sprintf( ' %8s s', $elapsed || '<1' );
             }
@@ -875,7 +880,7 @@ sub _should_display {
 
     return 1
       if $self->_should_show_failure($result)
-      || ( $self->verbose && !$self->failures );
+          || ( $self->verbose && !$self->failures );
 
     # TODO: Work out what to do with is_yaml results
     return 1

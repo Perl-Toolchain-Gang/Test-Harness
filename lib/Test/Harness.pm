@@ -141,7 +141,7 @@ sub _new_harness {
     # This is a bit crufty. The switches have all been joined into a
     # single string so we have to try and recover them.
     my ( @lib, @switches );
-    for my $opt (split( / \s+ (?=-) /x, $Switches )) {
+    for my $opt ( split( / \s+ (?=-) /x, $Switches ) ) {
         if ( $opt =~ /^ -I (.*) $ /x ) {
             push @lib, $1;
         }
@@ -149,6 +149,10 @@ sub _new_harness {
             push @switches, $opt;
         }
     }
+
+    # Get any additional libs from our @INC
+    my %default_inc = map { $_ => 1 } _default_inc();
+    push @lib, grep { !$default_inc{$_}++ } @INC;
 
     my $args = {
         verbose    => $Verbose,
@@ -159,6 +163,32 @@ sub _new_harness {
     };
 
     return TAP::Harness->new($args);
+}
+
+{
+    my %cache;
+
+    sub _default_inc {
+        my $perl = _command();
+        return @{
+            $cache{$perl} ||= [
+                do {
+                    local $ENV{PERL5LIB};
+                    chomp( my @inc
+                          = `$perl -le "print join qq[\\n], \@INC"` );
+                    @inc;
+                },
+            ],
+          };
+    }
+}
+
+sub _command {
+    return $ENV{HARNESS_PERL}
+      if defined $ENV{HARNESS_PERL};
+    return qq["$^X"]
+      if $^O eq 'MSWin32' && ( $^X =~ /[^\w\.\/\\]/ );
+    return $^X;
 }
 
 sub _check_sequence {
@@ -248,8 +278,8 @@ sub execute_tests {
         if ( @failed || $estat || @errors ) {
             $tot{bad}++;
 
-            my $huh_planned = $planned ? undef: '??';
-            my $huh_errors  = $ok_seq  ? undef: '??';
+            my $huh_planned = $planned ? undef : '??';
+            my $huh_errors  = $ok_seq  ? undef : '??';
 
             $failedtests{$test} = {
                 'canon' => $huh_planned

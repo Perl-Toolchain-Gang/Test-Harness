@@ -2194,7 +2194,7 @@ my %samples = (
                 explanation   => '',
             },
         ],
-        __ARGS__      => { switches => '-Iwe_added_this_lib', },
+        __ARGS__      => { switches => '-Iexamples', },
         plan          => '1..1',
         passed        => [1],
         actual_passed => [1],
