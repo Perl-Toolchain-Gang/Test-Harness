@@ -34,6 +34,7 @@ lib/TAP/Parser/YAMLish/Writer.pm
 lib/Test/Harness.pm
 Makefile.PL
 MANIFEST
+META.yml
 README
 t/000-load.t
 t/010-base.t
