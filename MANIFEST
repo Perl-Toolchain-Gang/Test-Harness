@@ -36,7 +36,6 @@ lib/TAP/Parser/YAMLish/Reader.pm
 lib/TAP/Parser/YAMLish/Writer.pm
 Makefile.PL
 MANIFEST
-patches/ExtUtils-MakeMaker-6.31.patch
 README
 t/000-load.t
 t/010-base.t
