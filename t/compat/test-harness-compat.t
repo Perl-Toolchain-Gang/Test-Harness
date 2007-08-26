@@ -6,6 +6,9 @@ use TAP::Harness;
 use Test::Harness qw(execute_tests);
 use File::Spec;
 
+# unset this global when self-testing ('testcover' and etc issue)
+local $ENV{HARNESS_PERL_SWITCHES};
+
 {
     # if the harness wants to save the resulting TAP we shouldn't
     # do it for our internal calls

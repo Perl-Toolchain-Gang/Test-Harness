@@ -138,6 +138,10 @@ sub _canon {
 
 sub _new_harness {
 
+    if ( defined( my $env_sw = $ENV{HARNESS_PERL_SWITCHES} ) ) {
+        $Switches .= ' ' . $env_sw if ( length($env_sw) );
+    }
+
     # This is a bit crufty. The switches have all been joined into a
     # single string so we have to try and recover them.
     my ( @lib, @switches );
