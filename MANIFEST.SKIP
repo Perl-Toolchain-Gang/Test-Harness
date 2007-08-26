@@ -26,4 +26,4 @@
 ^\.perltidyrc$
 ^smoke/
 ^benchmark/
-
+^reference/

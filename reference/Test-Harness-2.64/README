@@ -1,0 +1,5 @@
+These are not the Test::Harness you are looking for.
+
+This is a snapshot of the Test::Harness 2.64 code for use in
+compatibility testing and benchmarking against the TAP::Harness
+replacement.
