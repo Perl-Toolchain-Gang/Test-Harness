@@ -1,5 +1,4 @@
 bin/prove
-bin/runtests
 Build.PL
 Changes
 examples/bin/forked_tests.pl

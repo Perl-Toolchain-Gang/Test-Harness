@@ -474,7 +474,7 @@ sub summary {
                     $explain = "Displayed the first $MAX_ERRORS of "
                       . scalar(@errors)
                       . " TAP syntax errors.\n"
-                      . "Re-run runtests with the -p option to see them all.\n";
+                      . "Re-run prove with the -p option to see them all.\n";
                     splice @errors, $MAX_ERRORS;
                 }
                 $self->_summary_test_header( $test, $parser );
@@ -912,15 +912,15 @@ sub _croak {
 
 =head1 REPLACING
 
-If you like the C<runtests> utility and L<TAP::Parser> but you want your own
-harness, all you need to do is write one and provide C<new> and C<runtests>
-methods.  Then you can use the C<runtests> utility like so:
+If you like the C<prove> utility and L<TAP::Parser> but you want your
+own harness, all you need to do is write one and provide C<new> and
+C<runtests> methods. Then you can use the C<prove> utility like so:
 
- runtests --harness My::Test::Harness
+ prove --harness My::Test::Harness
 
-Note that while C<runtests> accepts a list of tests (or things to be tested),
-C<new> has a fairly rich set of arguments.  You'll probably want to read over
-this code carefully to see how all of them are being used.
+Note that while C<prove> accepts a list of tests (or things to be
+tested), C<new> has a fairly rich set of arguments. You'll probably want
+to read over this code carefully to see how all of them are being used.
 
 =head1 SEE ALSO
 

@@ -1,161 +1,205 @@
 #!/usr/bin/perl -w
 
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+
 use strict;
-
-use Test::Harness;
-
-use Getopt::Long;
 use Pod::Usage 1.12;
+use TAP::Harness;
+use File::Find;
 use File::Spec;
+use Getopt::Long;
 
-use vars qw( $VERSION );
-$VERSION = '2.64';
-
-my $shuffle  = 0;
-my $dry      = 0;
-my $blib     = 0;
-my $lib      = 0;
-my $recurse  = 0;
-my @includes = ();
-my @switches = ();
+my $DEFAULT_FORMATTER = 'TAP::Harness::Formatter::Basic';
 
 # Allow cuddling the paths with the -I
 @ARGV = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @ARGV;
+my $color_default = -t STDOUT && !( $^O =~ /MSWin32/ );
+my $COLOR;
 
-# Stick any default switches at the beginning, so they can be overridden
-# by the command line switches.
-unshift @ARGV, split( ' ', $ENV{PROVE_SWITCHES} )
-  if defined $ENV{PROVE_SWITCHES};
-
-Getopt::Long::Configure('no_ignore_case');
-Getopt::Long::Configure('bundling');
+Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
 GetOptions(
-    'b|blib'     => \$blib,
-    'd|debug'    => \$Test::Harness::debug,
-    'directives' => \$Test::Harness::Directives,
-    'D|dry'      => \$dry,
-    'h|help|?'   => sub { pod2usage( { -verbose => 1 } ); exit },
-    'H|man'      => sub { pod2usage( { -verbose => 2 } ); exit },
-    'I=s@'       => \@includes,
-    'l|lib'      => \$lib,
-    'perl=s'     => \$ENV{HARNESS_PERL},
-    'r|recurse'  => \$recurse,
-    's|shuffle'  => \$shuffle,
-    't' => sub { unshift @switches, '-t' },    # Always want -t up front
-    'T' => sub { unshift @switches, '-T' },    # Always want -T up front
-    'w' => sub { push @switches,    '-w' },
-    'W' => sub { push @switches,    '-W' },
-    'strap=s'   => \$ENV{HARNESS_STRAP_CLASS},
-    'timer'     => \$Test::Harness::Timer,
-    'v|verbose' => \$Test::Harness::verbose,
-    'V|version' => sub { print_version(); exit; },
-) or exit 1;
+    'v|verbose'   => \my $VERBOSE,
+    'f|failures'  => \my $FAILURES,
+    'l|lib'       => \my $LIB,
+    'b|blib'      => \my $BLIB,
+    's|shuffle'   => \my $SHUFFLE,
+    'color!'      => \$COLOR,
+    'c'           => \$COLOR,
+    'harness=s'   => \my $HARNESS,
+    'formatter=s' => \my $FORMATTER,
+    'r|recurse'   => \my $RECURSE,
+    'reverse'     => \my $REVERSE,
+    'p|parse'     => \my $PARSE,
+    'q|quiet'     => \my $QUIET,
+    'Q|QUIET'     => \my $REALLY_QUIET,
+    'e|exec=s'    => \my $EXEC,
+    'm|merge'     => \my $MERGE,
+    'I=s@'        => \my @INCLUDES,
+    'directives'  => \my $DIRECTIVES,
+    'h|help|?'    => sub { pod2usage( { -verbose => 1 } ); exit },
+    'H|man'       => sub { pod2usage( { -verbose => 2 } ); exit },
+    'V|version'   => sub { print_version(); exit },
+    'a|archive=s' => \my $ARCHIVE,
 
-$ENV{TEST_VERBOSE} = 1 if $Test::Harness::verbose;
+    #'x|xtension=s' => \my $EXTENSION,
+    'T' => \my $TAINT_FAIL,
+    't' => \my $TAINT_WARN,
+    'W' => \my $WARNINGS_FAIL,
+    'w' => \my $WARNINGS_WARN,
+);
 
-# Handle blib includes
-if ($blib) {
-    my @blibdirs = blibdirs();
-    if (@blibdirs) {
-        unshift @includes, @blibdirs;
+if ( !defined $COLOR ) {
+    $COLOR = $color_default;
+}
+
+# XXX otherwise, diagnostics and failure messages are out of sequence
+# or we can't suppress STDERR on quiet
+#$MERGE = 1 if $FAILURES || $QUIET || $REALLY_QUIET;
+
+my $harness_class = 'TAP::Harness';
+my %args;
+
+if ($COLOR) {
+    require TAP::Harness::Color;
+    $harness_class = 'TAP::Harness::Color';
+}
+
+if ($ARCHIVE) {
+    eval { require TAP::Harness::Archive };
+    die "TAP::Harness::Archive is required to use the --archive feature: $@" if $@;
+    $harness_class = 'TAP::Harness::Archive';
+    $args{archive} = $ARCHIVE;
+}
+
+if ($HARNESS) {
+    eval "use $HARNESS";
+    die "Cannot use harness ($HARNESS): $@" if $@;
+    $harness_class = $HARNESS;
+}
+
+my $formatter_class;
+if ($FORMATTER) {
+    eval "use $FORMATTER";
+    die "Cannot use formatter ($FORMATTER): $@" if $@;
+    $formatter_class = $FORMATTER;
+}
+
+unless ($formatter_class) {
+    eval "use $DEFAULT_FORMATTER";
+    $formatter_class = $DEFAULT_FORMATTER unless $@;
+}
+
+my @tests = get_tests(@ARGV);
+
+shuffle(@tests) if $SHUFFLE;
+@tests = reverse @tests if $REVERSE;
+
+if ( $TAINT_FAIL && $TAINT_WARN ) {
+    die "-t and -T are mutually exclusive";
+}
+if ( $WARNINGS_FAIL && $WARNINGS_WARN ) {
+    die "-w and -W are mutually exclusive";
+}
+
+$args{lib}          = get_libs();
+$args{switches}     = get_switches();
+$args{merge}        = $MERGE if $MERGE;
+$args{verbose}      = $VERBOSE if $VERBOSE;
+$args{failures}     = $FAILURES if $FAILURES;
+$args{quiet}        = 1 if $QUIET;
+$args{really_quiet} = 1 if $REALLY_QUIET;
+$args{errors}       = 1 if $PARSE;
+$args{exec}         = length($EXEC) ? [ split( / /, $EXEC ) ] : []
+  if ( defined($EXEC) );
+$args{directives} = 1 if $DIRECTIVES;
+
+if ($formatter_class) {
+    $args{formatter} = $formatter_class->new;
+}
+
+my $harness    = $harness_class->new( \%args );
+my $aggregator = $harness->runtests(@tests);
+
+exit $aggregator->has_problems ? 1 : 0;
+
+sub get_switches {
+    my @switches;
+
+    # notes that -T or -t must be at the front of the switches!
+    if ($TAINT_FAIL) {
+        push @switches, 'T';
     }
-    else {
-        warn "No blib directories found.\n";
+    elsif ($TAINT_WARN) {
+        push @switches, 't';
     }
-}
-
-# Handle lib includes
-if ($lib) {
-    unshift @includes, 'lib';
-}
-
-# Build up TH switches
-push @switches, map { /\s/ && !/^".*"$/ ? qq["-I$_"] : "-I$_" } @includes;
-$Test::Harness::Switches = join( ' ', @switches );
-print
-  "# \$Test::Harness::Switches: $Test::Harness::Switches\n"
-  if $Test::Harness::debug;
-
-@ARGV = File::Spec->curdir unless @ARGV;
-my @argv_globbed;
-my @tests;
-if ( $] >= 5.006001 ) {
-    require File::Glob;
-    @argv_globbed = map { File::Glob::bsd_glob($_) } @ARGV;
-}
-else {
-    @argv_globbed = map {glob} @ARGV;
-}
-
-for (@argv_globbed) {
-    push(
-        @tests,
-        -d $_ ? all_in( { recurse => $recurse, start => $_ } ) : $_
-    );
-}
-
-if (@tests) {
-    shuffle(@tests) if $shuffle;
-    if ($dry) {
-        print join( "\n", @tests, '' );
+    if ($WARNINGS_FAIL) {
+        push @switches, 'W';
     }
-    else {
-        print "# ", scalar @tests, " tests to run\n"
-          if $Test::Harness::debug;
-        runtests(@tests);
+    elsif ($WARNINGS_WARN) {
+        push @switches, 'w';
     }
+
+    return @switches ? \@switches : ();
 }
 
-sub print_version {
-    printf(
-        "prove v%s, using Test::Harness v%s and Perl v%vd\n",
-        $VERSION, $Test::Harness::VERSION, $^V
-    );
+sub get_libs {
+    my @libs;
+    if ($LIB) {
+        push @libs, 'lib';
+    }
+    if ($BLIB) {
+        push @libs, 'blib/lib';
+    }
+    if (@INCLUDES) {
+        push @libs, @INCLUDES;
+    }
+    return @libs ? \@libs : ();
 }
 
-sub all_in {
-    my $parms   = shift;
-    my $visited = shift || {};
-    my %parms   = (
-        start   => ".",
-        recurse => 1,
-        %$parms,
-    );
+sub get_tests {
+    my @argv = @_;
+    my ( @tests, %tests );
+    @argv = 't' unless @argv;
+    foreach my $arg (@argv) {
+        if ( '-' eq $arg ) {
+            push @argv => <STDIN>;
+            chomp(@argv);
+            next;
+        }
 
-    my @hits  = ();
-    my $start = $parms{start};
-
-    local *DH;
-    if ( opendir( DH, $start ) ) {
-        my @files = sort readdir DH;
-        closedir DH;
-        for my $file (@files) {
-            next if $file eq File::Spec->updir || $file eq File::Spec->curdir;
-            next if $file eq ".svn";
-            next if $file eq "CVS";
-
-            my $currfile = File::Spec->catfile( $start, $file );
-
-            if ( -d $currfile ) {
-                my ( $dev, $ino ) = lstat $currfile;
-                next if $dev && $visited->{ $dev, $ino }++;
-                push( @hits,
-                    all_in( { %parms, start => $currfile }, $visited ) )
-                  if $parms{recurse};
+        if ( -d $arg ) {
+            my @files = _get_tests($arg);
+            foreach my $file (@files) {
+                push @tests => $file unless exists $tests{$file};
             }
-            else {
-                push( @hits, $currfile ) if $currfile =~ /\.t$/;
-            }
+            @tests{@files} = (1) x @files;
+        }
+        else {
+            push @tests => $arg unless exists $tests{$arg};
+            $tests{$arg} = 1;
         }
     }
-    else {
-        warn "$start: $!\n";
-    }
+    return @tests;
+}
 
-    return @hits;
+sub _get_tests {
+    my $dir = shift;
+    my @tests;
+    if ($RECURSE) {
+        find(
+            sub { -f && /\.t$/ && push @tests => $File::Find::name },
+            $dir
+        );
+    }
+    else {
+        @tests = glob( File::Spec->catfile( $dir, '*.t' ) );
+    }
+    return @tests;
 }
 
 sub shuffle {
+    my $self = shift;
 
     # Fisher-Yates shuffle
     my $i = @_;
@@ -165,226 +209,120 @@ sub shuffle {
     }
 }
 
-sub blibdirs {
-    my $dir = File::Spec->curdir;
-    if ( $^O eq 'VMS' ) {
-        ( $dir = VMS::Filespec::unixify($dir) ) =~ s-/\z--;
-    }
-    my $archdir = "arch";
-    if ( $^O eq "MacOS" ) {
-
-        # Double up the MP::A so that it's not used only once.
-        $archdir = $MacPerl::Architecture = $MacPerl::Architecture;
-    }
-
-    my $i = 5;
-    while ( $i-- ) {
-        my $blib      = File::Spec->catdir( $dir,  "blib" );
-        my $blib_lib  = File::Spec->catdir( $blib, "lib" );
-        my $blib_arch = File::Spec->catdir( $blib, $archdir );
-
-        if ( -d $blib && -d $blib_arch && -d $blib_lib ) {
-            return ( $blib_arch, $blib_lib );
-        }
-        $dir = File::Spec->catdir( $dir, File::Spec->updir );
-    }
-    warn "$0: Cannot find blib\n";
-    return;
+sub print_version {
+    printf( "TAP::Harness v%s and Perl v%vd\n", $TAP::Harness::VERSION, $^V );
 }
-
 __END__
 
 =head1 NAME
 
-prove -- A command-line tool for running tests against Test::Harness
+prove - Run tests through a TAP harness.
 
-=head1 SYNOPSIS
+=head1 USAGE
 
-prove [options] [files/directories]
+ prove [options] [files or directories]
 
 =head1 OPTIONS
 
-    -b, --blib        Adds blib/lib to the path for your tests, a la "use blib"
-    -d, --debug       Includes extra debugging information
-    -D, --dry         Dry run: Show the tests to run, but don't run them
-    -h, --help        Display this help
-    -H, --man         Longer manpage for prove
-    -I                Add libraries to @INC, as Perl's -I
-    -l, --lib         Add lib to the path for your tests
-        --perl        Sets the name of the Perl executable to use
-    -r, --recurse     Recursively descend into directories
-    -s, --shuffle     Run the tests in a random order
-        --strap       Define strap class to use
-    -T                Enable tainting checks
-    -t                Enable tainting warnings
-        --timer       Print elapsed time after each test file
-        --directives  Only print results with directives (TODO or SKIP)
-    -v, --verbose     Display standard output of test scripts while running them
-    -V, --version     Display version info
-    -w                Report on warnings
- 
-Single-character options may be stacked.  Default options may be set by
-specifying the PROVE_SWITCHES environment variable.
+Boolean options
 
-=head1 OVERVIEW
+ -v,  --verbose     Print all test lines.
+ -l,  --lib         Add 'lib' to the path for your tests (-Ilib).
+ -b,  --blib        Add 'blib/lib' to the path for your tests (-Iblib/lib).
+ -s,  --shuffle     Run the tests in random order.
+ -c,  --color       Colored test output (default).  See TAP::Harness::Color.
+      --nocolor     Do not color test output.
+ -f,  --failures    Only show failed tests.
+ -m,  --merge       Merge test scripts' STDERR with their STDOUT.
+ -r,  --recurse     Recursively descend into directories.
+      --reverse     Run the tests in reverse order.
+ -q,  --quiet       Suppress some test output while running tests.
+ -Q,  --QUIET       Only print summary results.
+ -p,  --parse       Show full list of TAP parse errors, if any.
+      --directives  Only show results with TODO or SKIP directives.
+ -T                 Enable tainting checks.
+ -t                 Enable tainting warnings.
+ -W                 Enable fatal warnings.
+ -w                 Enable warnings.
+ -h,  --help        Display this help
+ -?,                Display this help
+ -H,  --man         Longer manpage for prove
 
-F<prove> is a command-line interface to the test-running functionality
-of C<Test::Harness>.  With no arguments, it will run all tests in the
-current directory.
+Options which take arguments
 
-Shell metacharacters may be used with command lines options and will be exanded 
-via C<File::Glob::bsd_glob>.
+ -I                 Library paths to include.
+ -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
+      --harness     Define test harness to use.  See TAP::Harness.
+      --formatter   Result formatter to use. See TAP::Harness.
+ -a,  --archive     Store the resulting TAP into the specified archive file.
 
-=head1 PROVE VS. "MAKE TEST"
+=head2 Reading from C<STDIN>
 
-F<prove> has a number of advantages over C<make test> when doing development.
+If you have a list of tests (or URLs, or anything else you want to test) in a
+file, you can add them to your tests by using a '-':
 
-=over 4
+ prove - < my_list_of_things_to_test.txt
 
-=item * F<prove> is designed as a development tool
+See the C<README> in the C<examples> directory of this distribution.
 
-Perl users typically run the test harness through a makefile via
-C<make test>.  That's fine for module distributions, but it's
-suboptimal for a test/code/debug development cycle.
+=head1 NOTES
 
-=item * F<prove> is granular 
+=head2 Default Test Directory
 
-F<prove> lets your run against only the files you want to check.
-Running C<prove t/live/ t/master.t> checks every F<*.t> in F<t/live>,
-plus F<t/master.t>.
+If no files or directories are supplied, C<prove> looks for all files
+matching the pattern C<t/*.t>.
 
-=item * F<prove> has an easy verbose mode
+=head2 Colored Test Output
 
-F<prove> has a C<-v> option to see the raw output from the tests.
-To do this with C<make test>, you must set C<HARNESS_VERBOSE=1> in
-the environment.
+Specifying the C<--color> or C<-c> switch is the same as:
 
-=item * F<prove> can run under taint mode
+ prove --harness TAP::Harness::Color
 
-F<prove>'s C<-T> runs your tests under C<perl -T>, and C<-t> runs them
-under C<perl -t>.
+Colored test output is the default, but if output is not to a terminal, color
+is disabled.  You can override this by adding the C<--color> switch.
 
-=item * F<prove> can shuffle tests
+=head2 C<--exec>
 
-You can use F<prove>'s C<--shuffle> option to try to excite problems
-that don't show up when tests are run in the same order every time.
+Normally you can just pass a list of Perl tests and the harness will know how
+to execute them.  However, if your tests are not written in Perl or if you
+want all tests invoked exactly the same way, use the C<-e>, or C<--exec>
+switch:
 
-=item * F<prove> doesn't rely on a make tool
+ prove --exec '/usr/bin/ruby -w' t/
+ prove --exec '/usr/bin/perl -Tw -mstrict -Ilib' t/
+ prove --exec '/path/to/my/customer/exec'
 
-Not everyone wants to write a makefile, or use L<ExtUtils::MakeMaker>
-to do so.  F<prove> has no external dependencies.
+=head2 C<--merge>
 
-=item * Not everything is a module
+If you need to make sure your diagnostics are displayed in the correct
+order relative to test results you can use the C<--merge> option to
+merge the test scripts' STDERR into their STDOUT. 
 
-More and more users are using Perl's testing tools outside the
-context of a module distribution, and may not even use a makefile
-at all.
+This guarantees that STDOUT (where the test results appear) and STDOUT
+(where the diagnostics appear) will stay in sync. The harness will
+display any diagnostics your tests emit on STDERR.
 
-=back
+Caveat: this is a bit of a kludge. In particular note that if anything
+that appears on STDERR looks like a test result the test harness will
+get confused. Use this option only if you understand the consequences
+and can live with the risk.
 
-=head1 COMMAND LINE OPTIONS
+=head1 PERFORMANCE
 
-=head2 -b, --blib
+Because of its design, C<TAP::Parser> collects more information than
+C<Test::Harness>.  However, the trade-off is sometimes slightly slower
+performance than when using the C<prove> utility which is bundled with
+L<Test::Harness>.  For small tests suites, this is usually not a problem.
+However, enabling the C<--quiet> or C<--QUIET> options can sometimes speed up
+the test suite, sometimes running faster than C<prove>.
 
-Adds blib/lib to the path for your tests, a la "use blib".
+=head1 SEE ALSO
 
-=head2 -d, --debug
+C<prove>, which comes with L<Test::Harness> and whose code I've nicked in a
+few places (thanks Andy!).
 
-Include debug information about how F<prove> is being run.  This
-option doesn't show the output from the test scripts.  That's handled
-by -v,--verbose.
+=head1 CAVEATS
 
-=head2 -D, --dry
-
-Dry run: Show the tests to run, but don't run them.
-
-=head2 -I
-
-Add libraries to @INC, as Perl's -I.
-
-=head2 -l, --lib
-
-Add C<lib> to @INC.  Equivalent to C<-Ilib>.
-
-=head2 --perl
-
-Sets the C<HARNESS_PERL> environment variable, which controls what
-Perl executable will run the tests.
-
-=head2 -r, --recurse
-
-Descends into subdirectories of any directories specified, looking for tests.
-
-=head2 -s, --shuffle
-
-Sometimes tests are accidentally dependent on tests that have been
-run before.  This switch will shuffle the tests to be run prior to
-running them, thus ensuring that hidden dependencies in the test
-order are likely to be revealed.  The author hopes the run the
-algorithm on the preceding sentence to see if he can produce something
-slightly less awkward.
-
-=head2 --strap
-
-Sets the HARNESS_STRAP_CLASS variable to set which Test::Harness::Straps
-variable to use in running the tests.
-
-=head2 -t
-
-Runs test programs under perl's -t taint warning mode.
-
-=head2 -T
-
-Runs test programs under perl's -T taint mode.
-
-=head2 --timer
-
-Print elapsed time after each test file.
-
-=head2 --directives
-
-Only show results with TODO or SKIP directives.
-
-=head2 -v, --verbose
-
-Display standard output of test scripts while running them.  Also sets
-TEST_VERBOSE in case your tests rely on them.
-
-=head2 -V, --version
-
-Display version info.
-
-=head2 -w 
-
-Report on warnings, as per C<perl -w>.
-
-=head1 BUGS
-
-Please use the CPAN bug ticketing system at L<http://rt.cpan.org/>.
-You can also mail bugs, fixes and enhancements to 
-C<< <bug-test-harness@rt.cpan.org> >>.
-
-=head1 TODO
-
-=over 4
-
-=item *
-
-Shuffled tests must be recreatable
-
-=back
-
-=head1 AUTHORS
-
-Andy Lester C<< <andy at petdance.com> >>
-
-=head1 COPYRIGHT
-
-Copyright 2004-2006 by Andy Lester C<< <andy at petdance.com> >>.
-
-This program is free software; you can redistribute it and/or 
-modify it under the same terms as Perl itself.
-
-See L<http://www.perl.com/perl/misc/Artistic.html>.
+This is alpha code.  You've been warned.
 
 =cut

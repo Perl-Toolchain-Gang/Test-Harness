@@ -15,11 +15,11 @@ WriteMakefile(
     'VERSION_FROM' => 'lib/Test/Harness.pm',
     'PREREQ_PM'    => {
         'Test::More' => '0',
-        'Pod::Usage' => '0',    # for 'runtests' utility
+        'Pod::Usage' => '0',    # for 'prove' utility
     },
     'INSTALLDIRS' => 'site',
     'PL_FILES'    => {},
     'LICENSE'     => 'perl',
     'test'        => { 'TESTS' => 't/*.t t/compat/*.t' },
-    'EXE_FILES'   => ["bin/runtests"],
+    'EXE_FILES'   => ["bin/prove"],
 );

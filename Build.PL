@@ -6,47 +6,35 @@ use 5.005;
 my $build_class = Module::Build->subclass(
     class => 'inc::MyBuilder',
     code  => <<'    SUBCLASS',
-      sub ACTION_testruntests {
+      sub ACTION_testprove {
           my $self = shift;
           $self->depends_on('code');
-          exec($^X, '-Iblib/lib', 'bin/runtests', '-Iblib/lib');
+          exec($^X, '-Iblib/lib', 'bin/prove', '-Iblib/lib');
       }
     SUBCLASS
 );
 
 my $builder = $build_class->new(
-    module_name => 'TAP::Parser',
+    module_name => 'Test::Harness',
     license     => 'perl',
     meta_merge  => {
         resources => {
             homepage => 'http://testanything.org/',
             bugtracker =>
-              'http://rt.cpan.org/Public/Dist/Display.html?Name=TAP-Parser',
+              'http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Harness',
             MailingList => 'mailto:<tapx-dev@hexten.net>',
             repository =>
               'http://svn.hexten.net/tapx/trunk',
         },
-        keywords => [ 'TAP', 'test harness', 'prove', 'runtests' ],
+        keywords => [ 'TAP', 'test harness', 'prove' ],
     },
     recursive_test_files => 1,
     requires             => {
         'Test::More' => 0,
-        'Pod::Usage' => 0,    # for 'runtests'
+        'Pod::Usage' => 0,    # for 'prove'
     },
-    add_to_cleanup => ['TAP-Parser-*'],
-    script_files => ["bin/runtests"],
+    add_to_cleanup => ['Test-Harness-*'],
+    script_files => ["bin/prove"],
 );
-
-# if ($builder->prompt(
-#         "TAP::Parser includes \"runtests\" which is the equivalent of the\n"
-#           . "TAP::Harness \"prove\". If you choose to install runtests you will be able\n"
-#           . "to run a module's test suite via TAP::Parser by typing \"runtests -rb\" in\n"
-#           . "the project's root directory.\n\n" 
-#           . "Do you wish to install the 'runtests' utility?", "y"
-#     ) =~ /^[Yy]/
-#   )
-# {
-#     $builder->script_files( ["bin/runtests"] );
-# }
 
 $builder->create_build_script();
