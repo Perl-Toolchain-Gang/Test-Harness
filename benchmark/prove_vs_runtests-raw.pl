@@ -7,6 +7,7 @@ use strict;
 
 use Benchmark qw(:hireswallclock);
 use File::Temp ();
+use File::Spec ();
 use Cwd ();
 use Config;
 
@@ -17,7 +18,7 @@ my %knobs = (
     noisy          => 0,
 );
 
-if(1) { # header
+if(0) { # header
     my @mods = qw(
         TAP::Parser
         Test::Harness
@@ -57,8 +58,18 @@ for my $num (1..$knobs{num_test_files}) {
 }
 
 my $perl = $^X;
-my @prove    = ('prove', 't/');
-my @runtests = ('runtests');
+my $th_dir = 'reference/Test-Harness-2.64';
+my @prove = (
+    $perl,
+    '-I' . File::Spec->catfile( $pwd, $th_dir, 'lib' ),
+    File::Spec->catfile( $pwd, $th_dir, 'bin/prove' ),
+    't/'
+);
+my @runtests = (
+    $perl,
+    '-I' . File::Spec->catfile( $pwd, 'lib' ),
+    File::Spec->catfile( $pwd, 'bin/prove' )
+);
 
 my $catch_out = sub {
     open(my $TO_OUT, "<&STDOUT") or die "ack1\n";
@@ -87,6 +98,11 @@ sub time_this {
     print $name, "\n  $out\n\n";
 
     return($name, $t);
+}
+
+if($knobs{noisy}) {
+    warn "prove:    ", join(" ", @prove), "\n";
+    warn "runtests: ", join(" ", @runtests), "\n";
 }
 
 my $res = {
