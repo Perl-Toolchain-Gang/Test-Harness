@@ -89,7 +89,7 @@ sub ok ($;$) {
 
 Test::Simple will start by printing number of tests run in the form
 "1..M" (so "1..5" means you're going to run 5 tests).  This strange
-format lets TAP::Harness::Compatible know how many tests you plan on running in
+format lets Test::Harness know how many tests you plan on running in
 case something goes horribly wrong.
 
 If all your tests passed, Test::Simple will exit with zero (which is
@@ -204,7 +204,7 @@ Elaborate unit testing.
 
 Embed tests in your code!
 
-=item L<TAP::Harness::Compatible>
+=item L<Test::Harness>
 
 Interprets the output of your test program.
 

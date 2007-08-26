@@ -2,7 +2,7 @@
 
 use strict;
 
-use TAP::Harness::Compatible;
+use Test::Harness;
 
 use Getopt::Long;
 use Pod::Usage 1.12;
@@ -31,8 +31,8 @@ Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
     'b|blib'     => \$blib,
-    'd|debug'    => \$TAP::Harness::Compatible::debug,
-    'directives' => \$TAP::Harness::Compatible::Directives,
+    'd|debug'    => \$Test::Harness::debug,
+    'directives' => \$Test::Harness::Directives,
     'D|dry'      => \$dry,
     'h|help|?'   => sub { pod2usage( { -verbose => 1 } ); exit },
     'H|man'      => sub { pod2usage( { -verbose => 2 } ); exit },
@@ -46,12 +46,12 @@ GetOptions(
     'w' => sub { push @switches,    '-w' },
     'W' => sub { push @switches,    '-W' },
     'strap=s'   => \$ENV{HARNESS_STRAP_CLASS},
-    'timer'     => \$TAP::Harness::Compatible::Timer,
-    'v|verbose' => \$TAP::Harness::Compatible::verbose,
+    'timer'     => \$Test::Harness::Timer,
+    'v|verbose' => \$Test::Harness::verbose,
     'V|version' => sub { print_version(); exit; },
 ) or exit 1;
 
-$ENV{TEST_VERBOSE} = 1 if $TAP::Harness::Compatible::verbose;
+$ENV{TEST_VERBOSE} = 1 if $Test::Harness::verbose;
 
 # Handle blib includes
 if ($blib) {
@@ -71,10 +71,10 @@ if ($lib) {
 
 # Build up TH switches
 push @switches, map { /\s/ && !/^".*"$/ ? qq["-I$_"] : "-I$_" } @includes;
-$TAP::Harness::Compatible::Switches = join( ' ', @switches );
+$Test::Harness::Switches = join( ' ', @switches );
 print
-  "# \$TAP::Harness::Compatible::Switches: $TAP::Harness::Compatible::Switches\n"
-  if $TAP::Harness::Compatible::debug;
+  "# \$Test::Harness::Switches: $Test::Harness::Switches\n"
+  if $Test::Harness::debug;
 
 @ARGV = File::Spec->curdir unless @ARGV;
 my @argv_globbed;
@@ -101,15 +101,15 @@ if (@tests) {
     }
     else {
         print "# ", scalar @tests, " tests to run\n"
-          if $TAP::Harness::Compatible::debug;
+          if $Test::Harness::debug;
         runtests(@tests);
     }
 }
 
 sub print_version {
     printf(
-        "prove v%s, using TAP::Harness::Compatible v%s and Perl v%vd\n",
-        $VERSION, $TAP::Harness::Compatible::VERSION, $^V
+        "prove v%s, using Test::Harness v%s and Perl v%vd\n",
+        $VERSION, $Test::Harness::VERSION, $^V
     );
 }
 
@@ -196,7 +196,7 @@ __END__
 
 =head1 NAME
 
-prove -- A command-line tool for running tests against TAP::Harness::Compatible
+prove -- A command-line tool for running tests against Test::Harness
 
 =head1 SYNOPSIS
 
@@ -229,7 +229,7 @@ specifying the PROVE_SWITCHES environment variable.
 =head1 OVERVIEW
 
 F<prove> is a command-line interface to the test-running functionality
-of C<TAP::Harness::Compatible>.  With no arguments, it will run all tests in the
+of C<Test::Harness>.  With no arguments, it will run all tests in the
 current directory.
 
 Shell metacharacters may be used with command lines options and will be exanded 
@@ -326,7 +326,7 @@ slightly less awkward.
 
 =head2 --strap
 
-Sets the HARNESS_STRAP_CLASS variable to set which TAP::Harness::Compatible::Straps
+Sets the HARNESS_STRAP_CLASS variable to set which Test::Harness::Straps
 variable to use in running the tests.
 
 =head2 -t

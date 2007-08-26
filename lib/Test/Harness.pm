@@ -1,11 +1,11 @@
-package TAP::Harness::Compatible;
+package Test::Harness;
 
 require 5.00405;
 
 use TAP::Harness;
 use TAP::Parser::Aggregator;
 
-#use TAP::Harness::Compatible::Straps;
+#use Test::Harness::Straps;
 use Exporter;
 use Benchmark;
 use Config;
@@ -32,7 +32,7 @@ BEGIN {
 
 =head1 NAME
 
-TAP::Harness::Compatible - Run Perl standard test scripts with statistics
+Test::Harness - Run Perl standard test scripts with statistics
 
 =head1 VERSION
 
@@ -70,7 +70,7 @@ $Timer = $ENV{HARNESS_TIMER} || 0;
 
 =head1 SYNOPSIS
 
-  use TAP::Harness::Compatible;
+  use Test::Harness;
 
   runtests(@test_files);
 
@@ -328,14 +328,14 @@ __END__
 
 =head1 EXPORT
 
-C<&runtests> is exported by C<TAP::Harness::Compatible> by default.
+C<&runtests> is exported by C<Test::Harness> by default.
 
 C<&execute_tests>, C<$verbose>, C<$switches> and C<$debug> are
 exported upon request.
 
 =head1 ENVIRONMENT VARIABLES THAT TAP::HARNESS::COMPATIBLE SETS
 
-C<TAP::Harness::Compatible> sets these before executing the individual tests.
+C<Test::Harness> sets these before executing the individual tests.
 
 =over 4
 
@@ -346,7 +346,7 @@ are being executed through the harness or by any other means.
 
 =item C<HARNESS_VERSION>
 
-This is the version of C<TAP::Harness::Compatible>.
+This is the version of C<Test::Harness>.
 
 =back
 
@@ -362,12 +362,12 @@ switch.
 
 =item C<HARNESS_VERBOSE>
 
-If true, C<TAP::Harness::Compatible> will output the verbose results of running
-its tests.  Setting C<$TAP::Harness::Compatible::verbose> will override this,
+If true, C<Test::Harness> will output the verbose results of running
+its tests.  Setting C<$Test::Harness::verbose> will override this,
 or you can use the C<-v> switch in the F<prove> utility.
 
-If true, C<TAP::Harness::Compatible> will output the verbose results of running
-its tests.  Setting C<$TAP::Harness::Compatible::verbose> will override this,
+If true, C<Test::Harness> will output the verbose results of running
+its tests.  Setting C<$Test::Harness::verbose> will override this,
 or you can use the C<-v> switch in the F<prove> utility.
 
 =back

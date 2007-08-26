@@ -13,7 +13,6 @@ examples/test_urls.txt
 lib/TAP/Base.pm
 lib/TAP/Harness.pm
 lib/TAP/Harness/Color.pm
-lib/TAP/Harness/Compatible.pm
 lib/TAP/Parser.pm
 lib/TAP/Parser/Aggregator.pm
 lib/TAP/Parser/Grammar.pm
@@ -33,6 +32,7 @@ lib/TAP/Parser/Source.pm
 lib/TAP/Parser/Source/Perl.pm
 lib/TAP/Parser/YAMLish/Reader.pm
 lib/TAP/Parser/YAMLish/Writer.pm
+lib/Test/Harness.pm
 Makefile.PL
 MANIFEST
 README

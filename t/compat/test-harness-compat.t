@@ -3,7 +3,7 @@
 use strict;
 use Test::More;
 use TAP::Harness;
-use TAP::Harness::Compatible qw(execute_tests);
+use Test::Harness qw(execute_tests);
 use File::Spec;
 
 {

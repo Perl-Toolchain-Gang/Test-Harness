@@ -1,6 +1,6 @@
 #!/usr/bin/perl -wT
 
-use Test::More tests => 40;
+use Test::More tests => 42;
 
 BEGIN {
     my @classes = qw(
@@ -24,6 +24,7 @@ BEGIN {
       TAP::Harness
       TAP::Harness::Color
       TAP::Base
+      Test::Harness
     );
 
     foreach my $class (@classes) {
@@ -31,5 +32,5 @@ BEGIN {
         is $class->VERSION, TAP::Parser->VERSION,
           "... and it should have the correct version";
     }
-    diag("Testing TAP::Parser $TAP::Parser::VERSION, Perl $], $^X");
+    diag("Testing Test::Harness $Test::Harness::VERSION, Perl $], $^X");
 }

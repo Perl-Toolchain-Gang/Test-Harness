@@ -34,18 +34,19 @@ my $builder = $build_class->new(
         'Pod::Usage' => 0,    # for 'runtests'
     },
     add_to_cleanup => ['TAP-Parser-*'],
+    script_files => ["bin/runtests"],
 );
 
-if ($builder->prompt(
-        "TAP::Parser includes \"runtests\" which is the equivalent of the\n"
-          . "TAP::Harness \"prove\". If you choose to install runtests you will be able\n"
-          . "to run a module's test suite via TAP::Parser by typing \"runtests -rb\" in\n"
-          . "the project's root directory.\n\n" 
-          . "Do you wish to install the 'runtests' utility?", "y"
-    ) =~ /^[Yy]/
-  )
-{
-    $builder->script_files( ["bin/runtests"] );
-}
+# if ($builder->prompt(
+#         "TAP::Parser includes \"runtests\" which is the equivalent of the\n"
+#           . "TAP::Harness \"prove\". If you choose to install runtests you will be able\n"
+#           . "to run a module's test suite via TAP::Parser by typing \"runtests -rb\" in\n"
+#           . "the project's root directory.\n\n" 
+#           . "Do you wish to install the 'runtests' utility?", "y"
+#     ) =~ /^[Yy]/
+#   )
+# {
+#     $builder->script_files( ["bin/runtests"] );
+# }
 
 $builder->create_build_script();

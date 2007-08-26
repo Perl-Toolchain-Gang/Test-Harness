@@ -15,7 +15,7 @@ sub _all_ok {
     return $tot->{bad} == 0 && ( $tot->{max} || $tot->{skipped} ) ? 1 : 0;
 }
 
-use TAP::Harness::Compatible;
+use Test::Harness;
 use Test::More tests => 1;
 use Dev::Null;
 
@@ -26,7 +26,7 @@ use Dev::Null;
 
     tie *NULL, 'Dev::Null' or die $!;
     select NULL;
-    my ( $tot, $failed ) = TAP::Harness::Compatible::execute_tests(
+    my ( $tot, $failed ) = Test::Harness::execute_tests(
         tests => [
             $ENV{PERL_CORE}
             ? 'lib/sample-tests/inc_taint'

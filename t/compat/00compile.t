@@ -12,10 +12,10 @@ BEGIN {
 
 use Test::More tests => 1;
 
-BEGIN { use_ok 'TAP::Harness::Compatible' }
+BEGIN { use_ok 'Test::Harness' }
 
 BEGIN {
     diag(
-        "Testing TAP::Harness::Compatible $TAP::Harness::Compatible::VERSION under Perl $] and Test::More $Test::More::VERSION"
+        "Testing Test::Harness $Test::Harness::VERSION under Perl $] and Test::More $Test::More::VERSION"
     ) unless $ENV{PERL_CORE};
 }

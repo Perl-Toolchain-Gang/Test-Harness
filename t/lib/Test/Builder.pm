@@ -270,7 +270,7 @@ ERR
 
     if ( defined $name ) {
         $name
-          =~ s|#|\\#|g;   # # in a name can confuse TAP::Harness::Compatible.
+          =~ s|#|\\#|g;   # # in a name can confuse Test::Harness.
         $out .= " - $name";
     }
 
@@ -545,7 +545,7 @@ DIAGNOSTIC
 
     $Test->BAILOUT($reason);
 
-Indicates to the TAP::Harness::Compatible that things are going so badly all
+Indicates to the Test::Harness that things are going so badly all
 testing should terminate.  This includes running any additional test
 scripts.
 
@@ -694,7 +694,7 @@ or this if false
 Most useful when you can't depend on the test output order, such as
 when threads or forking is involved.
 
-TAP::Harness::Compatible will accept either, but avoid mixing the two styles.
+Test::Harness will accept either, but avoid mixing the two styles.
 
 Defaults to on.
 
@@ -988,7 +988,7 @@ Like summary(), but with a lot more detail.
     my $todo_reason = $Test->todo($pack);
 
 todo() looks for a $TODO variable in your tests.  If set, all tests
-will be considered 'todo' (see Test::More and TAP::Harness::Compatible for
+will be considered 'todo' (see Test::More and Test::Harness for
 details).  Returns the reason (ie. the value of $TODO) if running as
 todo tests, false otherwise.
 
@@ -1185,7 +1185,7 @@ At this point, Test::Simple and Test::More are your best examples.
 
 =head1 SEE ALSO
 
-Test::Simple, Test::More, TAP::Harness::Compatible
+Test::Simple, Test::More, Test::Harness
 
 =head1 AUTHORS
 

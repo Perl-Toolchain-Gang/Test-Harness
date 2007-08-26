@@ -15,9 +15,9 @@ use strict;
 use Test::More tests => 3;
 
 BEGIN {
-    use_ok('TAP::Harness::Compatible');
+    use_ok('Test::Harness');
 }
 
 my $ver = $ENV{HARNESS_VERSION} or die "HARNESS_VERSION not set";
 ok( $ver =~ /^[23].\d\d(_\d\d)?$/, "Version is proper format" );
-is( $ver, $TAP::Harness::Compatible::VERSION );
+is( $ver, $Test::Harness::VERSION );

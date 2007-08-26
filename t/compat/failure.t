@@ -16,7 +16,7 @@ use Test::More tests => 6;
 use File::Spec;
 
 BEGIN {
-    use_ok('TAP::Harness::Compatible');
+    use_ok('Test::Harness');
 }
 
 TODO: {
