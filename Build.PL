@@ -9,7 +9,7 @@ my $build_class = Module::Build->subclass(
       sub ACTION_testprove {
           my $self = shift;
           $self->depends_on('code');
-          exec($^X, '-Iblib/lib', 'bin/prove', '-Iblib/lib');
+          exec($^X, '-Iblib/lib', 'bin/prove', '-rb');
       }
     SUBCLASS
 );
