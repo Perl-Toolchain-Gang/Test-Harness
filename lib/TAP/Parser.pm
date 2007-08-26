@@ -89,12 +89,9 @@ BEGIN {
 
 =head1 DESCRIPTION
 
-C<TAP::Parser> is designed to produce a proper parse of TAP output.  It is
-ALPHA code and should be treated as such.  The interface is now solid, but it
-is still subject to change.
-
-For an example of how to run tests through this module, see the simple
-harnesses C<examples/>. 
+C<TAP::Parser> is designed to produce a proper parse of TAP output. For
+an example of how to run tests through this module, see the simple
+harnesses C<examples/>.
 
 There's a wiki dedicated to the Test Anything Protocol:
 
