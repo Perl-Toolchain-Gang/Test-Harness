@@ -745,7 +745,7 @@ sub _runtest {
         my $planned = $parser->tests_planned;
         if ( 1 == $test_print_modulus && $planned ) {
             my $divisor = $planned > 100 ? 5 : 2;
-            $test_print_modulus = int( $planned / $divisor );
+            $test_print_modulus = int( $planned / $divisor ) || 1;
         }
         $output = $self->_get_output_method($parser);
         if ( $result->is_bailout ) {
