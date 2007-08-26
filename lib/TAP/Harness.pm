@@ -745,10 +745,6 @@ sub _runtest {
     my $test_print_modulus = 1;
     while ( defined( my $result = $parser->next ) ) {
         my $planned = $parser->tests_planned;
-        if ( 1 == $test_print_modulus && $planned ) {
-            my $divisor = $planned > 100 ? 5 : 2;
-            $test_print_modulus = int( $planned / $divisor ) || 1;
-        }
         $output = $self->_get_output_method($parser);
         if ( $result->is_bailout ) {
             $self->failure_output(
@@ -760,11 +756,11 @@ sub _runtest {
         unless ($plan) {
             $plan = '/' . ( $planned || 0 ) . ' ';
         }
-        if ( $show_count && $result->is_test ) {
+        if ( $show_count && !$really_quiet && $result->is_test ) {
             my $number = $result->number;
+            $test_print_modulus *= 2 while $test_print_modulus < $number / 5;
             if ( !( $number % $test_print_modulus ) ) {
-                $self->$output( "\r$leader" . $number . $plan )
-                  unless $really_quiet;
+                $self->$output( "\r$leader" . $number . $plan );
             }
         }
         $self->_process( $parser, $result, $prev_result );
