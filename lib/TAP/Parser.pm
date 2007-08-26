@@ -42,7 +42,6 @@ BEGIN {
         _stream
         _spool
         _grammar
-        _state
         exec
         exit
         is_good_plan
@@ -240,41 +239,8 @@ module and related classes for more information on how to use them.
 =cut
 
 sub next {
-    my $self   = shift;
-    my $stream = $self->_stream;
-
-    my $result = eval { $self->_grammar->tokenize };
-    $self->_add_error($@) if $@;
-
-    if ( defined $result ) {
-        $self->_next_state($result);
-
-        my $code;
-        if ( $code = $self->_callback_for( $result->type ) ) {
-            $code->($result);
-        }
-        else {
-            $self->_make_callback( 'ELSE', $result );
-        }
-        $self->_make_callback( 'ALL', $result );
-
-        # Echo TAP to spool file
-        if ( my $spool = $self->_spool ) {
-            print $spool $result->raw, "\n";
-        }
-    }
-    else {
-        $self->exit( $stream->exit );
-        $self->wait( $stream->wait );
-        $self->_finish;
-
-        my $code;
-        if ( $code = $self->_callback_for('EOF') ) {
-            $code->($self);
-        }
-    }
-
-    return $result;
+    my $self = shift;
+    return ( $self->{_iter} ||= $self->_iter )->();
 }
 
 ##############################################################################
@@ -300,7 +266,6 @@ sub run {
     # of the following, anything beginning with an underscore is strictly
     # internal and should not be exposed.
     my %initialize = (
-        _state        => 'INIT',
         version       => $DEFAULT_TAP_VERSION,
         plan          => '',                    # the test plan (e.g., 1..3)
         tap           => '',                    # the TAP
@@ -968,24 +933,9 @@ sub _add_error {
     return $self;
 }
 
-sub _aggregate_results {
-    my ( $self, $test ) = @_;
-
-    my $num = $test->number;
-
-    push @{ $self->{todo} }          => $num if $test->has_todo;
-    push @{ $self->{todo_passed} }   => $num if $test->todo_passed;
-    push @{ $self->{passed} }        => $num if $test->is_ok;
-    push @{ $self->{actual_passed} } => $num if $test->is_actual_ok;
-    push @{ $self->{skipped} }       => $num if $test->has_skip;
-
-    push @{ $self->{actual_failed} } => $num if !$test->is_actual_ok;
-    push @{ $self->{failed} }        => $num if !$test->is_ok;
-}
-
-my %states;
-
-BEGIN {
+sub _make_state_table {
+    my $self = shift;
+    my %states;
 
     # These transitions are defaults for all states
     my %state_globals = (
@@ -993,7 +943,7 @@ BEGIN {
         bailout => {},
         version => {
             act => sub {
-                my ( $self, $version ) = @_;
+                my ($version) = @_;
                 local *__ANON__ = '__ANON__bad_version_handler';
                 $self->_add_error(
                     "If TAP version is present it must be the first line of output"
@@ -1006,7 +956,7 @@ BEGIN {
     my %state_defaults = (
         plan => {
             act => sub {
-                my ( $self, $plan ) = @_;
+                my ($plan) = @_;
                 local *__ANON__ = '__ANON__plan_handler';
                 $self->tests_planned( $plan->tests_planned );
                 $self->plan( $plan->plan );
@@ -1014,11 +964,11 @@ BEGIN {
         },
         test => {
             act => sub {
-                my ( $self, $test ) = @_;
+                my ($test) = @_;
                 local *__ANON__ = '__ANON__test_handler';
 
                 $self->in_todo( $test->has_todo );
-                $self->tests_run( $self->tests_run + 1 );
+                $self->{tests_run}++;
                 if ( defined( my $tests_planned = $self->tests_planned ) ) {
                     if ( $self->tests_run > $tests_planned ) {
                         $test->is_unplanned(1);
@@ -1037,12 +987,24 @@ BEGIN {
                 else {
                     $test->_number( $self->tests_run );
                 }
-                $self->_aggregate_results($test);
+
+                my $num = $test->number;
+
+                push @{ $self->{todo} }        => $num if $test->has_todo;
+                push @{ $self->{todo_passed} } => $num if $test->todo_passed;
+                push @{ $self->{passed} }      => $num if $test->is_ok;
+                push @{ $self->{actual_passed} } => $num
+                  if $test->is_actual_ok;
+                push @{ $self->{skipped} } => $num if $test->has_skip;
+
+                push @{ $self->{actual_failed} } => $num
+                  if !$test->is_actual_ok;
+                push @{ $self->{failed} } => $num if !$test->is_ok;
             },
         },
         yaml => {
             act => sub {
-                my ( $self, $test ) = @_;
+                my ($test) = @_;
                 local *__ANON__ = '__ANON__yaml_handler';
             },
         },
@@ -1057,7 +1019,7 @@ BEGIN {
         INIT => {
             version => {
                 act => sub {
-                    my ( $self, $version ) = @_;
+                    my ($version) = @_;
                     local *__ANON__ = '__ANON__version_handler';
                     my $ver_num = $version->version;
                     if ( $ver_num <= $DEFAULT_TAP_VERSION ) {
@@ -1090,7 +1052,7 @@ BEGIN {
             test => { goto => 'PLANNED_AFTER_TEST' },
             plan => {
                 act => sub {
-                    my ( $self, $version ) = @_;
+                    my ($version) = @_;
                     local *__ANON__ = '__ANON__multiple_plan_handler';
                     $self->_add_error(
                         "More than one plan found in TAP output");
@@ -1105,7 +1067,7 @@ BEGIN {
         GOT_PLAN => {
             test => {
                 act => sub {
-                    my ( $self, $plan ) = @_;
+                    my ($plan) = @_;
                     my $line = $self->plan;
                     $self->_add_error(
                         "Plan ($line) must be at the beginning or end of the TAP output"
@@ -1115,9 +1077,7 @@ BEGIN {
                 },
                 continue => 'PLANNED'
             },
-            plan => {
-                continue => 'PLANNED'
-            },
+            plan => { continue => 'PLANNED' },
         },
         UNPLANNED => {
             test => { goto => 'UNPLANNED_AFTER_TEST' },
@@ -1148,30 +1108,94 @@ BEGIN {
         # Stuff back in table
         $states{$name} = $st;
     }
+
+    return \%states;
 }
 
-# Advance the state machine
-sub _next_state {
-    my $self  = shift;
-    my $token = shift;
+sub _iter {
+    my $self        = shift;
+    my $stream      = $self->_stream;
+    my $spool       = $self->_spool;
+    my $grammar     = $self->_grammar;
+    my $state       = 'INIT';
+    my $state_table = $self->_make_state_table;
 
-    my $state = $states{ $self->_state }
-      or die "Illegal state: ", $self->_state;
+    # Make next_state closure
+    my $next_state = sub {
+        my $token = shift;
+        my $type  = $token->type;
+        my $count = 1;
+        TRANS: {
+            my $state_spec = $state_table->{$state}
+              or die "Illegal state: ", $state;
 
-    my $type = $token->type;
-
-    if ( my $next = $state->{$type} ) {
-        if ( my $act = $next->{act} ) {
-            $self->$act($token);
+            if ( my $next = $state_spec->{$type} ) {
+                if ( my $act = $next->{act} ) {
+                    $act->($token);
+                }
+                if ( my $cont = $next->{continue} ) {
+                    $state = $cont;
+                    redo TRANS;
+                }
+                elsif ( my $goto = $next->{goto} ) {
+                    $state = $goto;
+                }
+            }
         }
+    };
 
-        if ( my $cont = $next->{continue} ) {
-            $self->_state($cont);
-            $self->_next_state($token);
-        }
-        elsif ( my $goto = $next->{goto} ) {
-            $self->_state($goto);
-        }
+    if ( $self->_has_callbacks ) {
+        return sub {
+            my $result = eval { $grammar->tokenize };
+            $self->_add_error($@) if $@;
+
+            if ( defined $result ) {
+                $next_state->($result);
+
+                if ( my $code = $self->_callback_for( $result->type ) ) {
+                    $code->($result);
+                }
+                else {
+                    $self->_make_callback( 'ELSE', $result );
+                }
+
+                $self->_make_callback( 'ALL', $result );
+
+                # Echo TAP to spool file
+                print $spool $result->raw, "\n" if $spool;
+            }
+            else {
+                $self->exit( $stream->exit );
+                $self->wait( $stream->wait );
+                $self->_finish;
+
+                if ( my $code = $self->_callback_for('EOF') ) {
+                    $code->($self);
+                }
+            }
+
+            return $result;
+        };
+    }
+    else {
+        return sub {
+            my $result = eval { $grammar->tokenize };
+            $self->_add_error($@) if $@;
+
+            if ( defined $result ) {
+                $next_state->($result);
+
+                # Echo TAP to spool file
+                print $spool $result->raw, "\n" if $spool;
+            }
+            else {
+                $self->exit( $stream->exit );
+                $self->wait( $stream->wait );
+                $self->_finish;
+            }
+
+            return $result;
+        };
     }
 }
 
