@@ -19,11 +19,11 @@ TAP::Harness - Run Perl test scripts with statistics
 
 =head1 VERSION
 
-Version 0.54
+Version 2.99_01
 
 =cut
 
-$VERSION = '0.54';
+$VERSION = '2.99_01';
 
 $ENV{HARNESS_ACTIVE}  = 1;
 $ENV{HARNESS_VERSION} = $VERSION;

@@ -19,8 +19,5 @@ BEGIN {
 }
 
 my $ver = $ENV{HARNESS_VERSION} or die "HARNESS_VERSION not set";
-TODO: {
-    local $TODO = "Our version isn't numeric";
-    ok( $ver =~ /^2.\d\d(_\d\d)?$/, "Version is proper format" );
-}
+ok( $ver =~ /^[23].\d\d(_\d\d)?$/, "Version is proper format" );
 is( $ver, $TAP::Harness::Compatible::VERSION );
