@@ -185,6 +185,9 @@ sub _switches {
 
     push @switches, map {"-I$_"} $self->_filtered_inc;
 
+    push @switches, $ENV{HARNESS_PERL_SWITCHES}
+      if $ENV{HARNESS_PERL_SWITCHES};
+
     # Quote the argument if there's any whitespace in it, or if
     # we're VMS, since VMS requires all parms quoted.  Also, don't quote
     # it if it's already quoted.
