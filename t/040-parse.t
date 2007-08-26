@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 256;
+use Test::More tests => 258;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -861,6 +861,43 @@ END_TAP
 
     like shift @errors, qr/this is the dying iterator/,
       '...and it was what we expected';
+}
+
+{
+
+    # coverage testing of TAP::Parser::_next_state
+
+    package TAP::Parser::WithBrokenState;
+
+    our @ISA = qw< TAP::Parser >;
+
+    sub _make_state_table {
+        return { INIT => { plan => { goto => 'FOO' } } };
+    }
+
+    package main;
+
+    my $tap = <<'END_TAP';
+1..2
+ok 1 - input file opened
+ok 2 - Gandalf wins
+END_TAP
+
+    my $parser = TAP::Parser::WithBrokenState->new( { tap => $tap } );
+
+    my @die;
+
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
+
+        $parser->next;
+        $parser->next;
+    };
+
+    is @die, 1, 'detect broken state machine';
+
+    like pop @die, qr/Illegal state: FOO/,
+      '...and the message is as we expect';
 }
 
 {
