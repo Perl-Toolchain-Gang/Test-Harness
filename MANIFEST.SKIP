@@ -23,7 +23,7 @@
 ^andy
 ^TODO$
 ^TH_TODO$
-^perltidyrc$
+^\.perltidyrc$
 ^smoke/
 ^benchmark/
 

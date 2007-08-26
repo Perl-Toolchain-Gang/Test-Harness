@@ -1,4 +1,3 @@
-.perltidyrc
 bin/prove
 bin/runtests
 Build.PL
