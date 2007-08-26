@@ -10,7 +10,6 @@ use File::Spec;
     # if the harness wants to save the resulting TAP we shouldn't
     # do it for our internal calls
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
-    local $ENV{HARNESS_PERL_SWITCHES} = '';
 
     my $TEST_DIR = 't/sample-tests';
     my $PER_LOOP = 4;
