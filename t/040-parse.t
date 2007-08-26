@@ -4,7 +4,7 @@ use strict;
 
 use lib 'lib';
 
-use Test::More tests => 261;
+use Test::More tests => 265;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -466,7 +466,9 @@ is scalar $parser->passed, 2,
 
     sub dump {
         my $self = shift;
-        return @$self;
+        my @got  = @$self;
+        @$self = ();
+        return @got;
     }
 
     package main;
@@ -489,18 +491,37 @@ ok 6 - you shall not pass! # TODO should have failed
 not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
 END_TAP
 
-    my $parser = $PARSER->new(
-        {   tap   => $tap,
-            spool => \*STDOUT,
-        }
-    );
+    {
+        my $parser = $PARSER->new(
+            {   tap   => $tap,
+                spool => \*STDOUT,
+            }
+        );
 
-    _get_results($parser);
+        _get_results($parser);
 
-    my @spooled = tied(*STDOUT)->dump();
+        my @spooled = tied(*STDOUT)->dump();
 
-    is @spooled, 24, 'coverage testing for spool attribute of parser';
-    is join( '', @spooled ), $tap, "spooled tap matches";
+        is @spooled, 24, 'coverage testing for spool attribute of parser';
+        is join( '', @spooled ), $tap, "spooled tap matches";
+    }
+
+    {
+        my $parser = $PARSER->new(
+            {   tap   => $tap,
+                spool => \*STDOUT,
+            }
+        );
+
+        $parser->callback( 'ALL', sub { } );
+
+        _get_results($parser);
+
+        my @spooled = tied(*STDOUT)->dump();
+
+        is @spooled, 24, 'coverage testing for spool attribute of parser';
+        is join( '', @spooled ), $tap, "spooled tap matches";
+    }
 }
 
 {
@@ -928,6 +949,41 @@ END_TAP
 
     like pop @die, qr/Illegal state: FOO/,
       '...and the message is as we expect';
+}
+
+{
+
+    # coverage testing of TAP::Parser::_iter
+
+    package TAP::Parser::WithBrokenIter;
+    use vars qw(@ISA);
+
+    @ISA = qw< TAP::Parser >;
+
+    sub _iter {return}
+
+    package main;
+
+    my $tap = <<'END_TAP';
+1..2
+ok 1 - input file opened
+ok 2 - Gandalf wins
+END_TAP
+
+    my $parser = TAP::Parser::WithBrokenIter->new( { tap => $tap } );
+
+    my @die;
+
+    eval {
+        local $SIG{__WARN__} = sub { };
+        local $SIG{__DIE__} = sub { push @die, @_ };
+
+        $parser->next;
+    };
+
+    is @die, 1, 'detect broken iter';
+
+    like pop @die, qr/Can't use/, '...and the message is as we expect';
 }
 
 {
