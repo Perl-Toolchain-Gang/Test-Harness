@@ -23,27 +23,24 @@ TODO: {
     todo_skip 'Harness compatibility incomplete', 5;
     local $TODO = 'Harness compatibility incomplete';
     my $died;
-    sub prepare_for_death { $died = 0; }
-    sub signal_death      { $died = 1; }
+    sub prepare_for_death { $died = 0; return sub {$died = 1}}
 
-    my $Curdir = File::Spec->curdir;
-    my $SAMPLE_TESTS =
+    my $curdir = File::Spec->curdir;
+    my $sample_tests =
       $ENV{PERL_CORE}
-      ? File::Spec->catdir( $Curdir, 'lib', 'sample-tests' )
-      : File::Spec->catdir( $Curdir, 't',   'sample-tests' );
+      ? File::Spec->catdir( $curdir, 'lib', 'sample-tests' )
+      : File::Spec->catdir( $curdir, 't',   'sample-tests' );
 
     PASSING: {
-        local $SIG{__DIE__} = \&signal_death;
-        prepare_for_death();
-        eval { _runtests( File::Spec->catfile( $SAMPLE_TESTS, "simple" ) ) };
+        local $SIG{__DIE__} = prepare_for_death();
+        eval { _runtests( File::Spec->catfile( $sample_tests, "simple" ) ) };
         ok( !$@, "simple lives" );
         is( $died, 0, "Death never happened" );
     }
 
     FAILING: {
-        local $SIG{__DIE__} = \&signal_death;
-        prepare_for_death();
-        eval { _runtests( File::Spec->catfile( $SAMPLE_TESTS, "too_many" ) ) };
+        local $SIG{__DIE__} = prepare_for_death();
+        eval { _runtests( File::Spec->catfile( $sample_tests, "too_many" ) ) };
         ok( $@, "$@" );
         ok( $@ =~ m[Failed 1/1], "too_many dies" );
         is( $died, 1, "Death happened" );
