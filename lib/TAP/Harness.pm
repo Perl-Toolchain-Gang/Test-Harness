@@ -333,6 +333,9 @@ sub runtests {
 
     $self->summary($results);
 
+    # XXX where to put the exit status?
+    # die "something failed" if($aggregate->has_problems);
+
     return $aggregate;
 }
 

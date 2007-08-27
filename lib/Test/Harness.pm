@@ -115,6 +115,12 @@ sub runtests {
     my $total  = $aggregate->total;
     my $passed = $aggregate->passed;
 
+    # XXX I can't find methods in the aggregate API to easily emulate
+    # the old Test::Harness behavior here --Eric
+    #die("Failed ", $tot->{bad}/$tot->{tests} test programs. " .
+    #    "@{[$tot->{max} - $tot->{ok}]}/$tot->{max} subtests failed.\n");
+    die "something failed" if($aggregate->has_problems);
+
     return $total && $total == $passed;
 }
 
