@@ -30,8 +30,11 @@ my $builder = $build_class->new(
     },
     recursive_test_files => 1,
     requires             => {
-        'Test::More' => 0,
         'Pod::Usage' => 0,    # for 'prove'
+    },
+    build_requires       => {
+        'Test::More' => 0,
+        'IO::String' => 0,
     },
     add_to_cleanup => ['Test-Harness-*'],
     script_files => ["bin/prove"],

@@ -103,8 +103,9 @@ BEGIN {
         formatter    => sub { shift; shift },
         stdout => sub {
             my ( $self, $ref ) = @_;
-            ( ( ref($ref) || '' ) eq 'SCALAR' )
-              or die "catch_output needs a scalar reference";
+            $self->_croak("option 'stdout' needs a filehandle")
+              unless ( ( ref($ref) || '' ) eq 'GLOB'
+                or eval { $ref->can('print') } );
             return ($ref);
         },
     );
@@ -257,8 +258,7 @@ This overrides other settings such as C<verbose> or C<failures>.
 
 =item * C<stdout>
 
-A scalar reference (experimental) for catching standard output.  Maybe
-should be a filehandle.
+A filehandle for catching standard output.
 
 =back
 
@@ -294,7 +294,8 @@ should be a filehandle.
             $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
         }
         $self->quiet(0) unless $self->quiet;    # suppress unit warnings
-        $self->really_quiet(0) unless $self->really_quiet;
+        $self->really_quiet(0)    unless $self->really_quiet;
+        $self->stdout( \*STDOUT ) unless $self->stdout;
         return $self;
     }
 }
@@ -541,12 +542,8 @@ like to redirect output somewhere else, just override this method.
 
 sub output {
     my $self = shift;
-    if ( my $out = $self->stdout ) {
-        $$out .= $_ for (@_);    # XXX what's $\ here?
-    }
-    else {
-        print @_;
-    }
+
+    print {$self->stdout} @_;
 }
 
 ##############################################################################

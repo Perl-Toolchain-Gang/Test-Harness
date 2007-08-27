@@ -5,6 +5,7 @@ use strict;
 use lib 'lib';
 
 use Test::More;
+use IO::String;
 
 END {
 
@@ -307,12 +308,12 @@ SKIP: {
         skip "no '$cat'", 1;
     }
 
-    my $output  = '';
+    my $output;
     my $harness = TAP::Harness->new(
         {   verbose      => 1,
             really_quiet => 1,
             really_quiet => 1,
-            stdout       => \$output,
+            stdout       => IO::String->new($output),
             exec         => [$cat],
         }
     );
@@ -327,11 +328,11 @@ SKIP: {
 
 # catches "exec accumulates arguments" issue (r77)
 {
-    my $output  = '';
+    my $output;
     my $harness = TAP::Harness->new(
         {   verbose      => 1,
             really_quiet => 1,
-            stdout       => \$output,
+            stdout       => IO::String->new($output),
             exec         => [$^X]
         }
     );
