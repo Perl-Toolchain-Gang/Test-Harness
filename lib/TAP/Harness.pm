@@ -878,15 +878,6 @@ sub _should_display {
       if $self->_should_show_failure($result)
           || ( $self->verbose && !$self->failures );
 
-    # TODO: Work out what to do with is_yaml results
-    return 1
-      if ( $result->is_comment || $result->is_yaml )
-      && !$self->quiet
-      && !$parser->in_todo;
-
-    # Old line. Makes no sense. Can't be is_test /and/ is_comment.
-    #      && ( !$parser->in_todo || $result->is_test );
-
     return 0;
 }
 
