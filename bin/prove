@@ -4,7 +4,6 @@ eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
   if 0;    # not running under some shell
 
 use strict;
-use Pod::Usage 1.12;
 use TAP::Harness;
 use File::Find;
 use File::Spec;
@@ -16,6 +15,17 @@ my $DEFAULT_FORMATTER = 'TAP::Harness::Formatter::Basic';
 @ARGV = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @ARGV;
 my $color_default = -t STDOUT && !( $^O =~ /MSWin32/ );
 my $COLOR;
+
+my $help_sub = sub {
+    eval('use Pod::Usage 1.12 ()');
+    if($@) {
+        die 'Please install Pod::Usage for the --help option ' .
+            '(or try `perldoc prove`.)' .
+            "\n ($@)";
+    }
+    Pod::Usage::pod2usage( { -verbose => 1 } );
+    exit;
+};
 
 Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
 GetOptions(
@@ -37,8 +47,8 @@ GetOptions(
     'm|merge'     => \my $MERGE,
     'I=s@'        => \my @INCLUDES,
     'directives'  => \my $DIRECTIVES,
-    'h|help|?'    => sub { pod2usage( { -verbose => 1 } ); exit },
-    'H|man'       => sub { pod2usage( { -verbose => 2 } ); exit },
+    'h|help|?'    => $help_sub,
+    'H|man'       => $help_sub,
     'V|version'   => sub { print_version(); exit },
     'a|archive=s' => \my $ARCHIVE,
 
@@ -326,3 +336,5 @@ few places (thanks Andy!).
 This is alpha code.  You've been warned.
 
 =cut
+
+# vim:ts=4:sw=4:et:sta
