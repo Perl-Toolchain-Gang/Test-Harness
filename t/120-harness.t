@@ -30,7 +30,7 @@ use TAP::Harness;
 use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 72;
+my $PLAN      = 73;
 
 if ( TAP::Harness::Color->can_color ) {
     push @HARNESSES, 'TAP::Harness::Color';
@@ -107,11 +107,13 @@ foreach my $HARNESS (@HARNESSES) {
     my $harness_whisper    = TAP::Harness->new( { quiet        => 1 } );
     my $harness_mute       = TAP::Harness->new( { really_quiet => 1 } );
     my $harness_directives = TAP::Harness->new( { directives   => 1 } );
+    my $harness_failures   = TAP::Harness->new( { failures     => 1 } );
+
     can_ok $harness, 'runtests';
 
     # normal tests in verbose mode
 
-    ok my $aggregate = _runtests($harness, 't/source_tests/harness'),
+    ok my $aggregate = _runtests( $harness, 't/source_tests/harness' ),
       '... runtests returns the aggregate';
 
     isa_ok $aggregate, 'TAP::Parser::Aggregator';
@@ -136,7 +138,7 @@ foreach my $HARNESS (@HARNESSES) {
     # normal tests in quiet mode
 
     @output = ();
-    _runtests($harness_whisper, 't/source_tests/harness');
+    _runtests( $harness_whisper, 't/source_tests/harness' );
 
     chomp(@output);
     @expected = (
@@ -155,7 +157,7 @@ foreach my $HARNESS (@HARNESSES) {
     # normal tests in really_quiet mode
 
     @output = ();
-    _runtests($harness_mute, 't/source_tests/harness');
+    _runtests( $harness_mute, 't/source_tests/harness' );
 
     chomp(@output);
     @expected = (
@@ -172,7 +174,7 @@ foreach my $HARNESS (@HARNESSES) {
     # normal tests with failures
 
     @output = ();
-    _runtests($harness, 't/source_tests/harness_failure');
+    _runtests( $harness, 't/source_tests/harness_failure' );
 
     my @summary = @output[ 5 .. ( $#output - 1 ) ];
     @output   = @output[ 0 .. 4 ];
@@ -198,7 +200,7 @@ foreach my $HARNESS (@HARNESSES) {
     # quiet tests with failures
 
     @output = ();
-    _runtests($harness_whisper, 't/source_tests/harness_failure');
+    _runtests( $harness_whisper, 't/source_tests/harness_failure' );
 
     pop @output;    # get rid of summary line
     @expected = (
@@ -216,7 +218,7 @@ foreach my $HARNESS (@HARNESSES) {
     # really quiet tests with failures
 
     @output = ();
-    _runtests($harness_mute, 't/source_tests/harness_failure');
+    _runtests( $harness_mute, 't/source_tests/harness_failure' );
 
     pop @output;    # get rid of summary line
     @expected = (
@@ -232,7 +234,7 @@ foreach my $HARNESS (@HARNESSES) {
     # only show directives
 
     @output = ();
-    _runtests($harness_directives, 't/source_tests/harness_directives');
+    _runtests( $harness_directives, 't/source_tests/harness_directives' );
 
     chomp(@output);
 
@@ -269,7 +271,7 @@ foreach my $HARNESS (@HARNESSES) {
     );
 
     @output = ();
-    _runtests($harness, 't/source_tests/harness_badtap');
+    _runtests( $harness, 't/source_tests/harness_badtap' );
     chomp(@output);
 
     @output = map { trim($_) } @output;
@@ -298,6 +300,32 @@ foreach my $HARNESS (@HARNESSES) {
 
     cmp_ok( $callback_count, '==', 1, 'callback called once' );
     isa_ok $parser, 'TAP::Parser';
+
+    # coverage testing for _should_show_failures
+    # only show failures
+
+    @output = ();
+    _runtests( $harness_failures, 't/source_tests/harness_failure' );
+
+    chomp(@output);
+
+    @expected = (
+        't/source_tests/harness_failure....',
+        'not ok 2 - this is another test',
+        'Failed 1/2 subtests',
+        'Test Summary Report',
+        '-------------------',
+        't/source_tests/harness_failure (Wstat: 0 Tests: 2 Failed: 1)',
+        'Failed tests:',
+        '2',
+    );
+
+    $summary          = pop @output;
+    $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
+
+    is_deeply \@output, \@expected, '... and the output should be correct';
+
+    #XXXX
 }
 
 # make sure we can exec something ... anything!
@@ -318,7 +346,7 @@ SKIP: {
         }
     );
 
-    eval { _runtests($harness, 't/data/catme.1') };
+    eval { _runtests( $harness, 't/data/catme.1' ) };
 
     my @output = split( /\n/, $output );
     pop @output;    # get rid of summary line
@@ -447,7 +475,7 @@ sub harness_methods {
 }
 
 sub _runtests {
-    my ($harness, @tests) = @_;
+    my ( $harness, @tests ) = @_;
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
     my $aggregate = $harness->runtests(@tests);
     return $aggregate;

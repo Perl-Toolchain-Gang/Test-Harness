@@ -890,6 +890,7 @@ sub _should_show_count {
 
 sub _should_show_failure {
     my ( $self, $result ) = @_;
+
     return if !$result->is_test;
     return $self->failures && !$result->is_ok;
 }
