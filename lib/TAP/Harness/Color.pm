@@ -133,7 +133,9 @@ L<TAP::Harness> for more details.
 sub new {
     my $class = shift;
     if ($NO_COLOR) {
-        warn "Cannot run tests in color: $NO_COLOR";
+        # shorten that message a bit
+        (my $error = $NO_COLOR) =~ s/ in \@INC .*//s;
+        warn "Note: Cannot run tests in color: $error\n";
         return TAP::Harness->new(@_);
     }
     return $class->SUPER::new(@_);
