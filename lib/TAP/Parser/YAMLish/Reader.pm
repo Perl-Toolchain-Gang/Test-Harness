@@ -136,6 +136,8 @@ sub _read_scalar {
     my $string = shift;
 
     return undef if $string eq '~';
+    return {} if $string eq '{}';
+    return [] if $string eq '[]';
 
     if ( $string eq '>' || $string eq '|' ) {
 

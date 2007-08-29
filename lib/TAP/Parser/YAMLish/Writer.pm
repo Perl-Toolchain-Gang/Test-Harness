@@ -23,12 +23,12 @@ sub new {
 
 sub write {
     my $self = shift;
-    
+
     die "Need something to write"
       unless @_;
-    
-    my $obj  = shift;
-    my $out  = shift || \*STDOUT;
+
+    my $obj = shift;
+    my $out = shift || \*STDOUT;
 
     die "Need a reference to something I can write to"
       unless ref $out;
@@ -97,19 +97,30 @@ sub _write_obj {
 
     if ( my $ref = ref $obj ) {
         my $pad = '  ' x $indent;
-        $self->_put($prefix);
         if ( 'HASH' eq $ref ) {
-            for my $key ( sort keys %$obj ) {
-                my $value = $obj->{$key};
-                $self->_write_obj(
-                    $pad . $self->_enc_scalar($key) . ':',
-                    $value, $indent + 1
-                );
+            if ( keys %$obj ) {
+                $self->_put($prefix);
+                for my $key ( sort keys %$obj ) {
+                    my $value = $obj->{$key};
+                    $self->_write_obj(
+                        $pad . $self->_enc_scalar($key) . ':',
+                        $value, $indent + 1
+                    );
+                }
+            }
+            else {
+                $self->_put( $prefix, ' {}' );
             }
         }
         elsif ( 'ARRAY' eq $ref ) {
-            for my $value (@$obj) {
-                $self->_write_obj( $pad . '-', $value, $indent + 1 );
+            if (@$obj) {
+                $self->_put($prefix);
+                for my $value (@$obj) {
+                    $self->_write_obj( $pad . '-', $value, $indent + 1 );
+                }
+            }
+            else {
+                $self->_put( $prefix, ' []' );
             }
         }
         else {

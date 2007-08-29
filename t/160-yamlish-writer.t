@@ -40,6 +40,20 @@ BEGIN {
                 '...',
             ],
         },
+        {   name => 'Empty array',
+            in   => [],
+            out  => [
+                '--- []',
+                '...'
+            ],
+        },
+        {   name => 'Empty hash',
+            in   => {},
+            out  => [
+                '--- {}',
+                '...'
+            ],
+        },
         {   name => 'Array, two elements, undef',
             in   => [ undef, undef ],
             out  => [
@@ -58,6 +72,17 @@ BEGIN {
                 '-',
                 '  - 3',
                 '  - 4',
+                '- 5',
+                '...',
+            ],
+        },
+        {   name => 'Nested empty',
+            in   => [ 1, 2, [], 5 ],
+            out  => [
+                '---',
+                '- 1',
+                '- 2',
+                '- []',
                 '- 5',
                 '...',
             ],
@@ -81,6 +106,16 @@ BEGIN {
                 'more:',
                 '  four: 4',
                 '  three: 3',
+                'one: 1',
+                'two: 2',
+                '...',
+            ],
+        },
+        {   name => 'Nested empty',
+            in   => { one => '1', two => '2', more => {} },
+            out  => [
+                '---',
+                'more: {}',
                 'one: 1',
                 'two: 2',
                 '...',
@@ -174,7 +209,7 @@ BEGIN {
         },
     );
 
-    plan tests => @SCHEDULE * 5;
+    plan tests => @SCHEDULE * 6;
 }
 
 sub iter {
@@ -208,13 +243,18 @@ for my $test (@SCHEDULE) {
         unless ( ok !$@, "$name: No error" ) {
             diag "Error: $@\n";
         }
-        is_deeply $got, $want, "$name: Result matches";
+        unless ( is_deeply $got, $want, "$name: Result matches" ) {
+            use Data::Dumper;
+            diag Dumper($got);
+            diag Dumper($want);
+        }
 
         my $yr = TAP::Parser::YAMLish::Reader->new;
 
         # Now try parsing it
-        my $reader = sub { shift @$got };
-        my $parsed = $yr->read($reader);
+        my $reader = sub  { shift @$got };
+        my $parsed = eval { $yr->read($reader) };
+        ok !$@, "$name: no error" or diag "$@";
 
         is_deeply $parsed, $data, "$name: Reparse OK";
     }
