@@ -2,7 +2,7 @@
 
 use strict;
 
-use lib 'lib';
+use lib 't/lib';
 
 use Test::More tests => 222;
 use TAP::Parser::Result;

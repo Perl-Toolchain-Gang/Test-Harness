@@ -2,7 +2,7 @@
 
 use strict;
 
-use lib 'lib';
+use lib 't/lib';
 
 #use Test::More 'no_plan';
 

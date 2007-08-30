@@ -2,7 +2,7 @@
 
 use strict;
 
-use lib 'lib';
+use lib 't/lib';
 use TAP::Base;
 
 use Test::More tests => 30;
@@ -48,7 +48,7 @@ use Test::More tests => 30;
 }
 
 package CallbackOK;
-use lib 'lib';
+
 use TAP::Base;
 use vars qw(@ISA);
 @ISA = 'TAP::Base';

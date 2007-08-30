@@ -2,7 +2,7 @@
 
 use strict;
 
-use lib 'lib';
+use lib 't/lib';
 use TAP::Parser::Grammar;
 use TAP::Parser::Iterator::Array;
 
