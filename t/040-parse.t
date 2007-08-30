@@ -2,9 +2,10 @@
 
 use strict;
 
-use lib 'lib';
+use lib 't/lib';
 
 use Test::More tests => 265;
+use IO::Capture;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -452,28 +453,7 @@ is scalar $parser->passed, 2,
 {
 
     # set a spool to write to
-    package Capture;
-
-    sub TIEHANDLE {
-        return bless [], __PACKAGE__;
-    }
-
-    sub PRINT {
-        my $self = shift;
-
-        push @$self, @_;
-    }
-
-    sub dump {
-        my $self = shift;
-        my @got  = @$self;
-        @$self = ();
-        return @got;
-    }
-
-    package main;
-
-    tie local *STDOUT, 'Capture';
+    tie local *STDOUT, 'IO::Capture';
 
     my $tap = <<'END_TAP';
 TAP version 13

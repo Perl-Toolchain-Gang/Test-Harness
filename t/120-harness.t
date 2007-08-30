@@ -2,10 +2,9 @@
 
 use strict;
 
-use lib 'lib';
-
+use lib 't/lib';
 use Test::More;
-use IO::String;
+use IO::Capture;
 
 END {
 
@@ -336,31 +335,31 @@ SKIP: {
         skip "no '$cat'", 1;
     }
 
-    my $output;
+    my $capture = IO::Capture->new_handle;
     my $harness = TAP::Harness->new(
         {   verbose      => 1,
             really_quiet => 1,
             really_quiet => 1,
-            stdout       => IO::String->new($output),
+            stdout       => $capture,
             exec         => [$cat],
         }
     );
 
     eval { _runtests( $harness, 't/data/catme.1' ) };
 
-    my @output = split( /\n/, $output );
+    my @output = tied($$capture)->dump;
     pop @output;    # get rid of summary line
     my $answer = pop @output;
-    is( $answer, 'All tests successful.', 'cat meows' );
+    is( $answer, "All tests successful.\n", 'cat meows' );
 }
 
 # catches "exec accumulates arguments" issue (r77)
 {
-    my $output;
+    my $capture = IO::Capture->new_handle;
     my $harness = TAP::Harness->new(
         {   verbose      => 1,
             really_quiet => 1,
-            stdout       => IO::String->new($output),
+            stdout       => $capture,
             exec         => [$^X]
         }
     );
@@ -371,9 +370,9 @@ SKIP: {
         't/source_tests/harness',
     );
 
-    my @output = split( /\n/, $output );
+    my @output = tied($$capture)->dump;
     pop @output;                              # get rid of summary line
-    is( $output[-1], 'All tests successful.', 'No exec accumulation' );
+    is( $output[-1], "All tests successful.\n", 'No exec accumulation' );
 }
 
 sub trim {
