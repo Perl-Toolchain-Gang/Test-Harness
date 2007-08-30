@@ -1,0 +1,487 @@
+$ sh def
+  USER1:[ABELTJE.PERLMODULES.TEST-HARNESS-2_99_01]
+$ perl Makefile.PL
+
+Optional ExtUtils::MakeMaker::Coverage not available. Everything should
+still work correctly but you won't be able to run the coverage tests by
+typing "make testcover". If you subsequently install Devel::Cover please
+re-run "perl Makefile.PL" to include the testcover target.
+
+WARNING: LICENSE is not a known parameter.
+Checking if your kit is complete...
+Looks good
+'LICENSE' is not a known MakeMaker parameter name.
+Writing Descrip.MMS for Test::Harness
+$ mmk test
+cp [.lib.tap.parser.result]test.pm [.blib.lib.tap.parser.result]test.pm
+cp [.lib.tap.parser.result]yaml.pm [.blib.lib.tap.parser.result]yaml.pm
+cp [.lib.tap.parser.iterator]process.pm [.blib.lib.tap.parser.iterator]process.p
+m
+cp [.lib.tap.parser]aggregator.pm [.blib.lib.tap.parser]aggregator.pm
+cp [.lib.tap]base.pm [.blib.lib.tap]base.pm
+cp [.lib.tap.parser.result]version.pm [.blib.lib.tap.parser.result]version.pm
+cp [.lib.tap.parser]result.pm [.blib.lib.tap.parser]result.pm
+cp [.lib.tap.parser]iterator.pm [.blib.lib.tap.parser]iterator.pm
+cp [.lib.test]harness.pm [.blib.lib.test]harness.pm
+cp [.lib.tap.harness]color.pm [.blib.lib.tap.harness]color.pm
+cp [.lib.tap]harness.pm [.blib.lib.tap]harness.pm
+cp [.lib.tap.parser.result]plan.pm [.blib.lib.tap.parser.result]plan.pm
+cp [.lib.tap.parser.result]unknown.pm [.blib.lib.tap.parser.result]unknown.pm
+cp [.lib.tap.parser.source]perl.pm [.blib.lib.tap.parser.source]perl.pm
+cp [.lib.tap.parser]grammar.pm [.blib.lib.tap.parser]grammar.pm
+cp [.lib.tap.parser.result]bailout.pm [.blib.lib.tap.parser.result]bailout.pm
+cp [.lib.tap.parser.yamlish]writer.pm [.blib.lib.tap.parser.yamlish]writer.pm
+cp [.lib.tap.parser.result]comment.pm [.blib.lib.tap.parser.result]comment.pm
+cp [.lib.tap]parser.pm [.blib.lib.tap]parser.pm
+cp [.lib.tap.parser.iterator]array.pm [.blib.lib.tap.parser.iterator]array.pm
+cp [.lib.tap.parser.yamlish]reader.pm [.blib.lib.tap.parser.yamlish]reader.pm
+cp [.lib.tap.parser.iterator]stream.pm [.blib.lib.tap.parser.iterator]stream.pm
+cp [.lib.tap.parser]source.pm [.blib.lib.tap.parser]source.pm
+MCR $9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe "-MExtUtils::Command" 
+-e cp [.bin]prove [.blib.script]prove
+MCR $9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe "-MExtUtils::MY" -e "M
+Y->fixin(shift)" [.blib.script]prove
+MCR $9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe "-MExtUtils::Command::
+MM" "-e" "test_harness(0, '[.blib.lib]', '[.blib.arch]')" t/*.t t/compat/*.t
+t/000-load......................
+# Testing Test::Harness 2.99_01, Perl 5.008008, $9$dkb200:[abeltje.perl-5_8_x_ro
+ot.perl_root]perl.exe;1
+ok
+t/010-base......................
+ok
+t/020-regression................
+
+#   Failed test ''bailout' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]ba
+ilout): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 1
+31.
+
+#   Failed test ''bignum' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]bi
+gnum): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 13
+1.
+
+#   Failed test ''bignum_many' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]bi
+gnum_many): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm li
+ne 131.
+
+#   Failed test ''combined' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]co
+mbined): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 
+131.
+
+#   Failed test ''descriptive' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]de
+scriptive): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm li
+ne 131.
+
+#   Failed test ''descriptive_trailing' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]de
+scriptive_trailing): The fork function is unimplemented at /perl_root/lib/IPC/Op
+en3.pm line 131.
+
+#   Failed test ''die' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]di
+e): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 131.
+
+#   Failed test ''die_head_end' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]di
+e_head_end): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm l
+ine 131.
+
+#   Failed test ''die_last_minute' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]di
+e_last_minute): The fork function is unimplemented at /perl_root/lib/IPC/Open3.p
+m line 131.
+
+#   Failed test ''duplicates' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]du
+plicates): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm lin
+e 131.
+
+#   Failed test ''escape_eol' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]es
+cape_eol): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm lin
+e 131.
+
+#   Failed test ''escape_hash' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]es
+cape_hash): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm li
+ne 131.
+
+#   Failed test ''head_end' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]he
+ad_end): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 
+131.
+
+#   Failed test ''head_fail' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]he
+ad_fail): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line
+ 131.
+
+#   Failed test ''inc_taint' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "-Iexamples" "-T" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99
+_01/blib/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.
+sample-tests]inc_taint): The fork function is unimplemented at /perl_root/lib/IP
+C/Open3.pm line 131.
+
+#   Failed test ''junk_before_plan' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]ju
+nk_before_plan): The fork function is unimplemented at /perl_root/lib/IPC/Open3.
+pm line 131.
+
+#   Failed test ''no_nums' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]no
+_nums): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 1
+31.
+
+#   Failed test ''no_output' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]no
+_output): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line
+ 131.
+
+#   Failed test ''out_of_order' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]ou
+t_of_order): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm l
+ine 131.
+
+#   Failed test ''sequence_misparse' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]se
+quence_misparse): The fork function is unimplemented at /perl_root/lib/IPC/Open3
+.pm line 131.
+
+#   Failed test ''shbang_misparse' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]sh
+bang_misparse): The fork function is unimplemented at /perl_root/lib/IPC/Open3.p
+m line 131.
+
+#   Failed test ''simple' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]si
+mple): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 13
+1.
+
+#   Failed test ''simple_fail' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]si
+mple_fail): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm li
+ne 131.
+
+#   Failed test ''simple_yaml' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]si
+mple_yaml): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm li
+ne 131.
+
+#   Failed test ''skip' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]sk
+ip): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 131.
+
+#   Failed test ''skip_nomsg' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]sk
+ip_nomsg): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm lin
+e 131.
+
+#   Failed test ''skipall' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]sk
+ipall): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 1
+31.
+
+#   Failed test ''skipall_nomsg' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]sk
+ipall_nomsg): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm 
+line 131.
+
+#   Failed test ''stdout_stderr' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]st
+dout_stderr): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm 
+line 131.
+
+#   Failed test ''switches' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "-Mstrict" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/bli
+b/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-
+tests]switches): The fork function is unimplemented at /perl_root/lib/IPC/Open3.
+pm line 131.
+
+#   Failed test ''taint' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-T" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/l
+ib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tes
+ts]taint): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm lin
+e 131.
+
+#   Failed test ''todo_inline' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]to
+do_inline): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm li
+ne 131.
+
+#   Failed test ''todo_misparse' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]to
+do_misparse): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm 
+line 131.
+
+#   Failed test ''too_many' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]to
+o_many): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 
+131.
+
+#   Failed test ''version_good' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]ve
+rsion_good): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm l
+ine 131.
+
+#   Failed test ''version_late' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]ve
+rsion_late): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm l
+ine 131.
+
+#   Failed test ''version_old' should parse successfully'
+#   in t/020-regression.t at line 2807.
+# Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-I
+lib" "" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "
+-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]ve
+rsion_old): The fork function is unimplemented at /perl_root/lib/IPC/Open3.pm li
+ne 131.
+# Looks like you failed 37 tests of 908.
+%SYSTEM-F-ABORT, abort
+dubious
+        Test returned status 44 (wstat 1024, 0x400)
+                (VMS status is 44)
+DIED. FAILED tests 1, 26, 49, 72, 97, 122, 147, 170, 193, 217, 240, 265, 290, 31
+5, 340, 365, 390, 415, 438, 461, 486, 511, 536, 561, 586, 611, 636, 661, 686, 71
+1, 736, 761, 786, 811, 834, 859, 884
+        Failed 37/908 tests, 95.93% okay (less 871 skipped tests: 0 okay, 0.00%)
+t/030-grammar...................
+ok
+t/040-parse.....................
+Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-Ili
+b" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "-I/USER1/ABELTJ
+E/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" [.t.sample-tests]out_err_mix): The
+ fork function is unimplemented at /perl_root/lib/IPC/Open3.pm line 131.
+# Looks like you planned 265 tests but only ran 227.
+# Looks like your test died just after 227.
+%SYSTEM-F-ABORT, abort
+dubious
+        Test returned status 44 (wstat 1024, 0x400)
+                (VMS status is 44)
+DIED. FAILED tests 228-265
+        Failed 38/265 tests, 85.66% okay
+t/050-bailout...................
+ok
+t/060-errors....................
+ok
+t/070-streams...................
+ok
+t/080-aggregator................
+ok
+t/090-callbacks.................
+ok
+t/100-premature-bailout.........
+ok
+t/110-iterators.................
+Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 [.t.s
+ample-tests]out_err_mix): The fork function is unimplemented at /perl_root/lib/I
+PC/Open3.pm line 131, <DATA> line 1.
+# Looks like your test died before it could output anything.
+%SYSTEM-F-ABORT, abort
+dubious
+        Test returned status 44 (wstat 1024, 0x400)
+                (VMS status is 44)
+DIED. FAILED tests 1-62
+        Failed 62/62 tests, 0.00% okay
+t/120-harness...................
+Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-Ili
+b" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "-I/USER1/ABELTJ
+E/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" t/source_tests/harness): The fork 
+function is unimplemented at /perl_root/lib/IPC/Open3.pm line 131.
+# Looks like you planned 118 tests but only ran 97.
+# Looks like your test died just after 97.
+%SYSTEM-F-ABORT, abort
+dubious
+        Test returned status 44 (wstat 1024, 0x400)
+                (VMS status is 44)
+DIED. FAILED tests 98-118
+        Failed 21/118 tests, 82.20% okay
+t/130-source....................
+Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 -T [.
+t.source_tests]source): The fork function is unimplemented at /perl_root/lib/IPC
+/Open3.pm line 131.
+# Looks like you planned 34 tests but only ran 8.
+# Looks like your test died just after 8.
+%SYSTEM-F-ABORT, abort
+dubious
+        Test returned status 44 (wstat 1024, 0x400)
+                (VMS status is 44)
+DIED. FAILED tests 9-34
+        Failed 26/34 tests, 23.53% okay
+t/140-results...................
+ok
+t/150-yamlish...................
+ok
+t/160-yamlish-writer............
+ok
+t/170-yamlish-output............
+ok
+t/compat/00compile..............
+# Testing Test::Harness 2.99_01 under Perl 5.008008 and Test::More 0.42
+
+ok
+t/compat/failure................
+ok
+t/compat/inc_taint..............
+Could not execute ($9$dkb200:[abeltje.perl-5_8_x_root.perl_root]perl.exe;1 "-w" 
+"-T" "-It/lib" "-I/USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/lib" "-I/
+USER1/ABELTJE/PERLMODULES/TEST-HARNESS-2_99_01/blib/arch" "-Iexamples" t/sample-
+tests/inc_taint): The fork function is unimplemented at /perl_root/lib/IPC/Open3
+.pm line 131.
+# No tests run!
+%SYSTEM-F-ABORT, abort
+dubious
+        Test returned status 44 (wstat 1024, 0x400)
+                (VMS status is 44)
+DIED. FAILED test 1
+        Failed 1/1 tests, 0.00% okay
+t/compat/nonumbers..............
+ok
+t/compat/test-harness-compat....
+# Looks like your test died before it could output anything.
+%SYSTEM-F-ABORT, abort
+dubious
+        Test returned status 44 (wstat 1024, 0x400)
+                (VMS status is 44)
+DIED. FAILED tests 1-120
+        Failed 120/120 tests, 0.00% okay
+t/compat/version................
+ok
+t/pod-coverage..................
+skipped
+        all skipped: Test::Pod::Coverage 1.04 required for testing POD coverage
+t/pod...........................
+skipped
+        all skipped: Test::Pod 1.14 required for testing POD
+Failed Test                    Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+t/020-regression.t               44  1024   908   37   4.07%  1 26 49 72 97 122
+                                                              147 170 193 217
+                                                              240 265 290 315
+                                                              340 365 390 415
+                                                              438 461 486 511
+                                                              536 561 586 611
+                                                              636 661 686 711
+                                                              736 761 786 811
+                                                              834 859 884
+t/040-parse.t                    44  1024   265   76  28.68%  228-265
+t/110-iterators.t                44  1024    62  124 200.00%  1-62
+t/120-harness.t                  44  1024   118   42  35.59%  98-118
+t/130-source.t                   44  1024    34   52 152.94%  9-34
+t/compat/inc_taint.t             44  1024     1    2 200.00%  1
+t/compat/test-harness-compat.t   44  1024   120  240 200.00%  1-120
+2 tests and 871 subtests skipped.
+Failed 7/26 test scripts, 73.08% okay. 305/2383 subtests failed, 87.20% okay.
+%SYSTEM-F-ABORT, abort
+%MMK-F-ERRUPD, error status %X0000002C occurred when updating target TEST_DYNAMI
+C
+$
+
