@@ -35,6 +35,7 @@ lib/Test/Harness.pm
 Makefile.PL
 MANIFEST
 META.yml
+misc/vms/tp_vms-maketest
 README
 t/000-load.t
 t/010-base.t
@@ -64,6 +65,7 @@ t/data/catme.1
 t/data/sample.yml
 t/lib/Dev/Null.pm
 t/lib/if.pm
+t/lib/IO/Capture.pm
 t/lib/Test/Builder.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
