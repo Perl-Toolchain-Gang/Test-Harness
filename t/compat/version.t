@@ -1,7 +1,7 @@
 #!/usr/bin/perl -Tw
 
 use strict;
-use 't/lib';
+use lib 't/lib';
 
 use Test::More tests => 3;
 
