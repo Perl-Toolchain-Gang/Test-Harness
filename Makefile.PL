@@ -14,9 +14,6 @@ WriteMakefile(
     'NAME'         => 'Test::Harness',
     'VERSION_FROM' => 'lib/Test/Harness.pm',
     'PREREQ_PM'    => {
-        'Test::More' => '0',
-        'Pod::Usage' => '0',    # for 'prove' utility
-        'IO::String' => '0',
     },
     'INSTALLDIRS' => 'site',
     'PL_FILES'    => {},

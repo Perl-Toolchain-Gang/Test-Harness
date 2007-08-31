@@ -19,11 +19,11 @@ ok my $source = TAP::Parser::Source->new, '... and calling it should succeed';
 isa_ok $source, 'TAP::Parser::Source', '... and the object it returns';
 
 can_ok $source, 'source';
-eval { $source->source("$perl $test") };
+eval { $source->source("$perl -It/lib $test") };
 ok my $error = $@, '... and calling it with a string should fail';
 like $error, qr/^Argument to &source must be an array reference/,
   '... with an appropriate error message';
-ok $source->source( [ $perl, '-T', $test ] ),
+ok $source->source( [ $perl, '-It/lib', '-T', $test ] ),
   '... and calling it with valid args should succeed';
 
 can_ok $source, 'get_stream';
