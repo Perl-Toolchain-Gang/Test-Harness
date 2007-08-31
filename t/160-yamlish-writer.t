@@ -1,7 +1,10 @@
 #!/usr/bin/perl
 
 use strict;
+use lib 't/lib';
+
 use Test::More;
+
 use TAP::Parser::YAMLish::Reader;
 use TAP::Parser::YAMLish::Writer;
 

@@ -1,16 +1,15 @@
 #!/usr/bin/perl -w
 
 use strict;
-
 use lib 't/lib';
 
 use Test::More tests => 265;
 use IO::Capture;
 
+use File::Spec;
+
 use TAP::Parser;
 use TAP::Parser::Iterator;
-
-use File::Spec;
 
 sub _get_results {
     my $parser = shift;

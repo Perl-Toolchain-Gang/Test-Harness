@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 
 use strict;
-
 use lib 't/lib';
 
 use Test::More tests => 34;
 
+use File::Spec;
+
 use TAP::Parser::Source;
 use TAP::Parser::Source::Perl;
-use File::Spec;
 
 my $test = File::Spec->catfile( 't', 'source_tests', 'source' );
 

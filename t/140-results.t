@@ -1,10 +1,10 @@
 #!/usr/bin/perl -wT
 
 use strict;
-
 use lib 't/lib';
 
 use Test::More tests => 222;
+
 use TAP::Parser::Result;
 
 use constant RESULT  => 'TAP::Parser::Result';

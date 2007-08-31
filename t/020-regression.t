@@ -1,11 +1,10 @@
 #!/usr/bin/perl -w
 
-unshift @INC, 't/lib';
-
 use strict;
+use lib 't/lib';
 
-#use Test::More tests => 2567;
 use Test::More 'no_plan';
+
 use File::Spec;
 
 use constant TRUE  => "__TRUE__";

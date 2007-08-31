@@ -1,4 +1,8 @@
+#!/usr/bin/perl -wT
+
 use strict;
+use lib 't/lib';
+
 use Test::More tests => 9;
 
 use TAP::Parser::YAMLish::Writer;

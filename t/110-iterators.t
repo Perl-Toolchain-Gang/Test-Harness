@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 
 use strict;
+use lib 't/lib';
 
 use Test::More tests => 62;
 
 use File::Spec;
-use TAP::Parser;
 
+use TAP::Parser;
 use TAP::Parser::Iterator;
 
 sub array_ref_from {

@@ -1,12 +1,10 @@
 #!/usr/bin/perl -wT
 
 use strict;
-
 use lib 't/lib';
 
-#use Test::More 'no_plan';
-
 use Test::More tests => 33;
+
 use TAP::Parser;
 
 my $tap = <<'END_TAP';

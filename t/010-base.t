@@ -1,11 +1,11 @@
 #!/usr/bin/perl -wT
 
 use strict;
-
 use lib 't/lib';
-use TAP::Base;
 
 use Test::More tests => 30;
+
+use TAP::Base;
 
 {
 

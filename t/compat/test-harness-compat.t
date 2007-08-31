@@ -1,10 +1,13 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 use strict;
+use lib 't/lib';
+
 use Test::More;
-use TAP::Harness;
-use Test::Harness qw(execute_tests);
+
 use File::Spec;
+
+use Test::Harness qw(execute_tests);
 
 # unset this global when self-testing ('testcover' and etc issue)
 local $ENV{HARNESS_PERL_SWITCHES};

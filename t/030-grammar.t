@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
 
 use strict;
-
 use lib 't/lib';
-use TAP::Parser::Grammar;
-use TAP::Parser::Iterator::Array;
 
 use Test::More tests => 78;
+
+use TAP::Parser::Grammar;
+use TAP::Parser::Iterator::Array;
 
 my $GRAMMAR = 'TAP::Parser::Grammar';
 

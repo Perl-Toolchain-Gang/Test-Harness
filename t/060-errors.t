@@ -1,10 +1,10 @@
 #!/usr/bin/perl -wT
 
 use strict;
-
 use lib 't/lib';
 
 use Test::More tests => 23;
+
 use TAP::Parser;
 
 my $plan_line = 'TAP::Parser::Result::Plan';

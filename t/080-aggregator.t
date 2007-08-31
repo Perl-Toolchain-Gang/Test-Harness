@@ -1,13 +1,13 @@
 #!/usr/bin/perl -wT
 
 use strict;
-
 use lib 't/lib';
+
+use Test::More tests => 65;
+
 use TAP::Parser;
 use TAP::Parser::Iterator;
 use TAP::Parser::Aggregator;
-
-use Test::More tests => 65;
 
 my $tap = <<'END_TAP';
 1..5

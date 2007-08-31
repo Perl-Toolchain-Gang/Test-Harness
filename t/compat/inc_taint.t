@@ -1,23 +1,18 @@
 #!/usr/bin/perl -w
 
-BEGIN {
-    if ( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = ( '../lib', 'lib' );
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
-}
+use strict;
+use 't/lib';
+
+use Test::More tests => 1;
+
+use Dev::Null;
+
+use Test::Harness;
 
 sub _all_ok {
     my ($tot) = shift;
     return $tot->{bad} == 0 && ( $tot->{max} || $tot->{skipped} ) ? 1 : 0;
 }
-
-use Test::Harness;
-use Test::More tests => 1;
-use Dev::Null;
 
 {
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;

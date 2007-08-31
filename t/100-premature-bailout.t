@@ -1,10 +1,11 @@
 #!/usr/bin/perl -wT
 
 use strict;
+use lib 't/lib';
 
 use Test::More tests => 14;
-use TAP::Parser;
 
+use TAP::Parser;
 use TAP::Parser::Iterator;
 
 sub tap_to_lines {

@@ -1,9 +1,7 @@
 #!/usr/bin/perl -wT
 
 use strict;
-
 use lib 't/lib';
-use TAP::Parser::Iterator;
 
 use Test::More tests => 47;
 
