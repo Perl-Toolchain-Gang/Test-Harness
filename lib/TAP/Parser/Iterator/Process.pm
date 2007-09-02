@@ -97,12 +97,7 @@ sub new {
 
     if ($IS_WIN32) {
         $err = $merge ? '' : '>&STDERR';
-        eval {
-            $pid = open3(
-                \*DUMMY, $out,
-                $merge ? '' : $err, @command
-            );
-        };
+        eval { $pid = open3( \*DUMMY, $out, $merge ? '' : $err, @command ); };
         die "Could not execute (@command): $@" if $@;
         if ( $] >= 5.006 ) {
 
@@ -115,6 +110,11 @@ sub new {
         eval { $pid = open3( \*DUMMY, $out, $err, @command ); };
         die "Could not execute (@command): $@" if $@;
         $sel = $merge ? undef : IO::Select->new( $out, $err );
+    }
+
+    if ( $] >= 5.008 ) {
+        eval 'binmode($out, ":utf8")';
+        eval 'binmode($err, ":utf8")' if $err;
     }
 
     my $self = bless {
@@ -146,7 +146,7 @@ sub next_raw {
 
         # If we have an IO::Select we need to poll it.
         if ( my $sel = $self->{sel} ) {
-            my $err = $self->{err};
+            my $err  = $self->{err};
             my $flip = 0;
 
             # Loops forever while we're reading from STDERR

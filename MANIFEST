@@ -55,6 +55,7 @@ t/140-results.t
 t/150-yamlish.t
 t/160-yamlish-writer.t
 t/170-yamlish-output.t
+t/180-unicode.t
 t/compat/00compile.t
 t/compat/failure.t
 t/compat/inc_taint.t
