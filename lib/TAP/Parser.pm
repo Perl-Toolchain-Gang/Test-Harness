@@ -36,9 +36,9 @@ END {
     delete $ENV{TAP_VERSION};
 }
 
-BEGIN {
+BEGIN { # making accessors
     foreach my $method (
-        qw<
+        qw(
         _stream
         _spool
         _grammar
@@ -51,7 +51,7 @@ BEGIN {
         wait
         version
         in_todo
-        >
+        )
       )
     {
         no strict 'refs';
@@ -75,7 +75,7 @@ BEGIN {
             };
         }
     }
-}
+} # done making accessors
 
 =head1 SYNOPSIS
 
