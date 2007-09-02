@@ -32,10 +32,10 @@ Note the '$$' dereference.
 
 # XXX actually returns an IO::Handle :-/
 sub new_handle {
-    my $class = shift;
+    my $class  = shift;
     my $handle = IO::Handle->new;
     tie $$handle, $class;
-    return($handle);
+    return ($handle);
 }
 
 sub TIEHANDLE {
@@ -48,6 +48,11 @@ sub PRINT {
     push @$self, @_;
 }
 
+sub PRINTF {
+    my $self = shift;
+    push @$self, sprintf(@_);
+}
+
 sub dump {
     my $self = shift;
     my @got  = @$self;
@@ -56,4 +61,5 @@ sub dump {
 }
 
 1;
+
 # vim:ts=4:sw=4:et:sta
