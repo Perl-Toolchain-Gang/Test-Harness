@@ -5,7 +5,7 @@ use vars qw($VERSION);
 
 =head1 NAME
 
-TAP::Parser::Aggregator - Aggregate TAP::Parser results.
+TAP::Parser::Aggregator - Aggregate TAP::Parser results
 
 =head1 VERSION
 
@@ -35,8 +35,8 @@ $VERSION = '2.99_01';
 
 =head1 DESCRIPTION
 
-C<TAP::Parser::Aggregator> is a simple class which takes parser objects and
-allows reporting of aggregate results.
+C<TAP::Parser::Aggregator> collects parser objects and allows
+reporting/querying their aggregate results.
 
 =head1 METHODS
 
@@ -52,7 +52,7 @@ Returns a new C<TAP::Parser::Aggregator> object.
 
 my %SUMMARY_METHOD_FOR;
 
-BEGIN {
+BEGIN { # install summary methods
     %SUMMARY_METHOD_FOR = map { $_ => $_ } qw(
       failed
       parse_errors
@@ -76,7 +76,7 @@ BEGIN {
               : $self->{$method};
         };
     }
-}
+} # end install summary methods
 
 sub new {
     my ($class) = @_;
@@ -103,12 +103,13 @@ sub _initialize {
 
 =head3 C<add>
 
-  $aggregate->add( $description, $parser );
+  $aggregate->add( $description => $parser );
 
-Takes two arguments, the description of the TAP source (usually a test file
-name, but it doesn't have to be) and a L<TAP::Parser> object.
+The C<$description> is usually a test file name (but only by
+convention.)  It is used as a unique identifier (see e.g.
+L<"parsers">.)  Reusing a description is a fatal error.
 
-Trying to reuse a description is a fatal error.
+The C<$parser> is a TAP::Parser object (see L<TAP::Parser>.)
 
 =cut
 
@@ -142,12 +143,12 @@ In scalar context without arguments, this method returns the number of parsers
 aggregated.  In list context without arguments, returns the parsers in the
 order they were added.
 
-If arguments are used, these should be a list of descriptions used with the
-C<add> method.  Returns an array in list context or an array reference in
-scalar context.  The array contents will the requested parsers in the order
-they were listed in the argument list.  
+If C<@descriptions> is given, these correspond to the keys used in each
+call to the add() method.  Returns an array of the requested parsers (in
+the requested order) in list context or an array reference in scalar
+context.
 
-Passing in an unknown description is a fatal error.  
+Requesting an unknown identifier is a fatal error.
 
 =cut
 
@@ -234,8 +235,9 @@ sub total { shift->{total} }
       ...
   }
 
-This is a 'catch-all' method which returns true if any tests have currently
-failed, any TODO tests unexpectedly succeeded, or any parse errors.
+Returns true if I<any> of the parsers has a result other than "all
+passed".  This includes failed tests, TODO tests unexpectedly succeeded,
+parse errors, bad exit/wait status, etc.
 
 =cut
 
@@ -270,5 +272,13 @@ sub _croak {
     require Carp;
     Carp::croak(@_);
 }
+
+=head1 See Also
+
+L<TAP::Parser>
+
+L<TAP::Harness>
+
+=cut
 
 1;
