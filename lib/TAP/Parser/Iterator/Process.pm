@@ -114,7 +114,7 @@ sub new {
 
     if ( $] >= 5.008 ) {
         eval 'binmode($out, ":utf8")';
-	eval 'binmode($err, ":utf8")' if ref $err;
+        eval 'binmode($err, ":utf8")' if ref $err;
     }
 
     my $self = bless {
