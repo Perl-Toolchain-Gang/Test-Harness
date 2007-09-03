@@ -11,9 +11,9 @@ BEGIN {
     use_ok('Test::Harness');
 }
 
-TODO: {
-    todo_skip 'Harness compatibility incomplete', 5;
-    local $TODO = 'Harness compatibility incomplete';
+{
+    #todo_skip 'Harness compatibility incomplete', 5;
+    #local $TODO = 'Harness compatibility incomplete';
     my $died;
     sub prepare_for_death { $died = 0; return sub {$died = 1}}
 
@@ -23,14 +23,14 @@ TODO: {
       ? File::Spec->catdir( $curdir, 'lib', 'sample-tests' )
       : File::Spec->catdir( $curdir, 't',   'sample-tests' );
 
-    PASSING: {
+    {
         local $SIG{__DIE__} = prepare_for_death();
         eval { _runtests( File::Spec->catfile( $sample_tests, "simple" ) ) };
         ok( !$@, "simple lives" );
         is( $died, 0, "Death never happened" );
     }
 
-    FAILING: {
+    {
         local $SIG{__DIE__} = prepare_for_death();
         eval { _runtests( File::Spec->catfile( $sample_tests, "too_many" ) ) };
         ok( $@, "$@" );
@@ -41,8 +41,9 @@ TODO: {
 
 sub _runtests {
     my (@tests) = @_;
-    my $old_val = $ENV{PERL_TEST_HARNESS_DUMP_TAP};
-    $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
+
+    local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
     runtests(@tests);
-    $ENV{PERL_TEST_HARNESS_DUMP_TAP} = $old_val;
 }
+
+# vim:ts=2:sw=2:et:sta
