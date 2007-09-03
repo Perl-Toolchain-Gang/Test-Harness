@@ -9,6 +9,7 @@ examples/README
 examples/t/10-stuff.t
 examples/t/ruby.t
 examples/test_urls.txt
+HACKING.pod
 lib/TAP/Base.pm
 lib/TAP/Harness.pm
 lib/TAP/Harness/Color.pm
