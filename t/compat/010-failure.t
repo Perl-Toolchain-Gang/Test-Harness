@@ -46,4 +46,4 @@ sub _runtests {
     runtests(@tests);
 }
 
-# vim:ts=2:sw=2:et:sta
+# vim:ts=4:sw=4:et:sta
