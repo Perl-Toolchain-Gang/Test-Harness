@@ -37,7 +37,7 @@ package main;
 
 my @schedule = (
     {   name     => 'Process',
-	subclass => 'TAP::Parser::Iterator::Process',
+        subclass => 'TAP::Parser::Iterator::Process',
         source   => {
             command => [
                 $^X, File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' )
@@ -50,7 +50,7 @@ my @schedule = (
             is $did_setup,    1, "setup called";
             is $did_teardown, 1, "teardown called";
         },
-	need_fork => 15,
+        need_fork => 15,
     },
     {   name     => 'Array',
         subclass => 'TAP::Parser::Iterator::Array',
@@ -75,39 +75,44 @@ my @schedule = (
 
 for my $test (@schedule) {
     SKIP: {
-    my $name     = $test->{name};
-    my $need_fork= $test->{need_fork};
-    skip "No fork", $need_fork if $need_fork && !$Config{d_fork}; 
-    my $subclass = $test->{subclass};
-    my $source   = $test->{source};
-    my $class    = $test->{class} || 'TAP::Parser::Iterator';
-    ok my $iter = $class->new($source),
-      "$name: We should be able to create a new iterator";
-    isa_ok $iter, 'TAP::Parser::Iterator', '... and the object it returns';
-    isa_ok $iter, $subclass, '... and the object it returns';
+        my $name      = $test->{name};
+        my $need_fork = $test->{need_fork};
+        skip "No fork", $need_fork if $need_fork && !$Config{d_fork};
+        my $subclass = $test->{subclass};
+        my $source   = $test->{source};
+        my $class    = $test->{class} || 'TAP::Parser::Iterator';
+        ok my $iter = $class->new($source),
+          "$name: We should be able to create a new iterator";
+        isa_ok $iter, 'TAP::Parser::Iterator',
+          '... and the object it returns';
+        isa_ok $iter, $subclass, '... and the object it returns';
 
-    can_ok $iter, 'exit';
-    ok !defined $iter->exit,
-      "$name: ... and it should be undef before we are done ($subclass)";
+        can_ok $iter, 'exit';
+        ok !defined $iter->exit,
+          "$name: ... and it should be undef before we are done ($subclass)";
 
-    can_ok $iter, 'next';
-    is $iter->next, 'one', "$name: next() should return the first result";
+        can_ok $iter, 'next';
+        is $iter->next, 'one', "$name: next() should return the first result";
 
-    is $iter->next, 'two', "$name: next() should return the second result";
+        is $iter->next, 'two',
+          "$name: next() should return the second result";
 
-    is $iter->next, '', "$name: next() should return the third result";
+        is $iter->next, '', "$name: next() should return the third result";
 
-    is $iter->next, 'three', "$name: next() should return the fourth result";
+        is $iter->next, 'three',
+          "$name: next() should return the fourth result";
 
-    ok !defined $iter->next, "$name: next() should return undef after it is empty";
+        ok !defined $iter->next,
+          "$name: next() should return undef after it is empty";
 
-    is $iter->exit, 0, "$name: ... and exit should now return 0 ($subclass)";
+        is $iter->exit, 0,
+          "$name: ... and exit should now return 0 ($subclass)";
 
-    is $iter->wait, 0, "$name: wait should also now return 0 ($subclass)";
+        is $iter->wait, 0, "$name: wait should also now return 0 ($subclass)";
 
-    if ( my $after = $test->{after} ) {
-        $after->();
-    }
+        if ( my $after = $test->{after} ) {
+            $after->();
+        }
     }
 }
 
