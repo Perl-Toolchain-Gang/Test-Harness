@@ -8,8 +8,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = 'TAP::Parser::Iterator';
 
-use IPC::Open3;
-use IO::Select;
+use Config;
 use IO::Handle;
 
 my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
@@ -77,6 +76,16 @@ else {
     *_wait2exit = sub { POSIX::WEXITSTATUS( $_[1] ) }
 }
 
+sub _use_open3 {
+    my $self = shift;
+    return unless $Config{d_fork};
+    for my $module (qw< IPC::Open3 IO::Select >) {
+        eval "use $module";
+        return if $@;
+    }
+    return 1;
+}
+
 sub new {
     my $class = shift;
     my $args  = shift;
@@ -95,21 +104,32 @@ sub new {
 
     my $out = IO::Handle->new;
 
-    if ($IS_WIN32) {
-        $err = $merge ? '' : '>&STDERR';
-        eval { $pid = open3( \*DUMMY, $out, $merge ? '' : $err, @command ); };
-        die "Could not execute (@command): $@" if $@;
-        if ( $] >= 5.006 ) {
+    if ( $class->_use_open3 ) {
+        if ($IS_WIN32) {
+            $err = $merge ? '' : '>&STDERR';
+            eval {
+                $pid = open3( \*DUMMY, $out, $merge ? '' : $err, @command );
+            };
+            die "Could not execute (@command): $@" if $@;
+            if ( $] >= 5.006 ) {
 
-            # Kludge to avoid warning under 5.0.5
-            eval 'binmode($out, ":crlf")';
+                # Kludge to avoid warning under 5.0.5
+                eval 'binmode($out, ":crlf")';
+            }
+        }
+        else {
+            $err = $merge ? '' : IO::Handle->new;
+            eval { $pid = open3( \*DUMMY, $out, $err, @command ); };
+            die "Could not execute (@command): $@" if $@;
+            $sel = $merge ? undef : IO::Select->new( $out, $err );
         }
     }
     else {
-        $err = $merge ? '' : IO::Handle->new;
-        eval { $pid = open3( \*DUMMY, $out, $err, @command ); };
-        die "Could not execute (@command): $@" if $@;
-        $sel = $merge ? undef : IO::Select->new( $out, $err );
+        $err = '';
+        my $command
+          = join( ' ', map { $_ =~ /\s/ ? qq{"$_"} : $_ } @command );
+        open( $out, "$command|" )
+          or die "Could not execute ($command): $!";
     }
 
     if ( $] >= 5.008 ) {
@@ -206,6 +226,9 @@ sub _finish {
     if ( $self->{sel} ) {
         ( delete $self->{err} )->close;
         delete $self->{sel};
+    }
+    else {
+        $status = $?;
     }
 
     $self->{wait} = $status;

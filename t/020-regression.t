@@ -6,6 +6,7 @@ use lib 't/lib';
 use Test::More 'no_plan';
 
 use File::Spec;
+use Config;
 
 use constant TRUE  => "__TRUE__";
 use constant FALSE => "__FALSE__";
@@ -2383,6 +2384,7 @@ my %samples = (
         'exit'        => 0,
         wait          => 0,
         version       => 12,
+        need_fork     => 1,
     },
 
     junk_before_plan => {
@@ -2782,54 +2784,68 @@ my %HANDLER_FOR = (
     FALSE,    sub { local $^W; !shift },
 );
 
-foreach my $test ( sort keys %samples ) {
+my $have_fork = $Config{d_fork} ? 1 : 0;
 
-    #next unless 'duplicates' eq $test;
-    my $details = $samples{$test};
-    my $results = delete $details->{results};
-    my $args    = delete $details->{__ARGS__} || { switches => '' };
-
-    # the following acrobatics are necessary to make it easy for the
-    # Test::Builder::failure_output() method to be overridden when
-    # TAP::Parser is not installed.  Otherwise, these tests will fail.
-    my @switches
-      = 'ARRAY' eq ref $args->{switches}
-      ? @{ $args->{switches} }
-      : $args->{switches};
-    $args->{switches} = [ '-Ilib', @switches ];
-
-    $args->{source} = File::Spec->catfile( $SAMPLE_TESTS, $test );
-    $args->{merge} = 1;
-
-    my $parser = eval { analyze_test( $test, $results, $args ) };
-    my $error = $@;
-    ok !$error, "'$test' should parse successfully" or diag $error;
-
-    if ($error) {
-        my $tests = 0;
-        while ( my ( $method, $answer ) = each %$details ) {
-            $tests += ref $answer ? 2 : 1;
-        }
-        SKIP: {
-            skip "$test did not parse successfully", $tests;
-        }
+for my $hide_fork ( 0 .. $have_fork ) {
+    if ($hide_fork) {
+        no strict 'refs';
+        local $^W = 0;
+        *{'TAP::Parser::Iterator::Process::_use_open3'} = sub {return};
     }
-    else {
-        while ( my ( $method, $answer ) = each %$details ) {
-            if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
-                ok $handler->( $parser->$method() ),
-                  "... and $method should return a reasonable value ($test)";
+
+    TEST:
+    for my $test ( sort keys %samples ) {
+
+        #next unless 'duplicates' eq $test;
+        my %details   = %{ $samples{$test} };
+        my $results   = delete $details{results};
+        my $args      = delete $details{__ARGS__} || { switches => '' };
+        my $need_fork = delete $details{need_fork};
+
+        next TEST if $need_fork && ( $hide_fork || !$have_fork );
+
+        # the following acrobatics are necessary to make it easy for the
+        # Test::Builder::failure_output() method to be overridden when
+        # TAP::Parser is not installed.  Otherwise, these tests will fail.
+        my @switches
+          = 'ARRAY' eq ref $args->{switches}
+          ? @{ $args->{switches} }
+          : $args->{switches};
+        $args->{switches} = [ '-Ilib', @switches ];
+
+        $args->{source} = File::Spec->catfile( $SAMPLE_TESTS, $test );
+        $args->{merge} = !$hide_fork;
+
+        my $parser = eval { analyze_test( $test, [@$results], $args ) };
+        my $error = $@;
+        ok !$error, "'$test' should parse successfully" or diag $error;
+
+        if ($error) {
+            my $tests = 0;
+            while ( my ( $method, $answer ) = each %details ) {
+                $tests += ref $answer ? 2 : 1;
             }
-            elsif ( !ref $answer ) {
-                local $^W;    # uninit warnings
-                is $parser->$method(), $answer,
-                  "... and $method should equal $answer ($test)";
+            SKIP: {
+                skip "$test did not parse successfully", $tests;
             }
-            else {
-                is scalar $parser->$method(), scalar @$answer,
-                  "... and $method should be the correct amount ($test)";
-                is_deeply [ $parser->$method() ], $answer,
-                  "...... and the correct values ($test)";
+        }
+        else {
+            while ( my ( $method, $answer ) = each %details ) {
+                if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
+                    ok $handler->( $parser->$method() ),
+                      "... and $method should return a reasonable value ($test)";
+                }
+                elsif ( !ref $answer ) {
+                    local $^W;    # uninit warnings
+                    is $parser->$method(), $answer,
+                      "... and $method should equal $answer ($test)";
+                }
+                else {
+                    is scalar $parser->$method(), scalar @$answer,
+                      "... and $method should be the correct amount ($test)";
+                    is_deeply [ $parser->$method() ], $answer,
+                      "...... and the correct values ($test)";
+                }
             }
         }
     }

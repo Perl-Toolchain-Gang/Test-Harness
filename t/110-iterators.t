@@ -3,12 +3,12 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 62;
+use Test::More tests => 75;
 
 use File::Spec;
-
 use TAP::Parser;
 use TAP::Parser::Iterator;
+use Config;
 
 sub array_ref_from {
     my $string = shift;
@@ -26,6 +26,13 @@ my $did_teardown = 0;
 
 my $setup    = sub { $did_setup++ };
 my $teardown = sub { $did_teardown++ };
+
+package NoForkProcess;
+our @ISA = qw< TAP::Parser::Iterator::Process >;
+
+sub _use_open3 {return}
+
+package main;
 
 my @schedule = (
     {   subclass => 'TAP::Parser::Iterator::Process',
@@ -52,12 +59,18 @@ my @schedule = (
         source =>
           { command => [ $^X, '-e', 'print qq/one\ntwo\n\nthree\n/' ] },
     },
+    {   subclass => 'TAP::Parser::Iterator::Process',
+        class    => 'NoForkProcess',
+        source =>
+          { command => [ $^X, '-e', 'print qq/one\ntwo\n\nthree\n/' ] },
+    },
 );
 
 for my $test (@schedule) {
     my $subclass = $test->{subclass};
     my $source   = $test->{source};
-    ok my $iter = TAP::Parser::Iterator->new($source),
+    my $class    = $test->{class} || 'TAP::Parser::Iterator';
+    ok my $iter = $class->new($source),
       'We should be able to create a new iterator';
     isa_ok $iter, 'TAP::Parser::Iterator', '... and the object it returns';
     isa_ok $iter, $subclass, '... and the object it returns';
@@ -99,7 +112,7 @@ for my $test (@schedule) {
     eval {
         local $SIG{__DIE__} = sub { push @die, @_ };
 
-        TAP::Parser::Iterator->new( \1 ); # a ref to a scalar
+        TAP::Parser::Iterator->new( \1 );    # a ref to a scalar
     };
 
     is @die, 1, 'coverage of error case';
@@ -122,7 +135,8 @@ for my $test (@schedule) {
       'coverage of VMS line-splitting case';
 }
 
-{
+SKIP: {
+    skip "No fork", 4 unless $Config{d_fork};
 
     # coverage testing for TAP::Parser::Iterator::Process ctor
 
