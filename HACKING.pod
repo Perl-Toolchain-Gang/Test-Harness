@@ -32,8 +32,46 @@ automatically use if the project root is your working directory.  This
 is setup by default to read and write the perl code on a pipe.  To
 configure your editor:
 
-=for eric_not_it
-  TODO add vim/emacs config snippets
+=over 4
+
+=item * vim
+
+In C<.vimrc>, you can add the following lines:
+
+ nnoremap <Leader>pt :%!perltidy -q<cr> " only work in 'normal' mode
+ vnoremap <Leader>pt :!perltidy -q<cr>  " only work in 'visual' mode
+
+In other words, if your C<Leader> is a backslash, you can type C<\pt> to
+reformat the file using the C<.perltidyrc>.  If you are in visual mode
+(selecting lines with shift-v), then only the code you have currently have
+selected will be reformattted.
+
+=item * emacs
+
+For emacs, you can use this snippet from Sam Tregar
+(L<http://use.perl.org/~samtregar/journal/30185>):
+
+ (defun perltidy-region ()
+    "Run perltidy on the current region."
+    (interactive)
+    (save-excursion
+      (shell-command-on-region (point) (mark) "perltidy -q" nil t)
+      (cperl-mode)))
+
+ (defun perltidy-all ()
+    "Run perltidy on the current region."
+    (interactive)
+    (let ((p (point)))
+      (save-excursion
+        (shell-command-on-region (point-min) (point-max) "perltidy -q" nil t)
+        )
+      (goto-char p)
+      (cperl-mode)))
+
+ (global-set-key "\M-t" `perltidy-region)
+ (global-set-key "\M-T" `perltidy-all) 
+
+=back
 
 =head1 Tests and Coverage
 
