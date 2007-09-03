@@ -109,7 +109,7 @@ The C<$description> is usually a test file name (but only by
 convention.)  It is used as a unique identifier (see e.g.
 L<"parsers">.)  Reusing a description is a fatal error.
 
-The C<$parser> is a TAP::Parser object (see L<TAP::Parser>.)
+The C<$parser> is a L<TAP::Parser|TAP::Parser> object.
 
 =cut
 
