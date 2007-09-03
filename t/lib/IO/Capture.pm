@@ -60,6 +60,57 @@ sub dump {
     return @got;
 }
 
+package util;
+
+use IO::File;
+
+# mostly stolen from Module::Build MBTest.pm
+
+{ # backwards compatible temp filename recipe adapted from perlfaq
+  my $tmp_count = 0;
+  my $tmp_base_name = sprintf("%d-%d", $$, time());
+  sub temp_file_name {
+    sprintf("%s-%04d", $tmp_base_name, ++$tmp_count)
+  }
+}
+########################################################################
+
+sub save_handle {
+  my ($handle, $subr) = @_;
+  my $outfile = temp_file_name();
+
+  local *SAVEOUT;
+  open SAVEOUT, ">&" . fileno($handle)
+    or die "Can't save output handle: $!";
+  open $handle, "> $outfile" or die "Can't create $outfile: $!";
+
+  eval {$subr->()};
+  my $err = $@;
+  open $handle, ">&SAVEOUT" or die "Can't restore output: $!";
+
+  my $ret = slurp($outfile);
+  1 while unlink $outfile;
+  $err and die $err;
+  return $ret;
+}
+
+sub stdout_of { save_handle(\*STDOUT, @_) }
+sub stderr_of { save_handle(\*STDERR, @_) }
+sub stdout_stderr_of {
+  my $subr = shift;
+  my ($stdout, $stderr);
+  $stdout = stdout_of ( sub {
+      $stderr = stderr_of( $subr )
+  });
+  return ($stdout, $stderr);
+}
+
+sub slurp {
+  my $fh = IO::File->new($_[0]) or die "Can't open $_[0]: $!";
+  local $/;
+  return scalar <$fh>;
+}
+
 1;
 
 # vim:ts=4:sw=4:et:sta
