@@ -13,11 +13,11 @@ TAP::Parser::Iterator - Internal TAP::Parser Iterator
 
 =head1 VERSION
 
-Version 2.99_01
+Version 2.99_02
 
 =cut
 
-$VERSION = '2.99_01';
+$VERSION = '2.99_02';
 
 =head1 SYNOPSIS
 

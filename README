@@ -1,4 +1,4 @@
-TAP-Parser 2.99_1
+TAP-Parser 2.99_2
 
 TAP::Parser is designed as a replacement for Test::Harness. It is hoped
 that it will become Test::Harness 3.0.
