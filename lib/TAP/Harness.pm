@@ -279,8 +279,8 @@ A filehandle for catching standard output.
         my %arg_for = %$arg_for;    # force a shallow copy
 
         foreach my $name ( keys %VALIDATION_FOR ) {
-            if ( exists $arg_for{$name} ) {
-                my $property = delete $arg_for{$name};
+            my $property = delete $arg_for{$name};
+            if ( defined $property ) {
                 my $validate = $VALIDATION_FOR{$name};
 
                 my $value = $self->$validate($property);
