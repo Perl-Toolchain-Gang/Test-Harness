@@ -262,6 +262,8 @@ A filehandle for catching standard output.
 
 =back
 
+Any keys for which the value is C<undef> will be ignored.
+
 =cut
 
 # new supplied by TAP::Base
