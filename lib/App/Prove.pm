@@ -5,6 +5,7 @@ use TAP::Harness;
 use File::Find;
 use File::Spec;
 use Getopt::Long;
+use Carp;
 
 use vars qw($VERSION);
 
@@ -24,64 +25,64 @@ $VERSION = '2.99_02';
 
 =head2 Class Methods
 
+=cut 
+
+BEGIN {
+    my @ATTR = qw<
+      archive argv blib color default_formatter directives exec
+      extension failures formatter harness includes lib merge options
+      parse quiet really_quiet recurse backwards shuffle taint_fail
+      taint_warn verbose warnings_fail warnings_warn
+    >;
+
+    for my $attr (@ATTR) {
+        no strict 'refs';
+        *{ __PACKAGE__ . '::' . $attr } = sub {
+            my $self = shift;
+            croak "$attr is read-only" if @_;
+            $self->{$attr};
+        };
+    }
+
 =head3 C<new>
 
 =cut
 
-sub new {
-    my $class = shift;
-    my $args = shift || {};
+    sub new {
+        my $class = shift;
+        my $args = shift || {};
 
-    my $self = bless {
-        options => delete $args->{options} || \@ARGV,
-        includes          => [],
-        default_formatter => 'TAP::Harness::Formatter::Basic',
-    }, $class;
+        my $self = bless {
+            includes          => [],
+            default_formatter => 'TAP::Harness::Formatter::Basic',
+        }, $class;
 
-    return $self;
+        for my $attr (@ATTR) {
+            if ( exists $args->{$attr} ) {
+                $self->{$attr} = $args->{$attr};
+            }
+        }
+
+        return $self;
+    }
 }
 
-=head3 C<run>
+=head3 C<process_args>
 
 =cut
 
-BEGIN {
-    my @ATTR = qw<
-        argv shuffle archive argv blib color default_formatter
-        directives exec extension failures formatter harness includes
-        lib merge options parse quiet really_quiet recurse reverse
-        shuffle taint_fail taint_warn verbose warnings_fail
-        warnings_warn
-    >;
-}
-
-sub run {
-    my $self = shift;
-
-    # Allow cuddling the paths with the -I
-    my @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @{ $self->{options} };
-    my $color_default = -t STDOUT && !( $^O =~ /MSWin32/ );
-
-    my $help_sub = sub {
-        eval('use Pod::Usage 1.12 ()');
-        my $err = $@;
-
-        # XXX Getopt::Long is being helpy
-        local $SIG{__DIE__} = sub { warn @_; exit; };
-        if ($err) {
-            die 'Please install Pod::Usage for the --help option '
-              . '(or try `perldoc prove`.)'
-              . "\n ($@)";
-        }
-
-        Pod::Usage::pod2usage( { -verbose => 1 } );
-        exit;
-    };
+sub process_args {
+    my ( $self, @args ) = @_;
 
     if ( my @bad = map {"-$_"} grep {/^-(man|help)$/} @args ) {
         die "Long options should be written with two dashes: ",
           join( ', ', @bad ), "\n";
     }
+
+    # Allow cuddling the paths with the -I
+    @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @args;
+
+    my $help_sub = sub { $self->_help; exit; };
 
     {
         local @ARGV = @args;
@@ -97,7 +98,7 @@ sub run {
             'harness=s'   => \$self->{harness},
             'formatter=s' => \$self->{formatter},
             'r|recurse'   => \$self->{recurse},
-            'reverse'     => \$self->{reverse},
+            'reverse'     => \$self->{backwards},
             'p|parse'     => \$self->{parse},
             'q|quiet'     => \$self->{quiet},
             'Q|QUIET'     => \$self->{really_quiet},
@@ -120,71 +121,96 @@ sub run {
         # Stash the remainder of argv for later
         $self->{argv} = [@ARGV];
     }
+}
 
-    if ( !defined $self->{color} ) {
-        $self->{color} = $color_default;
+sub _help {
+    my $self = shift;
+    eval('use Pod::Usage 1.12 ()');
+    my $err = $@;
+
+    # XXX Getopt::Long is being helpy
+    local $SIG{__DIE__} = sub { warn @_; exit; };
+    if ($err) {
+        die 'Please install Pod::Usage for the --help option '
+          . '(or try `perldoc prove`.)'
+          . "\n ($@)";
     }
+
+    Pod::Usage::pod2usage( { -verbose => 1 } );
+}
+
+=head3 C<run>
+
+=cut
+
+sub run {
+    my $self = shift;
 
     my $harness_class = 'TAP::Harness';
     my %args;
+    my $color_default = -t STDOUT && !( $^O =~ /MSWin32/ );
 
-    if ( $self->{color} ) {
+    # if ( !defined $self->color ) {
+    #     $self->color = $color_default;
+    # }
+
+    if ( defined $self->color ? $self->color : $color_default ) {
         require TAP::Harness::Color;
         $harness_class = 'TAP::Harness::Color';
     }
 
-    if ( $self->{archive} ) {
+    if ( $self->archive ) {
         eval { require TAP::Harness::Archive };
         die
           "TAP::Harness::Archive is required to use the --archive feature: $@"
           if $@;
         $harness_class = 'TAP::Harness::Archive';
-        $args{archive} = $self->{archive};
+        $args{archive} = $self->archive;
     }
 
-    if ( $self->{harness} ) {
-        eval "use $self->{harness}";
-        die "Cannot use harness ($self->{harness}): $@" if $@;
-        $harness_class = $self->{harness};
+    if ( $self->harness ) {
+        eval "use $self->harness";
+        die "Cannot use harness ($self->harness): $@" if $@;
+        $harness_class = $self->harness;
     }
 
     my $formatter_class;
-    if ( $self->{formatter} ) {
-        eval "use $self->{formatter}";
-        die "Cannot use formatter ($self->{formatter}): $@" if $@;
-        $formatter_class = $self->{formatter};
+    if ( $self->formatter ) {
+        eval "use $self->formatter";
+        die "Cannot use formatter ($self->formatter): $@" if $@;
+        $formatter_class = $self->formatter;
     }
 
     unless ($formatter_class) {
-        eval "use $self->{default_formatter}";
-        $formatter_class = $self->{default_formatter} unless $@;
+        eval "use $self->default_formatter";
+        $formatter_class = $self->default_formatter unless $@;
     }
 
-    my @tests = $self->get_tests( @{ $self->{argv} } );
+    my @tests = $self->get_tests( @{ $self->argv } );
 
-    $self->shuffle(@tests) if $self->{shuffle};
-    @tests = reverse @tests if $self->{reverse};
+    $self->_shuffle(@tests) if $self->shuffle;
+    @tests = reverse @tests if $self->backwards;
 
-    if ( $self->{taint_fail} && $self->{taint_warn} ) {
+    if ( $self->taint_fail && $self->taint_warn ) {
         die "-t and -T are mutually exclusive";
     }
-    if ( $self->{warnings_fail} && $self->{warnings_warn} ) {
+    
+    if ( $self->warnings_fail && $self->warnings_warn ) {
         die "-w and -W are mutually exclusive";
     }
 
     $args{lib}          = $self->get_libs;
     $args{switches}     = $self->get_switches;
-    $args{merge}        = $self->{merge} if $self->{merge};
-    $args{verbose}      = $self->{verbose} if $self->{verbose};
-    $args{failures}     = $self->{failures} if $self->{failures};
-    $args{quiet}        = 1 if $self->{quiet};
-    $args{really_quiet} = 1 if $self->{really_quiet};
-    $args{errors}       = 1 if $self->{parse};
-    $args{exec}
-      = length( $self->{exec} ) ? [ split( / /, $self->{exec} ) ] : []
-      if ( defined( $self->{exec} ) );
+    $args{merge}        = $self->merge if $self->merge;
+    $args{verbose}      = $self->verbose if $self->verbose;
+    $args{failures}     = $self->failures if $self->failures;
+    $args{quiet}        = 1 if $self->quiet;
+    $args{really_quiet} = 1 if $self->really_quiet;
+    $args{errors}       = 1 if $self->parse;
+    $args{exec} = length( $self->exec ) ? [ split( / /, $self->exec ) ] : []
+      if ( defined( $self->exec ) );
 
-    $args{directives} = 1 if $self->{directives};
+    $args{directives} = 1 if $self->directives;
 
     if ($formatter_class) {
         $args{formatter} = $formatter_class->new;
@@ -205,16 +231,16 @@ sub get_switches {
     my @switches;
 
     # notes that -T or -t must be at the front of the switches!
-    if ( $self->{taint_fail} ) {
+    if ( $self->taint_fail ) {
         push @switches, 'T';
     }
-    elsif ( $self->{taint_warn} ) {
+    elsif ( $self->taint_warn ) {
         push @switches, 't';
     }
-    if ( $self->{warnings_fail} ) {
+    if ( $self->warnings_fail ) {
         push @switches, 'W';
     }
-    elsif ( $self->{warnings_warn} ) {
+    elsif ( $self->warnings_warn ) {
         push @switches, 'w';
     }
 
@@ -228,14 +254,14 @@ sub get_switches {
 sub get_libs {
     my $self = shift;
     my @libs;
-    if ( $self->{lib} ) {
+    if ( $self->lib ) {
         push @libs, 'lib';
     }
-    if ( $self->{blib} ) {
+    if ( $self->blib ) {
         push @libs, 'blib/lib';
     }
-    if ( @{ $self->{includes} } ) {
-        push @libs, @{ $self->{includes} };
+    if ( @{ $self->includes } ) {
+        push @libs, @{ $self->includes };
     }
     return @libs ? \@libs : ();
 }
@@ -275,7 +301,7 @@ sub _get_tests {
     my $self = shift;
     my $dir  = shift;
     my @tests;
-    if ( $self->{recurse} ) {
+    if ( $self->recurse ) {
         find(
             sub { -f && /\.t$/ && push @tests => $File::Find::name },
             $dir
@@ -287,11 +313,7 @@ sub _get_tests {
     return @tests;
 }
 
-=head3 C<shuffle>
-
-=cut
-
-sub shuffle {
+sub _shuffle {
     my $self = shift;
 
     # Fisher-Yates shuffle
@@ -317,5 +339,63 @@ sub print_version {
 1;
 
 __END__
+
+=head2 Attributes
+
+=over
+
+=item C< archive >
+
+=item C< argv >
+
+=item C< backwards >
+
+=item C< blib >
+
+=item C< color >
+
+=item C< default_formatter >
+
+=item C< directives >
+
+=item C< exec >
+
+=item C< extension >
+
+=item C< failures >
+
+=item C< formatter >
+
+=item C< harness >
+
+=item C< includes >
+
+=item C< lib >
+
+=item C< merge >
+
+=item C< options >
+
+=item C< parse >
+
+=item C< quiet >
+
+=item C< really_quiet >
+
+=item C< recurse >
+
+=item C< shuffle >
+
+=item C< taint_fail >
+
+=item C< taint_warn >
+
+=item C< verbose >
+
+=item C< warnings_fail >
+
+=item C< warnings_warn >
+
+=back
 
 # vim:ts=4:sw=4:et:sta

@@ -6,7 +6,8 @@ eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
 use strict;
 use App::Prove;
 
-my $app = App::Prove->new( { options => \@ARGV } );
+my $app = App::Prove->new;
+$app->process_args(@ARGV);
 $app->run;
 
 __END__
