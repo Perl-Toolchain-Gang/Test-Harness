@@ -29,7 +29,7 @@ use TAP::Harness;
 use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 73;
+my $PLAN      = 81;
 
 if ( TAP::Harness::Color->can_color ) {
     push @HARNESSES, 'TAP::Harness::Color';
@@ -478,4 +478,26 @@ sub _runtests {
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
     my $aggregate = $harness->runtests(@tests);
     return $aggregate;
+}
+
+{
+
+    # coverage tests for ctor
+
+    my $harness = TAP::Harness->new(
+        {   timer     => 0,
+            errors    => 1,
+            merge     => 2,
+            formatter => 3,
+        }
+    );
+
+    is( $harness->timer(),       0,  'timer getter' );
+    is( $harness->timer(10),     10, 'timer setter' );
+    is( $harness->errors(),      1,  'errors getter' );
+    is( $harness->errors(10),    10, 'errors setter' );
+    is( $harness->merge(),       2,  'merge getter' );
+    is( $harness->merge(10),     10, 'merge setter' );
+    is( $harness->formatter(),   3,  'formatter getter' );
+    is( $harness->formatter(10), 10, 'formatter setter' );
 }
