@@ -18,14 +18,19 @@ my $COLOR;
 
 my $help_sub = sub {
     eval('use Pod::Usage 1.12 ()');
-    if($@) {
-        die 'Please install Pod::Usage for the --help option ' .
-            '(or try `perldoc prove`.)' .
-            "\n ($@)";
+    if ($@) {
+        die 'Please install Pod::Usage for the --help option '
+          . '(or try `perldoc prove`.)'
+          . "\n ($@)";
     }
     Pod::Usage::pod2usage( { -verbose => 1 } );
     exit;
 };
+
+if ( my @bad = map {"-$_"} grep {/^-(man|help)$/} @ARGV ) {
+    die "Long options should be written with two dashes: ",
+      join( ', ', @bad ), "\n";
+}
 
 Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
 GetOptions(
@@ -77,7 +82,8 @@ if ($COLOR) {
 
 if ($ARCHIVE) {
     eval { require TAP::Harness::Archive };
-    die "TAP::Harness::Archive is required to use the --archive feature: $@" if $@;
+    die "TAP::Harness::Archive is required to use the --archive feature: $@"
+      if $@;
     $harness_class = 'TAP::Harness::Archive';
     $args{archive} = $ARCHIVE;
 }
