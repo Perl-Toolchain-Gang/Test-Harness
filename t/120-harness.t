@@ -374,7 +374,7 @@ foreach my $HARNESS (@HARNESSES) {
 
     @expected = (
         't/sample-tests/no_output....',
-        'No tests run',
+        'No subtests run',
         'Test Summary Report',
         '-------------------',
         't/sample-tests/no_output (Wstat: 0 Tests: 0 Failed: 0)',
