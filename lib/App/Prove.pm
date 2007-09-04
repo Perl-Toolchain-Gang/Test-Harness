@@ -25,7 +25,9 @@ $VERSION = '2.99_02';
 
 =head2 Class Methods
 
-=cut 
+=head3 C<new>
+
+=cut
 
 BEGIN {
     my @ATTR = qw<
@@ -43,10 +45,6 @@ BEGIN {
             $self->{$attr};
         };
     }
-
-=head3 C<new>
-
-=cut
 
     sub new {
         my $class = shift;
@@ -263,6 +261,8 @@ sub get_libs {
     if ( @{ $self->includes } ) {
         push @libs, @{ $self->includes };
     }
+    
+    # Huh?
     return @libs ? \@libs : ();
 }
 
