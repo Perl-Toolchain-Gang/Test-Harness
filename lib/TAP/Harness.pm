@@ -500,6 +500,8 @@ sub summary {
     }
     my $files = @$tests;
     $self->output("Files=$files, Tests=$total, $runtime\n");
+    my $status = $aggregate->get_status;
+    $self->output("Result: $status\n");
 }
 
 sub _output_summary_failure {

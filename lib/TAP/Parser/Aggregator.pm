@@ -52,7 +52,7 @@ Returns a new C<TAP::Parser::Aggregator> object.
 
 my %SUMMARY_METHOD_FOR;
 
-BEGIN { # install summary methods
+BEGIN {    # install summary methods
     %SUMMARY_METHOD_FOR = map { $_ => $_ } qw(
       failed
       parse_errors
@@ -76,7 +76,7 @@ BEGIN { # install summary methods
               : $self->{$method};
         };
     }
-} # end install summary methods
+}    # end install summary methods
 
 sub new {
     my ($class) = @_;
@@ -172,6 +172,26 @@ sub _get_parsers {
         push @parsers => $self->{parser_for}{$description};
     }
     return wantarray ? @parsers : \@parsers;
+}
+
+=head3 C<get_status>
+
+Get a single word describing the status of the aggregated tests.
+Depending on the outcome of the tests returns 'PASS', 'FAIL' or
+'NOTESTS'. This token is understood by L<CPAN::Reporter>.
+
+=cut
+
+sub get_status {
+    my $self = shift;
+
+    if ( my $total = $self->total ) {
+        return $total == $self->passed
+          && !$self->has_problems ? 'PASS' : 'FAIL';
+    }
+    else {
+        return 'NOTESTS';
+    }
 }
 
 ##############################################################################

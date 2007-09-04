@@ -29,7 +29,7 @@ use TAP::Harness;
 use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 85;
+my $PLAN      = 96;
 
 if ( TAP::Harness::Color->can_color ) {
     push @HARNESSES, 'TAP::Harness::Color';
@@ -126,11 +126,14 @@ foreach my $HARNESS (@HARNESSES) {
         'ok',
         'All tests successful.',
     );
-
+    my $status           = pop @output;
+    my $expected_status  = qr{^Result: PASS$};
     my $summary          = pop @output;
-    my $expected_summary = qr/^Files=1, Tests=1,  \d+ wallclock secs/;
+    my $expected_summary = qr{^Files=1, Tests=1,  \d+ wallclock secs};
 
     is_deeply \@output, \@expected, '... and the output should be correct';
+    like $status, $expected_status,
+      '... and the status line should be correct';
     like $summary, $expected_summary,
       '... and the report summary should look correct';
 
@@ -146,10 +149,14 @@ foreach my $HARNESS (@HARNESSES) {
         'All tests successful.',
     );
 
+    $status           = pop @output;
+    $expected_status  = qr{^Result: PASS$};
     $summary          = pop @output;
     $expected_summary = qr/^Files=1, Tests=1,  \d+ wallclock secs/;
 
     is_deeply \@output, \@expected, '... and the output should be correct';
+    like $status, $expected_status,
+      '... and the status line should be correct';
     like $summary, $expected_summary,
       '... and the report summary should look correct';
 
@@ -163,10 +170,14 @@ foreach my $HARNESS (@HARNESSES) {
         'All tests successful.',
     );
 
+    $status           = pop @output;
+    $expected_status  = qr{^Result: PASS$};
     $summary          = pop @output;
     $expected_summary = qr/^Files=1, Tests=1,  \d+ wallclock secs/;
 
     is_deeply \@output, \@expected, '... and the output should be correct';
+    like $status, $expected_status,
+      '... and the status line should be correct';
     like $summary, $expected_summary,
       '... and the report summary should look correct';
 
@@ -175,8 +186,15 @@ foreach my $HARNESS (@HARNESSES) {
     @output = ();
     _runtests( $harness, 't/source_tests/harness_failure' );
 
-    my @summary = @output[ 5 .. ( $#output - 1 ) ];
-    @output   = @output[ 0 .. 4 ];
+    $status  = pop @output;
+    $summary = pop @output;
+
+    like $status, qr{^Result: FAIL$},
+      '... and the status line should be correct';
+
+    my @summary = @output[ 5 .. $#output ];
+    @output = @output[ 0 .. 4 ];
+
     @expected = (
         't/source_tests/harness_failure....',
         '1..2',
@@ -184,8 +202,10 @@ foreach my $HARNESS (@HARNESSES) {
         'not ok 2 - this is another test',
         'Failed 1/2 subtests',
     );
+
     is_deeply \@output, \@expected,
       '... and failing test output should be correct';
+
     my @expected_summary = (
         'Test Summary Report',
         '-------------------',
@@ -193,6 +213,7 @@ foreach my $HARNESS (@HARNESSES) {
         'Failed tests:',
         '2',
     );
+
     is_deeply \@summary, \@expected_summary,
       '... and the failure summary should also be correct';
 
@@ -201,7 +222,8 @@ foreach my $HARNESS (@HARNESSES) {
     @output = ();
     _runtests( $harness_whisper, 't/source_tests/harness_failure' );
 
-    pop @output;    # get rid of summary line
+    $status   = pop @output;
+    $summary  = pop @output;
     @expected = (
         't/source_tests/harness_failure....',
         'Failed 1/2 subtests',
@@ -211,6 +233,10 @@ foreach my $HARNESS (@HARNESSES) {
         'Failed tests:',
         '2',
     );
+
+    like $status, qr{^Result: FAIL$},
+      '... and the status line should be correct';
+
     is_deeply \@output, \@expected,
       '... and failing test output should be correct';
 
@@ -219,7 +245,8 @@ foreach my $HARNESS (@HARNESSES) {
     @output = ();
     _runtests( $harness_mute, 't/source_tests/harness_failure' );
 
-    pop @output;    # get rid of summary line
+    $status   = pop @output;
+    $summary  = pop @output;
     @expected = (
         'Test Summary Report',
         '-------------------',
@@ -227,6 +254,10 @@ foreach my $HARNESS (@HARNESSES) {
         'Failed tests:',
         '2',
     );
+
+    like $status, qr{^Result: FAIL$},
+      '... and the status line should be correct';
+
     is_deeply \@output, \@expected,
       '... and failing test output should be correct';
 
@@ -250,12 +281,16 @@ foreach my $HARNESS (@HARNESSES) {
         '3',
     );
 
+    $status           = pop @output;
     $summary          = pop @output;
     $expected_summary = qr/^Files=1, Tests=3,  \d+ wallclock secs/;
 
     is_deeply \@output, \@expected, '... and the output should be correct';
     like $summary, $expected_summary,
       '... and the report summary should look correct';
+
+    like $status, qr{^Result: PASS$},
+      '... and the status line should be correct';
 
     # normal tests with bad tap
 
@@ -273,7 +308,8 @@ foreach my $HARNESS (@HARNESSES) {
     _runtests( $harness, 't/source_tests/harness_badtap' );
     chomp(@output);
 
-    @output = map { trim($_) } @output;
+    @output   = map { trim($_) } @output;
+    $status   = pop @output;
     @summary  = @output[ 6 .. ( $#output - 1 ) ];
     @output   = @output[ 0 .. 5 ];
     @expected = (
@@ -286,6 +322,8 @@ foreach my $HARNESS (@HARNESSES) {
     );
     is_deeply \@output, \@expected,
       '... and failing test output should be correct';
+    like $status, qr{^Result: FAIL$},
+      '... and the status line should be correct';
     @expected_summary = (
         'Test Summary Report',
         '-------------------',
@@ -319,9 +357,12 @@ foreach my $HARNESS (@HARNESSES) {
         '2',
     );
 
-    $summary          = pop @output;
-    $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
+    $status  = pop @output;
+    $summary = pop @output;
 
+    like $status, qr{^Result: FAIL$},
+      '... and the status line should be correct';
+    $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';
 
     #XXXX
@@ -348,6 +389,9 @@ SKIP: {
     eval { _runtests( $harness, 't/data/catme.1' ) };
 
     my @output = tied($$capture)->dump;
+    my $status = pop @output;
+    like $status, qr{^Result: PASS$},
+      '... and the status line should be correct';
     pop @output;    # get rid of summary line
     my $answer = pop @output;
     is( $answer, "All tests successful.\n", 'cat meows' );
@@ -371,6 +415,9 @@ SKIP: {
     );
 
     my @output = tied($$capture)->dump;
+    my $status = pop @output;
+    like $status, qr{^Result: PASS$},
+      '... and the status line should be correct';
     pop @output;                              # get rid of summary line
     is( $output[-1], "All tests successful.\n", 'No exec accumulation' );
 }
