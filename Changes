@@ -1,6 +1,7 @@
 Revision history for TAP-Parser
 
 2.99_01 2007-09-04
+        - Moved logic of prove program into App::Prove.
         - Added simple machine readable summary.
         - Performance improvement: The processing pipeline within
           TAP::Parser is now a closure which speeds up access to the
