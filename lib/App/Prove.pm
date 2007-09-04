@@ -106,7 +106,7 @@ sub process_args {
             'directives'  => \$self->{directives},
             'h|help|?'    => $help_sub,
             'H|man'       => $help_sub,
-            'V|version'   => sub { $self->print_version(); exit },
+            'V|version'   => sub { $self->print_version; exit },
             'a|archive=s' => \$self->{archive},
 
             #'x|xtension=s' => \$self->{extension},
@@ -123,6 +123,7 @@ sub process_args {
 
 sub _help {
     my $self = shift;
+
     eval('use Pod::Usage 1.12 ()');
     my $err = $@;
 
@@ -137,22 +138,19 @@ sub _help {
     Pod::Usage::pod2usage( { -verbose => 1 } );
 }
 
-=head3 C<run>
-
-=cut
-
-sub run {
+sub _color_default {
     my $self = shift;
 
+    return -t STDOUT
+      && !( $^O =~ /MSWin32/ );
+}
+
+sub _get_args {
+    my $self          = shift;
     my $harness_class = 'TAP::Harness';
     my %args;
-    my $color_default = -t STDOUT && !( $^O =~ /MSWin32/ );
 
-    # if ( !defined $self->color ) {
-    #     $self->color = $color_default;
-    # }
-
-    if ( defined $self->color ? $self->color : $color_default ) {
+    if ( defined $self->color ? $self->color : $self->_color_default ) {
         require TAP::Harness::Color;
         $harness_class = 'TAP::Harness::Color';
     }
@@ -184,21 +182,16 @@ sub run {
         $formatter_class = $self->default_formatter unless $@;
     }
 
-    my @tests = $self->get_tests( @{ $self->argv } );
-
-    $self->_shuffle(@tests) if $self->shuffle;
-    @tests = reverse @tests if $self->backwards;
-
     if ( $self->taint_fail && $self->taint_warn ) {
         die "-t and -T are mutually exclusive";
     }
-    
+
     if ( $self->warnings_fail && $self->warnings_warn ) {
         die "-w and -W are mutually exclusive";
     }
 
-    $args{lib}          = $self->get_libs;
-    $args{switches}     = $self->get_switches;
+    $args{lib}          = $self->_get_libs;
+    $args{switches}     = $self->_get_switches;
     $args{merge}        = $self->merge if $self->merge;
     $args{verbose}      = $self->verbose if $self->verbose;
     $args{failures}     = $self->failures if $self->failures;
@@ -214,17 +207,29 @@ sub run {
         $args{formatter} = $formatter_class->new;
     }
 
-    my $harness    = $harness_class->new( \%args );
+    return ( \%args, $harness_class );
+}
+
+=head3 C<run>
+
+=cut
+
+sub run {
+    my $self = shift;
+
+    my @tests = $self->_get_tests( @{ $self->argv } );
+
+    $self->_shuffle(@tests) if $self->shuffle;
+    @tests = reverse @tests if $self->backwards;
+
+    my ( $args, $harness_class ) = $self->_get_args;
+    my $harness    = $harness_class->new($args);
     my $aggregator = $harness->runtests(@tests);
 
     exit $aggregator->has_problems ? 1 : 0;
 }
 
-=head3 C<get_switches>
-
-=cut
-
-sub get_switches {
+sub _get_switches {
     my $self = shift;
     my @switches;
 
@@ -245,11 +250,7 @@ sub get_switches {
     return @switches ? \@switches : ();
 }
 
-=head3 C<get_libs>
-
-=cut
-
-sub get_libs {
+sub _get_libs {
     my $self = shift;
     my @libs;
     if ( $self->lib ) {
@@ -261,16 +262,12 @@ sub get_libs {
     if ( @{ $self->includes } ) {
         push @libs, @{ $self->includes };
     }
-    
+
     # Huh?
     return @libs ? \@libs : ();
 }
 
-=head3 C<get_tests>
-
-=cut
-
-sub get_tests {
+sub _get_tests {
     my $self = shift;
     my @argv = @_;
     my ( @tests, %tests );
@@ -283,7 +280,7 @@ sub get_tests {
         }
 
         if ( -d $arg ) {
-            my @files = $self->_get_tests($arg);
+            my @files = $self->_expand_dir($arg);
             foreach my $file (@files) {
                 push @tests => $file unless exists $tests{$file};
             }
@@ -297,7 +294,7 @@ sub get_tests {
     return @tests;
 }
 
-sub _get_tests {
+sub _expand_dir {
     my $self = shift;
     my $dir  = shift;
     my @tests;
