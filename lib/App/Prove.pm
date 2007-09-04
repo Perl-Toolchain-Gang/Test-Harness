@@ -30,12 +30,12 @@ $VERSION = '2.99_02';
 =cut
 
 BEGIN {
-    my @ATTR = qw<
+    my @ATTR = qw(
       archive argv blib color default_formatter directives exec
       extension failures formatter harness includes lib merge options
       parse quiet really_quiet recurse backwards shuffle taint_fail
       taint_warn verbose warnings_fail warnings_warn
-    >;
+    );
 
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -57,6 +57,7 @@ BEGIN {
 
         for my $attr (@ATTR) {
             if ( exists $args->{$attr} ) {
+                # TODO: Some validation here
                 $self->{$attr} = $args->{$attr};
             }
         }
