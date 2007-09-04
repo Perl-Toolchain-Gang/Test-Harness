@@ -18,7 +18,10 @@ my $COLOR;
 
 my $help_sub = sub {
     eval('use Pod::Usage 1.12 ()');
-    if ($@) {
+    my $err = $@;
+    # XXX Getopt::Long is being helpy
+    local $SIG{__DIE__} = sub { warn @_; exit; };
+    if ($err) {
         die 'Please install Pod::Usage for the --help option '
           . '(or try `perldoc prove`.)'
           . "\n ($@)";
