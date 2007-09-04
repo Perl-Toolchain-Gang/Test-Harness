@@ -56,6 +56,7 @@ t/150-yamlish.t
 t/160-yamlish-writer.t
 t/170-yamlish-output.t
 t/180-unicode.t
+t/190-nofork.t
 t/compat/000-compile.t
 t/compat/010-failure.t
 t/compat/020-inc_taint.t
@@ -67,6 +68,7 @@ t/data/sample.yml
 t/lib/Dev/Null.pm
 t/lib/if.pm
 t/lib/IO/Capture.pm
+t/lib/NoFork.pm
 t/lib/Test/Builder.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
