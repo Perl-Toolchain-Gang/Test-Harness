@@ -4,7 +4,7 @@ use strict;
 use TAP::Harness;
 use File::Find;
 use File::Spec;
-use Getopt::Long qw( GetOptionsFromArray );
+use Getopt::Long;
 
 use vars qw($VERSION);
 
@@ -64,41 +64,43 @@ sub new {
           join( ', ', @bad ), "\n";
     }
 
-    Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
-    GetOptionsFromArray(
-        \@args,
-        'v|verbose'   => \$self->{verbose},
-        'f|failures'  => \$self->{failures},
-        'l|lib'       => \$self->{lib},
-        'b|blib'      => \$self->{blib},
-        's|shuffle'   => \$self->{shuffle},
-        'color!'      => \$self->{color},
-        'c'           => \$self->{color},
-        'harness=s'   => \$self->{harness},
-        'formatter=s' => \$self->{formatter},
-        'r|recurse'   => \$self->{recurse},
-        'reverse'     => \$self->{reverse},
-        'p|parse'     => \$self->{parse},
-        'q|quiet'     => \$self->{quiet},
-        'Q|QUIET'     => \$self->{really_quiet},
-        'e|exec=s'    => \$self->{exec},
-        'm|merge'     => \$self->{merge},
-        'I=s@'        => \$self->{includes},
-        'directives'  => \$self->{directives},
-        'h|help|?'    => $help_sub,
-        'H|man'       => $help_sub,
-        'V|version'   => sub { $self->print_version(); exit },
-        'a|archive=s' => \$self->{archive},
+    {
+        local @ARGV = @args;
+        Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
+        GetOptions(
+            'v|verbose'   => \$self->{verbose},
+            'f|failures'  => \$self->{failures},
+            'l|lib'       => \$self->{lib},
+            'b|blib'      => \$self->{blib},
+            's|shuffle'   => \$self->{shuffle},
+            'color!'      => \$self->{color},
+            'c'           => \$self->{color},
+            'harness=s'   => \$self->{harness},
+            'formatter=s' => \$self->{formatter},
+            'r|recurse'   => \$self->{recurse},
+            'reverse'     => \$self->{reverse},
+            'p|parse'     => \$self->{parse},
+            'q|quiet'     => \$self->{quiet},
+            'Q|QUIET'     => \$self->{really_quiet},
+            'e|exec=s'    => \$self->{exec},
+            'm|merge'     => \$self->{merge},
+            'I=s@'        => \$self->{includes},
+            'directives'  => \$self->{directives},
+            'h|help|?'    => $help_sub,
+            'H|man'       => $help_sub,
+            'V|version'   => sub { $self->print_version(); exit },
+            'a|archive=s' => \$self->{archive},
 
-        #'x|xtension=s' => \$self->{extension},
-        'T' => \$self->{taint_fail},
-        't' => \$self->{taint_warn},
-        'W' => \$self->{warnings_fail},
-        'w' => \$self->{warnings_warn},
-    );
+            #'x|xtension=s' => \$self->{extension},
+            'T' => \$self->{taint_fail},
+            't' => \$self->{taint_warn},
+            'W' => \$self->{warnings_fail},
+            'w' => \$self->{warnings_warn},
+        );
 
-    # Stash the remainder of argv for later
-    $self->{argv} = \@args;
+        # Stash the remainder of argv for later
+        $self->{argv} = [@ARGV];
+    }
 
     if ( !defined $self->{color} ) {
         $self->{color} = $color_default;
