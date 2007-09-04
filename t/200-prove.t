@@ -146,6 +146,7 @@ for my $test (@schedule) {
         my $val       = $app->$attr();
         my $assertion = $expect->{$attr} || $DEFAULT_ASSERTION{$attr};
         my $is_ok     = undef;
+        
         if ( 'CODE' eq ref $assertion ) {
             $is_ok = ok $assertion->( $val, $attr ),
               "$name: $attr has the expected value";
