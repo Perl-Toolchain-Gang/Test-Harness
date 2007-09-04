@@ -29,7 +29,7 @@ use TAP::Harness;
 use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 96;
+my $PLAN      = 98;
 
 if ( TAP::Harness::Color->can_color ) {
     push @HARNESSES, 'TAP::Harness::Color';
@@ -361,6 +361,30 @@ foreach my $HARNESS (@HARNESSES) {
     $summary = pop @output;
 
     like $status, qr{^Result: FAIL$},
+      '... and the status line should be correct';
+    $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
+    is_deeply \@output, \@expected, '... and the output should be correct';
+
+    # check the status output for no tests
+
+    @output = ();
+    _runtests( $harness_failures, 't/sample-tests/no_output' );
+
+    chomp(@output);
+
+    @expected = (
+        't/sample-tests/no_output....',
+        'No tests run',
+        'Test Summary Report',
+        '-------------------',
+        't/sample-tests/no_output (Wstat: 0 Tests: 0 Failed: 0)',
+        'Parse errors: No plan found in TAP output',
+    );
+
+    $status  = pop @output;
+    $summary = pop @output;
+
+    like $status, qr{^Result: NOTESTS$},
       '... and the status line should be correct';
     $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';

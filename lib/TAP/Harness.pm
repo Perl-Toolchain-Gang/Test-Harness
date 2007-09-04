@@ -686,7 +686,8 @@ sub output_test_failure {
     }
 
     if ( $failed == 0 ) {
-        $self->failure_output(" All $total subtests passed ");
+        $self->failure_output(
+            $total ? " All $total subtests passed " : " No tests run " );
     }
     else {
         $self->failure_output(" Failed $failed/$total subtests ");
