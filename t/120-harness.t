@@ -29,7 +29,7 @@ use TAP::Harness;
 use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 81;
+my $PLAN      = 85;
 
 if ( TAP::Harness::Color->can_color ) {
     push @HARNESSES, 'TAP::Harness::Color';
@@ -492,12 +492,69 @@ sub _runtests {
         }
     );
 
-    is( $harness->timer(),       0,  'timer getter' );
-    is( $harness->timer(10),     10, 'timer setter' );
-    is( $harness->errors(),      1,  'errors getter' );
-    is( $harness->errors(10),    10, 'errors setter' );
-    is( $harness->merge(),       2,  'merge getter' );
-    is( $harness->merge(10),     10, 'merge setter' );
-    is( $harness->formatter(),   3,  'formatter getter' );
-    is( $harness->formatter(10), 10, 'formatter setter' );
+    is $harness->timer(), 0, 'timer getter';
+    is $harness->timer(10), 10, 'timer setter';
+    is $harness->errors(), 1, 'errors getter';
+    is $harness->errors(10), 10, 'errors setter';
+    is $harness->merge(), 2, 'merge getter';
+    is $harness->merge(10), 10, 'merge setter';
+    is $harness->formatter(), 3, 'formatter getter';
+    is $harness->formatter(10), 10, 'formatter setter';
+}
+
+{
+
+# coverage tests for the stdout key of VALIDATON_FOR, used by _initialize() in the ctor
+
+    # the coverage tests are
+    # 1. ref $ref => false
+    # 2. ref => ! GLOB and ref->can(print)
+    # 3. ref $ref => GLOB
+
+    # case 1
+
+    my @die;
+
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
+
+        my $harness = TAP::Harness->new(
+            {   stdout => bless {}, '0',    # how evil is THAT !!!
+            }
+        );
+    };
+
+    is @die, 1, 'bad filehandle to stdout';
+    like pop @die, qr/option 'stdout' needs a filehandle/,
+      '... and we died as expected';
+
+    # case 2
+
+    @die = ();
+
+    package Printable;
+
+    sub new { return bless {}, shift }
+
+    sub print {return}
+
+    package main;
+
+    my $harness = TAP::Harness->new(
+        {   stdout => Printable->new(),
+        }
+    );
+
+    isa_ok $harness, 'TAP::Harness';
+
+    # case 3
+
+    @die = ();
+
+    $harness = TAP::Harness->new(
+        {   stdout => bless {}, 'GLOB',    # again with the evil
+        }
+    );
+
+    isa_ok $harness, 'TAP::Harness';
 }
