@@ -13,7 +13,7 @@ use TAP::Parser::Result::YAML;
 
 BEGIN {
     no strict 'refs';
-    foreach my $token (qw<plan comment test bailout version unknown yaml>) {
+    foreach my $token (qw( plan comment test bailout version unknown yaml )) {
         my $method = "is_$token";
         *$method = sub { return $token eq shift->type };
     }

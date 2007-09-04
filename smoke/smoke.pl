@@ -9,7 +9,7 @@ use IPC::Open3;
 use IO::Select;
 use Mail::Send;
 use Getopt::Long;
-use YAML qw< DumpFile LoadFile >;
+use YAML qw( DumpFile LoadFile );
 
 GetOptions(
     'v|verbose' => \my $VERBOSE,

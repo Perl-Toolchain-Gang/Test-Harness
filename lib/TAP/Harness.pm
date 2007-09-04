@@ -437,7 +437,7 @@ This is a bit clunky and will be cleaned up in a later release.
 sub summary {
     my ( $self, $arg_for ) = @_;
     my ( $start_time, $aggregate, $tests )
-      = @$arg_for{qw< start aggregate tests >};
+      = @$arg_for{qw( start aggregate tests )};
 
     my $end_time = $arg_for->{end} || Benchmark->new;
 

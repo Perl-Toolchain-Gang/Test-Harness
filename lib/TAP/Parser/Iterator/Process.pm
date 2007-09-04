@@ -79,7 +79,7 @@ else {
 sub _use_open3 {
     my $self = shift;
     return unless $Config{d_fork};
-    for my $module (qw< IPC::Open3 IO::Select >) {
+    for my $module (qw( IPC::Open3 IO::Select )) {
         eval "use $module";
         return if $@;
     }

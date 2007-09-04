@@ -899,7 +899,7 @@ END_TAP
     package TAP::Parser::WithBrokenState;
     use vars qw(@ISA);
 
-    @ISA = qw< TAP::Parser >;
+    @ISA = qw( TAP::Parser );
 
     sub _make_state_table {
         return { INIT => { plan => { goto => 'FOO' } } };
@@ -937,7 +937,7 @@ END_TAP
     package TAP::Parser::WithBrokenIter;
     use vars qw(@ISA);
 
-    @ISA = qw< TAP::Parser >;
+    @ISA = qw( TAP::Parser );
 
     sub _iter {return}
 

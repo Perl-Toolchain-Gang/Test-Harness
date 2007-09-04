@@ -51,12 +51,14 @@ BEGIN {
         my $args = shift || {};
 
         my $self = bless {
+            argv              => [],
             includes          => [],
             default_formatter => 'TAP::Harness::Formatter::Basic',
         }, $class;
 
         for my $attr (@ATTR) {
             if ( exists $args->{$attr} ) {
+
                 # TODO: Some validation here
                 $self->{$attr} = $args->{$attr};
             }
@@ -191,14 +193,20 @@ sub _get_args {
         die "-w and -W are mutually exclusive";
     }
 
-    $args{lib}          = $self->_get_libs;
-    $args{switches}     = $self->_get_switches;
-    $args{merge}        = $self->merge if $self->merge;
-    $args{verbose}      = $self->verbose if $self->verbose;
-    $args{failures}     = $self->failures if $self->failures;
+    for my $a (qw( lib switches )) {
+        my $method = "_get_$a";
+        my $val    = $self->$method();
+        $args{$a} = $val if defined $val;
+    }
+
+    $args{merge}    = $self->merge    if $self->merge;
+    $args{verbose}  = $self->verbose  if $self->verbose;
+    $args{failures} = $self->failures if $self->failures;
+
     $args{quiet}        = 1 if $self->quiet;
     $args{really_quiet} = 1 if $self->really_quiet;
     $args{errors}       = 1 if $self->parse;
+
     $args{exec} = length( $self->exec ) ? [ split( / /, $self->exec ) ] : []
       if ( defined( $self->exec ) );
 
@@ -223,7 +231,11 @@ sub run {
     $self->_shuffle(@tests) if $self->shuffle;
     @tests = reverse @tests if $self->backwards;
 
-    my ( $args, $harness_class ) = $self->_get_args;
+    $self->_runtests( $self->_get_args, @tests );
+}
+
+sub _runtests {
+    my ( $self, $args, $harness_class, @tests ) = @_;
     my $harness    = $harness_class->new($args);
     my $aggregator = $harness->runtests(@tests);
 
@@ -251,7 +263,7 @@ sub _get_switches {
     return @switches ? \@switches : ();
 }
 
-sub _get_libs {
+sub _get_lib {
     my $self = shift;
     my @libs;
     if ( $self->lib ) {

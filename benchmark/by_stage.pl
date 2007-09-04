@@ -5,8 +5,8 @@ use warnings;
 use IPC::Open3;
 use IO::Select;
 use IO::Handle;
-use YAML qw< LoadFile DumpFile >;
-use Term::ANSIColor qw< :constants >;
+use YAML qw( LoadFile DumpFile );
+use Term::ANSIColor qw( :constants );
 use Getopt::Long;
 use File::Which;
 
@@ -20,7 +20,7 @@ my %SPECIAL = (
     prove    => scalar which('prove'),
 );
 
-my @STAGES = qw< source grammar parser runtests prove >;
+my @STAGES = qw( source grammar parser runtests prove );
 
 GetOptions( 'baseline' => \my $BASELINE ) or syntax();
 
@@ -51,7 +51,7 @@ if ($baseline) {
     for my $stage (@STAGES) {
         print "$stage\n";
         if ( my $result = $baseline->{$stage} ) {
-            for my $type (qw< real user sys >) {
+            for my $type (qw( real user sys )) {
                 print "  $type ";
                 if (   ( my $base_time = $result->{$type} )
                     && ( my $cur_time = $current->{$stage}->{$type} ) )
