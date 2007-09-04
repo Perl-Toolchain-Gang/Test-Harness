@@ -32,15 +32,34 @@ sub new {
     my $class = shift;
     my $args = shift || {};
 
-    my $opts = delete $args->{options} || \@ARGV;
-
     my $self = bless {
+        options => delete $args->{options} || \@ARGV,
         includes          => [],
         default_formatter => 'TAP::Harness::Formatter::Basic',
     }, $class;
 
+    return $self;
+}
+
+=head3 C<run>
+
+=cut
+
+BEGIN {
+    my @ATTR = qw<
+        argv shuffle archive argv blib color default_formatter
+        directives exec extension failures formatter harness includes
+        lib merge options parse quiet really_quiet recurse reverse
+        shuffle taint_fail taint_warn verbose warnings_fail
+        warnings_warn
+    >;
+}
+
+sub run {
+    my $self = shift;
+
     # Allow cuddling the paths with the -I
-    my @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @$opts;
+    my @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @{ $self->{options} };
     my $color_default = -t STDOUT && !( $^O =~ /MSWin32/ );
 
     my $help_sub = sub {
@@ -84,7 +103,7 @@ sub new {
             'Q|QUIET'     => \$self->{really_quiet},
             'e|exec=s'    => \$self->{exec},
             'm|merge'     => \$self->{merge},
-            'I=s@'        => \$self->{includes},
+            'I=s@'        => $self->{includes},
             'directives'  => \$self->{directives},
             'h|help|?'    => $help_sub,
             'H|man'       => $help_sub,
@@ -105,20 +124,6 @@ sub new {
     if ( !defined $self->{color} ) {
         $self->{color} = $color_default;
     }
-
-# XXX otherwise, diagnostics and failure messages are out of sequence
-# or we can't suppress STDERR on quiet
-#$self->{merge} = 1 if $self->{failures} || $self->{quiet} || $self->{really_quiet};
-
-    return $self;
-}
-
-=head3 C<run>
-
-=cut
-
-sub run {
-    my $self = shift;
 
     my $harness_class = 'TAP::Harness';
     my %args;
