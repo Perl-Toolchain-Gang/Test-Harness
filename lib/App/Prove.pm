@@ -31,10 +31,10 @@ $VERSION = '2.99_02';
 
 BEGIN {
     my @ATTR = qw(
-      archive argv blib color default_formatter directives exec
-      extension failures formatter harness includes lib merge options
-      parse quiet really_quiet recurse backwards shuffle taint_fail
-      taint_warn verbose warnings_fail warnings_warn
+      archive argv blib color default_formatter directives exec failures
+      formatter harness includes lib merge parse quiet really_quiet
+      recurse backwards shuffle taint_fail taint_warn verbose
+      warnings_fail warnings_warn
     );
 
     for my $attr (@ATTR) {
@@ -112,7 +112,6 @@ sub process_args {
             'V|version'   => sub { $self->print_version; exit },
             'a|archive=s' => \$self->{archive},
 
-            #'x|xtension=s' => \$self->{extension},
             'T' => \$self->{taint_fail},
             't' => \$self->{taint_warn},
             'W' => \$self->{warnings_fail},
@@ -168,20 +167,21 @@ sub _get_args {
     }
 
     if ( $self->harness ) {
-        eval "use $self->harness";
-        die "Cannot use harness ($self->harness): $@" if $@;
         $harness_class = $self->harness;
+        eval "use $harness_class";
+        die "Cannot use harness ($harness_class): $@" if $@;
     }
 
     my $formatter_class;
     if ( $self->formatter ) {
-        eval "use $self->formatter";
-        die "Cannot use formatter ($self->formatter): $@" if $@;
         $formatter_class = $self->formatter;
+        eval "use $formatter_class";
+        die "Cannot use formatter ($formatter_class): $@" if $@;
     }
 
     unless ($formatter_class) {
-        eval "use $self->default_formatter";
+        my $class = $self->default_formatter;
+        eval "use $class";
         $formatter_class = $self->default_formatter unless $@;
     }
 
@@ -370,8 +370,6 @@ __END__
 
 =item C< exec >
 
-=item C< extension >
-
 =item C< failures >
 
 =item C< formatter >
@@ -383,8 +381,6 @@ __END__
 =item C< lib >
 
 =item C< merge >
-
-=item C< options >
 
 =item C< parse >
 
