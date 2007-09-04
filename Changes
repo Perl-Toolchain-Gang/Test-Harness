@@ -1,5 +1,13 @@
 Revision history for TAP-Parser
 
+2.99_01 2007-09-04
+        - Improved support for non-forking systems.
+
+======================================================================
+Version numbers below this point relate to TAP::Parser - which was the
+name of this version of Test::Harness during its development.
+======================================================================
+
 0.54
     - Optimized I/O for common case of 'runtests -l'
     - Croak if supplied an empty (0 lines) Perl script.
