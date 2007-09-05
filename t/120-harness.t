@@ -632,7 +632,7 @@ sub _runtests {
 
 {
 
-    # coverage testinf of lib/switches accessor
+    # coverage testing of lib/switches accessor
     my $harness = TAP::Harness->new;
 
     my @die;
