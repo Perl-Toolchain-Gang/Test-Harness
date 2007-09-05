@@ -16,6 +16,8 @@ use constant NOT_ZERO => "__NOT_ZERO__";
 
 use TAP::Parser;
 
+my $IsVMS = $^O eq 'VMS';
+
 my $SAMPLE_TESTS
   = File::Spec->catdir( File::Spec->curdir, 't', 'sample-tests' );
 
@@ -37,6 +39,7 @@ $SIG{__WARN__} = sub {
         CORE::warn @_;
     }
 };
+
 
 # the %samples keys are the names of test scripts in t/sample-tests
 my %samples = (
@@ -2833,6 +2836,9 @@ for my $hide_fork ( 0 .. $have_fork ) {
                 }
                 elsif ( !ref $answer ) {
                     local $^W;    # uninit warnings
+                    
+                    $answer = _vmsify_answer($method, $answer);
+                    
                     is $parser->$method(), $answer,
                       "... and $method should equal $answer ($test)";
                 }
@@ -2845,6 +2851,25 @@ for my $hide_fork ( 0 .. $have_fork ) {
             }
         }
     }
+}
+
+
+my %Unix2VMS_Exit_Codes = (
+    1 => 4,
+);
+
+sub _vmsify_answer {
+    my($method, $answer) = @_;
+    
+    return $answer unless $IsVMS;
+    
+    if( $method eq 'exit'                       and
+        exists $Unix2VMS_Exit_Codes{$answer}
+    ) {
+        $answer = $Unix2VMS_Exit_Codes{$answer};
+    }
+    
+    return $answer;
 }
 
 sub analyze_test {
