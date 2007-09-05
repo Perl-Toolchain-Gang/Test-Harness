@@ -116,7 +116,7 @@ sub get_stream {
     # PERL5LIB
     my @libs;
     for ( grep { $_ !~ /:/ } @switches ) {
-        push @libs, $1 if / ^ -I (.*) $ /x;
+        push @libs, $1 if / ^ ['"]? -I (.*?) ['"]? $ /x;
     }
 
     my $previous = $ENV{PERL5LIB};
