@@ -4,6 +4,8 @@ Changes
 examples/bin/forked_tests.pl
 examples/bin/test_html.pl
 examples/bin/tprove_gtk
+examples/harness-hook/hook.pl
+examples/harness-hook/lib/Harness/Hook.pm
 examples/my_exec
 examples/README
 examples/t/10-stuff.t
