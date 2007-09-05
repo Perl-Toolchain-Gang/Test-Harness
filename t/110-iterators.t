@@ -50,7 +50,7 @@ my @schedule = (
             is $did_setup,    1, "setup called";
             is $did_teardown, 1, "teardown called";
         },
-        need_fork => 15,
+        need_open3 => 15,
     },
     {   name     => 'Array',
         subclass => 'TAP::Parser::Iterator::Array',
@@ -73,11 +73,15 @@ my @schedule = (
     },
 );
 
+sub _can_open3 {
+    return $^O eq 'MSWin32' || $Config{d_fork}; 
+}
+
 for my $test (@schedule) {
     SKIP: {
         my $name      = $test->{name};
-        my $need_fork = $test->{need_fork};
-        skip "No fork", $need_fork if $need_fork && !$Config{d_fork};
+        my $need_open3 = $test->{need_open3};
+        skip "No open3", $need_open3 if $need_open3 && !_can_open3();
         my $subclass = $test->{subclass};
         my $source   = $test->{source};
         my $class    = $test->{class} || 'TAP::Parser::Iterator';
@@ -153,7 +157,7 @@ for my $test (@schedule) {
 }
 
 SKIP: {
-    skip "No fork", 4 unless $Config{d_fork};
+    skip "No open3", 4 unless _can_open3();
 
     # coverage testing for TAP::Parser::Iterator::Process ctor
 
