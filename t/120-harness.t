@@ -29,7 +29,7 @@ use TAP::Harness;
 use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 98;
+my $PLAN      = 101;
 
 if ( TAP::Harness::Color->can_color ) {
     push @HARNESSES, 'TAP::Harness::Color';
@@ -628,4 +628,28 @@ sub _runtests {
     );
 
     isa_ok $harness, 'TAP::Harness';
+}
+
+{
+
+    # coverage testinf of lib/switches accessor
+    my $harness = TAP::Harness->new;
+
+    my @die;
+
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
+
+        $harness->switches(qw( too many arguments));
+    };
+
+    is @die, 1, 'too many arguments to accessor';
+
+    like pop @die, qr/Too many arguments to &\$method/,
+      '...and we died as expected';
+
+    $harness->switches('simple scalar');
+
+    my $arrref = $harness->switches;
+    is_deeply $arrref, ['simple scalar'], 'scalar wrapped in arr ref';
 }
