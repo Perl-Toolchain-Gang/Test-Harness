@@ -16,7 +16,8 @@ use constant NOT_ZERO => "__NOT_ZERO__";
 
 use TAP::Parser;
 
-my $IsVMS = $^O eq 'VMS';
+my $IsVMS   = $^O eq 'VMS';
+my $IsWin32 = $^O eq 'MSWin32';
 
 my $SAMPLE_TESTS
   = File::Spec->catdir( File::Spec->curdir, 't', 'sample-tests' );
@@ -2387,7 +2388,7 @@ my %samples = (
         'exit'        => 0,
         wait          => 0,
         version       => 12,
-        need_fork     => 1,
+        need_open3     => 1,
     },
 
     junk_before_plan => {
@@ -2787,9 +2788,9 @@ my %HANDLER_FOR = (
     FALSE,    sub { local $^W; !shift },
 );
 
-my $have_fork = $Config{d_fork} ? 1 : 0;
+my $can_open3 = ($Config{d_fork} || $IsWin32) ? 1 : 0;
 
-for my $hide_fork ( 0 .. $have_fork ) {
+for my $hide_fork ( 0 .. $can_open3 ) {
     if ($hide_fork) {
         no strict 'refs';
         local $^W = 0;
@@ -2803,9 +2804,9 @@ for my $hide_fork ( 0 .. $have_fork ) {
         my %details   = %{ $samples{$test} };
         my $results   = delete $details{results};
         my $args      = delete $details{__ARGS__};
-        my $need_fork = delete $details{need_fork};
+        my $need_open3 = delete $details{need_open3};
 
-        next TEST if $need_fork && ( $hide_fork || !$have_fork );
+        next TEST if $need_open3 && ( $hide_fork || !$can_open3 );
 
         # the following acrobatics are necessary to make it easy for the
         # Test::Builder::failure_output() method to be overridden when
