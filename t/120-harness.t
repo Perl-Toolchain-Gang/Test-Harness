@@ -29,7 +29,7 @@ use TAP::Harness;
 use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 101;
+my $PLAN      = 102;
 
 if ( TAP::Harness::Color->can_color ) {
     push @HARNESSES, 'TAP::Harness::Color';
@@ -297,6 +297,17 @@ foreach my $HARNESS (@HARNESSES) {
     # install callback handler
     my $parser;
     my $callback_count = 0;
+
+    my @callback_log = ();
+
+    for my $evt (qw(made_parser before_runtests after_runtests)) {
+        $harness->callback(
+            $evt => sub {
+                push @callback_log, $evt;
+            }
+        );
+    }
+
     $harness->callback(
         made_parser => sub {
             $parser = shift;
@@ -336,6 +347,9 @@ foreach my $HARNESS (@HARNESSES) {
       '... and the badtap summary should also be correct';
 
     cmp_ok( $callback_count, '==', 1, 'callback called once' );
+    is_deeply( \@callback_log,
+        [ 'before_runtests', 'made_parser', 'after_runtests' ],
+        'callback log matches' );
     isa_ok $parser, 'TAP::Parser';
 
     # coverage testing for _should_show_failures

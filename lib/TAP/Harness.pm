@@ -271,6 +271,8 @@ Any keys for which the value is C<undef> will be ignored.
 {
     my @legal_callback = qw(
       made_parser
+      before_runtests
+      after_runtests
     );
 
     sub _initialize {
@@ -331,9 +333,13 @@ sub runtests {
 
     my $aggregate = TAP::Parser::Aggregator->new;
 
+    $self->_make_callback( 'before_runtests', $aggregate );
+
     my $results = $self->aggregate_tests( $aggregate, @tests );
 
     $self->summary($results);
+
+    $self->_make_callback( 'after_runtests', $aggregate, $results );
 
     # XXX where to put the exit status?
     # die "something failed" if($aggregate->has_problems);

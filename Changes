@@ -3,6 +3,8 @@ Revision history for TAP-Parser
 2.99_01 2007-09-04
         - It is now possible to register multiple callback handlers for
           a particular event.
+        - Added before_runtests, after_runtests callbacks to
+          TAP::Harness.
         - Moved logic of prove program into App::Prove.
         - Added simple machine readable summary.
         - Performance improvement: The processing pipeline within
