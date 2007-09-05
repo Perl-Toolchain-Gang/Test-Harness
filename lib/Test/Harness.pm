@@ -105,6 +105,9 @@ one of the messages in the DIAGNOSTICS section.
 sub runtests {
     my @tests = @_;
 
+    # shield against -l
+    local ($\, $,);
+
     my $harness   = _new_harness();
     my $aggregate = TAP::Parser::Aggregator->new();
 
