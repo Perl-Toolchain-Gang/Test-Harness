@@ -36,7 +36,7 @@ END {
     delete $ENV{TAP_VERSION};
 }
 
-BEGIN { # making accessors
+BEGIN {    # making accessors
     foreach my $method (
         qw(
         _stream
@@ -75,7 +75,7 @@ BEGIN { # making accessors
             };
         }
     }
-} # done making accessors
+}    # done making accessors
 
 =head1 SYNOPSIS
 
@@ -1150,7 +1150,7 @@ sub _iter {
                 $next_state->($result);
 
                 if ( my $code = $self->_callback_for( $result->type ) ) {
-                    $code->($result);
+                    $_->($result) for @$code;
                 }
                 else {
                     $self->_make_callback( 'ELSE', $result );
@@ -1167,7 +1167,7 @@ sub _iter {
                 $self->_finish;
 
                 if ( my $code = $self->_callback_for('EOF') ) {
-                    $code->($self);
+                    $_->($self) for @$code;
                 }
             }
 

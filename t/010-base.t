@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 30;
+use Test::More tests => 41;
 
 use TAP::Base;
 
@@ -85,19 +85,26 @@ package main;
 
     ok( !$@, 'callbacks installed OK' );
 
-    my $nice_cb = $base->_callback_for('nice_event');
+    my $nice_cbs = $base->_callback_for('nice_event');
+    is( ref $nice_cbs, 'ARRAY', 'callbacks type ok');
+    is( scalar @$nice_cbs, 1, 'right number of callbacks');
+    my $nice_cb = $nice_cbs->[0];
     ok( ref $nice_cb eq 'CODE', 'callback for nice_event returned' );
     my $got = $nice_cb->('Is ');
     is( $got, 'Is OK', 'args passed to callback' );
     cmp_ok( $nice, '==', 1, 'callback calls the right sub' );
 
-    my $other_cb = $base->_callback_for('other_event');
+    my $other_cbs = $base->_callback_for('other_event');
+    is( ref $other_cbs, 'ARRAY', 'callbacks type ok');
+    is( scalar @$other_cbs, 1, 'right number of callbacks');
+    my $other_cb = $other_cbs->[0];
     ok( ref $other_cb eq 'CODE', 'callback for other_event returned' );
     $other_cb->();
     cmp_ok( $other, '==', -1, 'callback calls the right sub' );
 
-    $got = $base->_make_callback( 'nice_event', 'I am ' );
-    is( $got, 'I am OK', 'callback via _make_callback works' );
+    my @got = $base->_make_callback( 'nice_event', 'I am ' );
+    is ( scalar @got, 1, 'right number of results' );
+    is( $got[0], 'I am OK', 'callback via _make_callback works' );
 }
 
 {
@@ -129,22 +136,38 @@ package main;
 
     ok( !$@, 'callback installed OK' );
 
-    my $nice_cb = $base->_callback_for('nice_event');
+
+    my $nice_cbs = $base->_callback_for('nice_event');
+    is( ref $nice_cbs, 'ARRAY', 'callbacks type ok');
+    is( scalar @$nice_cbs, 1, 'right number of callbacks');
+    my $nice_cb = $nice_cbs->[0];
     ok( ref $nice_cb eq 'CODE', 'callback for nice_event returned' );
     $nice_cb->();
     cmp_ok( $nice, '==', 1, 'callback calls the right sub' );
 
-    my $other_cb = $base->_callback_for('other_event');
+    my $other_cbs = $base->_callback_for('other_event');
+    is( ref $other_cbs, 'ARRAY', 'callbacks type ok');
+    is( scalar @$other_cbs, 1, 'right number of callbacks');
+    my $other_cb = $other_cbs->[0];
     ok( ref $other_cb eq 'CODE', 'callback for other_event returned' );
     $other_cb->();
     cmp_ok( $other, '==', -1, 'callback calls the right sub' );
 
+    # my @got = $base->_make_callback( 'nice_event', 'I am ' );
+    # is ( scalar @got, 1, 'right number of results' );
+    # is( $got[0], 'I am OK', 'callback via _make_callback works' );
+
+
     my $status = undef;
 
-    # Replace callback
-    $base->callback( other_event => sub { $status = 'OK' } );
-    my $new_cb = $base->_callback_for('other_event');
-    ok( ref $new_cb eq 'CODE', 'new callback for other_event returned' );
-    $new_cb->();
+    # Stack another callback
+    $base->callback( other_event => sub { $status = 'OK'; return 'Aye' } );
+
+    my $new_cbs = $base->_callback_for('other_event');
+    is( ref $new_cbs, 'ARRAY', 'callbacks type ok');
+    is( scalar @$new_cbs, 2, 'right number of callbacks');
+    my $new_cb = $new_cbs->[1];
+    ok( ref $new_cb eq 'CODE', 'callback for new_event returned' );
+    my @got = $new_cb->();
     is( $status, 'OK', 'new callback called OK' );
 }

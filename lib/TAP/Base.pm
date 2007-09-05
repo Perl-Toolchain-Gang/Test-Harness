@@ -85,7 +85,7 @@ sub callback {
           . join( ', ', sort keys %ok_map ) )
       unless exists $ok_map{$event};
 
-    $self->{code_for}{$event} = $callback;
+    push @{$self->{code_for}{$event}}, $callback;
 }
 
 sub _has_callbacks {
@@ -104,7 +104,7 @@ sub _make_callback {
 
     my $cb = $self->_callback_for($event);
     return unless defined $cb;
-    return $cb->(@_);
+    return map { $_->(@_) } @$cb;
 }
 
 sub _croak {

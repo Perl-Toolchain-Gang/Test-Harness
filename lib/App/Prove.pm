@@ -31,7 +31,7 @@ $VERSION = '2.99_02';
 
 BEGIN {
     my @ATTR = qw(
-      archive argv blib color default_formatter directives exec failures
+      archive argv blib color directives exec failures
       formatter harness includes lib merge parse quiet really_quiet
       recurse backwards shuffle taint_fail taint_warn verbose
       warnings_fail warnings_warn
@@ -180,9 +180,9 @@ sub _get_args {
     }
 
     unless ($formatter_class) {
-        my $class = $self->default_formatter;
+        my $class = $self->{default_formatter};
         eval "use $class";
-        $formatter_class = $self->default_formatter unless $@;
+        $formatter_class = $class unless $@;
     }
 
     if ( $self->taint_fail && $self->taint_warn ) {
@@ -363,8 +363,6 @@ __END__
 =item C< blib >
 
 =item C< color >
-
-=item C< default_formatter >
 
 =item C< directives >
 

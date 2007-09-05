@@ -37,15 +37,12 @@ my ( @ATTR, %DEFAULT_ASSERTION, @SCHEDULE );
 
 BEGIN {
     @ATTR = qw(
-      archive argv blib color default_formatter directives exec failures
-      formatter harness includes lib merge parse quiet really_quiet
-      recurse backwards shuffle taint_fail taint_warn verbose
-      warnings_fail warnings_warn
+      archive argv blib color directives exec failures formatter harness
+      includes lib merge parse quiet really_quiet recurse backwards
+      shuffle taint_fail taint_warn verbose warnings_fail warnings_warn
     );
 
     %DEFAULT_ASSERTION = map { $_ => undef } @ATTR;
-
-    $DEFAULT_ASSERTION{default_formatter} = 'TAP::Harness::Formatter::Basic';
 
     $DEFAULT_ASSERTION{includes} = $DEFAULT_ASSERTION{argv}
       = sub { 'ARRAY' eq ref shift };
@@ -56,56 +53,54 @@ BEGIN {
         },
         {   name => 'Set all options via constructor',
             args => {
-                archive           => 1,
-                argv              => [qw(one two three)],
-                blib              => 2,
-                color             => 3,
-                default_formatter => 'some formatter',
-                directives        => 4,
-                exec              => 5,
-                failures          => 7,
-                formatter         => 8,
-                harness           => 9,
-                includes          => [qw(four five six)],
-                lib               => 10,
-                merge             => 11,
-                parse             => 13,
-                quiet             => 14,
-                really_quiet      => 15,
-                recurse           => 16,
-                backwards         => 17,
-                shuffle           => 18,
-                taint_fail        => 19,
-                taint_warn        => 20,
-                verbose           => 21,
-                warnings_fail     => 22,
-                warnings_warn     => 23,
+                archive       => 1,
+                argv          => [qw(one two three)],
+                blib          => 2,
+                color         => 3,
+                directives    => 4,
+                exec          => 5,
+                failures      => 7,
+                formatter     => 8,
+                harness       => 9,
+                includes      => [qw(four five six)],
+                lib           => 10,
+                merge         => 11,
+                parse         => 13,
+                quiet         => 14,
+                really_quiet  => 15,
+                recurse       => 16,
+                backwards     => 17,
+                shuffle       => 18,
+                taint_fail    => 19,
+                taint_warn    => 20,
+                verbose       => 21,
+                warnings_fail => 22,
+                warnings_warn => 23,
             },
             expect => {
-                archive           => 1,
-                argv              => [qw(one two three)],
-                blib              => 2,
-                color             => 3,
-                default_formatter => 'some formatter',
-                directives        => 4,
-                exec              => 5,
-                failures          => 7,
-                formatter         => 8,
-                harness           => 9,
-                includes          => [qw(four five six)],
-                lib               => 10,
-                merge             => 11,
-                parse             => 13,
-                quiet             => 14,
-                really_quiet      => 15,
-                recurse           => 16,
-                backwards         => 17,
-                shuffle           => 18,
-                taint_fail        => 19,
-                taint_warn        => 20,
-                verbose           => 21,
-                warnings_fail     => 22,
-                warnings_warn     => 23,
+                archive       => 1,
+                argv          => [qw(one two three)],
+                blib          => 2,
+                color         => 3,
+                directives    => 4,
+                exec          => 5,
+                failures      => 7,
+                formatter     => 8,
+                harness       => 9,
+                includes      => [qw(four five six)],
+                lib           => 10,
+                merge         => 11,
+                parse         => 13,
+                quiet         => 14,
+                really_quiet  => 15,
+                recurse       => 16,
+                backwards     => 17,
+                shuffle       => 18,
+                taint_fail    => 19,
+                taint_warn    => 20,
+                verbose       => 21,
+                warnings_fail => 22,
+                warnings_warn => 23,
             }
         },
         {   name   => 'Call with defaults',
@@ -187,24 +182,6 @@ BEGIN {
                 ]
             ],
         },
-
-      # {   name => 'Just default_formatter',
-      #     args => {
-      #         argv => [qw( one two three )],
-      #         default_formatter => 'TAP::Harness::Formatter::Basic',
-      #     },
-      #     expect => {
-      #         default_formatter => 'TAP::Harness::Formatter::Basic',
-      #     },
-      #     runlog => [
-      #         [   {   default_formatter => 'TAP::Harness::Formatter::Basic',
-      #             },
-      #             'TAP::Harness',
-      #             'one', 'two',
-      #             'three'
-      #         ]
-      #     ],
-      # },
         {   name => 'Just directives',
             args => {
                 argv       => [qw( one two three )],
@@ -254,22 +231,27 @@ BEGIN {
             ],
         },
 
-        # {   name => 'Just formatter',
-        #     args => {
-        #         argv      => [qw( one two three )],
-        #         formatter => 'TAP::Harness',
-        #     },
-        #     expect => {
-        #         formatter => 'TAP::Harness',
-        #     },
-        #     runlog => [
-        #         [   {   formatter => 'TAP::Harness',
-        #             },
-        #             'TAP::Harness',
-        #             'one', 'two', 'three'
-        #         ]
-        #     ],
-        # },
+        {   name => 'Just formatter',
+            args => {
+                argv      => [qw( one two three )],
+                formatter => 'TAP::Harness',
+            },
+            expect => {
+                formatter => 'TAP::Harness',
+            },
+            extra => sub {
+                my $log       = shift;
+                my $formatter = delete $log->[0]->[0]->{formatter};
+                isa_ok $formatter, 'TAP::Harness',;
+            },
+            plan   => 1,
+            runlog => [
+                [   {},
+                    'TAP::Harness',
+                    'one', 'two', 'three'
+                ]
+            ],
+        },
         {   name => 'Just harness',
             args => {
                 argv    => [qw( one two three )],
@@ -553,16 +535,23 @@ for my $test (@SCHEDULE) {
         if ( my $err_pattern = $test->{run_error} ) {
             like $@, $err_pattern, "$name: expected error OK";
             pass;
+            pass for 1 .. $test->{plan};
         }
         else {
             unless ( ok !$@, "$name: no error OK" ) {
                 diag "$name: error: $@\n";
             }
-            my @gotlog = $app->get_log;
-            unless ( is_deeply \@gotlog, $runlog, "$name: run results match" )
+
+            my $gotlog = [ $app->get_log ];
+
+            if ( my $extra = $test->{extra} ) {
+                $extra->($gotlog);
+            }
+
+            unless ( is_deeply $gotlog, $runlog, "$name: run results match" )
             {
                 use Data::Dumper;
-                diag Dumper( { wanted => $runlog, got => \@gotlog } );
+                diag Dumper( { wanted => $runlog, got => $gotlog } );
             }
         }
     }
