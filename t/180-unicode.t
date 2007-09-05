@@ -97,7 +97,7 @@ for my $test (@schedule) {
             for my $item ( sort keys %$exp ) {
                 my $val = $exp->{$item};
                 if ( 'isa' eq $item ) {
-                    ok $tok->isa($val), "$name: token isa $val";
+                    isa_ok $tok, $val;
                 }
                 elsif ( 'CODE' eq ref $val ) {
                     ok $val->($tok), "$name: assertion for $item";
