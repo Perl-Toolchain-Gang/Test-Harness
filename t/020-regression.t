@@ -2885,7 +2885,7 @@ sub analyze_test {
             }
         }
     }
-    ok !@$results,
+    is @$results, 0,
       "... and we should have the correct number of results ($test)";
     return $parser;
 }
