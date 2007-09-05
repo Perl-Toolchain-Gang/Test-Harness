@@ -1,6 +1,7 @@
 bin/prove
 Build.PL
 Changes
+Changes-2.64
 examples/bin/forked_tests.pl
 examples/bin/test_html.pl
 examples/bin/tprove_gtk
@@ -132,4 +133,3 @@ t/source_tests/harness_complain
 t/source_tests/harness_directives
 t/source_tests/harness_failure
 t/source_tests/source
-Test-Harness-Changes
