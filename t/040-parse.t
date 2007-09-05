@@ -630,7 +630,7 @@ END_TAP
 
     $parser = TAP::Parser->new(
         {   source =>
-              File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' ),
+              File::Spec->catfile( 't', 'sample-tests', 'simple' ),
         }
     );
 
