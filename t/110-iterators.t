@@ -74,12 +74,12 @@ my @schedule = (
 );
 
 sub _can_open3 {
-    return $^O eq 'MSWin32' || $Config{d_fork}; 
+    return $^O eq 'MSWin32' || $Config{d_fork};
 }
 
 for my $test (@schedule) {
     SKIP: {
-        my $name      = $test->{name};
+        my $name       = $test->{name};
         my $need_open3 = $test->{need_open3};
         skip "No open3", $need_open3 if $need_open3 && !_can_open3();
         my $subclass = $test->{subclass};
