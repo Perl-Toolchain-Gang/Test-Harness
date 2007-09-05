@@ -397,7 +397,7 @@ SKIP: {
 
     my $cat = '/bin/cat';
     unless ( -e $cat ) {
-        skip "no '$cat'", 1;
+        skip "no '$cat'", 2;
     }
 
     my $capture = IO::Capture->new_handle;
