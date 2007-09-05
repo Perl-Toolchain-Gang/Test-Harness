@@ -23,6 +23,8 @@ sub new {
             warn "After runtests\n";
         }
     );
+    
+    return $self;
 }
 
 1;
