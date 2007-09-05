@@ -58,7 +58,7 @@ ok !$stream->next, '... and we should have no more results';
 # internals tests!
 
 can_ok $source, '_switches';
-ok( grep( $_ eq '-T', $source->_switches ),
+ok( grep( $_ =~ /^['"]?-T['"]?$/, $source->_switches ),
     '... and it should find the taint switch'
 );
 
