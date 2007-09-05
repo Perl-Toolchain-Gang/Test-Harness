@@ -14,10 +14,18 @@ sub new {
     return $self;
 }
 
+sub _color_default { 0 }
+
 sub _runtests {
-    my ( $self, $args, $harness_class, @tests ) = @_;
-    push @{ $self->{_log} }, [ $args, $harness_class, @tests ];
+    my $self = shift;
+    push @{ $self->{_log} }, [ '_runtests', @_ ];
 }
+
+# sub _exit {
+#     my $self = shift;
+#     push @{ $self->{_log} }, [ '_exit', @_ ];
+#     die "Exited";
+# }
 
 sub get_log {
     my $self = shift;
@@ -46,6 +54,10 @@ BEGIN {
 
     $DEFAULT_ASSERTION{includes} = $DEFAULT_ASSERTION{argv}
       = sub { 'ARRAY' eq ref shift };
+
+    my @dummy_tests = map { File::Spec->catdir( 't', 'sample-tests', $_ ) }
+      qw(simple simple_yaml);
+    my $dummy_test = $dummy_tests[0];
 
     @SCHEDULE = (
         {   name   => 'Create empty',
@@ -107,7 +119,8 @@ BEGIN {
             args   => { argv => [qw( one two three )] },
             expect => {},
             runlog => [
-                [   {},
+                [   '_runtests',
+                    {},
                     'TAP::Harness',
                     'one',
                     'two',
@@ -115,6 +128,8 @@ BEGIN {
                 ]
             ],
         },
+
+        # Test all options individually
 
         # {   name => 'Just archive',
         #     args => {
@@ -141,7 +156,8 @@ BEGIN {
                 argv => [qw( one two three )],
             },
             runlog => [
-                [   {},
+                [   '_runtests',
+                    {},
                     'TAP::Harness',
                     'one', 'two',
                     'three'
@@ -157,7 +173,8 @@ BEGIN {
                 blib => 1,
             },
             runlog => [
-                [   { 'lib' => ['blib/lib'] },
+                [   '_runtests',
+                    { 'lib' => ['blib/lib'] },
                     'TAP::Harness',
                     'one',
                     'two',
@@ -174,7 +191,8 @@ BEGIN {
                 color => 1,
             },
             runlog => [
-                [   {},
+                [   '_runtests',
+                    {},
                     'TAP::Harness::Color',
                     'one',
                     'two',
@@ -191,7 +209,8 @@ BEGIN {
                 directives => 1,
             },
             runlog => [
-                [   {   directives => 1,
+                [   '_runtests',
+                    {   directives => 1,
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -207,7 +226,8 @@ BEGIN {
                 exec => 1,
             },
             runlog => [
-                [   {   exec => [1],
+                [   '_runtests',
+                    {   exec => [1],
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -223,7 +243,8 @@ BEGIN {
                 failures => 1,
             },
             runlog => [
-                [   {   failures => 1,
+                [   '_runtests',
+                    {   failures => 1,
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -241,12 +262,13 @@ BEGIN {
             },
             extra => sub {
                 my $log       = shift;
-                my $formatter = delete $log->[0]->[0]->{formatter};
+                my $formatter = delete $log->[0]->[1]->{formatter};
                 isa_ok $formatter, 'TAP::Harness',;
             },
             plan   => 1,
             runlog => [
-                [   {},
+                [   '_runtests',
+                    {},
                     'TAP::Harness',
                     'one', 'two', 'three'
                 ]
@@ -261,7 +283,8 @@ BEGIN {
                 harness => 'TAP::Harness::Color',
             },
             runlog => [
-                [   {},
+                [   '_runtests',
+                    {},
                     'TAP::Harness::Color',
                     'one', 'two', 'three'
                 ]
@@ -276,7 +299,8 @@ BEGIN {
                 includes => [qw( four five six )],
             },
             runlog => [
-                [   {   lib => [qw( four five six )],
+                [   '_runtests',
+                    {   lib => [qw( four five six )],
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -292,7 +316,8 @@ BEGIN {
                 lib => 1,
             },
             runlog => [
-                [   { lib => ['lib'], },
+                [   '_runtests',
+                    { lib => ['lib'], },
                     'TAP::Harness',
                     'one', 'two', 'three'
                 ]
@@ -307,7 +332,8 @@ BEGIN {
                 merge => 1,
             },
             runlog => [
-                [   {   merge => 1,
+                [   '_runtests',
+                    {   merge => 1,
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -323,7 +349,8 @@ BEGIN {
                 parse => 1,
             },
             runlog => [
-                [   { errors => 1, },
+                [   '_runtests',
+                    { errors => 1, },
                     'TAP::Harness',
                     'one', 'two', 'three'
                 ]
@@ -338,7 +365,8 @@ BEGIN {
                 quiet => 1,
             },
             runlog => [
-                [   {   quiet => 1,
+                [   '_runtests',
+                    {   quiet => 1,
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -354,7 +382,8 @@ BEGIN {
                 really_quiet => 1,
             },
             runlog => [
-                [   {   really_quiet => 1,
+                [   '_runtests',
+                    {   really_quiet => 1,
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -370,7 +399,8 @@ BEGIN {
                 recurse => 1,
             },
             runlog => [
-                [   {},
+                [   '_runtests',
+                    {},
                     'TAP::Harness',
                     'one', 'two', 'three'
                 ]
@@ -385,7 +415,8 @@ BEGIN {
                 backwards => 1,
             },
             runlog => [
-                [   {},
+                [   '_runtests',
+                    {},
                     'TAP::Harness',
                     'three', 'two', 'one'
                 ]
@@ -401,7 +432,8 @@ BEGIN {
                 shuffle => 1,
             },
             runlog => [
-                [   {},
+                [   '_runtests',
+                    {},
                     'TAP::Harness',
                     'xxxone', 'xxxtwo',
                     'xxxthree'
@@ -417,7 +449,8 @@ BEGIN {
                 taint_fail => 1,
             },
             runlog => [
-                [   { 'switches' => ['T'] },
+                [   '_runtests',
+                    { 'switches' => ['T'] },
                     'TAP::Harness',
                     'one',
                     'two',
@@ -434,7 +467,8 @@ BEGIN {
                 taint_warn => 1,
             },
             runlog => [
-                [   { 'switches' => ['t'] },
+                [   '_runtests',
+                    { 'switches' => ['t'] },
                     'TAP::Harness',
                     'one', 'two', 'three'
                 ]
@@ -449,7 +483,8 @@ BEGIN {
                 verbose => 1,
             },
             runlog => [
-                [   {   verbose => 1,
+                [   '_runtests',
+                    {   verbose => 1,
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -465,7 +500,8 @@ BEGIN {
                 warnings_fail => 1,
             },
             runlog => [
-                [   { 'switches' => ['W'] },
+                [   '_runtests',
+                    { 'switches' => ['W'] },
                     'TAP::Harness',
                     'one', 'two', 'three'
                 ]
@@ -480,18 +516,588 @@ BEGIN {
                 warnings_warn => 1,
             },
             runlog => [
-                [   { 'switches' => ['w'] },
+                [   '_runtests',
+                    { 'switches' => ['w'] },
                     'TAP::Harness',
                     'one', 'two', 'three'
                 ]
             ],
         },
+
+        # Command line parsing
+        {   name => 'Switch -v',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-v', $dummy_test ],
+            expect   => {
+                verbose => 1,
+            },
+            runlog => [
+                [   '_runtests',
+                    {   verbose => 1,
+                    },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --verbose',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--verbose', $dummy_test ],
+            expect   => {
+                verbose => 1,
+            },
+            runlog => [
+                [   '_runtests',
+                    {   verbose => 1,
+                    },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch -f',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-f',    $dummy_test ],
+            expect   => { failures => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { failures => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --failures',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--failures', $dummy_test ],
+            expect   => { failures      => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { failures => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch -l',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-l', $dummy_test ],
+            expect   => { lib   => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { lib => ['lib'] },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --lib',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--lib', $dummy_test ],
+            expect   => { lib      => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { lib => ['lib'] },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch -b',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-b', $dummy_test ],
+            expect   => { blib  => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { lib => ['blib/lib'] },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --blib',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--blib', $dummy_test ],
+            expect   => { blib      => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { lib => ['blib/lib'] },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch -s',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-s',   $dummy_test ],
+            expect   => { shuffle => 1 },
+            runlog   => [
+                [   '_runtests',
+                    {},
+                    'TAP::Harness',
+                    "xxx$dummy_test"
+                ]
+            ],
+        },
+
+        {   name => 'Switch --shuffle',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--shuffle', $dummy_test ],
+            expect   => { shuffle      => 1 },
+            runlog   => [
+                [   '_runtests',
+                    {},
+                    'TAP::Harness',
+                    "xxx$dummy_test"
+                ]
+            ],
+        },
+
+        {   name => 'Switch -c',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-c', $dummy_test ],
+            expect   => { color => 1 },
+            runlog   => [
+                [   '_runtests',
+                    {},
+                    'TAP::Harness::Color',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch -r',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-r',   $dummy_test ],
+            expect   => { recurse => 1 },
+            runlog   => [
+                [   '_runtests',
+                    {},
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --recurse',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--recurse', $dummy_test ],
+            expect   => { recurse      => 1 },
+            runlog   => [
+                [   '_runtests',
+                    {},
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --reverse',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--reverse', @dummy_tests ],
+            expect   => { backwards    => 1 },
+            runlog   => [
+                [   '_runtests',
+                    {},
+                    'TAP::Harness',
+                    reverse @dummy_tests
+                ]
+            ],
+        },
+
+        {   name => 'Switch -p',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-p', $dummy_test ],
+            expect   => {
+                parse => 1,
+            },
+            runlog => [
+                [   '_runtests',
+                    { errors => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --parse',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--parse', $dummy_test ],
+            expect   => {
+                parse => 1,
+            },
+            runlog => [
+                [   '_runtests',
+                    { errors => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch -q',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-q', $dummy_test ],
+            expect   => { quiet => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { quiet => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --quiet',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--quiet', $dummy_test ],
+            expect   => { quiet      => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { quiet => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch -Q',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-Q',        $dummy_test ],
+            expect   => { really_quiet => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { really_quiet => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --QUIET',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--QUIET',   $dummy_test ],
+            expect   => { really_quiet => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { really_quiet => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch -m',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-m', $dummy_test ],
+            expect   => { merge => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { merge => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --merge',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--merge', $dummy_test ],
+            expect   => { merge      => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { merge => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'Switch --directives',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--directives', $dummy_test ],
+            expect   => { directives      => 1 },
+            runlog   => [
+                [   '_runtests',
+                    { directives => 1 },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        # Hmm, that doesn't work...
+        # {   name => 'Switch -h',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '-h', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   '_runtests',
+        #             {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+
+        # {   name => 'Switch --help',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '--help', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        # {   name => 'Switch -?',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '-?', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch -H',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '-H', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch --man',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '--man', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch -V',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '-V', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch --version',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '--version', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch --color!',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '--color!', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch -I=s@',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '-I=s@', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch -a',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '-a', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch --archive=-s',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '--archive=-s', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch --formatter=-s',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '--formatter=-s', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch -e',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '-e', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch --exec=-s',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '--exec=-s', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+        #
+        # {   name => 'Switch --harness=-s',
+        #     args => {
+        #         argv => [qw( one two three )],
+        #     },
+        #     switches => [ '--harness=-s', $dummy_test ],
+        #     expect   => {},
+        #     runlog   => [
+        #         [   {},
+        #             'TAP::Harness',
+        #             $dummy_test
+        #         ]
+        #     ],
+        # },
+
     );
 
     my $extra_plan = 0;
     for my $test (@SCHEDULE) {
         $extra_plan += $test->{plan} || 0;
         $extra_plan += 2 if $test->{runlog};
+        $extra_plan += 1 if $test->{switches};
     }
 
     plan tests => @SCHEDULE * ( 3 + @ATTR ) + $extra_plan;
@@ -506,6 +1112,17 @@ for my $test (@SCHEDULE) {
 
     isa_ok $app, 'App::Prove';
     isa_ok $app, $class;
+
+    # Optionally parse command args
+    if ( my $switches = $test->{switches} ) {
+        eval { $app->process_args(@$switches) };
+        if ( my $err_pattern = $test->{parse_error} ) {
+            like $@, $err_pattern, "$name: expected parse error";
+        }
+        else {
+            ok !$@, "$name: no parse error";
+        }
+    }
 
     my $expect = $test->{expect} || {};
     for my $attr ( sort @ATTR ) {

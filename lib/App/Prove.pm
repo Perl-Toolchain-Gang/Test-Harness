@@ -83,7 +83,7 @@ sub process_args {
     # Allow cuddling the paths with the -I
     @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @args;
 
-    my $help_sub = sub { $self->_help; exit; };
+    my $help_sub = sub { $self->_help; $self->_exit };
 
     {
         local @ARGV = @args;
@@ -109,7 +109,7 @@ sub process_args {
             'directives'  => \$self->{directives},
             'h|help|?'    => $help_sub,
             'H|man'       => $help_sub,
-            'V|version'   => sub { $self->print_version; exit },
+            'V|version'   => sub { $self->print_version; $self->_exit },
             'a|archive=s' => \$self->{archive},
 
             'T' => \$self->{taint_fail},
@@ -123,6 +123,8 @@ sub process_args {
     }
 }
 
+sub _exit { exit( $_[1] || 0 ) }
+
 sub _help {
     my $self = shift;
 
@@ -130,7 +132,7 @@ sub _help {
     my $err = $@;
 
     # XXX Getopt::Long is being helpy
-    local $SIG{__DIE__} = sub { warn @_; exit; };
+    local $SIG{__DIE__} = sub { warn @_; $self->_exit; };
     if ($err) {
         die 'Please install Pod::Usage for the --help option '
           . '(or try `perldoc prove`.)'
@@ -239,7 +241,7 @@ sub _runtests {
     my $harness    = $harness_class->new($args);
     my $aggregator = $harness->runtests(@tests);
 
-    exit $aggregator->has_problems ? 1 : 0;
+    $self->_exit( $aggregator->has_problems ? 1 : 0 );
 }
 
 sub _get_switches {
