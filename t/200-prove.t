@@ -26,6 +26,11 @@ sub get_log {
     return @log;
 }
 
+sub _shuffle {
+    my $self = shift;
+    s/^/xxx/ for @_;
+}
+
 package main;
 
 my ( @ATTR, %DEFAULT_ASSERTION, @SCHEDULE );
@@ -248,6 +253,7 @@ BEGIN {
                 ]
             ],
         },
+
         # {   name => 'Just formatter',
         #     args => {
         #         argv      => [qw( one two three )],
@@ -404,22 +410,22 @@ BEGIN {
             ],
         },
 
-        # {   name => 'Just shuffle',
-        #     args => {
-        #         argv    => [qw( one two three )],
-        #         shuffle => 1,
-        #     },
-        #     expect => {
-        #         shuffle => 1,
-        #     },
-        #     runlog => [
-        #         [   {   shuffle => 1,
-        #             },
-        #             'TAP::Harness',
-        #             'one', 'two', 'three'
-        #         ]
-        #     ],
-        # },
+        {   name => 'Just shuffle',
+            args => {
+                argv    => [qw( one two three )],
+                shuffle => 1,
+            },
+            expect => {
+                shuffle => 1,
+            },
+            runlog => [
+                [   {},
+                    'TAP::Harness',
+                    'xxxone', 'xxxtwo',
+                    'xxxthree'
+                ]
+            ],
+        },
         {   name => 'Just taint_fail',
             args => {
                 argv       => [qw( one two three )],
