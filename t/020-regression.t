@@ -2156,7 +2156,7 @@ my %samples = (
                 explanation   => '',
             },
         ],
-        __ARGS__      => { switches => '-Mstrict', },
+        __ARGS__      => { switches => ['-Mstrict'] },
         plan          => '1..1',
         passed        => [1],
         actual_passed => [1],
@@ -2194,7 +2194,7 @@ my %samples = (
                 explanation   => '',
             },
         ],
-        __ARGS__      => { switches => '-Iexamples', },
+        __ARGS__      => { switches => ['-Iexamples'] },
         plan          => '1..1',
         passed        => [1],
         actual_passed => [1],
@@ -2799,7 +2799,7 @@ for my $hide_fork ( 0 .. $have_fork ) {
         #next unless 'duplicates' eq $test;
         my %details   = %{ $samples{$test} };
         my $results   = delete $details{results};
-        my $args      = delete $details{__ARGS__} || { switches => '' };
+        my $args      = delete $details{__ARGS__};
         my $need_fork = delete $details{need_fork};
 
         next TEST if $need_fork && ( $hide_fork || !$have_fork );
@@ -2807,11 +2807,7 @@ for my $hide_fork ( 0 .. $have_fork ) {
         # the following acrobatics are necessary to make it easy for the
         # Test::Builder::failure_output() method to be overridden when
         # TAP::Parser is not installed.  Otherwise, these tests will fail.
-        my @switches
-          = 'ARRAY' eq ref $args->{switches}
-          ? @{ $args->{switches} }
-          : $args->{switches};
-        $args->{switches} = [ '-Ilib', @switches ];
+        unshift @{$args->{switches}}, '-Ilib';
 
         $args->{source} = File::Spec->catfile( $SAMPLE_TESTS, $test );
         $args->{merge} = !$hide_fork;
