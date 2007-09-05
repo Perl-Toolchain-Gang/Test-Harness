@@ -41,7 +41,6 @@ $SIG{__WARN__} = sub {
     }
 };
 
-
 # the %samples keys are the names of test scripts in t/sample-tests
 my %samples = (
     descriptive => {
@@ -2388,7 +2387,7 @@ my %samples = (
         'exit'        => 0,
         wait          => 0,
         version       => 12,
-        need_open3     => 1,
+        need_open3    => 1,
     },
 
     junk_before_plan => {
@@ -2788,7 +2787,7 @@ my %HANDLER_FOR = (
     FALSE,    sub { local $^W; !shift },
 );
 
-my $can_open3 = ($Config{d_fork} || $IsWin32) ? 1 : 0;
+my $can_open3 = ( $Config{d_fork} || $IsWin32 ) ? 1 : 0;
 
 for my $hide_fork ( 0 .. $can_open3 ) {
     if ($hide_fork) {
@@ -2801,9 +2800,9 @@ for my $hide_fork ( 0 .. $can_open3 ) {
     for my $test ( sort keys %samples ) {
 
         #next unless 'duplicates' eq $test;
-        my %details   = %{ $samples{$test} };
-        my $results   = delete $details{results};
-        my $args      = delete $details{__ARGS__};
+        my %details    = %{ $samples{$test} };
+        my $results    = delete $details{results};
+        my $args       = delete $details{__ARGS__};
         my $need_open3 = delete $details{need_open3};
 
         next TEST if $need_open3 && ( $hide_fork || !$can_open3 );
@@ -2811,7 +2810,7 @@ for my $hide_fork ( 0 .. $can_open3 ) {
         # the following acrobatics are necessary to make it easy for the
         # Test::Builder::failure_output() method to be overridden when
         # TAP::Parser is not installed.  Otherwise, these tests will fail.
-        unshift @{$args->{switches}}, '-Ilib';
+        unshift @{ $args->{switches} }, '-Ilib';
 
         $args->{source} = File::Spec->catfile( $SAMPLE_TESTS, $test );
         $args->{merge} = !$hide_fork;
@@ -2837,9 +2836,9 @@ for my $hide_fork ( 0 .. $can_open3 ) {
                 }
                 elsif ( !ref $answer ) {
                     local $^W;    # uninit warnings
-                    
-                    $answer = _vmsify_answer($method, $answer);
-                    
+
+                    $answer = _vmsify_answer( $method, $answer );
+
                     is $parser->$method(), $answer,
                       "... and $method should equal $answer ($test)";
                 }
@@ -2854,22 +2853,21 @@ for my $hide_fork ( 0 .. $can_open3 ) {
     }
 }
 
-
 my %Unix2VMS_Exit_Codes = (
     1 => 4,
 );
 
 sub _vmsify_answer {
-    my($method, $answer) = @_;
-    
+    my ( $method, $answer ) = @_;
+
     return $answer unless $IsVMS;
-    
-    if( $method eq 'exit'                       and
-        exists $Unix2VMS_Exit_Codes{$answer}
-    ) {
+
+    if ( $method eq 'exit'
+        and exists $Unix2VMS_Exit_Codes{$answer} )
+    {
         $answer = $Unix2VMS_Exit_Codes{$answer};
     }
-    
+
     return $answer;
 }
 
