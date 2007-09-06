@@ -322,7 +322,7 @@ sub _expand_dir {
     else {
         @tests = glob( File::Spec->catfile( $dir, '*.t' ) );
     }
-    return @tests;
+    return sort @tests;
 }
 
 sub _shuffle {
