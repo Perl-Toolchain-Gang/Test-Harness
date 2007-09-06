@@ -452,7 +452,7 @@ is scalar $parser->passed, 2,
 {
 
     # set a spool to write to
-    tie local *STDOUT, 'IO::Capture';
+    tie local *SPOOL, 'IO::Capture';
 
     my $tap = <<'END_TAP';
 TAP version 13
@@ -473,13 +473,13 @@ END_TAP
     {
         my $parser = $PARSER->new(
             {   tap   => $tap,
-                spool => \*STDOUT,
+                spool => \*SPOOL,
             }
         );
 
         _get_results($parser);
 
-        my @spooled = tied(*STDOUT)->dump();
+        my @spooled = tied(*SPOOL)->dump();
 
         is @spooled, 24, 'coverage testing for spool attribute of parser';
         is join( '', @spooled ), $tap, "spooled tap matches";
@@ -488,7 +488,7 @@ END_TAP
     {
         my $parser = $PARSER->new(
             {   tap   => $tap,
-                spool => \*STDOUT,
+                spool => \*SPOOL,
             }
         );
 
@@ -496,7 +496,7 @@ END_TAP
 
         _get_results($parser);
 
-        my @spooled = tied(*STDOUT)->dump();
+        my @spooled = tied(*SPOOL)->dump();
 
         is @spooled, 24, 'coverage testing for spool attribute of parser';
         is join( '', @spooled ), $tap, "spooled tap matches";
@@ -625,10 +625,14 @@ END_TAP
 
     like pop @die, qr/Cannot determine source for nosuchfile/,
       '... and we died as expected';
+}
+
+{
 
     # coverage test of perl source with switches
 
-    $parser = TAP::Parser->new(
+    # pass for 1..2;
+    my $parser = TAP::Parser->new(
         {   source => File::Spec->catfile( 't', 'sample-tests', 'simple' ),
         }
     );
