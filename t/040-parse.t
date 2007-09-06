@@ -631,7 +631,6 @@ END_TAP
 
     # coverage test of perl source with switches
 
-    # pass for 1..2;
     my $parser = TAP::Parser->new(
         {   source => File::Spec->catfile( 't', 'sample-tests', 'simple' ),
         }
