@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Path;
+use File::TinyLock;
 use IO::Handle;
 use IPC::Open3;
 use IO::Select;
@@ -20,6 +21,10 @@ GetOptions(
 die "smoke.pl [-v] [--force] config\n" unless @ARGV == 1;
 my $config = shift;
 die "No file $config\n" unless -f $config;
+
+# TIMEOUT doesn't seem to work. Ho hum...
+exit if File::TinyLock::lock( $config, TIMEOUT => 1 );
+
 my $Config = load_config($config);
 my $Status = load_config( $Config->{global}->{status} );
 
@@ -334,4 +339,5 @@ END {
     if ( defined $Status ) {
         save_config( $Config->{global}->{status}, $Status );
     }
+    File::TinyLock::unlock($config);
 }
