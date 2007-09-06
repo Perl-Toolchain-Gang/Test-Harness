@@ -9,6 +9,7 @@ use IPC::Open3;
 use IO::Select;
 use Mail::Send;
 use Getopt::Long;
+use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
 GetOptions(
@@ -97,7 +98,7 @@ sub test_and_report {
         my $version = perl_version($interp);
         if ( defined $version ) {
             mention("Testing against $interp ($version)");
-            my $rv = test_against_perl( $version, $interp, $task );
+            my $rv = test_against_perl( $version, $interp, $task, $cur_rev );
             $failed += $rv->{failed};
             push @results, $rv;
         }
@@ -126,7 +127,9 @@ sub test_and_report {
         my $msg = Mail::Send->new;
         $msg->to(@to);
         $msg->subject( fail_pass( !$failed )
-              . ": Test report for $task->{name} r$cur_rev" );
+              . ": Test report for $task->{name} r$cur_rev ("
+              . hostname
+              . ")" );
 
         my $fh = $msg->open;
 
@@ -172,8 +175,12 @@ sub work_dir {
 }
 
 sub checkout {
-    my $task   = shift;
-    my @svn    = ( $Config->{global}->{svn}, 'checkout', $task->{svn} );
+    my $task = shift;
+    my $rev  = shift;
+    my @svn  = (
+        $Config->{global}->{svn}, 'checkout',
+        ( defined $rev ? ("-r$rev") : () ), $task->{svn}
+    );
     my $result = capture_command(@svn);
     die join( ' ', @svn ), " failed: $result->{status}" if $result->{status};
 }
@@ -185,14 +192,14 @@ sub expand {
 }
 
 sub test_against_perl {
-    my ( $version, $interp, $task ) = @_;
+    my ( $version, $interp, $task, $rev ) = @_;
     my $work = work_dir( $task, $version );
 
     rmtree($work) if -d $work;
     mkpath($work);
 
     chdir($work);
-    checkout($task);
+    checkout( $task, $rev );
 
     my $build_dir = File::Spec->catdir( $work, $task->{subdir} );
     chdir($build_dir);
@@ -288,7 +295,7 @@ sub capture_command {
                 my $pfx = $fh == $err ? 'E' : 'O';
                 chomp $line;
                 push @lines, "$pfx| $line";
-                mention("$pfx| $line");
+                mention( $lines[-1] );
             }
             else {
                 $sel->remove($fh);
