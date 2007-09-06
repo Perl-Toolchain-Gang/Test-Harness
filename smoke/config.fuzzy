@@ -1,19 +1,15 @@
 ---
 global:
   perls:
-    - /home/andy/Works/Perl/versions/5.0.5/bin/perl
-    - /home/andy/Works/Perl/versions/5.6.1/bin/perl
     - /home/andy/Works/Perl/versions/5.6.2/bin/perl
-    - /home/andy/Works/Perl/versions/5.8.5/bin/perl
     - /home/andy/Works/Perl/versions/5.8.6/bin/perl
     - /home/andy/Works/Perl/versions/5.8.7/bin/perl
     - /usr/bin/perl
-    - /home/andy/Works/Perl/versions/5.9.5/bin/perl5.9.5
     - /home/andy/Works/Perl/versions/blead/bin/perl5.*
   status: /home/andy/.smoke-tapx
-  svn: /usr/bin/svn
+  svn: /usr/local/bin/svn
   work: /home/andy/.smoke-work
-  description: Ubuntu Fiesty box with a recent version Test::Harness 2.64
+  description: FreeBSD 6.2 box with a recent version Test::Harness 2.99 / 3.xx
 tasks:
   - mailto:
       - email: tapx-commit@hexten.net

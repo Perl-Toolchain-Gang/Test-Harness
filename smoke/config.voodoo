@@ -7,6 +7,7 @@ global:
   status: /Users/andy/.smoke-tapx
   svn: /opt/local/bin/svn
   work: /Users/andy/.smoke-work
+  description: MacBook Pro
 tasks:
   - mailto:
       - email: andy@hexten.net
