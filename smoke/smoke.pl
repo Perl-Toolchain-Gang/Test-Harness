@@ -204,7 +204,7 @@ sub test_against_perl {
     my $build_dir = File::Spec->catdir( $work, $task->{subdir} );
     chdir($build_dir);
 
-    my $bind = { PERL => $interp };
+    my $bind = { PERL => $interp, REV => $rev };
 
     # Doesn't work in 5.0.5
     local $ENV{PERL_MM_USE_DEFAULT} = 1;
