@@ -5,6 +5,7 @@ global:
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
   work: /home/andy/.smoke-work
+  OUTDIR: /usr/local/apache-php/home/hexten.net/htdocs/tapx
 tasks:
   - mailto:
       - email: andy@hexten.net
@@ -16,8 +17,8 @@ tasks:
       - ./Build
       - ./Build test
       - ./Build dist
-      - mkdir /usr/local/apache-php/home/hexten.net/htdocs/tapx/r%REV%
-      - mv *.gz /usr/local/apache-php/home/hexten.net/htdocs/tapx/r%REV%
+      - mkdir %OUTDIR%/r%REV%
+      - mv *.gz %OUTDIR%/r%REV%
       - ./Build distclean
     subdir: trunk
     svn: http://svn.hexten.net/tapx/trunk
