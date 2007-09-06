@@ -70,6 +70,8 @@ sub perl_version {
     return $ver;
 }
 
+sub fail_pass { $_[0] ? 'PASS' : 'FAIL' }
+
 sub test_and_report {
     my $task   = shift;
     my $name   = $task->{name};
@@ -88,33 +90,74 @@ sub test_and_report {
           && exists $Status->{revision}
           && $Status->{revision} == $cur_rev;
 
-    my $mailto = $task->{mailto};
-    my @mailto = 'ARRAY' eq ref $mailto ? @$mailto : $mailto;
-
-    my $msg = Mail::Send->new;
-    $msg->to(@mailto);
-    $msg->subject("Automated test report for $task->{name} r$cur_rev");
-
-    my $fh = $msg->open;
-
-    print $fh "To obtain this release use the following command:\n\n";
-    print $fh "  svn checkout -r$cur_rev $task->{svn}\n";
+    my @results = ();
+    my $failed  = 0;
 
     for my $interp ( map glob, @{ $Config->{global}->{perls} } ) {
         my $version = perl_version($interp);
         if ( defined $version ) {
             mention("Testing against $interp ($version)");
-            my $chunk = test_against_perl( $version, $interp, $task );
-            print $fh "\n$chunk" if $chunk;
-        }
-        else {
-            print $fh "Can't get version of $interp\n";
+            my $rv = test_against_perl( $version, $interp, $task );
+            $failed += $rv->{failed};
+            push @results, $rv;
         }
     }
 
-    $fh->close;
+    return unless @results;
 
-    mention( "Mail sent to ", join( ', ', @mailto ) );
+    my $mailto = $task->{mailto};
+
+    for my $mail ( 'ARRAY' eq ref $mailto ? @$mailto : ($mailto) ) {
+        $mail = { email => $mail } unless 'HASH' eq ref $mail;
+
+        my $filter = $mail->{filter} || 'all';
+
+        die "Illegal filter spec: $filter\n"
+          unless $filter =~ /^all|passed|failed$/;
+
+        my $verbose = exists $mail->{verbose} ? $mail->{verbose} : $failed;
+        my $to      = $mail->{email};
+        my @to      = 'ARRAY' eq ref $to ? @$to : ($to);
+
+        next
+          unless $filter eq 'all'
+              || $filter eq ( $failed ? 'failed' : 'passed' );
+
+        my $msg = Mail::Send->new;
+        $msg->to(@to);
+        $msg->subject( fail_pass( !$failed )
+              . ": Test report for $task->{name} r$cur_rev" );
+
+        my $fh = $msg->open;
+
+        print $fh "To obtain this release use the following command:\n\n";
+        print $fh "  svn checkout -r$cur_rev $task->{svn}\n\n";
+
+        for my $result (@results) {
+            print $fh $result->{title}, "\n\n";
+
+            for my $cmd ( @{ $result->{commands} } ) {
+                print $fh sprintf(
+                    "%s: %s\n", fail_pass( $cmd->{passed} ),
+                    $cmd->{cmd}
+                );
+                if ($verbose) {
+                    print $fh '  ', $_, "\n" for @{ $cmd->{output} };
+                    print $fh '  Status: ', $cmd->{status}, "\n\n";
+                }
+            }
+
+            if ($verbose) {
+                print $fh $result->{env};
+            }
+
+            print $fh "\n";
+        }
+
+        $fh->close;
+
+        mention( "Mail sent to ", join( ', ', @to ) );
+    }
 
     $Status->{revision} = $cur_rev;
 }
@@ -145,8 +188,6 @@ sub test_against_perl {
     my ( $version, $interp, $task ) = @_;
     my $work = work_dir( $task, $version );
 
-    my @out = ( "=== Test against perl $version ===", '' );
-
     rmtree($work) if -d $work;
     mkpath($work);
 
@@ -161,33 +202,40 @@ sub test_against_perl {
     # Doesn't work in 5.0.5
     local $ENV{PERL_MM_USE_DEFAULT} = 1;
 
-    my $ok = run_commands(
+    my $rv = {
+        bind  => $bind,
+        title => "=== Test against perl $version ==="
+    };
+
+    my $failed = 0;
+    my $ok     = run_commands(
         $task->{script},
         $bind,
         sub {
-            my ( $type, $cmd, $results ) = @_;
-            push @out, "$type: $cmd";
-            unless ( $type eq 'passed' ) {
-                push @out, @{ $results->{output} };
-                push @out, "Exit status: $results->{status}", '';
-                return 0;
-            }
-            return 1;
+            my ( $passed, $cmd, $results ) = @_;
+            $failed++ unless $passed;
+            push @{ $rv->{commands} },
+              { passed => $passed,
+                cmd    => $cmd,
+                %{$results}
+              };
+
+            return $passed;
         }
     );
 
-    unless ($ok) {
-        push @out, '' if $out[-1];
-        for my $cmd ( 'uname -a', '%PERL% -V' ) {
-            my $cooked = expand( $cmd, $bind );
-            push @out, $cooked;
-            my $results = capture_command($cooked);
-            push @out, @{ $results->{output} };
-            push @out, '';
-        }
+    my @out = ();
+    for my $cmd ( 'uname -a', '%PERL% -V' ) {
+        my $cooked = expand( $cmd, $bind );
+        push @out, $cooked;
+        my $results = capture_command($cooked);
+        push @out, ( map {"  $_"} @{ $results->{output} } ), '';
     }
 
-    return join "\n", @out, '';
+    $rv->{env} = join "\n", @out;
+    $rv->{failed} = $failed;
+
+    return $rv;
 }
 
 sub run_commands {
@@ -202,12 +250,11 @@ sub run_commands {
         my $cooked = expand( $cmd, $bind );
         my $results = capture_command($cooked);
 
-        my $status
-          = ( $results->{status} == 0 && $check->($results) )
-          ? 'passed'
-          : 'failed';
-
-        return unless $feedback->( $status, $cooked, $results );
+        return
+          unless $feedback->(
+            ( $results->{status} == 0 && $check->($results) ) ? 1 : 0,
+            $cooked, $results
+          );
     }
 
     return 1;

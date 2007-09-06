@@ -8,12 +8,21 @@ global:
   svn: /opt/local/bin/svn
   work: /Users/andy/.smoke-work
 tasks:
-  - mailto: n@rciss.us
+  - mailto:
+      - email: andy@hexten.net
+        filter: all
+        verbose: 1
+      - email: andy@singletrackworld.com
+        filter: passed
+        verbose: 0
+      - email: andy@edfax.co.uk
+        filter: failed
+        verbose: 0
     name: TAP::Parser
     script:
       - yes n | %PERL% Makefile.PL
       - make
       - make test
-      - '%PERL% -Ilib bin/runtests -b t/*.t t/compat/*.t'
+      - '%PERL% -Ilib bin/prove -b t/*.t t/compat/*.t'
     subdir: trunk
     svn: http://svn.hexten.net/tapx/trunk
