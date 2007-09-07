@@ -15,7 +15,7 @@ global:
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
   work: /home/andy/.smoke-work
-  description: Ubuntu Fiesty box with a recent version Test::Harness 2.64
+  description: Ubuntu Fiesty box with Test::Harness 2.64
 tasks:
   - mailto:
       - email: tapx-commit@hexten.net
