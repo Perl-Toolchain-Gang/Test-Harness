@@ -1,6 +1,8 @@
 Revision history for TAP-Parser
 
-2.99_01 2007-09-04
+2.99_03
+
+2.99_02 2007-09-07
         - Ensure prove (and App::Prove) sort any recursively
           discovered tests
         - It is now possible to register multiple callback handlers for
