@@ -15,7 +15,7 @@ WriteMakefile(
     'VERSION_FROM' => 'lib/Test/Harness.pm',
     'PREREQ_PM'    => {
     },
-    'INSTALLDIRS' => 'site',
+    'INSTALLDIRS' => 'perl',
     'PL_FILES'    => {},
     ($ExtUtils::MakeMaker::VERSION <= 6.31 ? (LICENSE         => 'perl') : ()),
     'test'        => { 'TESTS' => 't/*.t t/compat/*.t' },

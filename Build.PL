@@ -17,6 +17,7 @@ my $build_class = Module::Build->subclass(
 my $builder = $build_class->new(
     module_name => 'Test::Harness',
     license     => 'perl',
+    installdirs => 'core',
     meta_merge  => {
         resources => {
             homepage => 'http://testanything.org/',
