@@ -99,13 +99,19 @@ sub test_and_report {
     my @results = ();
     my $failed  = 0;
 
-    for my $interp ( map glob, @{ $Config->{global}->{perls} } ) {
-        my $version = perl_version($interp);
-        if ( defined $version ) {
-            mention("Testing against $interp ($version)");
-            my $rv = test_against_perl( $version, $interp, $task, $cur_rev );
-            $failed += $rv->{failed};
-            push @results, $rv;
+    for my $perl ( @{ $Config->{global}->{perls} } ) {
+        $perl = { interp => $perl } unless 'HASH' eq ref $perl;
+        for my $interp ( glob( $perl->{interp} ) ) {
+            my $version = perl_version($interp);
+            if ( defined $version ) {
+                mention("Testing against $interp ($version)");
+                my $rv = test_against_perl(
+                    $version, $interp, $task, $cur_rev,
+                    $perl->{desc}
+                );
+                $failed += $rv->{failed};
+                push @results, $rv;
+            }
         }
     }
 
@@ -142,8 +148,10 @@ sub test_and_report {
         print $fh "  svn checkout -r$cur_rev $task->{svn}\n\n";
 
         if ( my $desc = $Config->{global}->{description} ) {
-            print $fh
-              sprintf( "Tests run on %s which is a %s.\n\n", hostname, $desc );
+            print $fh sprintf(
+                "Tests run on %s which is a %s.\n\n", hostname,
+                $desc
+            );
         }
 
         for my $result (@results) {
@@ -202,7 +210,7 @@ sub expand {
 }
 
 sub test_against_perl {
-    my ( $version, $interp, $task, $rev ) = @_;
+    my ( $version, $interp, $task, $rev, $desc ) = @_;
     my $work = work_dir( $task, $version );
 
     rmtree($work) if -d $work;
@@ -223,9 +231,11 @@ sub test_against_perl {
     # Doesn't work in 5.0.5
     local $ENV{PERL_MM_USE_DEFAULT} = 1;
 
+    $desc = $desc ? "($desc) " : "";
+
     my $rv = {
         bind  => $bind,
-        title => "=== Test against perl $version ==="
+        title => "=== Test against perl $version $desc==="
     };
 
     my $failed = 0;
