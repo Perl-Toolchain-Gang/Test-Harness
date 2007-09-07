@@ -1062,6 +1062,7 @@ my %samples = (
         parse_errors  => ['Bad plan.  You planned 3 tests but ran 7.'],
         'exit'        => 4,
         wait          => NOT_ZERO,
+        skip_if       => sub {$IsVMS},
     },
     taint => {
         results => [
@@ -2800,7 +2801,12 @@ for my $hide_fork ( 0 .. $can_open3 ) {
     for my $test ( sort keys %samples ) {
 
         #next unless 'duplicates' eq $test;
-        my %details    = %{ $samples{$test} };
+        my %details = %{ $samples{$test} };
+
+        if ( my $skip_if = delete $details{skip_if} ) {
+            next TEST if $skip_if->();
+        }
+
         my $results    = delete $details{results};
         my $args       = delete $details{__ARGS__};
         my $need_open3 = delete $details{need_open3};
