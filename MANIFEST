@@ -17,7 +17,6 @@ lib/App/Prove.pm
 lib/TAP/Base.pm
 lib/TAP/Harness.pm
 lib/TAP/Harness/Color.pm
-lib/TAP/Harness/ConsoleOutput.pm
 lib/TAP/Parser.pm
 lib/TAP/Parser/Aggregator.pm
 lib/TAP/Parser/Grammar.pm

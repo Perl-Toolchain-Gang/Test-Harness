@@ -113,7 +113,7 @@ sub runtests {
 
     my $results = $harness->aggregate_tests( $aggregate, @tests );
 
-    $harness->formatter->summary($results);
+    $harness->summary($results);
 
     my $total  = $aggregate->total;
     my $passed = $aggregate->passed;
