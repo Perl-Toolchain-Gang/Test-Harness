@@ -151,23 +151,23 @@ sub _color_default {
 
 sub _get_args {
     my $self          = shift;
-    my $harness_class = 'TAP::Harness';
+
+    $self->{harness_class} = 'TAP::Harness';
+
     my %args;
 
     if ( defined $self->color ? $self->color : $self->_color_default ) {
-        require TAP::Harness::Color;
-        $harness_class = 'TAP::Harness::Color';
+        $self->require_harness(color => 'TAP::Harness::Color');
     }
 
     if ( $self->archive ) {
-        $harness_class = 'TAP::Harness::Archive';
-        $self->require_harness(archive => $harness_class);
+        eval("sub TAP::Harness::Archive::auto_inherit {1}"); # wink,wink
+        $self->require_harness(archive => 'TAP::Harness::Archive');
         $args{archive} = $self->archive;
     }
 
-    if ( $self->harness ) {
-        $harness_class = $self->harness;
-        $self->require_harness(harness => $harness_class);
+    if ( my $harness_opt = $self->harness ) {
+        $self->require_harness(harness => $harness_opt);
     }
 
     my $formatter_class;
@@ -214,7 +214,7 @@ sub _get_args {
         $args{formatter} = $formatter_class->new;
     }
 
-    return ( \%args, $harness_class );
+    return ( \%args, $self->{harness_class} );
 }
 
 =head3 C<run>
@@ -342,9 +342,12 @@ Load a harness class and add it to the inheritance chain.
 
 sub require_harness {
     my ($self, $for, $class) = @_;
+
     eval("require $class");
     die "$class is required to use the --$for feature: $@" if $@;
-    #$class->inherit($class->current_subclass);
+    $class->inherit($self->{harness_class});
+
+    $self->{harness_class} = $class;
 }
 
 =head3 C<print_version>

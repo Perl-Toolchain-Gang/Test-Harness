@@ -151,6 +151,57 @@ BEGIN {
 
 =head2 Class Methods
 
+=head3 C<auto_inherit>
+
+Defaults to false.  Set this class constant to true in your harness
+subclass to engage in "chained cooperative inheritance."  If your
+subclass declares this, it is a promis to not get in the way of other
+subclasses -- e.g. it should do things such call SUPER::method() from
+any overridden methods.
+
+  use base 'TAP::Harness';
+  use constant auto_inherit => 1;
+
+=cut
+
+use constant auto_inherit     => 0;
+
+=head3 C<inherit>
+
+When `prove` needs to utilize multiple harness subclasses, they are
+built into a chain of "cooperative inheritance" (provided that their
+C<auto_inherit()> method is true.)
+
+  $class->inherit($base_class);
+
+This typically means that $class isa TAP::Harness, though it may
+ultimately work for additional schemes.
+
+=cut
+
+sub inherit {
+    my ($class, $base_class) = @_;
+
+    croak("missing required '\$base_class' argument")
+      unless(defined($base_class));
+
+    my $your_isa = do { no strict 'refs'; \@{"${class}::ISA"}; };
+
+    my ($i, @and) =
+        grep({$your_isa->[$_] eq __PACKAGE__} 0..$#$your_isa);
+    if(defined($i)) {
+        splice(@$your_isa, $_, 1) for(@and); # cleanup (should we?)
+        splice(@$your_isa, $i, 1, $base_class);
+    }
+    else {
+        # TODO we really shouldn't get here, but the grep should do
+        # something more interesting -- e.g. with isa()
+        croak("cannot inherit() without isa TAP::Harness");
+        # if we weren't there already, be nice like 'use base'
+        push(@$your_isa, $base_class);
+    }
+}
+
 =head3 C<new>
 
  my %args = (
