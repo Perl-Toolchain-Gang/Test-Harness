@@ -127,7 +127,7 @@ BEGIN {
                     return
                       wantarray ? @{ $self->{$method} } : $self->{$method};
                 }
-                $self->_croak("Too many arguments to &\$method")
+                $self->_croak("Too many arguments to method '$method'")
                   if @_ > 1;
                 my $args = shift;
                 $args = [$args] unless ref $args;
@@ -375,9 +375,8 @@ sub aggregate_tests {
         my $extra = 0;
         my $name  = $test;
         unless ($tests_without_extensions) {
-            if ( $name =~ s/(\.\w+)$// ) {    # strip the .t or .pm
-                $extra = length $1;
-            }
+            $name =~ s/(\.\w+)$//;    # strip the .t or .pm
+            $extra = length $1;
         }
         my $periods = '.' x ( $longest + $extra + 4 - length $test );
 
@@ -887,7 +886,7 @@ sub _should_display {
 
     return 1
       if $self->_should_show_failure($result)
-          || ( $self->verbose && !$self->failures );
+      || ( $self->verbose && !$self->failures );
 
     return 0;
 }

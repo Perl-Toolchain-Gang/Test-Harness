@@ -347,9 +347,11 @@ foreach my $HARNESS (@HARNESSES) {
       '... and the badtap summary should also be correct';
 
     cmp_ok( $callback_count, '==', 1, 'callback called once' );
-    is_deeply( \@callback_log,
+    is_deeply(
+        \@callback_log,
         [ 'before_runtests', 'made_parser', 'after_runtests' ],
-        'callback log matches' );
+        'callback log matches'
+    );
     isa_ok $parser, 'TAP::Parser';
 
     # coverage testing for _should_show_failures
@@ -659,7 +661,7 @@ sub _runtests {
 
     is @die, 1, 'too many arguments to accessor';
 
-    like pop @die, qr/Too many arguments to &\$method/,
+    like pop @die, qr/Too many arguments to method 'switches'/,
       '...and we died as expected';
 
     $harness->switches('simple scalar');
