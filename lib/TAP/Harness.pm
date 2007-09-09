@@ -766,10 +766,10 @@ sub _runtest {
         unless ($plan) {
             $plan = '/' . ( $planned || 0 ) . ' ';
         }
-        if ( $show_count && !$really_quiet && $result->is_test ) {
+        if ( $show_count and not $really_quiet and $result->is_test ) {
             my $number = $result->number;
             $test_print_modulus *= 2 while $test_print_modulus < $number / 5;
-            if ( !( $number % $test_print_modulus ) ) {
+            unless ( $number % $test_print_modulus ) {
                 $self->$output( "\r$leader" . $number . $plan );
             }
         }
@@ -787,7 +787,7 @@ sub _runtest {
               + length( $parser->tests_run ) );
         $self->$output("\r$spaces\r$leader") unless $really_quiet;
     }
-    if ( !$parser->has_problems ) {
+    unless ( $parser->has_problems ) {
         unless ($really_quiet) {
             my $time_report = '';
             if ( $self->timer ) {
