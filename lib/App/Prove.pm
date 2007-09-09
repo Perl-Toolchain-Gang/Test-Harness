@@ -160,18 +160,14 @@ sub _get_args {
     }
 
     if ( $self->archive ) {
-        eval { require TAP::Harness::Archive };
-        die
-          "TAP::Harness::Archive is required to use the --archive feature: $@"
-          if $@;
         $harness_class = 'TAP::Harness::Archive';
+        $self->require_harness(archive => $harness_class);
         $args{archive} = $self->archive;
     }
 
     if ( $self->harness ) {
         $harness_class = $self->harness;
-        eval "use $harness_class";
-        die "Cannot use harness ($harness_class): $@" if $@;
+        $self->require_harness(harness => $harness_class);
     }
 
     my $formatter_class;
@@ -334,6 +330,21 @@ sub _shuffle {
         my $j = rand $i--;
         @_[ $i, $j ] = @_[ $j, $i ];
     }
+}
+
+=head3 C<require_harness>
+
+Load a harness class and add it to the inheritance chain.
+
+  $prove->require_harness($for => $class_name);
+
+=cut
+
+sub require_harness {
+    my ($self, $for, $class) = @_;
+    eval("require $class");
+    die "$class is required to use the --$for feature: $@" if $@;
+    #$class->inherit($class->current_subclass);
 }
 
 =head3 C<print_version>
