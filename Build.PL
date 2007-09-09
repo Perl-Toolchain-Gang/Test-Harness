@@ -2,6 +2,9 @@ use strict;
 use Module::Build;
 use 5.005;
 
+use File::Spec;
+use lib File::Spec->catdir('lib');      # use our self to install
+
 # NOTE: make this actually be inc/MyBuilder.pm if it gets any bigger
 my $build_class = Module::Build->subclass(
     class => 'inc::MyBuilder',
