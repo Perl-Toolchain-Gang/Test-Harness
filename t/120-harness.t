@@ -29,7 +29,7 @@ use TAP::Harness;
 use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 102;
+my $PLAN      = 96;
 
 if ( TAP::Harness::Color->can_color ) {
     push @HARNESSES, 'TAP::Harness::Color';
@@ -81,19 +81,19 @@ foreach my $HARNESS (@HARNESSES) {
               $test->{test_name};
         }
     }
-    foreach my $method_data ( harness_methods() ) {
-        my ( $method, $data ) = %$method_data;
-        can_ok $harness, $method;
-        is_deeply [ $harness->$method( $data->{in}->() ) ],
-          [ $data->{out}->() ], $data->{test_name};
-    }
+    # foreach my $method_data ( harness_methods() ) {
+    #     my ( $method, $data ) = %$method_data;
+    #     can_ok $harness, $method;
+    #     is_deeply [ $harness->$method( $data->{in}->() ) ],
+    #       [ $data->{out}->() ], $data->{test_name};
+    # }
 }
 
 {
     my @output;
     local $^W;
-    local *TAP::Harness::_should_show_count = sub {0};
-    local *TAP::Harness::output = sub {
+    local *TAP::Harness::ConsoleOutput::_should_show_count = sub {0};
+    local *TAP::Harness::ConsoleOutput::_output = sub {
         my $self = shift;
         push @output => grep { $_ ne '' }
           map {
@@ -274,6 +274,7 @@ foreach my $HARNESS (@HARNESSES) {
         "ok 3 houston, we don't have liftoff # SKIP no funding",
         'ok',
         'All tests successful.',
+
         # ~TODO {{{ this should be an option
         #'Test Summary Report',
         #'-------------------',
@@ -547,20 +548,20 @@ sub get_arg_sets {
       };
 }
 
-sub harness_methods {
-    return {
-        range => {
-            in  => sub {qw/2 7 1 3 10 9/},
-            out => sub {qw/1-3 7 9-10/},
-            test_name => '... and it should return numbers as ranges'
-        },
-        balanced_range => {
-            in  => sub { 7,        qw/2 7 1 3 10 9/ },
-            out => sub { '1-3, 7', '9-10' },
-            test_name => '... and it should return numbers as ranges'
-        },
-    };
-}
+# sub harness_methods {
+#     return {
+#         range => {
+#             in  => sub {qw/2 7 1 3 10 9/},
+#             out => sub {qw/1-3 7 9-10/},
+#             test_name => '... and it should return numbers as ranges'
+#         },
+#         balanced_range => {
+#             in  => sub { 7,        qw/2 7 1 3 10 9/ },
+#             out => sub { '1-3, 7', '9-10' },
+#             test_name => '... and it should return numbers as ranges'
+#         },
+#     };
+# }
 
 sub _runtests {
     my ( $harness, @tests ) = @_;
@@ -574,10 +575,11 @@ sub _runtests {
     # coverage tests for ctor
 
     my $harness = TAP::Harness->new(
-        {   timer     => 0,
-            errors    => 1,
-            merge     => 2,
-            formatter => 3,
+        {   timer  => 0,
+            errors => 1,
+            merge  => 2,
+
+            # formatter => 3,
         }
     );
 
@@ -587,8 +589,9 @@ sub _runtests {
     is $harness->errors(10), 10, 'errors setter';
     is $harness->merge(), 2, 'merge getter';
     is $harness->merge(10), 10, 'merge setter';
-    is $harness->formatter(), 3, 'formatter getter';
-    is $harness->formatter(10), 10, 'formatter setter';
+
+    # is $harness->formatter(), 3, 'formatter getter';
+    # is $harness->formatter(10), 10, 'formatter setter';
 }
 
 {
