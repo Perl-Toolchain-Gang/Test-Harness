@@ -457,10 +457,9 @@ sub summary {
     if ( $total && $total == $passed && !$aggregate->has_problems ) {
         $self->output("All tests successful.\n");
     }
-    if (   $total != $passed
-        or $aggregate->has_problems
-        or $aggregate->skipped )
-    {
+
+    # ~TODO option where $aggregate->skipped generates reports
+    if ( $total != $passed or $aggregate->has_problems ) {
         $self->output("\nTest Summary Report");
         $self->output("\n-------------------\n");
         foreach my $test (@$tests) {
@@ -473,7 +472,9 @@ sub summary {
                 'todo_passed',
                 "  TODO passed:   "
             );
-            $self->_output_summary_failure( 'skipped', "  Tests skipped: " );
+
+            # ~TODO this cannot be the default
+            #$self->_output_summary_failure( 'skipped', "  Tests skipped: " );
 
             if ( my $exit = $parser->exit ) {
                 $self->_summary_test_header( $test, $parser );

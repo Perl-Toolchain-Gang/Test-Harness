@@ -274,11 +274,13 @@ foreach my $HARNESS (@HARNESSES) {
         "ok 3 houston, we don't have liftoff # SKIP no funding",
         'ok',
         'All tests successful.',
-        'Test Summary Report',
-        '-------------------',
-        't/source_tests/harness_directives (Wstat: 0 Tests: 3 Failed: 0)',
-        'Tests skipped:',
-        '3',
+        # ~TODO {{{ this should be an option
+        #'Test Summary Report',
+        #'-------------------',
+        #'t/source_tests/harness_directives (Wstat: 0 Tests: 3 Failed: 0)',
+        #'Tests skipped:',
+        #'3',
+        # }}}
     );
 
     $status           = pop @output;
