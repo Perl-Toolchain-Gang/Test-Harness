@@ -14,6 +14,7 @@ WriteMakefile(
     'NAME'         => 'Test::Harness',
     'VERSION_FROM' => 'lib/Test/Harness.pm',
     'PREREQ_PM'    => {
+	'File::Spec'	=> 0.8,
     },
     'INSTALLDIRS' => 'perl',
     'PL_FILES'    => {},
