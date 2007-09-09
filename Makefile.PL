@@ -1,14 +1,14 @@
+#!/usr/bin/perl -w
+
 use ExtUtils::MakeMaker qw/WriteMakefile prompt/;
 
 use strict;
 
-eval 'use ExtUtils::MakeMaker::Coverage';
-warn
-  "\nOptional ExtUtils::MakeMaker::Coverage not available. Everything should\n",
-  "still work correctly but you won't be able to run the coverage tests by\n",
-  "typing \"make testcover\". If you subsequently install Devel::Cover please\n",
-  "re-run \"perl Makefile.PL\" to include the testcover target.\n\n"
-  if $@;
+my $Have_Testcover = eval {
+    require ExtUtils::MakeMaker::Coverage;
+    ExtUtils::MakeMaker::Coverage->import;
+    1;
+};
 
 WriteMakefile(
     'NAME'         => 'Test::Harness',
@@ -22,3 +22,18 @@ WriteMakefile(
     'EXE_FILES'   => ["bin/prove"],
 );
 
+{
+    package MY;
+    
+    sub postamble {
+        if( $Have_Testcover ) {
+            return testcover();
+        }
+        else {
+            return q[
+testcover :
+	$(NOECHO) $(ECHO) To enable testcover, install ExtUtils::MakeMaker::Coverage and rerun Makefile.PL.
+];
+        }
+    }
+}
