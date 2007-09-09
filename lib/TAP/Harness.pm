@@ -188,7 +188,7 @@ sub inherit {
     my $your_isa = do { no strict 'refs'; \@{"${class}::ISA"}; };
 
     my ($i, @and) =
-        grep({$your_isa->[$_] eq __PACKAGE__} 0..$#$your_isa);
+        grep {$your_isa->[$_] eq __PACKAGE__} 0..$#$your_isa;
     if(defined($i)) {
         splice(@$your_isa, $_, 1) for(@and); # cleanup (should we?)
         splice(@$your_isa, $i, 1, $base_class);
