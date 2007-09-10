@@ -1,6 +1,8 @@
 package TAP::Parser::Aggregator;
 
 use strict;
+use Carp;
+use Benchmark;
 use vars qw($VERSION);
 
 =head1 NAME
@@ -172,6 +174,53 @@ sub _get_parsers {
         push @parsers => $self->{parser_for}{$description};
     }
     return wantarray ? @parsers : \@parsers;
+}
+
+=head3 C<descriptions>
+
+Get an array of descriptions in the order in which they were added to the aggregator.
+
+=cut
+
+sub descriptions { @{ shift->{parse_order} || [] } }
+
+=head3 C<start>
+
+Call C<start> immediately before adding any results to the aggregator.
+Among other times it records the start time for the test run.
+
+=cut
+
+sub start {
+    my $self = shift;
+    $self->{start_time} = Benchmark->new;
+}
+
+=head3 C<stop>
+
+Call C<stop> immediately after adding all test results to the aggregator.
+
+=cut
+
+sub stop {
+    my $self = shift;
+    $self->{end_time} = Benchmark->new;
+}
+
+=head3 C<elapsed>
+
+Elapsed returns a L<Benchmark> object that represents the running time
+of the aggregated tests. In order for C<elapsed> to be valid you must
+call C<start> before running the tests and C<stop> immediately
+afterwards.
+
+=cut
+
+sub elapsed {
+    my $self = shift;
+    croak "Can't call elapsed without first calling start and then stop"
+      unless defined $self->{start_time} && defined $self->{end_time};
+    return timediff( $self->{end_time}, $self->{start_time} );
 }
 
 =head3 C<get_status>

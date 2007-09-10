@@ -3,7 +3,6 @@ package TAP::Harness;
 use strict;
 use Carp;
 
-use Benchmark;
 use File::Spec;
 use File::Path;
 
@@ -127,7 +126,7 @@ BEGIN {
       _longest
     );
 
-    for my $method (@AUTO_FORWARD, @FORMATTER_ARGS) {
+    for my $method ( @AUTO_FORWARD, @FORMATTER_ARGS ) {
         no strict 'refs';
         *$method = sub {
             my $self = shift;
@@ -394,12 +393,9 @@ sub runtests {
     my $aggregate = TAP::Parser::Aggregator->new;
 
     $self->_make_callback( 'before_runtests', $aggregate );
-
-    my $results = $self->aggregate_tests( $aggregate, @tests );
-
-    $self->formatter->summary($results);
-
-    $self->_make_callback( 'after_runtests', $aggregate, $results );
+    $self->aggregate_tests( $aggregate, @tests );
+    $self->formatter->summary($aggregate);
+    $self->_make_callback( 'after_runtests', $aggregate );
 
     return $aggregate;
 }
@@ -418,20 +414,16 @@ sub aggregate_tests {
     my $formatter = $self->formatter;
 
     $formatter->prepare(@tests);
-
-    my $start_time = Benchmark->new;
+    $aggregate->start;
 
     for my $test (@tests) {
         my $parser = $self->_runtest($test);
         $aggregate->add( $test, $parser );
     }
 
-    return {
-        start     => $start_time,
-        end       => Benchmark->new,
-        aggregate => $aggregate,
-        tests     => \@tests,
-    };
+    $aggregate->stop;
+
+    return $aggregate;
 }
 
 =head3 C<output>

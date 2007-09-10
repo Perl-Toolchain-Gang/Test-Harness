@@ -363,47 +363,19 @@ sub result {
 
 =head3 C<summary>
 
-  $harness->summary( \%args );
+  $harness->summary( $aggregate );
 
 C<summary> prints the summary report after all tests are run.  The argument is
-a hashref with the following keys:
-
-=over 4
-
-=item * C<start>
-
-This is created with C<< Benchmark->new >> and it the time the tests started.
-You can print a useful summary time, if desired, with:
-
-  $self->output(timestr( timediff( Benchmark->new, $start_time ), 'nop' ));
-
-=item * C<tests>
-
-This is an array reference of all test names.  To get the L<TAP::Parser>
-object for individual tests:
-
- my $aggregate = $args->{aggregate};
- my $tests     = $args->{tests};
-
- foreach my $name ( @$tests ) {
-     my ($parser) = $aggregate->parsers($test);
-     ... do something with $parser
- }
-
-This is a bit clunky and will be cleaned up in a later release.
-
-=back
+an aggregate.
 
 =cut
 
 sub summary {
-    my ( $self, $arg_for ) = @_;
-    my ( $start_time, $aggregate, $tests )
-      = @$arg_for{qw( start aggregate tests )};
+    my ( $self, $aggregate ) = @_;
+    my @t     = $aggregate->descriptions;
+    my $tests = \@t;
 
-    my $end_time = $arg_for->{end} || Benchmark->new;
-
-    my $runtime = timestr( timediff( $end_time, $start_time ), 'nop' );
+    my $runtime = timestr( $aggregate->elapsed );
 
     my $total  = $aggregate->total;
     my $passed = $aggregate->passed;

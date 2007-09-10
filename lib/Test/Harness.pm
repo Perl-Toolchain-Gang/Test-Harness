@@ -111,9 +111,9 @@ sub runtests {
     my $harness   = _new_harness();
     my $aggregate = TAP::Parser::Aggregator->new();
 
-    my $results = $harness->aggregate_tests( $aggregate, @tests );
+    $harness->aggregate_tests( $aggregate, @tests );
 
-    $harness->formatter->summary($results);
+    $harness->formatter->summary($aggregate);
 
     my $total  = $aggregate->total;
     my $passed = $aggregate->passed;
@@ -231,18 +231,19 @@ sub execute_tests {
         }
     );
 
-    my $results = $harness->aggregate_tests( $aggregate, @{ $args{tests} } );
+    $harness->aggregate_tests( $aggregate, @{ $args{tests} } );
 
-    $tot{bench} = timediff( $results->{end}, $results->{start} );
+    $tot{bench} = $aggregate->elapsed;
+    my @tests = $aggregate->descriptions;
 
     # TODO: Work out the circumstances under which the files
     # and tests totals can differ.
-    $tot{files} = $tot{tests} = @{ $results->{tests} };
+    $tot{files} = $tot{tests} = scalar @tests;
 
     my %failedtests = ();
     my %todo_passed = ();
 
-    for my $test ( @{ $results->{tests} } ) {
+    for my $test ( @tests ) {
         my ($parser) = $aggregate->parsers($test);
 
         my @failed = $parser->failed;
