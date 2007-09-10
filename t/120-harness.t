@@ -433,9 +433,7 @@ SKIP: {
 
     my $capture = IO::Capture->new_handle;
     my $harness = TAP::Harness->new(
-        {   verbose      => 1,
-            really_quiet => 1,
-            really_quiet => 1,
+        {   really_quiet => 1,
             stdout       => $capture,
             exec         => [$cat],
         }
@@ -456,8 +454,7 @@ SKIP: {
 {
     my $capture = IO::Capture->new_handle;
     my $harness = TAP::Harness->new(
-        {   verbose      => 1,
-            really_quiet => 1,
+        {   really_quiet => 1,
             stdout       => $capture,
             exec         => [$^X]
         }
@@ -495,22 +492,34 @@ sub get_arg_sets {
             out       => liblist('lib'),
             test_name => '... a single lib switch should be correct'
         },
-        verbose => {
+        verbosity => {
             in        => 1,
             out       => 1,
-            test_name => '... and we should be able to set verbose to true'
+            test_name => '... and we should be able to set verbosity to 1'
         },
+
+        # verbose => {
+        #     in        => 1,
+        #     out       => 1,
+        #     test_name => '... and we should be able to set verbose to true'
+        # },
       },
       { lib => {
             in        => [ 'lib',        't' ],
             out       => liblist( 'lib', 't' ),
             test_name => '... multiple lib switches should be correct'
         },
-        verbose => {
+        verbosity => {
             in        => 0,
             out       => 0,
-            test_name => '... and we should be able to set verbose to false'
+            test_name => '... and we should be able to set verbosity to 0'
         },
+
+        # verbose => {
+        #     in        => 0,
+        #     out       => 0,
+        #     test_name => '... and we should be able to set verbose to false'
+        # },
       },
       { switches => {
             in  => [ '-T', '-w', '-T' ],
@@ -522,19 +531,30 @@ sub get_arg_sets {
             out       => 1,
             test_name => '... and we should be able to set failures to true',
         },
-        quiet => {
-            in        => 1,
-            out       => 1,
-            test_name => '... and we should be able to set quiet to false'
+        verbosity => {
+            in        => -1,
+            out       => -1,
+            test_name => '... and we should be able to set verbosity to -1'
         },
+
+        # quiet => {
+        #     in        => 1,
+        #     out       => 1,
+        #     test_name => '... and we should be able to set quiet to false'
+        # },
       },
 
-      { really_quiet => {
-            in  => 1,
-            out => 1,
-            test_name =>
-              '... and we should be able to set really_quiet to true',
+      { verbosity => {
+            in        => -2,
+            out       => -2,
+            test_name => '... and we should be able to set verbosity to -2'
         },
+        # really_quiet => {
+        #     in  => 1,
+        #     out => 1,
+        #     test_name =>
+        #       '... and we should be able to set really_quiet to true',
+        # },
         exec => {
             in        => $^X,
             out       => $^X,

@@ -6,8 +6,10 @@ use File::Spec;
 use File::Path;
 
 use TAP::Base;
-use TAP::Parser;
-use TAP::Harness;
+
+# use TAP::Parser;
+# use TAP::Harness;
+use Carp;
 
 # use TAP::Parser::Aggregator;
 
@@ -20,14 +22,16 @@ my %VALIDATION_FOR;
 
 BEGIN {
     %VALIDATION_FOR = (
-        directives   => sub { shift; shift },
-        verbose      => sub { shift; shift },
-        timer        => sub { shift; shift },
-        failures     => sub { shift; shift },
-        errors       => sub { shift; shift },
-        quiet        => sub { shift; shift },
-        really_quiet => sub { shift; shift },
-        color        => sub { shift; shift },
+        directives => sub { shift; shift },
+        verbosity  => sub { shift; shift },
+        timer      => sub { shift; shift },
+        failures   => sub { shift; shift },
+        errors     => sub { shift; shift },
+
+        # verbose      => sub { shift; shift },
+        # quiet        => sub { shift; shift },
+        # really_quiet => sub { shift; shift },
+        color => sub { shift; shift },
         stdout => sub {
             my ( $self, $ref ) = @_;
             $self->_croak("option 'stdout' needs a filehandle")
@@ -108,6 +112,18 @@ This provides console orientated output formatting for TAP::Harness.
         $self->SUPER::_initialize($arg_for);
         my %arg_for = %$arg_for;    # force a shallow copy
 
+        # Handle legacy verbose, quiet, really_quiet flags
+        my %verb_map = ( verbose => 1, quiet => -1, really_quiet => -2, );
+
+        my @verb_adj
+          = grep {$_} map { delete $arg_for{$_} ? $verb_map{$_} : 0 }
+          keys %verb_map;
+
+        croak "Only one of verbose, quiet, really_quiet should be specified"
+          if 1 < @verb_adj;
+
+        $self->verbosity( shift @verb_adj || 0 );
+
         for my $name ( keys %VALIDATION_FOR ) {
             my $property = delete $arg_for{$name};
             if ( defined $property ) {
@@ -120,8 +136,8 @@ This provides console orientated output formatting for TAP::Harness.
             $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
         }
 
-        $self->quiet(0) unless $self->quiet;    # suppress unit warnings
-        $self->really_quiet(0)    unless $self->really_quiet;
+        # $self->quiet(0) unless $self->quiet;    # suppress unit warnings
+        # $self->really_quiet(0)    unless $self->really_quiet;
         $self->stdout( \*STDOUT ) unless $self->stdout;
 
         if ( $self->color ) {
@@ -132,6 +148,10 @@ This provides console orientated output formatting for TAP::Harness.
         return $self;
     }
 }
+
+sub verbose      { shift->verbosity >= 1 }
+sub quiet        { shift->verbosity <= -1 }
+sub really_quiet { shift->verbosity <= -2 }
 
 =head1 METHODS
 
@@ -151,6 +171,10 @@ following options were given to TAP::Harness->new they well be passed to
 this constructor which accepts an optional hashref whose allowed keys are:
 
 =over 4
+
+=item * C<verbosity>
+
+Set the verbosity level.
 
 =item * C<verbose>
 
@@ -270,14 +294,10 @@ sub after_test {
     my $show_count   = $self->_should_show_count;
     my $leader       = $self->_current_test_name;
 
-    if ($show_count) {
+    if ( $show_count && !$really_quiet ) {
         my $spaces
-          = ' ' x ( 1 
-              + length($leader) 
-              + length( $self->_plan )
-              + length( $parser->tests_run ) );
-        $self->$output("\r$spaces\r$leader")
-          unless $really_quiet;
+          = ' ' x length( '.' . $leader . $self->_plan . $parser->tests_run );
+        $self->$output("\r$spaces\r$leader");
     }
 
     unless ( $parser->has_problems ) {

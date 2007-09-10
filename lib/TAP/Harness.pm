@@ -62,7 +62,8 @@ sub _error {
 BEGIN {
 
     @FORMATTER_ARGS = qw(
-      directives verbose timer failures errors quiet really_quiet stdout color
+      directives verbose verbosity timer failures errors quiet
+      really_quiet stdout color
     );
 
     %VALIDATION_FOR = (
@@ -206,6 +207,10 @@ The constructor returns a new C<TAP::Harness> object.  It accepts an optional
 hashref whose allowed keys are:
 
 =over 4
+
+=item * C<verbosity>
+
+Set the verbosity level.
 
 =item * C<verbose>
 
