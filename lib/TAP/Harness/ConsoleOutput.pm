@@ -27,11 +27,7 @@ BEGIN {
         timer      => sub { shift; shift },
         failures   => sub { shift; shift },
         errors     => sub { shift; shift },
-
-        # verbose      => sub { shift; shift },
-        # quiet        => sub { shift; shift },
-        # really_quiet => sub { shift; shift },
-        color => sub { shift; shift },
+        color      => sub { shift; shift },
         stdout => sub {
             my ( $self, $ref ) = @_;
             $self->_croak("option 'stdout' needs a filehandle")
@@ -513,22 +509,36 @@ sub _failure_output {
       if $has_newline;
 }
 
-sub _output_result {
-    my ( $self, $parser, $result, $prev_result ) = @_;
-    if ( $result->is_test ) {
-        if ( !$result->is_ok ) {    # even if it's TODO
-            $self->_set_colors('red');
-        }
-        elsif ( $result->has_skip ) {
-            $self->_set_colors( 'white', 'on_blue' );
+{
+    my @COLOR_MAP = (
+        {   test => sub { $_->is_test && !$_->is_ok },
+            colors => ['red'],
+        },
+        {   test => sub { $_->is_test && $_->has_skip },
+            colors => [
+                'white',
+                'on_blue'
+            ],
+        },
+        {   test => sub { $_->is_test && $_->has_todo },
+            colors => ['white'],
+        },
+    );
 
+    sub _output_result {
+        my ( $self, $parser, $result, $prev_result ) = @_;
+        if ( $self->colorizer ) {
+            for my $col (@COLOR_MAP) {
+                local $_ = $result;
+                if ( $col->{test}->() ) {
+                    $self->_set_colors( @{ $col->{colors} } );
+                    last;
+                }
+            }
         }
-        elsif ( $result->has_todo ) {
-            $self->_set_colors('white');
-        }
+        $self->_output( $self->_format_result( $result, $prev_result ) );
+        $self->_set_colors('reset');
     }
-    $self->_output( $self->_format_result( $result, $prev_result ) );
-    $self->_set_colors('reset');
 }
 
 sub _balanced_range {

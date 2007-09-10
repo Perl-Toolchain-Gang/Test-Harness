@@ -104,16 +104,8 @@ under Windows) tests will be run without color.
 
 =head3 C<new>
 
- my %args = (
-    verbose => 1,
-    lib     => [ 'lib', 'blib/lib' ],
-    shuffle => 0,
- )
- my $harness = TAP::Harness::Color->new( \%args );
-
-The constructor returns a new C<TAP::Harness::Color> object.  If
-L<Term::ANSIColor> is not installed, returns a L<TAP::Harness> object.  See
-L<TAP::Harness> for more details.
+The constructor returns a new C<TAP::Harness::Color> object. If
+L<Term::ANSIColor> is not installed, returns undef.
 
 =cut
 
