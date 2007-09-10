@@ -1,6 +1,8 @@
 package TAP::Harness;
 
 use strict;
+use Carp;
+
 use Benchmark;
 use File::Spec;
 use File::Path;
