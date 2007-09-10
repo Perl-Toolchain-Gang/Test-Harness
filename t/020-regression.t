@@ -219,11 +219,11 @@ my %samples = (
         is_good_plan  => FALSE,
         tests_planned => undef,
         tests_run     => 0,
-        parse_errors  => [ 'No plan found in TAP output' ],
+        parse_errors  => ['No plan found in TAP output'],
         'exit'        => 0,
         wait          => 0,
         version       => 12,
-      },
+    },
     simple => {
         results => [
             {   is_plan       => TRUE,
@@ -2904,8 +2904,8 @@ sub analyze_test {
     while ( defined( my $result = $parser->next ) ) {
 
         my $expected = shift @$results;
-        my $desc
-          = $result->is_test
+        my $desc =
+            $result->is_test
           ? $result->description
           : $result->raw;
         $desc = $result->plan if $result->is_plan && $desc =~ /SKIP/i;
