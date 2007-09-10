@@ -19,7 +19,7 @@ sub new {
     return $self;
 }
 
-sub _color_default { 0 }
+sub _color_default {0}
 
 sub _runtests {
     my $self = shift;
@@ -187,6 +187,7 @@ BEGIN {
                 ]
             ],
         },
+
         {   name => 'Just color',
             args => {
                 argv  => [qw( one two three )],
@@ -197,14 +198,15 @@ BEGIN {
             },
             runlog => [
                 [   '_runtests',
-                    {},
-                    'TAP::Harness::Color',
+                    { color => 1 },
+                    'TAP::Harness',
                     'one',
                     'two',
                     'three'
                 ]
             ],
         },
+
         {   name => 'Just directives',
             args => {
                 argv       => [qw( one two three )],
@@ -279,22 +281,7 @@ BEGIN {
                 ]
             ],
         },
-        {   name => 'Just harness',
-            args => {
-                argv    => [qw( one two three )],
-                harness => 'TAP::Harness::Color',
-            },
-            expect => {
-                harness => 'TAP::Harness::Color',
-            },
-            runlog => [
-                [   '_runtests',
-                    {},
-                    'TAP::Harness::Color',
-                    'one', 'two', 'three'
-                ]
-            ],
-        },
+
         {   name => 'Just includes',
             args => {
                 argv     => [qw( one two three )],
@@ -694,8 +681,8 @@ BEGIN {
             expect   => { color => 1 },
             runlog   => [
                 [   '_runtests',
-                    {},
-                    'TAP::Harness::Color',
+                    { color => 1 },
+                    'TAP::Harness',
                     $dummy_test
                 ]
             ],

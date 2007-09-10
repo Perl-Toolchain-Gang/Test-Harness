@@ -10,31 +10,31 @@ END {
 
     # we push this at the end because there are annoying problem with other
     # modules which check $^O
-    my @warnings;
-    local $^O = 'MSWin32';
-    $SIG{__WARN__} = sub { @warnings = shift };
-    delete $INC{'TAP/Harness/Color.pm'};
-    use_ok 'TAP::Harness::Color';
-    ok my $harness = TAP::Harness::Color->new,
-      '... and loading it on windows should succeed';
-    isa_ok $harness, 'TAP::Harness', '... but the object it returns';
-
-    ok( grep( qr/^Color test output disabled on Windows/, @warnings ),
-        'Using TAP::Harness::Color on Windows should disable colored output'
-    );
-
+    # my @warnings;
+    # local $^O = 'MSWin32';
+    # $SIG{__WARN__} = sub { @warnings = shift };
+    # delete $INC{'TAP/Harness/Color.pm'};
+    # use_ok 'TAP::Harness::Color';
+    # ok my $harness = TAP::Harness::Color->new,
+    #   '... and loading it on windows should succeed';
+    # isa_ok $harness, 'TAP::Harness', '... but the object it returns';
+    # 
+    # ok( grep( qr/^Color test output disabled on Windows/, @warnings ),
+    #     'Using TAP::Harness::Color on Windows should disable colored output'
+    # );
+    # 
 }
 
 use TAP::Harness;
-use TAP::Harness::Color;
+# use TAP::Harness::Color;
 
 my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 98;
+my $PLAN      = 94;
 
-if ( TAP::Harness::Color->can_color ) {
-    push @HARNESSES, 'TAP::Harness::Color';
-    $PLAN += 43;
-}
+# if ( TAP::Harness::Color->can_color ) {
+#     push @HARNESSES, 'TAP::Harness::Color';
+#     $PLAN += 43;
+# }
 
 plan tests => $PLAN;
 

@@ -5,8 +5,7 @@ use strict;
 use TAP::Parser;
 use TAP::Harness;
 
-use vars qw($VERSION @ISA);
-@ISA = 'TAP::Harness';
+use vars qw($VERSION);
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 
@@ -27,9 +26,8 @@ BEGIN {
             my $fg = eval '$FG_LIGHTGRAY';
             my $bg = eval '$BG_BLACK';
 
-            *_set_color = sub {
-                my $self  = shift;
-                my $color = shift;
+            *set_color = sub {
+                my ($self, $formatter, $color) = @_;
 
                 my $var;
                 if ( $color eq 'reset' ) {
@@ -44,21 +42,11 @@ BEGIN {
                 }
 
                 # In case of colors that aren't defined
-                $self->_set_color('reset')
+                $self->set_color('reset')
                   unless defined $bg && defined $fg;
 
                 $console->Attr( $bg | $fg );
             };
-
-           # Not sure if we'll have buffering problems using print instead
-           # of $console->Write(). Don't want to override output unnecessarily
-           # though and it /seems/ to work OK.
-           #
-           # *output = sub {
-           #     my $self = shift;
-           #     $console->Write($_) for @_;
-           #     #print @_;
-           # };
         }
     }
     else {
@@ -67,16 +55,15 @@ BEGIN {
             $NO_COLOR = $@;
         }
         else {
-            *_set_color = sub {
-                my $self  = shift;
-                my $color = shift;
-                $self->output( color($color) );
+            *set_color = sub {
+                my ($self, $formatter, $color) = @_;
+                $formatter->_output( color($color) );
             };
         }
     }
 
     if ($NO_COLOR) {
-        *_set_color = sub { };
+        *set_color = sub { };
     }
 }
 
@@ -132,15 +119,17 @@ L<TAP::Harness> for more details.
 
 sub new {
     my $class = shift;
-    if ($NO_COLOR) {
 
+    if ($NO_COLOR) {
         # shorten that message a bit
         ( my $error = $NO_COLOR ) =~ s/ in \@INC .*//s;
         warn "Note: Cannot run tests in color: $error\n";
-        return TAP::Harness->new(@_);
+        return;
     }
-    return $class->SUPER::new(@_);
+
+    return bless {}, $class;
 }
+
 ##############################################################################
 
 =head3 C<can_color>
@@ -157,52 +146,10 @@ sub can_color {
     return !$NO_COLOR;
 }
 
-##############################################################################
+=head3 C<set_color>
 
-=head3 C<failure_output>
-
-  $harness->failure_output(@list_of_strings_to_output);
-
-Overrides L<TAP::Harness> C<failure_output> to output failure information in
-red.
+Set the output color.
 
 =cut
-
-sub failure_output {
-    my $self = shift;
-    $self->_set_colors('red');
-    my $out = join( '', @_ );
-    my $has_newline = chomp $out;
-    $self->output($out);
-    $self->_set_colors('reset');
-    $self->output($/)
-      if $has_newline;
-}
-
-# Set terminal color
-sub _set_colors {
-    my $self = shift;
-    for my $color (@_) {
-        $self->_set_color($color);
-    }
-}
-
-sub _output_result {
-    my ( $self, $parser, $result, $prev_result ) = @_;
-    if ( $result->is_test ) {
-        if ( !$result->is_ok ) {    # even if it's TODO
-            $self->_set_colors('red');
-        }
-        elsif ( $result->has_skip ) {
-            $self->_set_colors( 'white', 'on_blue' );
-
-        }
-        elsif ( $result->has_todo ) {
-            $self->_set_colors('white');
-        }
-    }
-    $self->SUPER::_output_result($parser, $result, $prev_result);
-    $self->_set_colors('reset');
-}
 
 1;

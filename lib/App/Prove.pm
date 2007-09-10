@@ -151,29 +151,29 @@ sub _color_default {
 }
 
 sub _get_args {
-    my $self          = shift;
+    my $self = shift;
 
     $self->{harness_class} = 'TAP::Harness';
 
     my %args;
 
     if ( defined $self->color ? $self->color : $self->_color_default ) {
-        $self->require_harness(color => 'TAP::Harness::Color');
+        $args{color} = 1;
     }
 
     if ( $self->archive ) {
-        eval("sub TAP::Harness::Archive::auto_inherit {1}"); # wink,wink
-        $self->require_harness(archive => 'TAP::Harness::Archive');
+        eval("sub TAP::Harness::Archive::auto_inherit {1}");    # wink,wink
+        $self->require_harness( archive => 'TAP::Harness::Archive' );
         $args{archive} = $self->archive;
     }
 
     if ( my $jobs = $self->jobs ) {
-        $self->require_harness(jobs => 'TAP::Harness::Parallel');
+        $self->require_harness( jobs => 'TAP::Harness::Parallel' );
         $args{jobs} = $jobs;
     }
 
     if ( my $harness_opt = $self->harness ) {
-        $self->require_harness(harness => $harness_opt);
+        $self->require_harness( harness => $harness_opt );
     }
 
     my $formatter_class;
@@ -347,11 +347,11 @@ Load a harness class and add it to the inheritance chain.
 =cut
 
 sub require_harness {
-    my ($self, $for, $class) = @_;
+    my ( $self, $for, $class ) = @_;
 
     eval("require $class");
     die "$class is required to use the --$for feature: $@" if $@;
-    $class->inherit($self->{harness_class});
+    $class->inherit( $self->{harness_class} );
 
     $self->{harness_class} = $class;
 }
@@ -376,53 +376,53 @@ __END__
 
 =over
 
-=item C< archive >
+=item C<archive>
 
-=item C< argv >
+=item C<argv>
 
-=item C< backwards >
+=item C<backwards>
 
-=item C< blib >
+=item C<blib>
 
-=item C< color >
+=item C<color>
 
-=item C< directives >
+=item C<directives>
 
-=item C< exec >
+=item C<exec>
 
-=item C< failures >
+=item C<failures>
 
-=item C< formatter >
+=item C<formatter>
 
-=item C< harness >
+=item C<harness>
 
-=item C< includes >
+=item C<includes>
 
-=item C< jobs >
+=item C<jobs>
 
-=item C< lib >
+=item C<lib>
 
-=item C< merge >
+=item C<merge>
 
-=item C< parse >
+=item C<parse>
 
-=item C< quiet >
+=item C<quiet>
 
-=item C< really_quiet >
+=item C<really_quiet>
 
-=item C< recurse >
+=item C<recurse>
 
-=item C< shuffle >
+=item C<shuffle>
 
-=item C< taint_fail >
+=item C<taint_fail>
 
-=item C< taint_warn >
+=item C<taint_warn>
 
-=item C< verbose >
+=item C<verbose>
 
-=item C< warnings_fail >
+=item C<warnings_fail>
 
-=item C< warnings_warn >
+=item C<warnings_warn>
 
 =back
 

@@ -61,7 +61,7 @@ sub _error {
 BEGIN {
 
     @FORMATTER_ARGS = qw(
-      directives verbose timer failures errors quiet really_quiet stdout
+      directives verbose timer failures errors quiet really_quiet stdout color
     );
 
     %VALIDATION_FOR = (
@@ -229,6 +229,10 @@ this only makes sense in the context of tests written in Perl.
 Accepts a scalar value or array ref of scalar values indicating which switches
 should be included if Perl tests are executed.  Naturally, this only makes
 sense in the context of tests written in Perl.
+
+=item * C<color>
+
+Attempt to produce color output.
 
 =item * C<quiet>
 

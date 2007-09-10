@@ -33,13 +33,7 @@ BEGIN {
         errors       => sub { shift; shift },
         quiet        => sub { shift; shift },
         really_quiet => sub { shift; shift },
-        colorize => sub {
-            my ( $self, $ref ) = @_;
-            $self->_croak(
-                "option 'colorize' needs an object that can set_color")
-              unless eval { $ref->can('set_color') };
-            return $ref;
-        },
+        color        => sub { shift; shift },
         stdout => sub {
             my ( $self, $ref ) = @_;
             $self->_croak("option 'stdout' needs a filehandle")
@@ -58,6 +52,7 @@ BEGIN {
       _output_method
       _start_time
       _printed_summary_header
+      _colorizer
     );
 
     for my $method ( @getter_setters, keys %VALIDATION_FOR ) {
@@ -136,6 +131,11 @@ This provides console orientated output formatting for TAP::Harness.
         $self->really_quiet(0)    unless $self->really_quiet;
         $self->stdout( \*STDOUT ) unless $self->stdout;
 
+        if ( $self->color ) {
+            require TAP::Harness::Color;
+            $self->_colorizer( TAP::Harness::Color->new );
+        }
+
         return $self;
     }
 }
@@ -196,10 +196,11 @@ This overrides other settings such as C<verbose> or C<failures>.
 
 A filehandle for catching standard output.
 
-=item * C<colorize>
+=item * C<color>
 
-A delegate which implements C<set_color> which may be used to provide
-colored output.
+If defined specifies whether color output is desired. If C<color> is not
+defined it will default to color output if color support is available on
+the current platform and output is not being redirected.
 
 =back
 
@@ -504,18 +505,18 @@ sub _output {
     print { $self->stdout } @_;
 }
 
-# Use colorize delegate to set output color. NOP if we have no delegate
+# Use _colorizer delegate to set output color. NOP if we have no delegate
 sub _set_colors {
     my ( $self, @colors ) = @_;
-    if ( my $colorize = $self->colorize ) {
-        $colorize->set_color($_) for @colors;
+    if ( my $colorizer = $self->_colorizer ) {
+        $colorizer->set_color( $self, $_ ) for @colors;
     }
 }
 
 sub _failure_output {
     my $self = shift;
     $self->_set_colors('red');
-    my $out = join '', @_ ;
+    my $out = join '', @_;
     my $has_newline = chomp $out;
     $self->_output($out);
     $self->_set_colors('reset');
