@@ -205,6 +205,25 @@ my %samples = (
         wait          => 0,
         version       => 12,
     },
+    empty => {
+        results       => [],
+        plan          => '',
+        passed        => [],
+        actual_passed => [],
+        failed        => [],
+        actual_failed => [],
+        todo          => [],
+        todo_passed   => [],
+        skipped       => [],
+        good_plan     => FALSE,
+        is_good_plan  => FALSE,
+        tests_planned => undef,
+        tests_run     => 0,
+        parse_errors  => [ 'No plan found in TAP output' ],
+        'exit'        => 0,
+        wait          => 0,
+        version       => 12,
+      },
     simple => {
         results => [
             {   is_plan       => TRUE,
@@ -2800,7 +2819,7 @@ for my $hide_fork ( 0 .. $can_open3 ) {
     TEST:
     for my $test ( sort keys %samples ) {
 
-        #next unless 'duplicates' eq $test;
+        #next unless 'empty' eq $test;
         my %details = %{ $samples{$test} };
 
         if ( my $skip_if = delete $details{skip_if} ) {

@@ -91,6 +91,7 @@ t/sample-tests/die_head_end
 t/sample-tests/die_last_minute
 t/sample-tests/die_unfinished
 t/sample-tests/duplicates
+t/sample-tests/empty
 t/sample-tests/escape_eol
 t/sample-tests/escape_hash
 t/sample-tests/head_end
