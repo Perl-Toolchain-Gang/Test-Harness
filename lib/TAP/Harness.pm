@@ -122,7 +122,6 @@ BEGIN {
     }
 
     my @AUTO_FORWARD = qw(
-      output
       _longest
     );
 
@@ -436,6 +435,10 @@ sub aggregate_tests {
 Send output to the test report via the current formatter.
 
 ##############################################################################
+
+=cut
+
+sub output { shift->formatter->_output(@_) }
 
 =head1 SUBCLASSING
 
