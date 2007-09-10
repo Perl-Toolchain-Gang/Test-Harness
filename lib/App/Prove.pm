@@ -32,7 +32,7 @@ $VERSION = '2.99_03';
 BEGIN {
     my @ATTR = qw(
       archive argv blib color directives exec failures
-      formatter harness includes lib merge parse quiet really_quiet
+      formatter harness includes jobs lib merge parse quiet really_quiet
       recurse backwards shuffle taint_fail taint_warn verbose
       warnings_fail warnings_warn
     );
@@ -111,6 +111,7 @@ sub process_args {
             'H|man'       => $help_sub,
             'V|version'   => sub { $self->print_version; $self->_exit },
             'a|archive=s' => \$self->{archive},
+            'j|jobs=i'    => \$self->{jobs},
 
             'T' => \$self->{taint_fail},
             't' => \$self->{taint_warn},
@@ -164,6 +165,11 @@ sub _get_args {
         eval("sub TAP::Harness::Archive::auto_inherit {1}"); # wink,wink
         $self->require_harness(archive => 'TAP::Harness::Archive');
         $args{archive} = $self->archive;
+    }
+
+    if ( my $jobs = $self->jobs ) {
+        $self->require_harness(jobs => 'TAP::Harness::Parallel');
+        $args{jobs} = $jobs;
     }
 
     if ( my $harness_opt = $self->harness ) {
@@ -391,6 +397,8 @@ __END__
 =item C< harness >
 
 =item C< includes >
+
+=item C< jobs >
 
 =item C< lib >
 
