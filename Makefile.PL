@@ -18,7 +18,7 @@ WriteMakefile(
     },
     'INSTALLDIRS' => 'perl',
     'PL_FILES'    => {},
-    ($ExtUtils::MakeMaker::VERSION <= 6.31 ? (LICENSE         => 'perl') : ()),
+    ($ExtUtils::MakeMaker::VERSION >= 6.31 ? (LICENSE         => 'perl') : ()),
     'test'        => { 'TESTS' => 't/*.t t/compat/*.t' },
     'EXE_FILES'   => ["bin/prove"],
 );
