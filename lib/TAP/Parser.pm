@@ -13,10 +13,6 @@ use Carp;
 
 @ISA = qw(TAP::Base);
 
-BEGIN {
-    eval 'use Time::HiRes qw(time)';
-}
-
 =head1 NAME
 
 TAP::Parser - Parse L<TAP|Test::Harness::TAP> output
@@ -367,7 +363,7 @@ sub run {
         $self->_grammar($grammar);
         $self->_spool($spool);
 
-        $self->start_time( time() );
+        $self->start_time( $self->get_time );
 
         return $self;
     }
@@ -1215,7 +1211,7 @@ sub _iter {
 sub _finish {
     my $self = shift;
 
-    $self->end_time( time() );
+    $self->end_time( $self->get_time );
 
     # sanity checks
     if ( !$self->plan ) {

@@ -6,12 +6,7 @@ use File::Spec;
 use File::Path;
 
 use TAP::Base;
-
-# use TAP::Parser;
-# use TAP::Harness;
 use Carp;
-
-# use TAP::Parser::Aggregator;
 
 use vars qw($VERSION @ISA);
 
@@ -303,8 +298,11 @@ sub after_test {
                 my $start_time = $parser->start_time;
                 my $end_time   = $parser->end_time;
                 if ( defined $start_time and defined $end_time ) {
+                    my $elapsed = $end_time - $start_time;
                     $time_report
-                      = sprintf( ' %5.3f s', $end_time - $start_time );
+                      = $self->time_is_hires
+                      ? sprintf( ' %5.3f s', $elapsed )
+                      : sprintf( ' %8s s', $elapsed || '<1' );
                 }
             }
 
