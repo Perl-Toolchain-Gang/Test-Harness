@@ -2,8 +2,8 @@ package TAP::Harness::Color;
 
 use strict;
 
-use TAP::Parser;
-use TAP::Harness;
+# use TAP::Parser;
+# use TAP::Harness;
 
 use vars qw($VERSION);
 

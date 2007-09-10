@@ -63,6 +63,7 @@ t/170-yamlish-output.t
 t/180-unicode.t
 t/190-nofork.t
 t/200-prove.t
+t/210-console.t
 t/compat/000-compile.t
 t/compat/010-failure.t
 t/compat/020-inc_taint.t

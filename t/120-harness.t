@@ -6,87 +6,68 @@ use lib 't/lib';
 use Test::More;
 use IO::Capture;
 
-END {
-
-    # we push this at the end because there are annoying problem with other
-    # modules which check $^O
-    # my @warnings;
-    # local $^O = 'MSWin32';
-    # $SIG{__WARN__} = sub { @warnings = shift };
-    # delete $INC{'TAP/Harness/Color.pm'};
-    # use_ok 'TAP::Harness::Color';
-    # ok my $harness = TAP::Harness::Color->new,
-    #   '... and loading it on windows should succeed';
-    # isa_ok $harness, 'TAP::Harness', '... but the object it returns';
-    # 
-    # ok( grep( qr/^Color test output disabled on Windows/, @warnings ),
-    #     'Using TAP::Harness::Color on Windows should disable colored output'
-    # );
-    # 
-}
-
 use TAP::Harness;
-# use TAP::Harness::Color;
 
-my @HARNESSES = 'TAP::Harness';
-my $PLAN      = 94;
+my $HARNESS = 'TAP::Harness';
 
-# if ( TAP::Harness::Color->can_color ) {
-#     push @HARNESSES, 'TAP::Harness::Color';
-#     $PLAN += 43;
-# }
-
-plan tests => $PLAN;
+plan tests => 94;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
 ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
-foreach my $HARNESS (@HARNESSES) {
+#### For color tests ####
 
-    #foreach my $HARNESS ( () ) {   # XXX
-    can_ok $HARNESS, 'new';
+package Colorizer;
 
-    eval { $HARNESS->new( { no_such_key => 1 } ) };
-    like $@, qr/\QUnknown arguments to TAP::Harness::new (no_such_key)/,
-      '... and calling it with bad keys should fail';
+sub new { bless {}, shift }
+sub can_color {1}
 
-    eval { $HARNESS->new( { lib => 'aint_no_such_lib' } ) };
-    ok my $error = $@,
-      '... and calling it with a non-existent lib should fail';
-    like $error, qr/^\QNo such lib (aint_no_such_lib)/,
-      '... with an appropriate error message';
+sub set_color {
+    my ( $self, $output, $color ) = @_;
+    $output->("[[$color]]");
+}
 
-    eval { $HARNESS->new( { lib => [qw/bad_lib_1 bad_lib_2/] } ) };
-    ok $error = $@, '... and calling it with non-existent libs should fail';
-    like $error, qr/^\QNo such libs (bad_lib_1 bad_lib_2)/,
-      '... with an appropriate error message';
+package main;
 
-    ok my $harness = $HARNESS->new,
-      'Calling new() without arguments should succeed';
+sub colorize {
+    my $harness = shift;
+    $harness->formatter->_colorizer( Colorizer->new );
+}
 
-    foreach my $test_args ( get_arg_sets() ) {
-        my %args = %$test_args;
-        foreach my $key ( sort keys %args ) {
-            $args{$key} = $args{$key}{in};
-        }
-        ok my $harness = $HARNESS->new( {%args} ),
-          'Calling new() with valid arguments should succeed';
-        isa_ok $harness, $HARNESS, '... and the object it returns';
+can_ok $HARNESS, 'new';
 
-        while ( my ( $property, $test ) = each %$test_args ) {
-            my $value = $test->{out};
-            can_ok $harness, $property;
-            is_deeply scalar $harness->$property(), $value,
-              $test->{test_name};
-        }
+eval { $HARNESS->new( { no_such_key => 1 } ) };
+like $@, qr/\QUnknown arguments to TAP::Harness::new (no_such_key)/,
+  '... and calling it with bad keys should fail';
+
+eval { $HARNESS->new( { lib => 'aint_no_such_lib' } ) };
+ok my $error = $@, '... and calling it with a non-existent lib should fail';
+like $error, qr/^\QNo such lib (aint_no_such_lib)/,
+  '... with an appropriate error message';
+
+eval { $HARNESS->new( { lib => [qw/bad_lib_1 bad_lib_2/] } ) };
+ok $error = $@, '... and calling it with non-existent libs should fail';
+like $error, qr/^\QNo such libs (bad_lib_1 bad_lib_2)/,
+  '... with an appropriate error message';
+
+ok my $harness = $HARNESS->new,
+  'Calling new() without arguments should succeed';
+
+foreach my $test_args ( get_arg_sets() ) {
+    my %args = %$test_args;
+    foreach my $key ( sort keys %args ) {
+        $args{$key} = $args{$key}{in};
     }
-    # foreach my $method_data ( harness_methods() ) {
-    #     my ( $method, $data ) = %$method_data;
-    #     can_ok $harness, $method;
-    #     is_deeply [ $harness->$method( $data->{in}->() ) ],
-    #       [ $data->{out}->() ], $data->{test_name};
-    # }
+    ok my $harness = $HARNESS->new( {%args} ),
+      'Calling new() with valid arguments should succeed';
+    isa_ok $harness, $HARNESS, '... and the object it returns';
+
+    while ( my ( $property, $test ) = each %$test_args ) {
+        my $value = $test->{out};
+        can_ok $harness, $property;
+        is_deeply scalar $harness->$property(), $value, $test->{test_name};
+    }
 }
 
 {
@@ -108,6 +89,8 @@ foreach my $HARNESS (@HARNESSES) {
     my $harness_directives = TAP::Harness->new( { directives   => 1 } );
     my $harness_failures   = TAP::Harness->new( { failures     => 1 } );
 
+    colorize($harness);
+
     can_ok $harness, 'runtests';
 
     # normal tests in verbose mode
@@ -122,7 +105,9 @@ foreach my $HARNESS (@HARNESSES) {
     my @expected = (
         't/source_tests/harness....',
         '1..1',
+        '[[reset]]',
         'ok 1 - this is a test',
+        '[[reset]]',
         'ok',
         'All tests successful.',
     );
@@ -192,14 +177,19 @@ foreach my $HARNESS (@HARNESSES) {
     like $status, qr{^Result: FAIL$},
       '... and the status line should be correct';
 
-    my @summary = @output[ 5 .. $#output ];
-    @output = @output[ 0 .. 4 ];
+    my @summary = @output[ 10 .. $#output ];
+    @output = @output[ 0 .. 9 ];
 
     @expected = (
         't/source_tests/harness_failure....',
         '1..2',
+        '[[reset]]',
         'ok 1 - this is a test',
+        '[[reset]]',
+        '[[red]]',
         'not ok 2 - this is another test',
+        '[[reset]]',
+        '[[red]]',
         'Failed 1/2 subtests',
     );
 
@@ -207,11 +197,18 @@ foreach my $HARNESS (@HARNESSES) {
       '... and failing test output should be correct';
 
     my @expected_summary = (
+        '[[reset]]',
         'Test Summary Report',
         '-------------------',
+        '[[red]]',
         't/source_tests/harness_failure (Wstat: 0 Tests: 2 Failed: 1)',
+        '[[reset]]',
+        '[[red]]',
         'Failed tests:',
+        '[[reset]]',
+        '[[red]]',
         '2',
+        '[[reset]]',
     );
 
     is_deeply \@summary, \@expected_summary,
@@ -324,14 +321,20 @@ foreach my $HARNESS (@HARNESSES) {
 
     @output   = map { trim($_) } @output;
     $status   = pop @output;
-    @summary  = @output[ 6 .. ( $#output - 1 ) ];
-    @output   = @output[ 0 .. 5 ];
+    @summary  = @output[ 12 .. ( $#output - 1 ) ];
+    @output   = @output[ 0 .. 11 ];
     @expected = (
         't/source_tests/harness_badtap....',
         '1..2',
+        '[[reset]]',
         'ok 1 - this is a test',
+        '[[reset]]',
+        '[[red]]',
         'not ok 2 - this is another test',
+        '[[reset]]',
         '1..2',
+        '[[reset]]',
+        '[[red]]',
         'Failed 1/2 subtests',
     );
     is_deeply \@output, \@expected,
@@ -339,12 +342,21 @@ foreach my $HARNESS (@HARNESSES) {
     like $status, qr{^Result: FAIL$},
       '... and the status line should be correct';
     @expected_summary = (
+        '[[reset]]',
         'Test Summary Report',
         '-------------------',
+        '[[red]]',
         't/source_tests/harness_badtap (Wstat: 0 Tests: 2 Failed: 1)',
+        '[[reset]]',
+        '[[red]]',
         'Failed tests:',
+        '[[reset]]',
+        '[[red]]',
         '2',
-        'Parse errors: More than one plan found in TAP output'
+        '[[reset]]',
+        '[[red]]',
+        'Parse errors: More than one plan found in TAP output',
+        '[[reset]]',
     );
     is_deeply \@summary, \@expected_summary,
       '... and the badtap summary should also be correct';
@@ -548,21 +560,6 @@ sub get_arg_sets {
       };
 }
 
-# sub harness_methods {
-#     return {
-#         range => {
-#             in  => sub {qw/2 7 1 3 10 9/},
-#             out => sub {qw/1-3 7 9-10/},
-#             test_name => '... and it should return numbers as ranges'
-#         },
-#         balanced_range => {
-#             in  => sub { 7,        qw/2 7 1 3 10 9/ },
-#             out => sub { '1-3, 7', '9-10' },
-#             test_name => '... and it should return numbers as ranges'
-#         },
-#     };
-# }
-
 sub _runtests {
     my ( $harness, @tests ) = @_;
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
@@ -589,9 +586,6 @@ sub _runtests {
     is $harness->errors(10), 10, 'errors setter';
     is $harness->merge(), 2, 'merge getter';
     is $harness->merge(10), 10, 'merge setter';
-
-    # is $harness->formatter(), 3, 'formatter getter';
-    # is $harness->formatter(10), 10, 'formatter setter';
 }
 
 {
