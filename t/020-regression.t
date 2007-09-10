@@ -2028,7 +2028,7 @@ my %samples = (
                 passed        => TRUE,
                 is_ok         => TRUE,
                 directive     => 'SKIP',
-                explanation   => ': rope'
+                explanation   => 'rope'
             },
         ],
         plan          => '1..0',

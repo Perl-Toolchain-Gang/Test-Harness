@@ -51,94 +51,105 @@ sub new {
     return $self;
 }
 
-# XXX the 'not' and 'ok' might be on separate lines in VMS ...
-my $ok  = qr/(?:not )?ok\b/;
-my $num = qr/\d+/;
+my %token_for;
 
-my %v12 = (
-    version => {
-        syntax  => qr/^TAP\s+version\s+(\d+)\s*\z/i,
-        handler => sub {
-            my ( $self, $line ) = @_;
-            local *__ANON__ = '__ANON__version_token_handler';
-            my $version = $1;
-            return $self->_make_version_token( $line, $version, );
-          }
-    },
-    plan => {
-        syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\b(.*))?\z/i,
-        handler => sub {
-            my ( $self, $line ) = @_;
-            local *__ANON__ = '__ANON__plan_token_handler';
-            my $tests_planned = $1;
-            my $explanation   = $2;
-            my $skip
-              = ( 0 == $tests_planned || defined $explanation )
-              ? 'SKIP'
-              : '';
-            $explanation = '' unless defined $explanation;
-            return $self->_make_plan_token(
-                $line, $tests_planned, $skip,
-                _trim($explanation),
-            );
+{
+
+    # XXX the 'not' and 'ok' might be on separate lines in VMS ...
+    my $ok           = qr/(?:not )?ok\b/;
+    my $num          = qr/\d+/;
+    my $plan_handler = sub {
+        my ( $self, $line ) = @_;
+        local *__ANON__ = '__ANON__plan_token_handler';
+        my $tests_planned = $1;
+        my $explanation   = $2;
+        my $skip
+          = ( 0 == $tests_planned || defined $explanation )
+          ? 'SKIP'
+          : '';
+        $explanation = '' unless defined $explanation;
+        return $self->_make_plan_token(
+            $line, $tests_planned, $skip,
+            _trim($explanation),
+        );
+    };
+
+    my %v12 = (
+        version => {
+            syntax  => qr/^TAP\s+version\s+(\d+)\s*\z/i,
+            handler => sub {
+                my ( $self, $line ) = @_;
+                local *__ANON__ = '__ANON__version_token_handler';
+                my $version = $1;
+                return $self->_make_version_token( $line, $version, );
+              }
         },
-    },
-    test => {
-        syntax  => qr/^($ok) \s* ($num)? \s* (.*) \z/x,
-        handler => sub {
-            my ( $self, $line ) = @_;
-            local *__ANON__ = '__ANON__test_token_handler';
-            my ( $ok, $num, $desc ) = ( $1, $2, $3 );
-            my ( $dir, $explanation ) = ( '', '' );
-            if ($desc =~ m/^ ( [^\\\#]* (?: \\. [^\\\#]* )* ) 
+        plan => {
+            syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\S*\s*(.*))?\z/i,
+            handler => $plan_handler,
+        },
+        test => {
+            syntax  => qr/^($ok) \s* ($num)? \s* (.*) \z/x,
+            handler => sub {
+                my ( $self, $line ) = @_;
+                local *__ANON__ = '__ANON__test_token_handler';
+                my ( $ok, $num, $desc ) = ( $1, $2, $3 );
+                my ( $dir, $explanation ) = ( '', '' );
+                if ($desc =~ m/^ ( [^\\\#]* (?: \\. [^\\\#]* )* ) 
                        \# \s* (SKIP|TODO) \b \s* (.*) $/ix
-              )
-            {
-                ( $desc, $dir, $explanation ) = ( $1, $2, $3 );
-            }
-            return $self->_make_test_token(
-                $line,   $ok, $num, _trim($desc),
-                uc $dir, $explanation
-            );
+                  )
+                {
+                    ( $desc, $dir, $explanation ) = ( $1, $2, $3 );
+                }
+                return $self->_make_test_token(
+                    $line,   $ok, $num, _trim($desc),
+                    uc $dir, $explanation
+                );
+            },
         },
-    },
-    comment => {
-        syntax  => qr/^#(.*)/,
-        handler => sub {
-            my ( $self, $line ) = @_;
-            local *__ANON__ = '__ANON__comment_token_handler';
-            my $comment = $1;
-            return $self->_make_comment_token( $line, $comment );
+        comment => {
+            syntax  => qr/^#(.*)/,
+            handler => sub {
+                my ( $self, $line ) = @_;
+                local *__ANON__ = '__ANON__comment_token_handler';
+                my $comment = $1;
+                return $self->_make_comment_token( $line, $comment );
+            },
         },
-    },
-    bailout => {
-        syntax  => qr/^Bail out!\s*(.*)/,
-        handler => sub {
-            my ( $self, $line ) = @_;
-            local *__ANON__ = '__ANON__bailout_token_handler';
-            my $explanation = $1;
-            return $self->_make_bailout_token( $line, _trim($explanation) );
+        bailout => {
+            syntax  => qr/^Bail out!\s*(.*)/,
+            handler => sub {
+                my ( $self, $line ) = @_;
+                local *__ANON__ = '__ANON__bailout_token_handler';
+                my $explanation = $1;
+                return $self->_make_bailout_token( $line,
+                    _trim($explanation) );
+            },
         },
-    },
-);
+    );
 
-my %v13 = (
-    %v12,
-    yaml => {
-        syntax  => qr/^ (\s+) (---.*) $/x,
-        handler => sub {
-            my ( $self, $line ) = @_;
-            local *__ANON__ = '__ANON__yaml_token_handler';
-            my ( $pad, $marker ) = ( $1, $2 );
-            return $self->_make_yaml_token( $pad, $marker );
+    my %v13 = (
+        %v12,
+        plan => {
+            syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\b(.*))?\z/i,
+            handler => $plan_handler,
         },
-    },
-);
+        yaml => {
+            syntax  => qr/^ (\s+) (---.*) $/x,
+            handler => sub {
+                my ( $self, $line ) = @_;
+                local *__ANON__ = '__ANON__yaml_token_handler';
+                my ( $pad, $marker ) = ( $1, $2 );
+                return $self->_make_yaml_token( $pad, $marker );
+            },
+        },
+    );
 
-my %token_for = (
-    '12' => \%v12,
-    '13' => \%v13,
-);
+    %token_for = (
+        '12' => \%v12,
+        '13' => \%v13,
+    );
+}
 
 ##############################################################################
 
