@@ -126,7 +126,7 @@ BEGIN {
       _longest
     );
 
-    for my $method (@FORMATTER_ARGS) {
+    for my $method (@AUTO_FORWARD, @FORMATTER_ARGS) {
         no strict 'refs';
         *$method = sub {
             my $self = shift;
@@ -428,6 +428,12 @@ sub aggregate_tests {
         tests     => \@tests,
     };
 }
+
+=head3 C<output>
+
+  $harness->output('Whatever');
+
+Send output to the test report via the current formatter.
 
 ##############################################################################
 
