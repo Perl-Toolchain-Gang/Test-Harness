@@ -527,7 +527,7 @@ sub _failure_output {
 
     sub _output_result {
         my ( $self, $parser, $result, $prev_result ) = @_;
-        if ( $self->colorizer ) {
+        if ( $self->_colorizer ) {
             for my $col (@COLOR_MAP) {
                 local $_ = $result;
                 if ( $col->{test}->() ) {
