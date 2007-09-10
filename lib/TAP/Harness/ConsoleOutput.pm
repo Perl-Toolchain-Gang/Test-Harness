@@ -43,7 +43,7 @@ BEGIN {
     );
 
     my @getter_setters = qw(
-      _longest 
+      _longest
       _tests_without_extensions
       _newline_printed
       _current_test_name
@@ -104,12 +104,6 @@ This provides console orientated output formatting for TAP::Harness.
 
 =cut
 
-sub _error {
-    my $self = shift;
-    return $self->{error} unless @_;
-    $self->{error} = shift;
-}
-
 {
 
     sub _initialize {
@@ -123,12 +117,7 @@ sub _error {
             my $property = delete $arg_for{$name};
             if ( defined $property ) {
                 my $validate = $VALIDATION_FOR{$name};
-
-                my $value = $self->$validate($property);
-                if ( $self->_error ) {
-                    $self->_croak;
-                }
-                $self->$name($value);
+                $self->$name( $self->$validate($property) );
             }
         }
 
@@ -327,7 +316,7 @@ sub result {
 
     $self->_plan( '/' . ( $planned || 0 ) . ' ' ) unless $self->_plan;
 
-    $self->_output_method( $self->_get_output_method_method($parser) );
+    $self->_output_method( $self->_get_output_method($parser) );
 
     if ( $show_count and not $really_quiet and $result->is_test ) {
         my $number = $result->number;
@@ -351,7 +340,7 @@ sub result {
 
         # TODO: quiet gets tested here /and/ in _should_display
         unless ( $self->quiet ) {
-            $self->_output_method_result( $parser, $result, $prev_result );
+            $self->_output_result( $parser, $result, $prev_result );
             $self->_output("\n");
         }
     }
@@ -418,17 +407,17 @@ sub summary {
         foreach my $test (@$tests) {
             $self->_printed_summary_header(0);
             my ($parser) = $aggregate->parsers($test);
-            $self->_output_method_summary_failure(
+            $self->_output_summary_failure(
                 'failed', "  Failed tests:  ",
                 $test,    $parser
             );
-            $self->_output_method_summary_failure(
+            $self->_output_summary_failure(
                 'todo_passed',
                 "  TODO passed:   ", $test, $parser
             );
 
             # ~TODO this cannot be the default
-            #$self->_output_method_summary_failure( 'skipped', "  Tests skipped: " );
+            #$self->_output_summary_failure( 'skipped', "  Tests skipped: " );
 
             if ( my $exit = $parser->exit ) {
                 $self->_summary_test_header( $test, $parser );
@@ -464,7 +453,7 @@ sub summary {
     $self->_output("Result: $status\n");
 }
 
-sub _output_method_summary_failure {
+sub _output_summary_failure {
     my ( $self, $method, $name, $test, $parser ) = @_;
 
     # ugly hack.  Must rethink this :(
@@ -489,7 +478,7 @@ sub _summary_test_header {
     return if $self->_printed_summary_header;
     my $spaces = ' ' x ( $self->_longest - length $test );
     $spaces = ' ' unless $spaces;
-    my $output = $self->_get_output_method_method($parser);
+    my $output = $self->_get_output_method($parser);
     $self->$output(
         sprintf "$test$spaces(Wstat: %d Tests: %d Failed: %d)\n",
         $parser->wait, $parser->tests_run, scalar $parser->failed
@@ -617,12 +606,12 @@ sub _format_result {
     return $result->as_string;
 }
 
-sub _output_method_result {
+sub _output_result {
     my ( $self, $parser, $result, $prev_result ) = @_;
     $self->_output( $self->_format_result( $result, $prev_result ) );
 }
 
-sub _get_output_method_method {
+sub _get_output_method {
     my ( $self, $parser ) = @_;
     return $parser->has_problems ? '_failure_output' : '_output';
 }
