@@ -779,7 +779,7 @@ local $ENV{HARNESS_PERL_SWITCHES};
         local $^W = 0;
 
         # Silence harness output
-        *TAP::Harness::output = sub {
+        *TAP::Harness::ConsoleOutput::_output = sub {
 
             # do nothing
         };
