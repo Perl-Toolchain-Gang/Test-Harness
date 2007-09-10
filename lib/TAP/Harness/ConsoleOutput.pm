@@ -95,14 +95,12 @@ $VERSION = '2.99_03';
 
 =head1 DESCRIPTION
 
-This is a simple test harness which allows tests to be run and results
-automatically aggregated and output to STDOUT.
+This provides console orientated output formatting for TAP::Harness.
 
 =head1 SYNOPSIS
 
  use TAP::Harness::ConsoleOutput;
  my $harness = TAP::Harness::ConsoleOutput->new( \%args );
- $harness->runtests(@tests);
 
 =cut
 
@@ -146,6 +144,76 @@ sub _error {
     }
 }
 
+=head1 METHODS
+
+=head2 Class Methods
+
+=head3 C<new>
+
+ my %args = (
+    verbose => 1,
+ )
+ my $harness = TAP::Harness::ConsoleOutput->new( \%args );
+
+The constructor returns a new C<TAP::Harness::ConsoleOutput> object. If
+a L<TAP::Harness> is created with no C<formatter> a
+C<TAP::Harness::ConsoleOutput> is automatically created. If any of the
+following options were given to TAP::Harness->new they well be passed to
+this constructor which accepts an optional hashref whose allowed keys are:
+
+=over 4
+
+=item * C<verbose>
+
+Print individual test results to STDOUT.
+
+=item * C<timer>
+
+Append run time for each test to output. Uses L<Time::HiRes> if available.
+
+=item * C<failures>
+
+Only show test failures (this is a no-op if C<verbose> is selected).
+
+=item * C<quiet>
+
+Suppress some test output (mostly failures while tests are running).
+
+=item * C<really_quiet>
+
+Suppress everything but the tests summary.
+
+=item * C<errors>
+
+If parse errors are found in the TAP output, a note of this will be made
+in the summary report.  To see all of the parse errors, set this argument to
+true:
+
+  errors => 1
+
+=item * C<directives>
+
+If set to a true value, only test results with directives will be displayed.
+This overrides other settings such as C<verbose> or C<failures>.
+
+=item * C<stdout>
+
+A filehandle for catching standard output.
+
+=back
+
+Any keys for which the value is C<undef> will be ignored.
+
+=cut
+
+# new supplied by TAP::Base
+
+=head3 C<prepare>
+
+Called by Test::Harness before any test output is generated. 
+
+=cut
+
 sub prepare {
     my ( $self, @tests ) = @_;
 
@@ -177,6 +245,12 @@ sub _format_name {
     return "$name$periods";
 }
 
+=head3 C<before_test>
+
+Called before each test is executed by the harness.
+
+=cut
+
 sub before_test {
     my ( $self, $test ) = @_;
     my $really_quiet = $self->really_quiet;
@@ -188,6 +262,12 @@ sub before_test {
     $self->_output( $self->_current_test_name ) unless $really_quiet;
     $self->_newline_printed(0);
 }
+
+=head3 C<after_test>
+
+Called after each test is executed by the harness.
+
+=cut
 
 sub after_test {
     my ( $self, $parser ) = @_;
@@ -225,6 +305,12 @@ sub after_test {
         $self->_output_test_failure($parser);
     }
 }
+
+=head3 C<result>
+
+Called by the harness for each line of TAP it receives.
+
+=cut
 
 sub result {
     my ( $self, $result, $prev_result, $parser ) = @_;
@@ -270,6 +356,41 @@ sub result {
         }
     }
 }
+
+=head3 C<summary>
+
+  $harness->summary( \%args );
+
+C<summary> prints the summary report after all tests are run.  The argument is
+a hashref with the following keys:
+
+=over 4
+
+=item * C<start>
+
+This is created with C<< Benchmark->new >> and it the time the tests started.
+You can print a useful summary time, if desired, with:
+
+  $self->output(timestr( timediff( Benchmark->new, $start_time ), 'nop' ));
+
+=item * C<tests>
+
+This is an array reference of all test names.  To get the L<TAP::Parser>
+object for individual tests:
+
+ my $aggregate = $args->{aggregate};
+ my $tests     = $args->{tests};
+
+ foreach my $name ( @$tests ) {
+     my ($parser) = $aggregate->parsers($test);
+     ... do something with $parser
+ }
+
+This is a bit clunky and will be cleaned up in a later release.
+
+=back
+
+=cut
 
 sub summary {
     my ( $self, $arg_for ) = @_;
@@ -537,37 +658,3 @@ sub _should_show_failure {
 }
 
 1;
-
-__END__
-
-=over
-
-=item C<output>
-
-=item C<after_test>
-
-=item C<before_test>
-
-=item C<directives>
-
-=item C<errors>
-
-=item C<failures>
-
-=item C<prepare>
-
-=item C<quiet>
-
-=item C<really_quiet>
-
-=item C<result>
-
-=item C<stdout>
-
-=item C<summary>
-
-=item C<timer>
-
-=item C<verbose>
-
-=back
