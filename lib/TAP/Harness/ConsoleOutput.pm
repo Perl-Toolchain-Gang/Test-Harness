@@ -509,7 +509,10 @@ sub _output {
 sub _set_colors {
     my ( $self, @colors ) = @_;
     if ( my $colorizer = $self->_colorizer ) {
-        $colorizer->set_color( $self, $_ ) for @colors;
+        my $output_func = $self->{_output_func} ||= sub {
+            $self->_output(@_);
+        };
+        $colorizer->set_color( $output_func, $_ ) for @colors;
     }
 }
 
@@ -624,7 +627,10 @@ sub _output_test_failure {
 
     if ( $failed == 0 ) {
         $self->_failure_output(
-            $total ? " All $total subtests passed " : " No subtests run " );
+            $total
+            ? " All $total subtests passed "
+            : " No subtests run "
+        );
     }
     else {
         $self->_failure_output(" Failed $failed/$total subtests ");

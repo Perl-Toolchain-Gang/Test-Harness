@@ -27,7 +27,7 @@ BEGIN {
             my $bg = eval '$BG_BLACK';
 
             *set_color = sub {
-                my ($self, $formatter, $color) = @_;
+                my ($self, $output, $color) = @_;
 
                 my $var;
                 if ( $color eq 'reset' ) {
@@ -56,8 +56,8 @@ BEGIN {
         }
         else {
             *set_color = sub {
-                my ($self, $formatter, $color) = @_;
-                $formatter->_output( color($color) );
+                my ($self, $output, $color) = @_;
+                $output->( color($color) );
             };
         }
     }
