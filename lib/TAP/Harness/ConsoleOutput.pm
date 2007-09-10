@@ -332,15 +332,14 @@ sub result {
     $self->_output_method( $self->_get_output_method($parser) );
 
     if ( $show_count and not $really_quiet and $result->is_test ) {
-        my $number = $result->number;
-
-        # $test_print_modulus *= 2 while $test_print_modulus < $number / 5;
-        # unless ( $number % $test_print_modulus ) {
-        my $output = $self->_output_method;
-        $self->$output(
-            "\r" . $self->_current_test_name . $number . $self->_plan );
-
-        # }
+        my $number             = $result->number;
+        my $test_print_modulus = 1;
+        $test_print_modulus *= 2 while $test_print_modulus < $number / 5;
+        unless ( $number % $test_print_modulus ) {
+            my $output = $self->_output_method;
+            $self->$output(
+                "\r" . $self->_current_test_name . $number . $self->_plan );
+        }
     }
 
     return if $really_quiet;
