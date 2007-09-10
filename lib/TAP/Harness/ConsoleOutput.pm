@@ -33,12 +33,19 @@ BEGIN {
         errors       => sub { shift; shift },
         quiet        => sub { shift; shift },
         really_quiet => sub { shift; shift },
+        colorize => sub {
+            my ( $self, $ref ) = @_;
+            $self->_croak(
+                "option 'colorize' needs an object that can set_color")
+              unless eval { $ref->can('set_color') };
+            return $ref;
+        },
         stdout => sub {
             my ( $self, $ref ) = @_;
             $self->_croak("option 'stdout' needs a filehandle")
-              unless ( ( ref($ref) || '' ) eq 'GLOB'
-                or eval { $ref->can('print') } );
-            return ($ref);
+              unless ( ref $ref || '' ) eq 'GLOB'
+              or eval { $ref->can('print') };
+            return $ref;
         },
     );
 
@@ -188,6 +195,11 @@ This overrides other settings such as C<verbose> or C<failures>.
 =item * C<stdout>
 
 A filehandle for catching standard output.
+
+=item * C<colorize>
+
+A delegate which implements C<set_color> which may be used to provide
+colored output.
 
 =back
 
@@ -492,8 +504,41 @@ sub _output {
     print { $self->stdout } @_;
 }
 
+# Use colorize delegate to set output color. NOP if we have no delegate
+sub _set_colors {
+    my ( $self, @colors ) = @_;
+    if ( my $colorize = $self->colorize ) {
+        $colorize->set_color($_) for @colors;
+    }
+}
+
 sub _failure_output {
-    shift->_output(@_);
+    my $self = shift;
+    $self->_set_colors('red');
+    my $out = join '', @_ ;
+    my $has_newline = chomp $out;
+    $self->_output($out);
+    $self->_set_colors('reset');
+    $self->_output($/)
+      if $has_newline;
+}
+
+sub _output_result {
+    my ( $self, $parser, $result, $prev_result ) = @_;
+    if ( $result->is_test ) {
+        if ( !$result->is_ok ) {    # even if it's TODO
+            $self->_set_colors('red');
+        }
+        elsif ( $result->has_skip ) {
+            $self->_set_colors( 'white', 'on_blue' );
+
+        }
+        elsif ( $result->has_todo ) {
+            $self->_set_colors('white');
+        }
+    }
+    $self->_output( $self->_format_result( $result, $prev_result ) );
+    $self->_set_colors('reset');
 }
 
 sub _balanced_range {
@@ -604,11 +649,6 @@ sub _output_test_failure {
 sub _format_result {
     my ( $self, $result, $prev_result ) = @_;
     return $result->as_string;
-}
-
-sub _output_result {
-    my ( $self, $parser, $result, $prev_result ) = @_;
-    $self->_output( $self->_format_result( $result, $prev_result ) );
 }
 
 sub _get_output_method {
