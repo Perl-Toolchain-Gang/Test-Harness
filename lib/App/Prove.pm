@@ -31,10 +31,10 @@ $VERSION = '2.99_03';
 
 BEGIN {
     my @ATTR = qw(
-      archive argv blib color directives exec failures
-      formatter harness includes jobs lib merge parse quiet really_quiet
-      recurse backwards shuffle taint_fail taint_warn verbose
-      warnings_fail warnings_warn
+      archive argv blib color directives exec failures formatter harness
+      includes jobs lib merge parse quiet really_quiet recurse backwards
+      shuffle taint_fail taint_warn timer verbose warnings_fail
+      warnings_warn
     );
 
     for my $attr (@ATTR) {
@@ -112,6 +112,7 @@ sub process_args {
             'V|version'   => sub { $self->print_version; $self->_exit },
             'a|archive=s' => \$self->{archive},
             'j|jobs=i'    => \$self->{jobs},
+            'timer'       => \$self->{timer},
 
             'T' => \$self->{taint_fail},
             't' => \$self->{taint_warn},
@@ -203,18 +204,18 @@ sub _get_args {
         $args{$a} = $val if defined $val;
     }
 
-    $args{merge}    = $self->merge    if $self->merge;
-    $args{verbose}  = $self->verbose  if $self->verbose;
-    $args{failures} = $self->failures if $self->failures;
+    for my $a (qw( merge verbose failures timer )) {
+        $args{$a} = $self->$a() if $self->$a();
+    }
 
-    $args{quiet}        = 1 if $self->quiet;
-    $args{really_quiet} = 1 if $self->really_quiet;
-    $args{errors}       = 1 if $self->parse;
+    for my $a (qw( quiet really_quiet directives )) {
+        $args{$a} = 1 if $self->$a();
+    }
+
+    $args{errors} = 1 if $self->parse;
 
     $args{exec} = length( $self->exec ) ? [ split( / /, $self->exec ) ] : []
       if ( defined( $self->exec ) );
-
-    $args{directives} = 1 if $self->directives;
 
     if ($formatter_class) {
         $args{formatter} = $formatter_class->new;
@@ -417,6 +418,8 @@ __END__
 =item C<taint_fail>
 
 =item C<taint_warn>
+
+=item C<timer>
 
 =item C<verbose>
 

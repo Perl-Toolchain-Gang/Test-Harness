@@ -223,6 +223,19 @@ sub elapsed {
     return timediff( $self->{end_time}, $self->{start_time} );
 }
 
+=head3 C<all_passed>
+
+Return true if all the tests passed and no parse errors were detected.
+
+=cut
+
+sub all_passed {
+    my $self = shift;
+    return $self->total
+      && $self->total == $self->passed
+      && !$self->has_problems;
+}
+
 =head3 C<get_status>
 
 Get a single word describing the status of the aggregated tests.

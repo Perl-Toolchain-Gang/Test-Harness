@@ -13,6 +13,10 @@ use Carp;
 
 @ISA = qw(TAP::Base);
 
+BEGIN {
+    eval 'use Time::HiRes qw(time)';
+}
+
 =head1 NAME
 
 TAP::Parser - Parse L<TAP|Test::Harness::TAP> output
@@ -51,6 +55,8 @@ BEGIN {    # making accessors
         wait
         version
         in_todo
+        start_time
+        end_time
         )
       )
     {
@@ -360,6 +366,8 @@ sub run {
         $grammar->set_version( $self->version );
         $self->_grammar($grammar);
         $self->_spool($spool);
+
+        $self->start_time( time() );
 
         return $self;
     }
@@ -819,6 +827,14 @@ plan of '1..17' will mean that 17 tests were planned.
 Returns the number of tests which actually were run.  Hopefully this will
 match the number of C<< $parser->tests_planned >>.
 
+=head3 C<start_time>
+
+Returns the time when the Parser was created.
+
+=head3 C<end_time>
+
+Returns the time when the end of TAP input was seen.
+
 =head3 C<has_problems>
 
   if ( $parser->has_problems ) {
@@ -1198,6 +1214,8 @@ sub _iter {
 
 sub _finish {
     my $self = shift;
+
+    $self->end_time( time() );
 
     # sanity checks
     if ( !$self->plan ) {

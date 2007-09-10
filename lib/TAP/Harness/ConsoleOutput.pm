@@ -17,12 +17,6 @@ use vars qw($VERSION @ISA);
 
 my $MAX_ERRORS = 5;
 my %VALIDATION_FOR;
-my $TIME_HIRES;
-
-BEGIN {
-    eval 'use Time::HiRes qw(time)';
-    $TIME_HIRES = !$@;
-}
 
 BEGIN {
     %VALIDATION_FOR = (
@@ -50,7 +44,6 @@ BEGIN {
       _current_test_name
       _plan
       _output_method
-      _start_time
       _printed_summary_header
       _colorizer
     );
@@ -259,7 +252,6 @@ sub before_test {
     $self->_current_test_name( $self->_format_name($test) );
     $self->_plan('');
     $self->_output_method('_output');
-    $self->_start_time( time() );
 
     $self->_output( $self->_current_test_name ) unless $really_quiet;
     $self->_newline_printed(0);
@@ -275,7 +267,6 @@ sub after_test {
     my ( $self, $parser ) = @_;
     my $output       = $self->_output_method;
     my $really_quiet = $self->really_quiet;
-    my $start_time   = $self->_start_time;
     my $show_count   = $self->_should_show_count;
     my $leader       = $self->_current_test_name;
 
@@ -293,11 +284,12 @@ sub after_test {
         unless ($really_quiet) {
             my $time_report = '';
             if ( $self->timer ) {
-                my $elapsed = time - $start_time;
-                $time_report
-                  = $TIME_HIRES
-                  ? sprintf( ' %8d ms', $elapsed * 1000 )
-                  : sprintf( ' %8s s', $elapsed || '<1' );
+                my $start_time = $parser->start_time;
+                my $end_time   = $parser->end_time;
+                if ( defined $start_time and defined $end_time ) {
+                    $time_report
+                      = sprintf( ' %5.3f s', $end_time - $start_time );
+                }
             }
 
             $self->_output("ok$time_report\n");
@@ -383,7 +375,7 @@ sub summary {
     # TODO: Check this condition still works when all subtests pass but
     # the exit status is nonzero
 
-    if ( $total && $total == $passed && !$aggregate->has_problems ) {
+    if ( $aggregate->all_passed ) {
         $self->_output("All tests successful.\n");
     }
 
