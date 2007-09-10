@@ -2023,7 +2023,7 @@ my %samples = (
     skipall => {
         results => [
             {   is_plan       => TRUE,
-                raw           => '1..0 # skip: rope',
+                raw           => '1..0 # skipping: rope',
                 tests_planned => 0,
                 passed        => TRUE,
                 is_ok         => TRUE,
@@ -2047,6 +2047,32 @@ my %samples = (
         'exit'        => 0,
         wait          => 0,
         version       => 12,
+    },
+    skipall_v13 => {
+        results => [
+            {   is_version => TRUE,
+                raw        => 'TAP version 13',
+            },
+            {   is_unknown => TRUE,
+                raw           => '1..0 # skipping: rope',
+            },
+        ],
+        plan          => '',
+        passed        => [],
+        actual_passed => [],
+        failed        => [],
+        actual_failed => [],
+        todo          => [],
+        todo_passed   => [],
+        skipped       => [],
+        good_plan     => FALSE,
+        is_good_plan  => FALSE,
+        tests_planned => FALSE,
+        tests_run     => 0,
+        parse_errors  => ['No plan found in TAP output'],
+        'exit'        => 0,
+        wait          => 0,
+        version       => 13,
     },
     skipall_nomsg => {
         results => [
