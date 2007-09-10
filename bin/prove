@@ -49,7 +49,8 @@ Options which take arguments
  -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
       --harness     Define test harness to use.  See TAP::Harness.
       --formatter   Result formatter to use. See TAP::Harness.
- -a,  --archive     Store the resulting TAP into the specified archive file.
+ -a,  --archive     Store the resulting TAP in an archive file.
+ -j,  --jobs N      Run N test jobs in parallel (try 9.)
 
 =head2 Reading from C<STDIN>
 
