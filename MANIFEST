@@ -138,3 +138,4 @@ t/source_tests/harness_complain
 t/source_tests/harness_directives
 t/source_tests/harness_failure
 t/source_tests/source
+t/stdin.t
