@@ -123,6 +123,7 @@ BEGIN {
         }
     }
 
+    # TODO scrub the tests and eliminate this bit {{{
     my @AUTO_FORWARD = qw(
       _longest
     );
@@ -134,6 +135,7 @@ BEGIN {
             return $self->formatter->$method(@_);
         };
     }
+    # }}}
 }
 
 ##############################################################################
@@ -431,17 +433,7 @@ sub aggregate_tests {
     return $aggregate;
 }
 
-=head3 C<output>
-
-  $harness->output('Whatever');
-
-Send output to the test report via the current formatter.
-
 ##############################################################################
-
-=cut
-
-sub output { shift->formatter->_output(@_) }
 
 =head1 SUBCLASSING
 
