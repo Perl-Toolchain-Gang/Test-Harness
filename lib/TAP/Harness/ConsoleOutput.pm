@@ -450,7 +450,7 @@ sub _output_summary_failure {
     my ( $self, $method, $name, $test, $parser ) = @_;
 
     # ugly hack.  Must rethink this :(
-    my $output = $method eq 'failed' ? '_failure_output' : 'output';
+    my $output = $method eq 'failed' ? '_failure_output' : '_output';
 
     # my $test   = $self->_curr_test;
     # my $parser = $self->_curr_parser;
