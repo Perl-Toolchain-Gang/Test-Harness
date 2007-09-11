@@ -1,0 +1,13 @@
+--- Devel-Cover-0.61-bad/lib/Devel/Cover/DB.pm  2007-01-11
+06:42:48.000000000 +1100
++++ Devel-Cover-0.61-good/lib/Devel/Cover/DB.pm 2007-08-12
+01:03:18.000000000 +1000
+@@ -708,7 +708,7 @@
+             while (my ($criterion, $fc) = each %$f)
+             {
+                 my $get = "get_$criterion";
+-                my $sc  = $st->$get($digests{$digest});
++                my $sc  = $st->$get($file);
+                 # print STDERR "$criterion: ", Dumper $sc, $fc;
+                 next unless $sc;  # TODO - why?
+                 my $cc  = $cf->{$criterion} ||= {};
