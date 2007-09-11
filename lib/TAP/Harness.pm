@@ -135,6 +135,7 @@ BEGIN {
             return $self->formatter->$method(@_);
         };
     }
+
     # }}}
 }
 
@@ -509,21 +510,13 @@ sub _runtest {
 
     $self->_make_callback( 'made_parser', $parser );
 
-    $formatter->before_test($test);
-
-    my $prev_result = undef;
-
-    # my $test_print_modulus = 1;
+    my $session = $formatter->open_test( $test, $parser );
     while ( defined( my $result = $parser->next ) ) {
-        $formatter->result( $result, $prev_result, $parser );
-
-        # $self->_process( $parser, $result, $prev_result );
+        $session->result($result);
         exit 1 if $result->is_bailout;
-        $prev_result = $result;
     }
-
+    $session->close_test;
     $self->_close_spool;
-    $formatter->after_test($parser);
 
     return $parser;
 }

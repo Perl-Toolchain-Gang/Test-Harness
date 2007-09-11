@@ -37,6 +37,8 @@ BEGIN {
       _tests_without_extensions
       _newline_printed
       _current_test_name
+      _current_parser
+      _prev_result
       _plan
       _output_method
       _printed_summary_header
@@ -255,63 +257,33 @@ sub _format_name {
     return "$name$periods";
 }
 
-=head3 C<before_test>
+=head3 C<open_test>
 
-Called before each test is executed by the harness.
+Called to create a new test session. A test session looks like this:
+
+    my $session = $formatter->open_test( $test, $parser );
+    while ( defined( my $result = $parser->next ) ) {
+        $session->result($result);
+        exit 1 if $result->is_bailout;
+    }
+    $session->close_test;
 
 =cut
 
-sub before_test {
-    my ( $self, $test ) = @_;
+sub open_test {
+    my ( $self, $test, $parser ) = @_;
     my $really_quiet = $self->really_quiet;
     $self->_current_test_name( $self->_format_name($test) );
+    $self->_current_parser($parser);
+    $self->_prev_result(undef);
+
     $self->_plan('');
     $self->_output_method('_output');
 
     $self->_output( $self->_current_test_name ) unless $really_quiet;
     $self->_newline_printed(0);
-}
 
-=head3 C<after_test>
-
-Called after each test is executed by the harness.
-
-=cut
-
-sub after_test {
-    my ( $self, $parser ) = @_;
-    my $output       = $self->_output_method;
-    my $really_quiet = $self->really_quiet;
-    my $show_count   = $self->_should_show_count;
-    my $leader       = $self->_current_test_name;
-
-    if ( $show_count && !$really_quiet ) {
-        my $spaces
-          = ' ' x length( '.' . $leader . $self->_plan . $parser->tests_run );
-        $self->$output("\r$spaces\r$leader");
-    }
-
-    unless ( $parser->has_problems ) {
-        unless ($really_quiet) {
-            my $time_report = '';
-            if ( $self->timer ) {
-                my $start_time = $parser->start_time;
-                my $end_time   = $parser->end_time;
-                if ( defined $start_time and defined $end_time ) {
-                    my $elapsed = $end_time - $start_time;
-                    $time_report
-                      = $self->time_is_hires
-                      ? sprintf( ' %5.3f s', $elapsed )
-                      : sprintf( ' %8s s', $elapsed || '<1' );
-                }
-            }
-
-            $self->_output("ok$time_report\n");
-        }
-    }
-    else {
-        $self->_output_test_failure($parser);
-    }
+    return $self;
 }
 
 =head3 C<result>
@@ -321,7 +293,11 @@ Called by the harness for each line of TAP it receives.
 =cut
 
 sub result {
-    my ( $self, $result, $prev_result, $parser ) = @_;
+    my ( $self, $result ) = @_;
+
+    my $parser      = $self->_current_parser;
+    my $prev_result = $self->_prev_result;
+    $self->_prev_result($result);
 
     my $show_count   = $self->_should_show_count;
     my $really_quiet = $self->really_quiet;
@@ -364,6 +340,49 @@ sub result {
             $self->_output_result( $parser, $result, $prev_result );
             $self->_output("\n");
         }
+    }
+}
+
+=head3 C<close_test>
+
+Called to close a test session.
+
+=cut
+
+sub close_test {
+    my $self         = shift;
+    my $parser       = $self->_current_parser;
+    my $output       = $self->_output_method;
+    my $really_quiet = $self->really_quiet;
+    my $show_count   = $self->_should_show_count;
+    my $leader       = $self->_current_test_name;
+
+    if ( $show_count && !$really_quiet ) {
+        my $spaces
+          = ' ' x length( '.' . $leader . $self->_plan . $parser->tests_run );
+        $self->$output("\r$spaces\r$leader");
+    }
+
+    unless ( $parser->has_problems ) {
+        unless ($really_quiet) {
+            my $time_report = '';
+            if ( $self->timer ) {
+                my $start_time = $parser->start_time;
+                my $end_time   = $parser->end_time;
+                if ( defined $start_time and defined $end_time ) {
+                    my $elapsed = $end_time - $start_time;
+                    $time_report
+                      = $self->time_is_hires
+                      ? sprintf( ' %5.3f s', $elapsed )
+                      : sprintf( ' %8s s', $elapsed || '<1' );
+                }
+            }
+
+            $self->_output("ok$time_report\n");
+        }
+    }
+    else {
+        $self->_output_test_failure($parser);
     }
 }
 
@@ -452,8 +471,6 @@ sub _output_summary_failure {
     # ugly hack.  Must rethink this :(
     my $output = $method eq 'failed' ? '_failure_output' : '_output';
 
-    # my $test   = $self->_curr_test;
-    # my $parser = $self->_curr_parser;
     if ( $parser->$method() ) {
         $self->_summary_test_header( $test, $parser );
         $self->$output($name);
