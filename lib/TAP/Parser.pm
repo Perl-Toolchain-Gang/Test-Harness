@@ -1243,6 +1243,20 @@ sub _finish {
     return $self;
 }
 
+=head3 C<delete_spool>
+
+Delete and return the spool.
+
+  my $fh = $parser->delete_spool;
+
+=cut
+
+sub delete_spool {
+  my $self = shift;
+
+  delete($self->{_spool});
+}
+
 ##############################################################################
 
 =head1 CALLBACKS

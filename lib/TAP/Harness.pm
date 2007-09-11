@@ -513,7 +513,7 @@ sub _runtest {
         exit 1 if $result->is_bailout;
     }
     $session->close_test;
-    $self->_close_spool;
+    $self->_close_spool($parser);
 
     return $parser;
 }
@@ -535,7 +535,7 @@ sub _open_spool {
         my $spool_handle = IO::Handle->new;
         open( $spool_handle, ">$spool" )
           or $self->_croak(" Can't write $spool ( $! ) ");
-        return $self->{spool} = $spool_handle;
+        return $spool_handle;
     }
 
     return;
@@ -543,8 +543,9 @@ sub _open_spool {
 
 sub _close_spool {
     my $self = shift;
+    my ($parser) = @_;
 
-    if ( my $spool_handle = delete $self->{spool} ) {
+    if ( my $spool_handle = $parser->delete_spool ) {
         close($spool_handle)
           or $self->_croak(" Error closing TAP spool file( $! ) \n ");
     }
