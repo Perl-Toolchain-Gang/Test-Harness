@@ -6,6 +6,7 @@ use File::Spec;
 use File::Path;
 
 use TAP::Base;
+use TAP::Formatter::Console::Session;
 use Carp;
 
 use vars qw($VERSION @ISA);
@@ -35,12 +36,6 @@ BEGIN {
     my @getter_setters = qw(
       _longest
       _tests_without_extensions
-      _newline_printed
-      _current_test_name
-      _current_parser
-      _prev_result
-      _plan
-      _output_method
       _printed_summary_header
       _colorizer
     );
@@ -96,50 +91,45 @@ This provides console orientated output formatting for TAP::Harness.
 
 =cut
 
-{
+sub _initialize {
+    my ( $self, $arg_for ) = @_;
+    $arg_for ||= {};
 
-    sub _initialize {
-        my ( $self, $arg_for ) = @_;
-        $arg_for ||= {};
+    $self->SUPER::_initialize($arg_for);
+    my %arg_for = %$arg_for;    # force a shallow copy
 
-        $self->SUPER::_initialize($arg_for);
-        my %arg_for = %$arg_for;    # force a shallow copy
+    # Handle legacy verbose, quiet, really_quiet flags
+    my %verb_map = ( verbose => 1, quiet => -1, really_quiet => -2, );
 
-        # Handle legacy verbose, quiet, really_quiet flags
-        my %verb_map = ( verbose => 1, quiet => -1, really_quiet => -2, );
+    my @verb_adj = grep {$_} map { delete $arg_for{$_} ? $verb_map{$_} : 0 }
+      keys %verb_map;
 
-        my @verb_adj
-          = grep {$_} map { delete $arg_for{$_} ? $verb_map{$_} : 0 }
-          keys %verb_map;
+    croak "Only one of verbose, quiet, really_quiet should be specified"
+      if 1 < @verb_adj;
 
-        croak "Only one of verbose, quiet, really_quiet should be specified"
-          if 1 < @verb_adj;
+    $self->verbosity( shift @verb_adj || 0 );
 
-        $self->verbosity( shift @verb_adj || 0 );
-
-        for my $name ( keys %VALIDATION_FOR ) {
-            my $property = delete $arg_for{$name};
-            if ( defined $property ) {
-                my $validate = $VALIDATION_FOR{$name};
-                $self->$name( $self->$validate($property) );
-            }
+    for my $name ( keys %VALIDATION_FOR ) {
+        my $property = delete $arg_for{$name};
+        if ( defined $property ) {
+            my $validate = $VALIDATION_FOR{$name};
+            $self->$name( $self->$validate($property) );
         }
-
-        if ( my @props = keys %arg_for ) {
-            $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
-        }
-
-        # $self->quiet(0) unless $self->quiet;    # suppress unit warnings
-        # $self->really_quiet(0)    unless $self->really_quiet;
-        $self->stdout( \*STDOUT ) unless $self->stdout;
-
-        if ( $self->color ) {
-            require TAP::Formatter::Color;
-            $self->_colorizer( TAP::Formatter::Color->new );
-        }
-
-        return $self;
     }
+
+    if ( my @props = keys %arg_for ) {
+        $self->_croak(
+            "Unknown arguments to " . __PACKAGE__ . "::new (@props)" );
+    }
+
+    $self->stdout( \*STDOUT ) unless $self->stdout;
+
+    if ( $self->color ) {
+        require TAP::Formatter::Color;
+        $self->_colorizer( TAP::Formatter::Color->new );
+    }
+
+    return $self;
 }
 
 sub verbose      { shift->verbosity >= 1 }
@@ -272,118 +262,13 @@ Called to create a new test session. A test session looks like this:
 
 sub open_test {
     my ( $self, $test, $parser ) = @_;
-    my $really_quiet = $self->really_quiet;
-    $self->_current_test_name( $self->_format_name($test) );
-    $self->_current_parser($parser);
-    $self->_prev_result(undef);
 
-    $self->_plan('');
-    $self->_output_method('_output');
-
-    $self->_output( $self->_current_test_name ) unless $really_quiet;
-    $self->_newline_printed(0);
-
-    return $self;
-}
-
-=head3 C<result>
-
-Called by the harness for each line of TAP it receives.
-
-=cut
-
-sub result {
-    my ( $self, $result ) = @_;
-
-    my $parser      = $self->_current_parser;
-    my $prev_result = $self->_prev_result;
-    $self->_prev_result($result);
-
-    my $show_count   = $self->_should_show_count;
-    my $really_quiet = $self->really_quiet;
-    my $planned      = $parser->tests_planned;
-
-    if ( $result->is_bailout ) {
-        $self->_failure_output( "Bailout called.  Further testing stopped:  "
-              . $result->explanation
-              . "\n" );
-    }
-
-    $self->_plan( '/' . ( $planned || 0 ) . ' ' ) unless $self->_plan;
-
-    $self->_output_method( $self->_get_output_method($parser) );
-
-    if ( $show_count and not $really_quiet and $result->is_test ) {
-        my $number = $result->number;
-
-        my $test_print_modulus = 1;
-        my $ceiling            = $number / 5;
-        $test_print_modulus *= 2 while $test_print_modulus < $ceiling;
-
-        unless ( $number % $test_print_modulus ) {
-            my $output = $self->_output_method;
-            $self->$output(
-                "\r" . $self->_current_test_name . $number . $self->_plan );
+    return TAP::Formatter::Console::Session->new(
+        {   name      => $self->_format_name($test),
+            formatter => $self,
+            parser    => $parser
         }
-    }
-
-    return if $really_quiet;
-
-    if ( $self->_should_display( $parser, $result, $prev_result ) ) {
-        unless ( $self->_newline_printed ) {
-            $self->_output("\n") unless $self->quiet;
-            $self->_newline_printed(1);
-        }
-
-        # TODO: quiet gets tested here /and/ in _should_display
-        unless ( $self->quiet ) {
-            $self->_output_result( $parser, $result, $prev_result );
-            $self->_output("\n");
-        }
-    }
-}
-
-=head3 C<close_test>
-
-Called to close a test session.
-
-=cut
-
-sub close_test {
-    my $self         = shift;
-    my $parser       = $self->_current_parser;
-    my $output       = $self->_output_method;
-    my $really_quiet = $self->really_quiet;
-    my $show_count   = $self->_should_show_count;
-    my $leader       = $self->_current_test_name;
-
-    if ( $show_count && !$really_quiet ) {
-        my $spaces
-          = ' ' x length( '.' . $leader . $self->_plan . $parser->tests_run );
-        $self->$output("\r$spaces\r$leader");
-    }
-
-    unless ( $parser->has_problems ) {
-        unless ($really_quiet) {
-            my $time_report = '';
-            if ( $self->timer ) {
-                my $start_time = $parser->start_time;
-                my $end_time   = $parser->end_time;
-                if ( defined $start_time and defined $end_time ) {
-                    my $elapsed = $end_time - $start_time;
-                    $time_report
-                      = $self->time_is_hires
-                      ? sprintf( ' %5.3f s', $elapsed )
-                      : sprintf( ' %8s s', $elapsed || '<1' );
-                }
-            }
-
-            $self->_output("ok$time_report\n");
-        }
-    }
-    else {
-        $self->_output_test_failure($parser);
-    }
+    );
 }
 
 =head3 C<summary>
@@ -524,38 +409,6 @@ sub _failure_output {
       if $has_newline;
 }
 
-{
-    my @COLOR_MAP = (
-        {   test => sub { $_->is_test && !$_->is_ok },
-            colors => ['red'],
-        },
-        {   test => sub { $_->is_test && $_->has_skip },
-            colors => [
-                'white',
-                'on_blue'
-            ],
-        },
-        {   test => sub { $_->is_test && $_->has_todo },
-            colors => ['white'],
-        },
-    );
-
-    sub _output_result {
-        my ( $self, $parser, $result, $prev_result ) = @_;
-        if ( $self->_colorizer ) {
-            for my $col (@COLOR_MAP) {
-                local $_ = $result;
-                if ( $col->{test}->() ) {
-                    $self->_set_colors( @{ $col->{colors} } );
-                    last;
-                }
-            }
-        }
-        $self->_output( $self->_format_result( $result, $prev_result ) );
-        $self->_set_colors('reset');
-    }
-}
-
 sub _balanced_range {
     my ( $self, $limit, @range ) = @_;
     @range = $self->_range(@range);
@@ -664,44 +517,9 @@ sub _output_test_failure {
     $self->_output("\n");
 }
 
-sub _format_result {
-    my ( $self, $result, $prev_result ) = @_;
-    return $result->as_string;
-}
-
 sub _get_output_method {
     my ( $self, $parser ) = @_;
     return $parser->has_problems ? '_failure_output' : '_output';
-}
-
-sub _should_display {
-    my ( $self, $parser, $result, $prev_result ) = @_;
-
-    # Always output directives
-    return $result->has_directive if $self->directives;
-
-    # Nothing else if really quiet
-    return 0 if $self->really_quiet;
-
-    return 1
-      if $self->_should_show_failure($result)
-          || ( $self->verbose && !$self->failures );
-
-    return 0;
-}
-
-sub _should_show_count {
-
-    # we need this because if someone tries to redirect the output, it can get
-    # very garbled from the carriage returns (\r) in the count line.
-    return !shift->verbose && -t STDOUT;
-}
-
-sub _should_show_failure {
-    my ( $self, $result ) = @_;
-
-    return if !$result->is_test;
-    return $self->failures && !$result->is_ok;
 }
 
 1;
