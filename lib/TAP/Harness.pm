@@ -419,16 +419,12 @@ Tests will be run in the order found.
 sub aggregate_tests {
     my ( $self, $aggregate, @tests ) = @_;
 
-    my $formatter = $self->formatter;
-
-    $formatter->prepare(@tests);
+    $self->formatter->prepare(@tests);
     $aggregate->start;
-
     for my $test (@tests) {
         my $parser = $self->_runtest($test);
         $aggregate->add( $test, $parser );
     }
-
     $aggregate->stop;
 
 }
