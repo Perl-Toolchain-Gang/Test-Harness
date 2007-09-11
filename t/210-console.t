@@ -1,7 +1,7 @@
 use strict;
 use lib 't/lib';
 use Test::More;
-use TAP::Harness::ConsoleOutput;
+use TAP::Formatter::Console;
 
 my @schedule;
 
@@ -24,8 +24,8 @@ BEGIN {
 
 for my $test (@schedule) {
     my $name = $test->{name};
-    my $cons = TAP::Harness::ConsoleOutput->new;
-    isa_ok $cons, 'TAP::Harness::ConsoleOutput';
+    my $cons = TAP::Formatter::Console->new;
+    isa_ok $cons, 'TAP::Formatter::Console';
     my $method = $test->{method};
     can_ok $cons, $method;
     is_deeply [ $cons->$method( $test->{in}->() ) ], [ $test->{out}->() ],

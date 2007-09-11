@@ -73,8 +73,8 @@ foreach my $test_args ( get_arg_sets() ) {
 {
     my @output;
     local $^W;
-    local *TAP::Harness::ConsoleOutput::_should_show_count = sub {0};
-    local *TAP::Harness::ConsoleOutput::_output = sub {
+    local *TAP::Formatter::Console::_should_show_count = sub {0};
+    local *TAP::Formatter::Console::_output = sub {
         my $self = shift;
         push @output => grep { $_ ne '' }
           map {

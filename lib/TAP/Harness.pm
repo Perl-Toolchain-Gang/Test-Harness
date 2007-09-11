@@ -10,7 +10,7 @@ use IO::Handle;
 use TAP::Base;
 use TAP::Parser;
 use TAP::Parser::Aggregator;
-use TAP::Harness::ConsoleOutput;
+use TAP::Formatter::Console;
 
 use vars qw($VERSION @ISA);
 
@@ -360,7 +360,7 @@ Any keys for which the value is C<undef> will be ignored.
 
             }
             $self->formatter(
-                TAP::Harness::ConsoleOutput->new( \%formatter_args ) );
+                TAP::Formatter::Console->new( \%formatter_args ) );
 
         }
 

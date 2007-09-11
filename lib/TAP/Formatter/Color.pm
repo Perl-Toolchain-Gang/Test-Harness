@@ -1,9 +1,6 @@
-package TAP::Harness::Color;
+package TAP::Formatter::Color;
 
 use strict;
-
-# use TAP::Parser;
-# use TAP::Harness;
 
 use vars qw($VERSION);
 
@@ -69,7 +66,7 @@ BEGIN {
 
 =head1 NAME
 
-TAP::Harness::Color - Run Perl test scripts with color
+TAP::Formatter::Color - Run Perl test scripts with color
 
 =head1 VERSION
 
@@ -94,8 +91,8 @@ under Windows) tests will be run without color.
 
 =head1 SYNOPSIS
 
- use TAP::Harness::Color;
- my $harness = TAP::Harness::Color->new( \%args );
+ use TAP::Formatter::Color;
+ my $harness = TAP::Formatter::Color->new( \%args );
  $harness->runtests(@tests);
 
 =head1 METHODS
@@ -104,7 +101,7 @@ under Windows) tests will be run without color.
 
 =head3 C<new>
 
-The constructor returns a new C<TAP::Harness::Color> object. If
+The constructor returns a new C<TAP::Formatter::Color> object. If
 L<Term::ANSIColor> is not installed, returns undef.
 
 =cut
@@ -126,7 +123,7 @@ sub new {
 
 =head3 C<can_color>
 
-  Test::Harness::Color->can_color()
+  Test::Formatter::Color->can_color()
 
 Returns a boolean indicating whether or not this module can actually
 generate colored output. This will be false if it could not load the

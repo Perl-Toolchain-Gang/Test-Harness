@@ -1,4 +1,4 @@
-package TAP::Harness::ConsoleOutput;
+package TAP::Formatter::Console;
 
 use strict;
 use Benchmark;
@@ -75,7 +75,7 @@ BEGIN {
 
 =head1 NAME
 
-TAP::Harness::ConsoleOutput - Harness output delegate for default console output
+TAP::Formatter::Console - Harness output delegate for default console output
 
 =head1 VERSION
 
@@ -91,8 +91,8 @@ This provides console orientated output formatting for TAP::Harness.
 
 =head1 SYNOPSIS
 
- use TAP::Harness::ConsoleOutput;
- my $harness = TAP::Harness::ConsoleOutput->new( \%args );
+ use TAP::Formatter::Console;
+ my $harness = TAP::Formatter::Console->new( \%args );
 
 =cut
 
@@ -134,8 +134,8 @@ This provides console orientated output formatting for TAP::Harness.
         $self->stdout( \*STDOUT ) unless $self->stdout;
 
         if ( $self->color ) {
-            require TAP::Harness::Color;
-            $self->_colorizer( TAP::Harness::Color->new );
+            require TAP::Formatter::Color;
+            $self->_colorizer( TAP::Formatter::Color->new );
         }
 
         return $self;
@@ -155,11 +155,11 @@ sub really_quiet { shift->verbosity <= -2 }
  my %args = (
     verbose => 1,
  )
- my $harness = TAP::Harness::ConsoleOutput->new( \%args );
+ my $harness = TAP::Formatter::Console->new( \%args );
 
-The constructor returns a new C<TAP::Harness::ConsoleOutput> object. If
+The constructor returns a new C<TAP::Formatter::Console> object. If
 a L<TAP::Harness> is created with no C<formatter> a
-C<TAP::Harness::ConsoleOutput> is automatically created. If any of the
+C<TAP::Formatter::Console> is automatically created. If any of the
 following options were given to TAP::Harness->new they well be passed to
 this constructor which accepts an optional hashref whose allowed keys are:
 

@@ -25,7 +25,7 @@ Boolean options
  -l,  --lib         Add 'lib' to the path for your tests (-Ilib).
  -b,  --blib        Add 'blib/lib' to the path for your tests (-Iblib/lib).
  -s,  --shuffle     Run the tests in random order.
- -c,  --color       Colored test output (default).  See TAP::Harness::Color.
+ -c,  --color       Colored test output (default).
       --nocolor     Do not color test output.
  -f,  --failures    Only show failed tests.
  -m,  --merge       Merge test scripts' STDERR with their STDOUT.
@@ -71,12 +71,13 @@ matching the pattern C<t/*.t>.
 
 =head2 Colored Test Output
 
-Specifying the C<--color> or C<-c> switch is the same as:
+Colored test output is the default, but if output is not to a
+terminal, color is disabled. You can override this by adding the 
+C<--color> switch.
 
- prove --harness TAP::Harness::Color
-
-Colored test output is the default, but if output is not to a terminal, color
-is disabled.  You can override this by adding the C<--color> switch.
+Color support requires L<Term::ANSIColor> on Unix-like platforms and
+L<Win32::Console> windows. If the necessary module is not installed
+colored output will not be available.
 
 =head2 C<--exec>
 

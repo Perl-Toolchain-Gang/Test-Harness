@@ -25,7 +25,7 @@ BEGIN {
       TAP::Parser::YAMLish::Reader
       TAP::Parser::YAMLish::Writer
       TAP::Harness
-      TAP::Harness::Color
+      TAP::Formatter::Color
       TAP::Base
       Test::Harness
     );

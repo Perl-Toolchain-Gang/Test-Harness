@@ -25,10 +25,10 @@ provides:
   TAP::Harness:
     file: lib/TAP/Harness.pm
     version: 2.99_03
-  TAP::Harness::Color:
+  TAP::Formatter::Color:
     file: lib/TAP/Harness/Color.pm
     version: 2.99_03
-  TAP::Harness::ConsoleOutput:
+  TAP::Formatter::Console:
     file: lib/TAP/Harness/ConsoleOutput.pm
     version: 2.99_03
   TAP::Parser:

@@ -15,9 +15,9 @@ examples/test_urls.txt
 HACKING.pod
 lib/App/Prove.pm
 lib/TAP/Base.pm
+lib/TAP/Formatter/Color.pm
+lib/TAP/Formatter/Console.pm
 lib/TAP/Harness.pm
-lib/TAP/Harness/Color.pm
-lib/TAP/Harness/ConsoleOutput.pm
 lib/TAP/Parser.pm
 lib/TAP/Parser/Aggregator.pm
 lib/TAP/Parser/Grammar.pm
@@ -117,6 +117,7 @@ t/sample-tests/skip
 t/sample-tests/skip_nomsg
 t/sample-tests/skipall
 t/sample-tests/skipall_nomsg
+t/sample-tests/skipall_v13
 t/sample-tests/stdout_stderr
 t/sample-tests/switches
 t/sample-tests/taint
