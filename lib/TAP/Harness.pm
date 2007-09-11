@@ -5,6 +5,7 @@ use Carp;
 
 use File::Spec;
 use File::Path;
+use IO::Handle;
 
 use TAP::Base;
 use TAP::Parser;
@@ -531,7 +532,8 @@ sub _open_spool {
         eval { mkpath($path) };
         $self->_croak($@) if $@;
 
-        open( my $spool_handle, ">$spool" )
+        my $spool_handle = IO::Handle->new;
+        open( $spool_handle, ">$spool" )
           or $self->_croak(" Can't write $spool ( $! ) ");
         return $self->{spool} = $spool_handle;
     }
