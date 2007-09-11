@@ -10,7 +10,7 @@ use TAP::Harness;
 
 my $HARNESS = 'TAP::Harness';
 
-plan tests => 94;
+plan tests => 98;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -549,6 +549,7 @@ sub get_arg_sets {
             out       => -2,
             test_name => '... and we should be able to set verbosity to -2'
         },
+
         # really_quiet => {
         #     in  => 1,
         #     out => 1,
@@ -687,4 +688,38 @@ sub _runtests {
 
     my $arrref = $harness->switches;
     is_deeply $arrref, ['simple scalar'], 'scalar wrapped in arr ref';
+}
+
+{
+
+    # coverage tests for the basically untested T::H::_open_spool
+
+    $ENV{PERL_TEST_HARNESS_DUMP_TAP} = File::Spec->catfile(qw(t spool));
+
+# now given that we're going to be writing stuff to the file system, make sure we have
+# a cleanup hook
+
+    END {
+        use File::Path;
+
+        # remove the tree if we made it this far
+        rmtree( $ENV{PERL_TEST_HARNESS_DUMP_TAP} )
+          if $ENV{PERL_TEST_HARNESS_DUMP_TAP};
+    }
+
+    my $harness = TAP::Harness->new( { really_quiet => 1 } );
+
+    can_ok $harness, 'runtests';
+
+    # normal tests in verbose mode
+
+    ok my $parser
+      = $harness->runtests(
+        File::Spec->catfile(qw (t source_tests harness )) ),
+      '... runtests returns the aggregate';
+
+    isa_ok $parser, 'TAP::Parser::Aggregator';
+
+    ok -e File::Spec->catfile( $ENV{PERL_TEST_HARNESS_DUMP_TAP},
+        qw( t source_tests harness ) );
 }

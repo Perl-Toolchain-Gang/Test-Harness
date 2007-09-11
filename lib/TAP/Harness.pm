@@ -526,6 +526,7 @@ sub _open_spool {
     my $test = shift;
 
     if ( my $spool_dir = $ENV{PERL_TEST_HARNESS_DUMP_TAP} ) {
+
         my $spool = File::Spec->catfile( $spool_dir, $test );
 
         # Make the directory
