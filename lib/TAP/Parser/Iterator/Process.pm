@@ -105,7 +105,7 @@ sub new {
     if ( $class->_use_open3 ) {
         # HOTPATCH {{{
         my $xclose = \&IPC::Open3::xclose;
-        'warnings'->can('unimport') and 'warnings'->unimport('redefine');
+        local $^W; # no warnings
         local *IPC::Open3::xclose = sub {
             my $fh = shift;
             no strict 'refs';
