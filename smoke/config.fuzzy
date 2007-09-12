@@ -8,6 +8,7 @@ global:
     - /home/andy/Works/Perl/versions/blead/bin/perl5.*
   status: /home/andy/.smoke-tapx
   svn: /usr/local/bin/svn
+  shell: /usr/local/bin/bash
   work: /home/andy/.smoke-work
   description: FreeBSD 6.2 box with a recent version Test::Harness 2.99 / 3.xx
 tasks:

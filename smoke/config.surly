@@ -14,6 +14,7 @@ global:
     - /home/andy/Works/Perl/versions/blead/bin/perl5.*
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
+  shell: /bin/bash
   work: /home/andy/.smoke-work
   description: Ubuntu Fiesty box with Test::Harness 2.64
 tasks:

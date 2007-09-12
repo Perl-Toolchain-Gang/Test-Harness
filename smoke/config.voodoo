@@ -6,6 +6,7 @@ global:
     - /opt/local/bin/perl
   status: /Users/andy/.smoke-tapx
   svn: /opt/local/bin/svn
+  shell: /bin/bash
   work: /Users/andy/.smoke-work
   description: MacBook Pro
 tasks:

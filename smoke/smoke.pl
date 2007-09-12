@@ -30,6 +30,8 @@ exit if File::TinyLock::lock( $config, TIMEOUT => 1 );
 my $Config = load_config($config);
 my $Status = load_config( $Config->{global}->{status} );
 
+my $SHELL = $Config->{global}->{shell} || 'bash';
+
 for my $task ( @{ $Config->{tasks} } ) {
     test_and_report($task);
 }
@@ -261,7 +263,7 @@ sub test_against_perl {
     for my $cmd ( 'uname -a', '%PERL% -V' ) {
         my $cooked = expand( $cmd, $bind );
         push @out, $cooked;
-        my $results = capture_command('bash', '-c', $cooked);
+        my $results = capture_command($SHELL, '-c', $cooked);
         push @out, ( map {"  $_"} @{ $results->{output} } ), '';
     }
 
@@ -281,7 +283,7 @@ sub run_commands {
           : ( $step, sub {1} );
 
         my $cooked = expand( $cmd, $bind );
-        my $results = capture_command('bash', '-c', $cooked);
+        my $results = capture_command($SHELL, '-c', $cooked);
 
         return
           unless $feedback->(
@@ -301,59 +303,21 @@ sub capture_command {
 
     my @lines = ();
 
-    my $got_line = sub {
+    my $got_chunk = sub {
         my ( $type, $line ) = @_;
-        chomp $line;
         push @lines, map {"$type| $_"} split /\n/, $line;
         mention( $lines[-1] );
     };
 
     run(\@cmd,
         '>',
-        sub { $got_line->( 'O', @_ ) },
+        sub { $got_chunk->( 'O', @_ ) },
         '2>',
-        sub { $got_line->( 'E', @_ ) }
+        sub { $got_chunk->( 'E', @_ ) }
     );
 
-    my $status = $?;
-
-    # my $out = IO::Handle->new;
-    # my $err = IO::Handle->new;
-    #
-    # my $pid = eval { open3( undef, $out, $err, @cmd ) };
-    # die "Could not execute ($cmd): $@" if $@;
-    #
-    # my $sel   = IO::Select->new( $out, $err );
-    # my $flip  = 0;
-    # my @lines = ();
-    #
-    # # Loops forever while we're reading from STDERR
-    # while ( my @ready = $sel->can_read ) {
-    #
-    #     # Load balancing :)
-    #     @ready = reverse @ready if $flip;
-    #     $flip = !$flip;
-    #
-    #     for my $fh (@ready) {
-    #         if ( defined( my $line = <$fh> ) ) {
-    #             my $pfx = $fh == $err ? 'E' : 'O';
-    #             chomp $line;
-    #             push @lines, "$pfx| $line";
-    #             mention( $lines[-1] );
-    #         }
-    #         else {
-    #             $sel->remove($fh);
-    #         }
-    #     }
-    # }
-
-    # my $status = undef;
-    # if ( $pid == waitpid( $pid, 0 ) ) {
-    #     $status = $?;
-    # }
-
     return {
-        status => $status,
+        status => $?,
         output => \@lines,
     };
 }
