@@ -90,8 +90,6 @@ sub new {
     my $class = shift;
     my $args  = shift;
 
-    local *DUMMY;
-
     my @command = @{ delete $args->{command} || [] }
       or die "Must supply a command to execute";
 
@@ -104,11 +102,14 @@ sub new {
 
     my $out = IO::Handle->new;
 
+    my $dup_stdin = IO::Handle->new;
+    open($dup_stdin, '>&='.fileno(STDIN));
+
     if ( $class->_use_open3 ) {
         if ($IS_WIN32) {
             $err = $merge ? '' : '>&STDERR';
             eval {
-                $pid = open3( \*DUMMY, $out, $merge ? '' : $err, @command );
+                $pid = open3( '<&STDIN', $out, $merge ? '' : $err, @command );
             };
             die "Could not execute (@command): $@" if $@;
             if ( $] >= 5.006 ) {
@@ -119,7 +120,7 @@ sub new {
         }
         else {
             $err = $merge ? '' : IO::Handle->new;
-            eval { $pid = open3( \*DUMMY, $out, $err, @command ); };
+            eval { $pid = open3( '<&STDIN', $out, $err, @command ); };
             die "Could not execute (@command): $@" if $@;
             $sel = $merge ? undef : IO::Select->new( $out, $err );
         }
@@ -138,6 +139,7 @@ sub new {
     }
 
     my $self = bless {
+        dup_stdin => $dup_stdin,
         out  => $out,
         err  => $err,
         sel  => $sel,
@@ -219,6 +221,7 @@ sub _finish {
             $status = $?;
         }
     }
+    open(STDIN, '<&=' . fileno(delete($self->{dup_stdin})));
 
     ( delete $self->{out} )->close if $self->{out};
 
