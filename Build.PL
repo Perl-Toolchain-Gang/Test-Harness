@@ -14,6 +14,15 @@ my $build_class = Module::Build->subclass(
           $self->depends_on('code');
           exec($^X, '-Iblib/lib', 'bin/prove', '-r');
       }
+      sub ACTION_testtrust {
+          my $self = shift;
+          $self->depends_on('code');
+          my $ref = 'reference/Test-Harness-2.64';
+          exec($^X,
+            (-e $ref ? ("-I$ref/lib", "$ref/bin/prove") : qw(-S prove) ),
+            '-Iblib/lib', '-r', 't'
+          );
+      }
     SUBCLASS
 );
 
