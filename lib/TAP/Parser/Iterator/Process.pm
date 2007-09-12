@@ -90,8 +90,6 @@ sub new {
     my $class = shift;
     my $args  = shift;
 
-    local *DUMMY;
-
     my @command = @{ delete $args->{command} || [] }
       or die "Must supply a command to execute";
 
@@ -105,10 +103,21 @@ sub new {
     my $out = IO::Handle->new;
 
     if ( $class->_use_open3 ) {
+        # HOTPATCH {{{
+        my $xclose = \&IPC::Open3::xclose;
+        'warnings'->can('unimport') and 'warnings'->unimport('redefine');
+        local *IPC::Open3::xclose = sub {
+            my $fh = shift;
+            no strict 'refs';
+            return if(fileno($fh) == fileno(STDIN));
+            $xclose->($fh);
+        };
+        # }}}
+
         if ($IS_WIN32) {
             $err = $merge ? '' : '>&STDERR';
             eval {
-                $pid = open3( \*DUMMY, $out, $merge ? '' : $err, @command );
+                $pid = open3( '<&STDIN', $out, $merge ? '' : $err, @command );
             };
             die "Could not execute (@command): $@" if $@;
             if ( $] >= 5.006 ) {
@@ -119,7 +128,7 @@ sub new {
         }
         else {
             $err = $merge ? '' : IO::Handle->new;
-            eval { $pid = open3( \*DUMMY, $out, $err, @command ); };
+            eval { $pid = open3( '<&STDIN', $out, $err, @command ); };
             die "Could not execute (@command): $@" if $@;
             $sel = $merge ? undef : IO::Select->new( $out, $err );
         }
