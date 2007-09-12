@@ -5,9 +5,11 @@ use warnings;
 use File::Spec;
 use File::Path;
 use File::TinyLock;
-use IO::Handle;
-use IPC::Open3;
-use IO::Select;
+
+# use IO::Handle;
+use IPC::Run qw( run );
+
+# use IO::Select;
 use Mail::Send;
 use Getopt::Long;
 use Sys::Hostname;
@@ -259,7 +261,7 @@ sub test_against_perl {
     for my $cmd ( 'uname -a', '%PERL% -V' ) {
         my $cooked = expand( $cmd, $bind );
         push @out, $cooked;
-        my $results = capture_command($cooked);
+        my $results = capture_command('bash', '-c', $cooked);
         push @out, ( map {"  $_"} @{ $results->{output} } ), '';
     }
 
@@ -279,7 +281,7 @@ sub run_commands {
           : ( $step, sub {1} );
 
         my $cooked = expand( $cmd, $bind );
-        my $results = capture_command($cooked);
+        my $results = capture_command('bash', '-c', $cooked);
 
         return
           unless $feedback->(
@@ -297,40 +299,58 @@ sub capture_command {
 
     mention($cmd);
 
-    my $out = IO::Handle->new;
-    my $err = IO::Handle->new;
-
-    my $pid = eval { open3( undef, $out, $err, @cmd ) };
-    die "Could not execute ($cmd): $@" if $@;
-
-    my $sel   = IO::Select->new( $out, $err );
-    my $flip  = 0;
     my @lines = ();
 
-    # Loops forever while we're reading from STDERR
-    while ( my @ready = $sel->can_read ) {
+    my $got_line = sub {
+        my ( $type, $line ) = @_;
+        chomp $line;
+        push @lines, map {"$type| $_"} split /\n/, $line;
+        mention( $lines[-1] );
+    };
 
-        # Load balancing :)
-        @ready = reverse @ready if $flip;
-        $flip = !$flip;
+    run(\@cmd,
+        '>',
+        sub { $got_line->( 'O', @_ ) },
+        '2>',
+        sub { $got_line->( 'E', @_ ) }
+    );
 
-        for my $fh (@ready) {
-            if ( defined( my $line = <$fh> ) ) {
-                my $pfx = $fh == $err ? 'E' : 'O';
-                chomp $line;
-                push @lines, "$pfx| $line";
-                mention( $lines[-1] );
-            }
-            else {
-                $sel->remove($fh);
-            }
-        }
-    }
+    my $status = $?;
 
-    my $status = undef;
-    if ( $pid == waitpid( $pid, 0 ) ) {
-        $status = $?;
-    }
+    # my $out = IO::Handle->new;
+    # my $err = IO::Handle->new;
+    #
+    # my $pid = eval { open3( undef, $out, $err, @cmd ) };
+    # die "Could not execute ($cmd): $@" if $@;
+    #
+    # my $sel   = IO::Select->new( $out, $err );
+    # my $flip  = 0;
+    # my @lines = ();
+    #
+    # # Loops forever while we're reading from STDERR
+    # while ( my @ready = $sel->can_read ) {
+    #
+    #     # Load balancing :)
+    #     @ready = reverse @ready if $flip;
+    #     $flip = !$flip;
+    #
+    #     for my $fh (@ready) {
+    #         if ( defined( my $line = <$fh> ) ) {
+    #             my $pfx = $fh == $err ? 'E' : 'O';
+    #             chomp $line;
+    #             push @lines, "$pfx| $line";
+    #             mention( $lines[-1] );
+    #         }
+    #         else {
+    #             $sel->remove($fh);
+    #         }
+    #     }
+    # }
+
+    # my $status = undef;
+    # if ( $pid == waitpid( $pid, 0 ) ) {
+    #     $status = $?;
+    # }
 
     return {
         status => $status,
