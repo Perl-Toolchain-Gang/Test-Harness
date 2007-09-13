@@ -79,8 +79,6 @@ t/lib/NoFork.pm
 t/lib/Test/Builder.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
-t/pod-coverage.t
-t/pod.t
 t/sample-tests/bailout
 t/sample-tests/bignum
 t/sample-tests/bignum_many
@@ -137,4 +135,6 @@ t/source_tests/harness_complain
 t/source_tests/harness_directives
 t/source_tests/harness_failure
 t/source_tests/source
+xt/author/pod-coverage.t
+xt/author/pod.t
 xt/smoke/stdin.t

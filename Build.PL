@@ -3,7 +3,7 @@ use Module::Build;
 use 5.005;
 
 use File::Spec;
-use lib File::Spec->canonpath('lib/');      # use our self to install
+use lib File::Spec->canonpath('lib/');    # use our self to install
 
 # NOTE: make this actually be inc/MyBuilder.pm if it gets any bigger
 my $build_class = Module::Build->subclass(
@@ -23,8 +23,14 @@ my $build_class = Module::Build->subclass(
             '-Iblib/lib', '-r', 't'
           );
       }
+      sub ACTION_testauthor {
+          my $self = shift;
+          $self->test_files('t', 'xt/author');
+          $self->generic_test( type => 'default' );
+      }
     SUBCLASS
 );
+
 
 my $builder = $build_class->new(
     module_name => 'Test::Harness',
@@ -43,15 +49,14 @@ my $builder = $build_class->new(
     },
     recursive_test_files => 1,
     requires             => {
-	'File::Spec' => '0.8',     # for 'rel2abs'
+        'File::Spec' => '0.8',    # for 'rel2abs'
     },
-    recommends           => {
+    recommends => {
         'Pod::Usage' => '1.12',    # for 'prove'
     },
-    build_requires       => {
-    },
+    build_requires => {},
     add_to_cleanup => ['Test-Harness-*'],
-    script_files => ["bin/prove"],
+    script_files   => ["bin/prove"],
 );
 
 $builder->create_build_script();
