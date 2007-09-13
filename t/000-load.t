@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 42;
+use Test::More tests => 48;
 
 BEGIN {
     my @classes = qw(
@@ -25,8 +25,11 @@ BEGIN {
       TAP::Parser::YAMLish::Reader
       TAP::Parser::YAMLish::Writer
       TAP::Harness
-      TAP::Formatter::Color
       TAP::Base
+      TAP::Formatter::Color
+      TAP::Formatter::Console
+      TAP::Formatter::Console::Session
+      TAP::Formatter::Console::ParallelSession
       Test::Harness
     );
 

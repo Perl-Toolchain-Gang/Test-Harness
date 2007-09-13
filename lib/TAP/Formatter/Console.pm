@@ -6,7 +6,6 @@ use File::Spec;
 use File::Path;
 
 use TAP::Base;
-use TAP::Formatter::Console::Session;
 use Carp;
 
 use vars qw($VERSION @ISA);
@@ -24,6 +23,7 @@ BEGIN {
         failures   => sub { shift; shift },
         errors     => sub { shift; shift },
         color      => sub { shift; shift },
+        jobs       => sub { shift; shift },
         stdout => sub {
             my ( $self, $ref ) = @_;
             $self->_croak("option 'stdout' needs a filehandle")
@@ -202,6 +202,10 @@ If defined specifies whether color output is desired. If C<color> is not
 defined it will default to color output if color support is available on
 the current platform and output is not being redirected.
 
+=item * C<jobs>
+
+The number of concurrent jobs this formatter will handle.
+
 =back
 
 Any keys for which the value is C<undef> will be ignored.
@@ -263,7 +267,15 @@ Called to create a new test session. A test session looks like this:
 sub open_test {
     my ( $self, $test, $parser ) = @_;
 
-    return TAP::Formatter::Console::Session->new(
+    my $class
+      = $self->jobs > 1
+      ? 'TAP::Formatter::Console::ParallelSession'
+      : 'TAP::Formatter::Console::Session';
+
+    eval "require $class";
+    croak $@ if $@;
+
+    return $class->new(
         {   name      => $self->_format_name($test),
             formatter => $self,
             parser    => $parser

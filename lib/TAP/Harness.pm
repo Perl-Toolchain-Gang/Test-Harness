@@ -352,13 +352,18 @@ Any keys for which the value is C<undef> will be ignored.
         }
 
         unless ( $self->formatter ) {
+
+            # This is a little bodge to preserve legacy behaviour. In
+            # the old days we didn't get given a formatter - so in that
+            # case we'll make our own formatter that provides default
+            # behaviour.
             my %formatter_args = ();
             for my $name (@FORMATTER_ARGS) {
                 if ( defined( my $property = delete $arg_for{$name} ) ) {
                     $formatter_args{$name} = $property;
                 }
-
             }
+            $formatter_args{jobs} = $self->jobs;
             $self->formatter(
                 TAP::Formatter::Console->new( \%formatter_args ) );
 
@@ -430,6 +435,16 @@ sub aggregate_tests {
 
 }
 
+=head3 C<jobs>
+
+Returns the number of concurrent test runs the harness is handling. For the default
+harness this value is always 1. A parallel harness such as L<TAP::Harness::Parallel>
+will override this to return the number of jobs it is handling.
+
+=cut
+
+sub jobs {1}
+
 ##############################################################################
 
 =head1 SUBCLASSING
@@ -439,7 +454,9 @@ like how a particular feature functions, just override the desired methods.
 
 =head2 Methods
 
-The following methods are one's you may wish to override if you want to
+TODO: This is out of date
+
+The following methods are ones you may wish to override if you want to
 subclass C<TAP::Harness>.
 
 =head3 C<summary>
@@ -495,26 +512,52 @@ sub _get_parser_args {
     return \%args;
 }
 
-sub _runtest {
+=head3 C<make_parser>
+
+Make a new parser. Typically used and/or overridden in subclasses.
+
+=cut
+
+sub make_parser {
     my ( $self, $test ) = @_;
 
     my $formatter = $self->formatter;
-
-    # my $really_quiet = $self->really_quiet;
-    # my $show_count   = $self->_should_show_count;
-
-    my $parser = TAP::Parser->new( $self->_get_parser_args($test) );
-
+    my $parser    = TAP::Parser->new( $self->_get_parser_args($test) );
     $self->_make_callback( 'made_parser', $parser );
+    $parser->stash( $formatter->open_test( $test, $parser ) );
 
-    my $session = $formatter->open_test( $test, $parser );
+    return $parser;
+}
+
+sub _runtest {
+    my ( $self, $test ) = @_;
+
+    my $parser    = $self->make_parser($test);
+    my $session   = $parser->stash;
+
     while ( defined( my $result = $parser->next ) ) {
         $session->result($result);
         exit 1 if $result->is_bailout;
     }
+
+    return $self->finish_parser($parser);
+
+}
+
+=head3 C<finish_parser>
+
+Terminate use of a parser. Typically used and/or overridden in
+subclasses. The parser isn't destroyed as a result of this.
+
+=cut
+
+sub finish_parser {
+    my ( $self, $parser ) = @_;
+
+    my $session = $parser->stash;
     $session->close_test;
     $self->_close_spool($parser);
-
+    $parser->stash(undef);
     return $parser;
 }
 

@@ -10,7 +10,7 @@ use TAP::Harness;
 
 my $HARNESS = 'TAP::Harness';
 
-plan tests => 98;
+plan tests => 99;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -607,6 +607,9 @@ sub _runtests {
     is $harness->errors(10), 10, 'errors setter';
     is $harness->merge(), 2, 'merge getter';
     is $harness->merge(10), 10, 'merge setter';
+
+    # jobs accessor
+    is $harness->jobs(), 1, 'jobs';
 }
 
 {
@@ -720,6 +723,8 @@ sub _runtests {
 
     isa_ok $parser, 'TAP::Parser::Aggregator';
 
-    ok -e File::Spec->catfile( $ENV{PERL_TEST_HARNESS_DUMP_TAP},
-        qw( t source_tests harness ) );
+    ok -e File::Spec->catfile(
+        $ENV{PERL_TEST_HARNESS_DUMP_TAP},
+        qw( t source_tests harness )
+    );
 }
