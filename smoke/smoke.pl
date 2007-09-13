@@ -15,6 +15,8 @@ use Getopt::Long;
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
+my $VERSION = 0.001;
+
 GetOptions(
     'v|verbose' => \my $VERBOSE,
     'force'     => \my $FORCE
@@ -153,7 +155,7 @@ sub test_and_report {
 
         if ( my $desc = $Config->{global}->{description} ) {
             print $fh sprintf(
-                "Tests run on %s which is a %s.\n\n", hostname,
+                "Tests run by smoke.pl $VERSION on %s which is a %s.\n\n", hostname,
                 $desc
             );
         }
