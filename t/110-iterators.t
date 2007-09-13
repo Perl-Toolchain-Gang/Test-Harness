@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 75;
+use Test::More tests => 76;
 
 use File::Spec;
 use TAP::Parser;
@@ -154,6 +154,15 @@ for my $test (@schedule) {
 
     is $stream->next, 'not ok 1 - I hate VMS',
       'coverage of VMS line-splitting case';
+
+    # coverage test for VMS case - nothing after 'not'
+
+    $stream = TAP::Parser::Iterator->new(
+        [   'not ',
+        ]
+    );
+
+    is $stream->next, 'not ', '...and we find "not" by itself';
 }
 
 SKIP: {

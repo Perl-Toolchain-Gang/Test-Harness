@@ -86,9 +86,10 @@ sub next {
     # by itself:
     #   not
     #   ok 1 - 'I hate VMS'
-    if ( defined $line && $line =~ /^\s*not\s*$/ ) {
+    if ( defined($line) and $line =~ /^\s*not\s*$/ ) {
         $line .= ( $self->next_raw || '' );
     }
+
     return $line;
 }
 
