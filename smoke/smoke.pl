@@ -15,10 +15,13 @@ use Getopt::Long;
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
-my $VERSION = 0.003;
+my $VERSION = 0.004;
 
-# Reopen stdin.
-#open(STDIN, '<', '/dev/tty') or die $!;
+# Reopen STDIN.
+use IO::Pty;
+my $pty = IO::Pty->new;
+open( STDIN, "<&" . $pty->slave->fileno() )
+  || die "Couldn't reopen STDIN for reading, $!\n";
 
 GetOptions(
     'v|verbose' => \my $VERBOSE,
@@ -158,7 +161,8 @@ sub test_and_report {
 
         if ( my $desc = $Config->{global}->{description} ) {
             print $fh sprintf(
-                "Tests run by smoke.pl $VERSION on %s which is a %s.\n\n", hostname,
+                "Tests run by smoke.pl $VERSION on %s which is a %s.\n\n",
+                hostname,
                 $desc
             );
         }
@@ -268,7 +272,7 @@ sub test_against_perl {
     for my $cmd ( 'uname -a', '%PERL% -V' ) {
         my $cooked = expand( $cmd, $bind );
         push @out, $cooked;
-        my $results = capture_command($SHELL, '-c', $cooked);
+        my $results = capture_command( $SHELL, '-c', $cooked );
         push @out, ( map {"  $_"} @{ $results->{output} } ), '';
     }
 
@@ -288,7 +292,7 @@ sub run_commands {
           : ( $step, sub {1} );
 
         my $cooked = expand( $cmd, $bind );
-        my $results = capture_command($SHELL, '-c', $cooked);
+        my $results = capture_command( $SHELL, '-c', $cooked );
 
         return
           unless $feedback->(
