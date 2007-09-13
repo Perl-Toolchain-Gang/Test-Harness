@@ -137,4 +137,5 @@ t/source_tests/harness_failure
 t/source_tests/source
 xt/author/pod-coverage.t
 xt/author/pod.t
+xt/author/stdin.t
 xt/smoke/stdin.t

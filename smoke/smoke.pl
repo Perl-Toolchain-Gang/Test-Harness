@@ -17,6 +17,9 @@ use YAML qw( DumpFile LoadFile );
 
 my $VERSION = 0.001;
 
+# Reopen stdin.
+open(STDIN, '<', '/dev/tty') or die $!;
+
 GetOptions(
     'v|verbose' => \my $VERBOSE,
     'force'     => \my $FORCE
