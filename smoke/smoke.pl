@@ -15,10 +15,10 @@ use Getopt::Long;
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
-my $VERSION = 0.001;
+my $VERSION = 0.003;
 
 # Reopen stdin.
-open(STDIN, '<', '/dev/tty') or die $!;
+#open(STDIN, '<', '/dev/tty') or die $!;
 
 GetOptions(
     'v|verbose' => \my $VERBOSE,
