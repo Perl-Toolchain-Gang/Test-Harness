@@ -33,7 +33,7 @@ WriteMakefile(
         else {
             return q[
 testcover :
-  $(NOECHO) $(ECHO) To enable testcover, install ExtUtils::MakeMaker::Coverage and rerun Makefile.PL.
+	$(NOECHO) $(ECHO) To enable testcover, install ExtUtils::MakeMaker::Coverage and rerun Makefile.PL.
 ];
         }
     }
