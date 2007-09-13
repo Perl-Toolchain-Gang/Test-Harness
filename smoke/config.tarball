@@ -15,7 +15,7 @@ tasks:
     script:
       - yes n | %PERL% Build.PL
       - ./Build
-      - ./Build test
+      - ./Build testauthor
       - ./Build dist
       - mkdir %OUTDIR%/r%REV%
       - mv *.gz %OUTDIR%/r%REV%

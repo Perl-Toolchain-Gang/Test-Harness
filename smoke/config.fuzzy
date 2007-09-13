@@ -27,7 +27,7 @@ tasks:
       - make distclean
       - yes n | %PERL% Build.PL
       - ./Build
-      - ./Build test
+      - ./Build testauthor
       - ./Build testprove
       - ./Build distclean
     subdir: trunk
