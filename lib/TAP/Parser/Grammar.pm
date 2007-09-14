@@ -82,11 +82,22 @@ my %token_for;
                 local *__ANON__ = '__ANON__version_token_handler';
                 my $version = $1;
                 return $self->_make_version_token( $line, $version, );
-              }
+            },
         },
         plan => {
             syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\S*\s*(.*))?\z/i,
             handler => $plan_handler,
+        },
+        simple_test => {
+            syntax  => qr/^($ok) \ ($num) (?:\ ([^#]+))? \z/x,
+            handler => sub {
+                my( $self, $line ) = @_;
+                my( $ok, $num, $desc ) = ( $1, $2, $3 );
+
+                return $self->_make_test_token(
+                    $line, $ok, $num, _trim($desc)
+                );
+            }
         },
         test => {
             syntax  => qr/^($ok) \s* ($num)? \s* (.*) \z/x,
@@ -171,10 +182,24 @@ sub set_version {
 
     if ( my $tokens = $token_for{$version} ) {
         $self->{tokens} = $tokens;
+
+        $self->_order_tokens;
     }
     else {
         croak "Unsupported syntax version: $version";
     }
+}
+
+# Optimization to put the most frequent tokens first.
+sub _order_tokens {
+    my $self = shift;
+
+    my %copy = %{$self->{tokens}};
+    my @ordered_tokens = grep defined,
+                         map  { delete $copy{$_} } qw(simple_test test comment plan);
+    push @ordered_tokens, values %copy;
+    
+    $self->{ordered_tokens} = \@ordered_tokens;
 }
 
 ##############################################################################
@@ -197,7 +222,7 @@ sub tokenize {
 
     my $token;
 
-    foreach my $token_data ( values %{ $self->{tokens} } ) {
+    foreach my $token_data ( @{ $self->{ordered_tokens} } ) {
         if ( $line =~ $token_data->{syntax} ) {
             my $handler = $token_data->{handler};
             $token = $self->$handler($line);

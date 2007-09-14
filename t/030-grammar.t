@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 78;
+use Test::More tests => 82;
 
 use TAP::Parser::Grammar;
 use TAP::Parser::Iterator::Array;
@@ -39,7 +39,7 @@ isa_ok $grammar, $GRAMMAR, '... and the object it returns';
 # why.  We'll still use the instance because that should be forward
 # compatible.
 
-my @V12 = qw(bailout comment plan test version);
+my @V12 = qw(bailout comment plan simple_test test version);
 my @V13 = ( @V12, 'yaml' );
 
 can_ok $grammar, 'token_types';

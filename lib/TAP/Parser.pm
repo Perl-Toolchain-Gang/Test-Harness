@@ -1018,10 +1018,7 @@ sub _make_state_table {
             },
         },
         yaml => {
-            act => sub {
-                my ($test) = @_;
-                local *__ANON__ = '__ANON__yaml_handler';
-            },
+            act => sub {},
         },
     );
 
