@@ -24,36 +24,18 @@ BEGIN {
     my @getter_setters = qw(
       _prev_result
       _plan
+      _pretty_name
       _output_method
       _newline_printed
     );
 
-    # TODO: We don't really need all this do we?
     for my $method ( @getter_setters, keys %VALIDATION_FOR ) {
         no strict 'refs';
-        if ( $method eq 'lib' || $method eq 'switches' ) {
-            *$method = sub {
-                my $self = shift;
-                unless (@_) {
-                    $self->{$method} ||= [];
-                    return
-                      wantarray ? @{ $self->{$method} } : $self->{$method};
-                }
-                $self->_croak("Too many arguments to method '$method'")
-                  if @_ > 1;
-                my $args = shift;
-                $args = [$args] unless ref $args;
-                $self->{$method} = $args;
-                return $self;
-            };
-        }
-        else {
-            *$method = sub {
-                my $self = shift;
-                return $self->{$method} unless @_;
-                $self->{$method} = shift;
-            };
-        }
+        *$method = sub {
+            my $self = shift;
+            return $self->{$method} unless @_;
+            $self->{$method} = shift;
+        };
     }
 }
 
@@ -123,14 +105,25 @@ sub _initialize {
 
     $self->_plan('');
     $self->_output_method('_output');
+    $self->_pretty_name( $self->formatter->_format_name( $self->name ) );
+
+    return $self;
+}
+
+=head3 C<header>
+
+Output test preamble
+
+=cut
+
+sub header {
+    my $self      = shift;
     my $formatter = $self->formatter;
 
-    $formatter->_output( $self->name )
+    $formatter->_output( $self->_pretty_name )
       unless $formatter->really_quiet;
 
     $self->_newline_printed(0);
-
-    return $self;
 }
 
 =head3 C<result>
@@ -173,7 +166,7 @@ sub result {
         unless ( $number % $test_print_modulus ) {
             my $output = $self->_output_method;
             $formatter->$output(
-                "\r" . $self->name . $number . $self->_plan );
+                "\r" . $self->_pretty_name . $number . $self->_plan );
         }
     }
 
@@ -207,7 +200,7 @@ sub close_test {
     my $output       = $self->_output_method;
     my $really_quiet = $formatter->really_quiet;
     my $show_count   = $self->_should_show_count;
-    my $leader       = $self->name;
+    my $leader       = $self->_pretty_name;
 
     if ( $show_count && !$really_quiet ) {
         my $spaces
@@ -234,7 +227,7 @@ sub close_test {
         }
     }
     else {
-        $formatter->_output_test_failure($parser);
+        $self->_output_test_failure($parser);
     }
 }
 
@@ -269,6 +262,65 @@ sub _should_show_count {
     # we need this because if someone tries to redirect the output, it can get
     # very garbled from the carriage returns (\r) in the count line.
     return !shift->formatter->verbose && -t STDOUT;
+}
+
+sub _output_test_failure {
+    my ( $self, $parser ) = @_;
+    my $formatter = $self->formatter;
+    return if $formatter->really_quiet;
+
+    my $tests_run     = $parser->tests_run;
+    my $tests_planned = $parser->tests_planned;
+
+    my $total
+      = defined $tests_planned
+      ? $tests_planned
+      : $tests_run;
+
+    my $passed = $parser->passed;
+
+    # The total number of fails includes any tests that were planned but
+    # didn't run
+    my $failed = $parser->failed + $total - $tests_run;
+    my $exit   = $parser->exit;
+
+    # TODO: $flist isn't used anywhere
+    # my $flist  = join ", " => $formatter->range( $parser->failed );
+
+    if ( my $exit = $parser->exit ) {
+        my $wstat = $parser->wait;
+        my $status = sprintf( "%d (wstat %d, 0x%x)", $exit, $wstat, $wstat );
+        $formatter->_failure_output(" Dubious, test returned $status\n");
+    }
+
+    if ( $failed == 0 ) {
+        $formatter->_failure_output(
+            $total
+            ? " All $total subtests passed "
+            : " No subtests run "
+        );
+    }
+    else {
+        $formatter->_failure_output(" Failed $failed/$total subtests ");
+        if ( !$total ) {
+            $formatter->_failure_output("\nNo tests run!");
+        }
+    }
+
+    if ( my $skipped = $parser->skipped ) {
+        $passed -= $skipped;
+        my $test = 'subtest' . ( $skipped != 1 ? 's' : '' );
+        $formatter->_output(
+            "\n\t(less $skipped skipped $test: $passed okay)");
+    }
+
+    if ( my $failed = $parser->todo_passed ) {
+        my $test = $failed > 1 ? 'tests' : 'test';
+        $formatter->_output(
+            "\n\t($failed TODO $test unexpectedly succeeded)");
+    }
+
+    $formatter->_output("\n");
 }
 
 {

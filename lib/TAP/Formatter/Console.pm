@@ -42,29 +42,11 @@ BEGIN {
 
     for my $method ( @getter_setters, keys %VALIDATION_FOR ) {
         no strict 'refs';
-        if ( $method eq 'lib' || $method eq 'switches' ) {
-            *$method = sub {
-                my $self = shift;
-                unless (@_) {
-                    $self->{$method} ||= [];
-                    return
-                      wantarray ? @{ $self->{$method} } : $self->{$method};
-                }
-                $self->_croak("Too many arguments to method '$method'")
-                  if @_ > 1;
-                my $args = shift;
-                $args = [$args] unless ref $args;
-                $self->{$method} = $args;
-                return $self;
-            };
-        }
-        else {
-            *$method = sub {
-                my $self = shift;
-                return $self->{$method} unless @_;
-                $self->{$method} = shift;
-            };
-        }
+        *$method = sub {
+            my $self = shift;
+            return $self->{$method} unless @_;
+            $self->{$method} = shift;
+        };
     }
 }
 
@@ -275,12 +257,16 @@ sub open_test {
     eval "require $class";
     croak $@ if $@;
 
-    return $class->new(
-        {   name      => $self->_format_name($test),
+    my $session = $class->new(
+        {   name      => $test,
             formatter => $self,
             parser    => $parser
         }
     );
+
+    $session->header;
+
+    return $session;
 }
 
 =head3 C<summary>
@@ -471,62 +457,6 @@ sub _range {
         }
     }
     return @range;
-}
-
-sub _output_test_failure {
-    my ( $self, $parser ) = @_;
-    return if $self->really_quiet;
-
-    my $tests_run     = $parser->tests_run;
-    my $tests_planned = $parser->tests_planned;
-
-    my $total
-      = defined $tests_planned
-      ? $tests_planned
-      : $tests_run;
-
-    my $passed = $parser->passed;
-
-    # The total number of fails includes any tests that were planned but
-    # didn't run
-    my $failed = $parser->failed + $total - $tests_run;
-    my $exit   = $parser->exit;
-
-    # TODO: $flist isn't used anywhere
-    # my $flist  = join ", " => $self->range( $parser->failed );
-
-    if ( my $exit = $parser->exit ) {
-        my $wstat = $parser->wait;
-        my $status = sprintf( "%d (wstat %d, 0x%x)", $exit, $wstat, $wstat );
-        $self->_failure_output(" Dubious, test returned $status\n");
-    }
-
-    if ( $failed == 0 ) {
-        $self->_failure_output(
-            $total
-            ? " All $total subtests passed "
-            : " No subtests run "
-        );
-    }
-    else {
-        $self->_failure_output(" Failed $failed/$total subtests ");
-        if ( !$total ) {
-            $self->_failure_output("\nNo tests run!");
-        }
-    }
-
-    if ( my $skipped = $parser->skipped ) {
-        $passed -= $skipped;
-        my $test = 'subtest' . ( $skipped != 1 ? 's' : '' );
-        $self->_output("\n\t(less $skipped skipped $test: $passed okay)");
-    }
-
-    if ( my $failed = $parser->todo_passed ) {
-        my $test = $failed > 1 ? 'tests' : 'test';
-        $self->_output("\n\t($failed TODO $test unexpectedly succeeded)");
-    }
-
-    $self->_output("\n");
 }
 
 sub _get_output_method {

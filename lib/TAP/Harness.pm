@@ -363,6 +363,7 @@ Any keys for which the value is C<undef> will be ignored.
                     $formatter_args{$name} = $property;
                 }
             }
+
             $formatter_args{jobs} = $self->jobs;
             $self->formatter(
                 TAP::Formatter::Console->new( \%formatter_args ) );
@@ -521,10 +522,10 @@ Make a new parser. Typically used and/or overridden in subclasses.
 sub make_parser {
     my ( $self, $test ) = @_;
 
-    my $formatter = $self->formatter;
-    my $parser    = TAP::Parser->new( $self->_get_parser_args($test) );
+    my $parser = TAP::Parser->new( $self->_get_parser_args($test) );
+
     $self->_make_callback( 'made_parser', $parser );
-    $parser->stash( $formatter->open_test( $test, $parser ) );
+    $parser->stash( $self->formatter->open_test( $test, $parser ) );
 
     return $parser;
 }
@@ -532,8 +533,8 @@ sub make_parser {
 sub _runtest {
     my ( $self, $test ) = @_;
 
-    my $parser    = $self->make_parser($test);
-    my $session   = $parser->stash;
+    my $parser  = $self->make_parser($test);
+    my $session = $parser->stash;
 
     while ( defined( my $result = $parser->next ) ) {
         $session->result($result);
@@ -541,7 +542,6 @@ sub _runtest {
     }
 
     return $self->finish_parser($parser);
-
 }
 
 =head3 C<finish_parser>
@@ -554,9 +554,10 @@ subclasses. The parser isn't destroyed as a result of this.
 sub finish_parser {
     my ( $self, $parser ) = @_;
 
-    my $session = $parser->stash;
-    $session->close_test;
+    $parser->stash->close_test;
     $self->_close_spool($parser);
+
+    # Avoid circularity
     $parser->stash(undef);
     return $parser;
 }
