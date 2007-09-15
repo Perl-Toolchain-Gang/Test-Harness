@@ -851,7 +851,6 @@ failed, any TODO tests unexpectedly succeeded, or any parse errors occurred.
 sub has_problems {
     my $self = shift;
     return $self->failed
-      || $self->todo_passed
       || $self->parse_errors
       || $self->wait
       || $self->exit;

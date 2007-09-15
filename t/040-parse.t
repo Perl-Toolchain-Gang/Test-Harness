@@ -669,7 +669,7 @@ END_TAP
     ok !$parser->failed;
     ok $parser->todo_passed;
 
-    ok $parser->has_problems;
+    ok !$parser->has_problems, 'and has_problems is false';
 
     # now parse_errors
 
