@@ -11,11 +11,14 @@ use File::Spec ();
 use Cwd ();
 use Config;
 
+# TODO probably getopt and something to skip 'prove', nicely format
+# output, etc
 my %knobs = (
     num_lines      => 1000,
     num_test_files => 10,
     num_runs       => 1,
     noisy          => 0,
+    named          => 1,
 );
 
 if(0) { # header
@@ -32,6 +35,11 @@ if(0) { # header
     print "\n";
 }
 
+# for historical benchmarks
+# (because we renamed this, but had both once)
+my $prove_or_runtests =
+    ( -e 'bin/runtests' ? 'bin/runtests' : 'bin/prove' );
+
 my $tmp_dir = File::Temp::tempdir(
     'tapx-' . 'X'x8,
     TMPDIR => 1,
@@ -44,11 +52,10 @@ mkdir('t') or die "cannot create t directory $!";
 
 # just checking raw output handling speed
 my $thetest = 'my $n = ' . $knobs{num_lines} . ';' .
-    <<'THETEST';
-    print "1..$n\n";
-    print "ok $_\n" for (1..$n);
-    # print "#$0";
-THETEST
+    q(print "1..$n\n";) .
+    q(print "ok $_) .
+      ($knobs{named} ? ' whee' : '') . q(\n" for (1..$n);) .
+    q(# print "#$0";);
 
 for my $num (1..$knobs{num_test_files}) {
     my $testfile = sprintf('t/%02d-test.t', $num);
@@ -68,10 +75,10 @@ my @prove = (
 my @runtests = (
     $perl,
     '-I' . File::Spec->catfile( $pwd, 'lib' ),
-    File::Spec->catfile( $pwd, 'bin/prove' )
+    File::Spec->catfile( $pwd, $prove_or_runtests )
 );
 
-my $catch_out = sub {
+my $catch_out = sub { # hmm, should just IPC::Run?
     open(my $TO_OUT, "<&STDOUT") or die "ack1\n";
     close(STDOUT) or die "ack2\n";
     my $catch = '';
@@ -112,6 +119,10 @@ my $res = {
 
 # Ah, the secret is to use the 'nop' to show children
 Benchmark::cmpthese($res, 'nop');
+
+# fake yaml
+print "---\n";
+printf("${_}: %0.3f\n", $res->{$_}[0]) for(qw(prove runtests));
 
 
 # vim:ts=4:sw=4:et:sta
