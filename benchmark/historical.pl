@@ -87,7 +87,9 @@ my $storedata = sub {
     my @markers = grep({$lines[$_] =~ m/^---(?:\s|$)/} 0..$#lines);
     my @yaml = map({$lines[$_]} $markers[-1]..$#lines);
     my ($hash) = YAML::Load(join("\n", @yaml, ''));
-    $prove_time = $hash->{prove} if(exists($hash->{prove}));
+    if($rev eq 'prove') {
+        return($hash->{prove}, $hash->{sp_factor});
+    }
     $revdata{$rev} = $hash->{runtests};
 };
 
@@ -105,31 +107,76 @@ my $sp_factor =
     ($knobs{num_test_files} / 10) *
     ($knobs{num_runs}       / 1);
 warn "speed factor: $sp_factor\n";
-my @opts = map({'--'.$_, $knobs{$_}} keys(%knobs));
+my @opts = (
+    map({'--'.$_, $knobs{$_}} keys(%knobs)),
+);
+
+# get/check the prove value
+my $cache_ok = 0;
+{
+    my $cached_file = 'prove.cached';
+    if(my $out = check_cache($cached_file)) {
+        my $check_sp;
+        ($prove_time, $check_sp) = $storedata->('prove', $out);
+        # verify that the settings haven't changed 
+        if($check_sp == $sp_factor) {
+            $cache_ok = 1;
+            print $out;
+        }
+    }
+    unless($cache_ok) {
+        open(my $fh, '>', $cached_file) or die "$!";
+        my $out = run_rev('trunk', $fh, @opts, '--no-runtests');
+        print $fh "sp_factor: $sp_factor\n";
+        ($prove_time) = $storedata->('prove', $out);
+    }
+}
+
+my $time_est = $prove_time * 1.8 * scalar(@revs);
+warn "estimated time: ", sprintf("%0.0fs", $time_est),
+    ' (' . localtime(time + $time_est) . ")\n";
 
 foreach my $rev (@revs) {
 
     print "#"x72, "\n";
     my $cached_file = "$rev.cached";
-    if(-e $cached_file) {
-        open(my $fh, '<', $cached_file) or
-            die "cannot open cache $cached_file $!";
-        print "cached r$rev\n";
-        my $data = do {local $/; <$fh>};
-        $storedata->($rev, $data);
-        print $data;
+    if($cache_ok and (my $out = check_cache($cached_file))) {
+        print "cached $rev\n", $out;
+        $storedata->($rev, $out);
         next;
     }
 
     open(my $fh, '>', $cached_file) or die "$!";
+    my $out = run_rev($rev, $fh, @opts, '--no-prove');
+    $storedata->($rev, $out);
+}
 
+print "\n\n";
+printf("prove:  1.000 # (by definition) -- %0.3fs\n", $prove_time);
+print map({sprintf("%6s %6s # %s\n",
+    $_.':',
+    sprintf("%0.3f", $revdata{$_}/$prove_time), # points
+    $revmap{$_}||'-'), # comment
+} @revs);
+
+sub check_cache {
+    my ($cached_file) = @_;
+    if(-e $cached_file) {
+        open(my $fh, '<', $cached_file) or
+            die "cannot open cache $cached_file $!";
+        my $data = do {local $/; <$fh>};
+        return($data);
+    }
+    return;
+}
+
+sub run_rev {
+    my ($rev, $fh, @opts) = @_;
     chdir($rev) or die $!;
     print "running $rev\n";
     my $err;
     my $out = '';
-    my @command = (
-        $^X, $bm_file, @opts, ($rev eq 'trunk' ? () : '--noprove')
-    );
+    my @command = ( $^X, $bm_file, @opts );
     print "@command\n" if($rev eq 'trunk');
     IPC::Run::run(
         [ @command ],
@@ -137,17 +184,9 @@ foreach my $rev (@revs) {
             sub {$out .= join('', @_); print $fh @_; print @_}, # tee
         '2>' => \$err,
     ) or die "now what $? $! $err";
-    $storedata->($rev, $out);
     chdir($basedir) or die $!;
+    return($out);
 }
-
-print "\n\n";
-printf("prove: %s\n", $prove_time / $sp_factor);
-print map({sprintf("%6s %6s # %s\n",
-    $_.':',
-    sprintf("%0.3f", $revdata{$_}/$sp_factor), # points
-    $revmap{$_}||'-'), # comment
-} @revs);
 
 sub do_svn {
     my @command = @_;

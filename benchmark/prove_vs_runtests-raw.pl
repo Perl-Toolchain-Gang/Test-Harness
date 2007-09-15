@@ -19,6 +19,7 @@ my %knobs = (
     noisy          => 0,
     named          => 1,
     prove          => 1,
+    runtests       => 1,
 );
 Getopt::Long::GetOptions(\%knobs,
   'num_lines=i',
@@ -27,6 +28,7 @@ Getopt::Long::GetOptions(\%knobs,
   'noisy',
   'named!',
   'prove!',
+  'runtests!',
 ) or die "bad options";
 
 if(0) { # header
@@ -125,7 +127,10 @@ my $res = {
         time_this(prove    => sub {system(@prove) and die;})
         : ()
     ),
-    time_this(runtests => sub {system(@runtests) and die;}),
+    ($knobs{runtests} ?
+        time_this(runtests => sub {system(@runtests) and die;})
+        : ()
+    ),
 };
 
 # Ah, the secret is to use the 'nop' to show children
