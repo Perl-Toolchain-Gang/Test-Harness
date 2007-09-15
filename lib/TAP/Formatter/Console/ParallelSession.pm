@@ -112,10 +112,9 @@ sub _output_ruler {
     my $context   = $shared{$formatter};
 
     # Too much boilerplate!
-    my $output = $self->_output_method;
     my $ruler = sprintf( "===( %7d )", $context->{tests} );
     $ruler .= ( '=' x ( WIDTH - length $ruler ) );
-    $formatter->$output("\r$ruler");
+    $formatter->_output("\r$ruler");
 }
 
 =head3 C<result>
@@ -128,10 +127,7 @@ sub result {
     my ( $self, $result ) = @_;
     my $parser      = $self->parser;
     my $formatter   = $self->formatter;
-    my $prev_result = $self->_prev_result;
     my $context     = $shared{$formatter};
-
-    $self->_prev_result($result);
 
     $self->_refresh;
 
@@ -148,8 +144,8 @@ sub result {
 
     # $self->_plan( '/' . ( $planned || 0 ) . ' ' ) unless $self->_plan;
 
-    $self->_output_method( my $output
-          = $formatter->_get_output_method($parser) );
+    # $self->_output_method( my $output
+    #       = $formatter->_get_output_method($parser) );
 
     if ( $result->is_test ) {
         $context->{tests}++;
@@ -207,8 +203,8 @@ sub close_test {
     my $context   = $shared{$formatter};
 
     $self->_clear_line;
-    my $output = $self->_output_method;
-    $formatter->$output( $self->_pretty_name, ' ' );
+    # my $output = $self->_output_method;
+    $formatter->_output( $formatter->_format_name( $self->name ), ' ' );
 
     if ( $parser->has_problems ) {
         $self->_output_test_failure($parser);
@@ -231,7 +227,7 @@ sub close_test {
     $self->_need_refresh;
 
     unless (@$active) {
-        $self->formatter->$output("\n");
+        $self->formatter->_output("\n");
         delete $shared{$formatter};
     }
 }
