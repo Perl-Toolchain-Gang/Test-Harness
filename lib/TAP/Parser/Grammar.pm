@@ -69,8 +69,7 @@ my %token_for;
           : '';
         $explanation = '' unless defined $explanation;
         return $self->_make_plan_token(
-            $line, $tests_planned, $skip,
-            _trim($explanation),
+            $line, $tests_planned, $skip, $explanation,
         );
     };
 
@@ -96,7 +95,7 @@ my %token_for;
                 my( $ok, $num, $desc ) = ( $1, $2, $3 );
 
                 return $self->_make_test_token(
-                    $line, $ok, $num, _trim($desc)
+                    $line, $ok, $num, $desc
                 );
             }
         },
@@ -114,7 +113,7 @@ my %token_for;
                     ( $desc, $dir, $explanation ) = ( $1, $2, $3 );
                 }
                 return $self->_make_test_token(
-                    $line,   $ok, $num, _trim($desc),
+                    $line,   $ok, $num, $desc,
                     uc $dir, $explanation
                 );
             },
@@ -134,8 +133,7 @@ my %token_for;
                 my ( $self, $line ) = @_;
                 local *__ANON__ = '__ANON__bailout_token_handler';
                 my $explanation = $1;
-                return $self->_make_bailout_token( $line,
-                    _trim($explanation) );
+                return $self->_make_bailout_token( $line, $explanation );
             },
         },
     );
@@ -321,7 +319,7 @@ sub _make_plan_token {
         raw           => $line,
         tests_planned => $tests_planned,
         directive     => $skip,
-        explanation   => $explanation,
+        explanation   => _trim($explanation),
     };
 }
 
@@ -361,7 +359,7 @@ sub _make_bailout_token {
     return {
         type    => 'bailout',
         raw     => $line,
-        bailout => _trim($1)
+        bailout => _trim($explanation)
     };
 }
 
