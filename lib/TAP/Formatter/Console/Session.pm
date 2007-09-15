@@ -189,12 +189,9 @@ sub _closures {
         # Always output directives
         return $result->has_directive if $directives;
 
-        # Nothing else if really quiet
-        return 0 if $really_quiet;
-
         return 1
-          if $self->_should_show_failure($result)
-              || ( $verbose && !$failures );
+          if ( $result->is_test && $failures && !$result->is_ok )
+          || ( $verbose && !$failures );
 
         return 0;
     };
@@ -244,8 +241,6 @@ sub _closures {
 
                 unless ($quiet) {
                     $output_result->($result);
-
-                    # $self->_output_result($result);
                     $formatter->_output("\n");
                 }
             }
@@ -281,13 +276,6 @@ sub _closures {
             }
         },
     };
-}
-
-sub _should_show_failure {
-    my ( $self, $result ) = @_;
-
-    return if !$result->is_test;
-    return $self->formatter->failures && !$result->is_ok;
 }
 
 sub _should_show_count {
