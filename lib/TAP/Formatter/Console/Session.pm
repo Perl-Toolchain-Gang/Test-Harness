@@ -12,22 +12,15 @@ use vars qw($VERSION @ISA);
 
 @ISA = qw(TAP::Base);
 
-my %VALIDATION_FOR;
+my @ACCESSOR;
 
 BEGIN {
-    %VALIDATION_FOR = (
-        name      => sub { shift; shift },
-        formatter => sub { shift; shift },
-        parser    => sub { shift; shift },
-    );
 
-    for my $method ( keys %VALIDATION_FOR ) {
+    @ACCESSOR = qw( name formatter parser );
+
+    for my $method (@ACCESSOR) {
         no strict 'refs';
-        *$method = sub {
-            my $self = shift;
-            return $self->{$method} unless @_;
-            $self->{$method} = shift;
-        };
+        *$method = sub { shift->{$method} };
     }
 
     my @CLOSURE_BINDING = qw( header result close_test );
@@ -94,12 +87,8 @@ sub _initialize {
     $self->SUPER::_initialize($arg_for);
     my %arg_for = %$arg_for;    # force a shallow copy
 
-    for my $name ( keys %VALIDATION_FOR ) {
-        my $property = delete $arg_for{$name};
-        if ( defined $property ) {
-            my $validate = $VALIDATION_FOR{$name};
-            $self->$name( $self->$validate($property) );
-        }
+    for my $name (@ACCESSOR) {
+        $self->{$name} = delete $arg_for{$name};
     }
 
     if ( my @props = keys %arg_for ) {
