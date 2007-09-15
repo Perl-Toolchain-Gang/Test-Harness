@@ -123,6 +123,46 @@ Called to close a test session.
 
 =cut
 
+sub _get_output_result {
+    my $self = shift;
+
+    my @color_map = (
+        {   test => sub { $_->is_test && !$_->is_ok },
+            colors => ['red'],
+        },
+        {   test => sub { $_->is_test && $_->has_skip },
+            colors => [
+                'white',
+                'on_blue'
+            ],
+        },
+        {   test => sub { $_->is_test && $_->has_todo },
+            colors => ['white'],
+        },
+    );
+
+    my $formatter = $self->formatter;
+    my $parser    = $self->parser;
+
+    return $formatter->_colorizer
+      ? sub {
+        my $result = shift;
+        for my $col (@color_map) {
+            local $_ = $result;
+            if ( $col->{test}->() ) {
+                $formatter->_set_colors( @{ $col->{colors} } );
+                last;
+            }
+        }
+        $formatter->_output( $result->as_string );
+        $formatter->_set_colors('reset');
+      }
+      : sub {
+        $formatter->_output( shift->as_string );
+      };
+
+}
+
 sub _closures {
     my $self = shift;
 
@@ -131,8 +171,9 @@ sub _closures {
     my $show_count = $self->_should_show_count;
     my $pretty     = $formatter->_format_name( $self->name );
 
-    my $really_quiet = $formatter->really_quiet;
-    my $quiet        = $formatter->quiet;
+    my $really_quiet  = $formatter->really_quiet;
+    my $quiet         = $formatter->quiet;
+    my $output_result = $self->_get_output_result;
 
     my $print_step      = 1;
     my $output          = '_output';
@@ -146,7 +187,7 @@ sub _closures {
         },
 
         result => sub {
-            my $result = shift;
+            my $result  = shift;
             my $planned = $parser->tests_planned;
 
             if ( $result->is_bailout ) {
@@ -184,7 +225,9 @@ sub _closures {
 
                 # TODO: quiet gets tested here /and/ in _should_display
                 unless ($quiet) {
-                    $self->_output_result($result);
+                    $output_result->($result);
+
+                    # $self->_output_result($result);
                     $formatter->_output("\n");
                 }
             }
@@ -312,40 +355,6 @@ sub _output_test_failure {
     }
 
     $formatter->_output("\n");
-}
-
-{
-    my @COLOR_MAP = (
-        {   test => sub { $_->is_test && !$_->is_ok },
-            colors => ['red'],
-        },
-        {   test => sub { $_->is_test && $_->has_skip },
-            colors => [
-                'white',
-                'on_blue'
-            ],
-        },
-        {   test => sub { $_->is_test && $_->has_todo },
-            colors => ['white'],
-        },
-    );
-
-    sub _output_result {
-        my ( $self, $result ) = @_;
-        my $formatter = $self->formatter;
-        my $parser    = $self->parser;
-        if ( $formatter->_colorizer ) {
-            for my $col (@COLOR_MAP) {
-                local $_ = $result;
-                if ( $col->{test}->() ) {
-                    $formatter->_set_colors( @{ $col->{colors} } );
-                    last;
-                }
-            }
-        }
-        $formatter->_output( $result->as_string );
-        $formatter->_set_colors('reset');
-    }
 }
 
 1;
