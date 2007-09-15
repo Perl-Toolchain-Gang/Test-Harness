@@ -21,20 +21,23 @@ BEGIN {
         parser    => sub { shift; shift },
     );
 
-    my @getter_setters = qw(
-      _prev_result
-      _plan
-      _pretty_name
-      _output_method
-      _newline_printed
-    );
-
-    for my $method ( @getter_setters, keys %VALIDATION_FOR ) {
+    for my $method ( keys %VALIDATION_FOR ) {
         no strict 'refs';
         *$method = sub {
             my $self = shift;
             return $self->{$method} unless @_;
             $self->{$method} = shift;
+        };
+    }
+
+    my @CLOSURE_BINDING = qw( header result close_test );
+
+    for my $method (@CLOSURE_BINDING) {
+        no strict 'refs';
+        *$method = sub {
+            my $self = shift;
+            return ( $self->{_closures} ||= $self->_closures )->{$method}
+              ->(@_);
         };
     }
 }
@@ -103,10 +106,6 @@ sub _initialize {
         $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
     }
 
-    $self->_plan('');
-    $self->_output_method('_output');
-    $self->_pretty_name( $self->formatter->_format_name( $self->name ) );
-
     return $self;
 }
 
@@ -114,77 +113,9 @@ sub _initialize {
 
 Output test preamble
 
-=cut
-
-sub header {
-    my $self      = shift;
-    my $formatter = $self->formatter;
-
-    $formatter->_output( $self->_pretty_name )
-      unless $formatter->really_quiet;
-
-    $self->_newline_printed(0);
-}
-
 =head3 C<result>
 
 Called by the harness for each line of TAP it receives.
-
-=cut
-
-sub result {
-    my ( $self, $result ) = @_;
-
-    my $parser      = $self->parser;
-    my $formatter   = $self->formatter;
-    my $prev_result = $self->_prev_result;
-
-    $self->_prev_result($result);
-
-    my $really_quiet = $formatter->really_quiet;
-    my $show_count   = $self->_should_show_count;
-    my $planned      = $parser->tests_planned;
-
-    if ( $result->is_bailout ) {
-        $formatter->_failure_output(
-                "Bailout called.  Further testing stopped:  "
-              . $result->explanation
-              . "\n" );
-    }
-
-    $self->_plan( '/' . ( $planned || 0 ) . ' ' ) unless $self->_plan;
-
-    $self->_output_method( $formatter->_get_output_method($parser) );
-
-    if ( $show_count and not $really_quiet and $result->is_test ) {
-        my $number = $result->number;
-
-        my $test_print_modulus = 1;
-        my $ceiling            = $number / 5;
-        $test_print_modulus *= 2 while $test_print_modulus < $ceiling;
-
-        unless ( $number % $test_print_modulus ) {
-            my $output = $self->_output_method;
-            $formatter->$output(
-                "\r" . $self->_pretty_name . $number . $self->_plan );
-        }
-    }
-
-    return if $really_quiet;
-
-    if ( $self->_should_display($result) ) {
-        unless ( $self->_newline_printed ) {
-            $formatter->_output("\n") unless $formatter->quiet;
-            $self->_newline_printed(1);
-        }
-
-        # TODO: quiet gets tested here /and/ in _should_display
-        unless ( $formatter->quiet ) {
-            $self->_output_result($result);
-            $formatter->_output("\n");
-        }
-    }
-}
 
 =head3 C<close_test>
 
@@ -192,43 +123,103 @@ Called to close a test session.
 
 =cut
 
-sub close_test {
+sub _closures {
     my $self = shift;
 
-    my $parser       = $self->parser;
-    my $formatter    = $self->formatter;
-    my $output       = $self->_output_method;
+    my $parser     = $self->parser;
+    my $formatter  = $self->formatter;
+    my $show_count = $self->_should_show_count;
+    my $pretty     = $formatter->_format_name( $self->name );
+
     my $really_quiet = $formatter->really_quiet;
-    my $show_count   = $self->_should_show_count;
-    my $leader       = $self->_pretty_name;
+    my $quiet        = $formatter->quiet;
 
-    if ( $show_count && !$really_quiet ) {
-        my $spaces
-          = ' ' x length( '.' . $leader . $self->_plan . $parser->tests_run );
-        $formatter->$output("\r$spaces\r$leader");
-    }
+    my $print_step      = 1;
+    my $output          = '_output';
+    my $plan            = '';
+    my $newline_printed = 0;
 
-    unless ( $parser->has_problems ) {
-        unless ($really_quiet) {
-            my $time_report = '';
-            if ( $formatter->timer ) {
-                my $start_time = $parser->start_time;
-                my $end_time   = $parser->end_time;
-                if ( defined $start_time and defined $end_time ) {
-                    my $elapsed = $end_time - $start_time;
-                    $time_report
-                      = $self->time_is_hires
-                      ? sprintf( ' %5.3f s', $elapsed )
-                      : sprintf( ' %8s s', $elapsed || '<1' );
+    return {
+        header => sub {
+            $formatter->_output($pretty)
+              unless $really_quiet;
+        },
+
+        result => sub {
+            my $result = shift;
+            my $planned = $parser->tests_planned;
+
+            if ( $result->is_bailout ) {
+                $formatter->_failure_output(
+                        "Bailout called.  Further testing stopped:  "
+                      . $result->explanation
+                      . "\n" );
+            }
+
+            return if $really_quiet;
+
+            # These are used in close_test - but only if $really_quiet
+            # is false - so it's safe to only set them here unless that
+            # relationship changes.
+
+            $plan = '/' . ( $planned || 0 ) . ' ' unless $plan;
+            $output = $formatter->_get_output_method($parser);
+
+            if ( $show_count and $result->is_test ) {
+                my $number = $result->number;
+
+                my $ceiling = $number / 5;
+                $print_step *= 2 while $print_step < $ceiling;
+
+                unless ( $number % $print_step ) {
+                    $formatter->$output( "\r" . $pretty . $number . $plan );
                 }
             }
 
-            $formatter->_output("ok$time_report\n");
-        }
-    }
-    else {
-        $self->_output_test_failure($parser);
-    }
+            if ( $self->_should_display($result) ) {
+                unless ( $newline_printed || $quiet ) {
+                    $formatter->_output("\n");
+                    $newline_printed = 1;
+                }
+
+                # TODO: quiet gets tested here /and/ in _should_display
+                unless ($quiet) {
+                    $self->_output_result($result);
+                    $formatter->_output("\n");
+                }
+            }
+        },
+
+        close_test => sub {
+            if ( $show_count && !$really_quiet ) {
+                my $spaces = ' ' x
+                  length( '.' . $pretty . $plan . $parser->tests_run );
+                $formatter->$output("\r$spaces\r$pretty");
+            }
+
+            unless ( $parser->has_problems ) {
+                unless ($really_quiet) {
+                    my $time_report = '';
+                    if ( $formatter->timer ) {
+                        my $start_time = $parser->start_time;
+                        my $end_time   = $parser->end_time;
+                        if ( defined $start_time and defined $end_time ) {
+                            my $elapsed = $end_time - $start_time;
+                            $time_report
+                              = $self->time_is_hires
+                              ? sprintf( ' %5.3f s', $elapsed )
+                              : sprintf( ' %8s s', $elapsed || '<1' );
+                        }
+                    }
+
+                    $formatter->_output("ok$time_report\n");
+                }
+            }
+            else {
+                $self->_output_test_failure($parser);
+            }
+        },
+    };
 }
 
 sub _should_display {
@@ -341,9 +332,8 @@ sub _output_test_failure {
 
     sub _output_result {
         my ( $self, $result ) = @_;
-        my $formatter   = $self->formatter;
-        my $parser      = $self->parser;
-        my $prev_result = $self->_prev_result;
+        my $formatter = $self->formatter;
+        my $parser    = $self->parser;
         if ( $formatter->_colorizer ) {
             for my $col (@COLOR_MAP) {
                 local $_ = $result;
