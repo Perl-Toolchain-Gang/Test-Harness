@@ -5,21 +5,29 @@
 use warnings;
 use strict;
 
+use Getopt::Long ();
 use Benchmark qw(:hireswallclock);
 use File::Temp ();
 use File::Spec ();
 use Cwd ();
 use Config;
 
-# TODO probably getopt and something to skip 'prove', nicely format
-# output, etc
 my %knobs = (
     num_lines      => 1000,
     num_test_files => 10,
     num_runs       => 1,
     noisy          => 0,
     named          => 1,
+    prove          => 1,
 );
+Getopt::Long::GetOptions(\%knobs,
+  'num_lines=i',
+  'num_test_files=i',
+  'num_runs=i',
+  'noisy',
+  'named!',
+  'prove!',
+) or die "bad options";
 
 if(0) { # header
     my @mods = qw(
@@ -113,16 +121,19 @@ if($knobs{noisy}) {
 }
 
 my $res = {
-    time_this(prove    => sub {system(@prove) and die;}),
+    ($knobs{prove} ?
+        time_this(prove    => sub {system(@prove) and die;})
+        : ()
+    ),
     time_this(runtests => sub {system(@runtests) and die;}),
 };
 
 # Ah, the secret is to use the 'nop' to show children
-Benchmark::cmpthese($res, 'nop');
+$knobs{prove} and Benchmark::cmpthese($res, 'nop');
 
 # fake yaml
 print "---\n";
-printf("${_}: %0.3f\n", $res->{$_}[0]) for(qw(prove runtests));
+printf("${_}: %0.3f\n", $res->{$_}[0]) for(keys %$res);
 
 
 # vim:ts=4:sw=4:et:sta
