@@ -88,6 +88,7 @@ my %token_for;
             syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\S*\s*(.*))?\z/i,
             handler => $plan_handler,
         },
+        # An optimization to handle the most common test lines without directives.
         simple_test => {
             syntax  => qr/^($ok) \ ($num) (?:\ ([^#]+))? \z/x,
             handler => sub {
