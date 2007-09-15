@@ -160,7 +160,6 @@ sub _get_output_result {
       : sub {
         $formatter->_output( shift->as_string );
       };
-
 }
 
 sub _closures {
@@ -171,14 +170,34 @@ sub _closures {
     my $show_count = $self->_should_show_count;
     my $pretty     = $formatter->_format_name( $self->name );
 
-    my $really_quiet  = $formatter->really_quiet;
-    my $quiet         = $formatter->quiet;
+    my $really_quiet = $formatter->really_quiet;
+    my $quiet        = $formatter->quiet;
+    my $verbose      = $formatter->verbose;
+    my $directives   = $formatter->directives;
+    my $failures     = $formatter->failures;
+
     my $output_result = $self->_get_output_result;
 
     my $print_step      = 1;
     my $output          = '_output';
     my $plan            = '';
     my $newline_printed = 0;
+
+    my $should_display = sub {
+        my $result = shift;
+
+        # Always output directives
+        return $result->has_directive if $directives;
+
+        # Nothing else if really quiet
+        return 0 if $really_quiet;
+
+        return 1
+          if $self->_should_show_failure($result)
+              || ( $verbose && !$failures );
+
+        return 0;
+    };
 
     return {
         header => sub {
@@ -217,13 +236,12 @@ sub _closures {
                 }
             }
 
-            if ( $self->_should_display($result) ) {
+            if ( $should_display->($result) ) {
                 unless ( $newline_printed || $quiet ) {
                     $formatter->_output("\n");
                     $newline_printed = 1;
                 }
 
-                # TODO: quiet gets tested here /and/ in _should_display
                 unless ($quiet) {
                     $output_result->($result);
 
@@ -263,25 +281,6 @@ sub _closures {
             }
         },
     };
-}
-
-sub _should_display {
-    my ( $self, $result ) = @_;
-
-    my $formatter = $self->formatter;
-    my $parser    = $self->parser;
-
-    # Always output directives
-    return $result->has_directive if $formatter->directives;
-
-    # Nothing else if really quiet
-    return 0 if $formatter->really_quiet;
-
-    return 1
-      if $self->_should_show_failure($result)
-          || ( $formatter->verbose && !$formatter->failures );
-
-    return 0;
 }
 
 sub _should_show_failure {
