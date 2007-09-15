@@ -7,7 +7,9 @@ use File::Path;
 use TAP::Formatter::Console::Session;
 use Carp;
 
+use constant WIDTH => 72;    # Because Eric says
 use vars qw($VERSION @ISA);
+
 @ISA = qw(TAP::Formatter::Console::Session);
 
 my %shared;
@@ -30,6 +32,8 @@ sub _create_shared_context {
     my $self = shift;
     return {
         active => [],
+        tests  => 0,
+        fails  => 0,
     };
 }
 
@@ -84,27 +88,109 @@ sub header {
 }
 
 sub _refresh {
+
+    # my $self      = shift;
+    # my $formatter = $self->formatter;
+    # my $context   = $shared{$formatter};
+    # if ( delete $context->{need_refresh} ) {
+    #     $self->_clear_line;
+    #     for my $test ( @{ $context->{active} } ) {
+    #         $formatter->_output( $test->_pretty_name, "\n" );
+    #     }
+    #     $formatter->_output("\n");
+    # }
+}
+
+sub _clear_line {
+    my $self = shift;
+    $self->formatter->_output( "\r" . ( ' ' x WIDTH ) . "\r" );
+}
+
+sub _output_ruler {
     my $self      = shift;
     my $formatter = $self->formatter;
     my $context   = $shared{$formatter};
-    if ( delete $context->{need_refresh} ) {
-        for my $test ( @{ $context->{active} } ) {
-            $formatter->_output( $test->_pretty_name, "\n" );
-        }
-        $formatter->_output("\n");
-    }
+
+    # Too much boilerplate!
+    my $output = $self->_output_method;
+    my $ruler = sprintf( "===( %7d )", $context->{tests} );
+    $ruler .= ( '=' x ( WIDTH - length $ruler ) );
+    $formatter->$output("\r$ruler");
 }
 
 =head3 C<result>
 
-Called by the harness for each line of TAP it receives.
+  Called by the harness for each line of TAP it receives .
 
 =cut
 
 sub result {
     my ( $self, $result ) = @_;
+    my $parser      = $self->parser;
+    my $formatter   = $self->formatter;
+    my $prev_result = $self->_prev_result;
+    my $context     = $shared{$formatter};
+
+    $self->_prev_result($result);
 
     $self->_refresh;
+
+    # my $really_quiet = $formatter->really_quiet;
+    # my $show_count   = $self->_should_show_count;
+    my $planned = $parser->tests_planned;
+
+    if ( $result->is_bailout ) {
+        $formatter->_failure_output(
+                "Bailout called.  Further testing stopped:  "
+              . $result->explanation
+              . "\n" );
+    }
+
+    # $self->_plan( '/' . ( $planned || 0 ) . ' ' ) unless $self->_plan;
+
+    $self->_output_method( my $output
+          = $formatter->_get_output_method($parser) );
+
+    if ( $result->is_test ) {
+        $context->{tests}++;
+
+        my $test_print_modulus = 1;
+        my $ceiling            = $context->{tests} / 5;
+        $test_print_modulus *= 2 while $test_print_modulus < $ceiling;
+
+        unless ( $context->{tests} % $test_print_modulus ) {
+            $self->_output_ruler;
+        }
+    }
+
+    # if ( $show_count and not $really_quiet and $result->is_test ) {
+    #     my $number = $result->number;
+    #
+    #     my $test_print_modulus = 1;
+    #     my $ceiling            = $number / 5;
+    #     $test_print_modulus *= 2 while $test_print_modulus < $ceiling;
+    #
+    #     unless ( $number % $test_print_modulus ) {
+    #         my $output = $self->_output_method;
+    #         $formatter->$output(
+    #             "\r" . $self->_pretty_name . $number . $self->_plan );
+    #     }
+    # }
+    #
+    # return if $really_quiet;
+    #
+    # if ( $self->_should_display($result) ) {
+    #     unless ( $self->_newline_printed ) {
+    #         $formatter->_output("\n") unless $formatter->quiet;
+    #         $self->_newline_printed(1);
+    #     }
+    #
+    #     # TODO: quiet gets tested here /and/ in _should_display
+    #     unless ( $formatter->quiet ) {
+    #         $self->_output_result($result);
+    #         $formatter->_output("\n");
+    #     }
+    # }
 
     # print ".";
 }
@@ -114,14 +200,28 @@ sub result {
 =cut
 
 sub close_test {
-    my $self = shift;
-    my $name = $self->name;
-    $self->formatter->_output( "Ending ", $name, "\n" );
-
-    # $self->SUPER::close_test;
+    my $self      = shift;
+    my $name      = $self->name;
+    my $parser    = $self->parser;
     my $formatter = $self->formatter;
     my $context   = $shared{$formatter};
-    my $active    = $context->{active};
+
+    $self->_clear_line;
+    my $output = $self->_output_method;
+    $formatter->$output( $self->_pretty_name, ' ' );
+
+    if ( $parser->has_problems ) {
+        $self->_output_test_failure($parser);
+    }
+    else {
+        $formatter->_output("ok\n")
+          unless $formatter->really_quiet;
+    }
+
+    $self->_output_ruler;
+
+    # $self->SUPER::close_test;
+    my $active = $context->{active};
 
     my @pos = grep { $active->[$_]->name eq $name } 0 .. $#$active;
 
@@ -131,7 +231,7 @@ sub close_test {
     $self->_need_refresh;
 
     unless (@$active) {
-        warn "Bye bye!\n";
+        $self->formatter->$output("\n");
         delete $shared{$formatter};
     }
 }

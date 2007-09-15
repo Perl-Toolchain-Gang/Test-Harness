@@ -17,6 +17,7 @@ lib/App/Prove.pm
 lib/TAP/Base.pm
 lib/TAP/Formatter/Color.pm
 lib/TAP/Formatter/Console.pm
+lib/TAP/Formatter/Console/ParallelSession.pm
 lib/TAP/Formatter/Console/Session.pm
 lib/TAP/Harness.pm
 lib/TAP/Parser.pm
