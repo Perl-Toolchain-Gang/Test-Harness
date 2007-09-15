@@ -303,7 +303,7 @@ sub summary {
             $self->_printed_summary_header(0);
             my ($parser) = $aggregate->parsers($test);
             $self->_output_summary_failure(
-                'failed', "  Failed tests:  ",
+                'failed', "  Failed test number(s):  ",
                 $test,    $parser
             );
             $self->_output_summary_failure(
