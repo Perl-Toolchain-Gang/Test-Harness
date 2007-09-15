@@ -103,15 +103,17 @@ sub new {
     my $out = IO::Handle->new;
 
     if ( $class->_use_open3 ) {
+
         # HOTPATCH {{{
         my $xclose = \&IPC::Open3::xclose;
-        local $^W; # no warnings
+        local $^W;    # no warnings
         local *IPC::Open3::xclose = sub {
             my $fh = shift;
             no strict 'refs';
-            return if(fileno($fh) == fileno(STDIN));
+            return if ( fileno($fh) == fileno(STDIN) );
             $xclose->($fh);
         };
+
         # }}}
 
         if ($IS_WIN32) {
@@ -141,11 +143,6 @@ sub new {
           or die "Could not execute ($command): $!";
     }
 
-    if ( $] >= 5.008 ) {
-        eval 'binmode($out, ":utf8")';
-        eval 'binmode($err, ":utf8")' if ref $err;
-    }
-
     my $self = bless {
         out  => $out,
         err  => $err,
@@ -154,6 +151,8 @@ sub new {
         exit => undef,
     }, $class;
 
+    # $self->handle_unicode;
+
     if ( my $teardown = delete $args->{teardown} ) {
         $self->{teardown} = sub {
             $teardown->(@command);
@@ -161,6 +160,21 @@ sub new {
     }
 
     return $self;
+}
+
+=head3 C<handle_unicode>
+
+Upgrade the input stream to handle UTF8.
+
+=cut
+
+sub handle_unicode {
+    my $self = shift;
+    if ( $] >= 5.008 ) {
+        my ( $out, $err ) = ( $self->{out}, $self->{err} );
+        eval 'binmode($out, ":utf8")';
+        eval 'binmode($err, ":utf8")' if ref $err;
+    }
 }
 
 ##############################################################################

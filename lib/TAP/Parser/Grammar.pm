@@ -51,7 +51,7 @@ sub new {
     return $self;
 }
 
-my %token_for;
+my %language_for;
 
 {
 
@@ -87,17 +87,16 @@ my %token_for;
             syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\S*\s*(.*))?\z/i,
             handler => $plan_handler,
         },
-        # An optimization to handle the most common test lines without directives.
+
+    # An optimization to handle the most common test lines without directives.
         simple_test => {
             syntax  => qr/^($ok) \ ($num) (?:\ ([^#]+))? \z/x,
             handler => sub {
-                my( $self, $line ) = @_;
-                my( $ok, $num, $desc ) = ( $1, $2, $3 );
+                my ( $self, $line ) = @_;
+                my ( $ok, $num, $desc ) = ( $1, $2, $3 );
 
-                return $self->_make_test_token(
-                    $line, $ok, $num, $desc
-                );
-            }
+                return $self->_make_test_token( $line, $ok, $num, $desc );
+              }
         },
         test => {
             syntax  => qr/^($ok) \s* ($num)? \s* (.*) \z/x,
@@ -155,9 +154,16 @@ my %token_for;
         },
     );
 
-    %token_for = (
-        '12' => \%v12,
-        '13' => \%v13,
+    %language_for = (
+        '12' => {
+            tokens => \%v12,
+        },
+        '13' => {
+            tokens => \%v13,
+            setup  => sub {
+                shift->{stream}->handle_unicode;
+            },
+        },
     );
 }
 
@@ -179,8 +185,12 @@ sub set_version {
     my $self    = shift;
     my $version = shift;
 
-    if ( my $tokens = $token_for{$version} ) {
-        $self->{tokens} = $tokens;
+    if ( my $language = $language_for{$version} ) {
+        $self->{tokens} = $language->{tokens};
+
+        if ( my $setup = $language->{setup} ) {
+            $self->$setup();
+        }
 
         $self->_order_tokens;
     }
@@ -193,11 +203,11 @@ sub set_version {
 sub _order_tokens {
     my $self = shift;
 
-    my %copy = %{$self->{tokens}};
+    my %copy           = %{ $self->{tokens} };
     my @ordered_tokens = grep defined,
-                         map  { delete $copy{$_} } qw(simple_test test comment plan);
+      map { delete $copy{$_} } qw(simple_test test comment plan);
     push @ordered_tokens, values %copy;
-    
+
     $self->{ordered_tokens} = \@ordered_tokens;
 }
 

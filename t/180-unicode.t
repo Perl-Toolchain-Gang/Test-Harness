@@ -55,10 +55,12 @@ BEGIN {
     @schedule = (
         {   name   => 'Non-unicode warm up',
             source => [
+                'TAP version 13',
                 '1..1',
                 'ok 1 Everything is fine',
             ],
             expect => [
+                { isa => 'TAP::Parser::Result::Version', },
                 { isa => 'TAP::Parser::Result::Plan', },
                 {   isa         => 'TAP::Parser::Result::Test',
                     description => "Everything is fine"
@@ -67,12 +69,14 @@ BEGIN {
         },
         {   name   => 'Unicode smiley',
             source => [
+                'TAP version 13',
                 '1..1',
 
                 # Funky quoting / eval to avoid errors on older Perls
                 eval qq{"ok 1 Everything is fine \\x{263a}"},
             ],
             expect => [
+                { isa => 'TAP::Parser::Result::Version', },
                 { isa => 'TAP::Parser::Result::Plan', },
                 {   isa         => 'TAP::Parser::Result::Test',
                     description => eval qq{"Everything is fine \\x{263a}"}

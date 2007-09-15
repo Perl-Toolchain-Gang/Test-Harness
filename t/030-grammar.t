@@ -28,6 +28,8 @@ sub put {
     unshift @$self, @_;
 }
 
+sub handle_unicode {}
+
 package main;
 
 my $stream = SS->new;

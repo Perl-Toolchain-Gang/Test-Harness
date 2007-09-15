@@ -93,4 +93,13 @@ sub next {
     return $line;
 }
 
+=head3 C<handle_unicode>
+
+If necessary switch the input stream to handle unicode. This only has
+any effect for I/O handle based streams.
+
+=cut
+
+sub handle_unicode { }
+
 1;
