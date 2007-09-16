@@ -151,8 +151,6 @@ sub new {
         exit => undef,
     }, $class;
 
-    # $self->handle_unicode;
-
     if ( my $teardown = delete $args->{teardown} ) {
         $self->{teardown} = sub {
             $teardown->(@command);
