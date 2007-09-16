@@ -26,7 +26,6 @@ Version 2.99_03
 $VERSION = '2.99_03';
 
 my $DEFAULT_TAP_VERSION = 12;
-my $STRICT_TAP_VERSION  = 13;
 my $MAX_TAP_VERSION     = 13;
 
 $ENV{TAP_VERSION} = $MAX_TAP_VERSION;
@@ -852,7 +851,6 @@ failed, any TODO tests unexpectedly succeeded, or any parse errors occurred.
 sub has_problems {
     my $self = shift;
     return $self->failed
-      || $self->tests_run == 0
       || $self->parse_errors
       || $self->wait
       || $self->exit;
@@ -865,19 +863,6 @@ sub has_problems {
 Once the parser is done, this will return the version number for the
 parsed TAP. Version numbers were introduced with TAP version 13 so if no
 version number is found version 12 is assumed.
-
-=head3 C<strict>
-
-When TAP::Parser detects that it is parsing TAP version 13 or later
-(because it sees a TAP version header) it enters strict mode.
-
-In strict mode it becomes less tolerant of missing plans, badly formed
-skips and a number of other minor TAP syntax problems. It also assumes
-that the TAP stream is UTF8 encoded.
-
-=cut
-
-sub strict { shift->version >= $STRICT_TAP_VERSION }
 
 =head3 C<exit>
 
@@ -1032,7 +1017,7 @@ sub _make_state_table {
             },
         },
         yaml => {
-            act => sub { },
+            act => sub {},
         },
     );
 
@@ -1231,14 +1216,11 @@ sub _finish {
     $self->end_time( $self->get_time );
 
     # sanity checks
-    if ( $self->plan ) {
-        $self->is_good_plan(1)
-          unless defined $self->is_good_plan;
+    if ( !$self->plan ) {
+        $self->_add_error("No plan found in TAP output");
     }
     else {
-        $self->is_good_plan(0);
-        $self->_add_error("No plan found in TAP output")
-          if $self->strict;
+        $self->is_good_plan(1) unless defined $self->is_good_plan;
     }
     if ( $self->tests_run != ( $self->tests_planned || 0 ) ) {
         $self->is_good_plan(0);
@@ -1272,9 +1254,9 @@ Delete and return the spool.
 =cut
 
 sub delete_spool {
-    my $self = shift;
+  my $self = shift;
 
-    delete( $self->{_spool} );
+  delete($self->{_spool});
 }
 
 ##############################################################################

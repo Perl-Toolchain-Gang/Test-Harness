@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 267;
+use Test::More tests => 265;
 use IO::Capture;
 
 use File::Spec;
@@ -51,7 +51,6 @@ can_ok $PARSER, 'new';
 ok my $parser = $PARSER->new( { tap => $tap } ),
   '... and calling it should succeed';
 isa_ok $parser, $PARSER, '... and the object it returns';
-ok !$parser->strict, '... parser switched to strict mode';
 
 ok $ENV{TAP_VERSION}, 'TAP_VERSION env variable should be set';
 
@@ -63,7 +62,6 @@ is scalar @results, 12, '... and there should be one for each line';
 my $version = shift @results;
 isa_ok $version, $VERSION;
 is $version->version, '13', '... and the version should be 13';
-ok $parser->strict, '... parser switched to strict mode';
 
 # check the test plan
 
@@ -857,7 +855,7 @@ END_TAP
         is $result, undef, 'iterator dies';
 
         my @errors = $parser->parse_errors;
-        is @errors, 1, '...and caught expected errors';
+        is @errors, 2, '...and caught expected errrors';
 
         like shift @errors, qr/this is the dying iterator/,
           '...and it was what we expected';
@@ -889,7 +887,7 @@ END_TAP
         is $result, undef, 'iterator dies';
 
         my @errors = $parser->parse_errors;
-        is @errors, 1, '...and caught expected errrors';
+        is @errors, 2, '...and caught expected errrors';
 
         like shift @errors, qr/this is the dying iterator/,
           '...and it was what we expected';

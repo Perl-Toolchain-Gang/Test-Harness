@@ -406,6 +406,10 @@ foreach my $test_args ( get_arg_sets() ) {
     @expected = (
         't/sample-tests/no_output....',
         'No subtests run',
+        'Test Summary Report',
+        '-------------------',
+        't/sample-tests/no_output (Wstat: 0 Tests: 0 Failed: 0)',
+        'Parse errors: No plan found in TAP output',
     );
 
     $status  = pop @output;

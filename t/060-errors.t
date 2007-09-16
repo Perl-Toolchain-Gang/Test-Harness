@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 24;
+use Test::More tests => 23;
 
 use TAP::Parser;
 
@@ -106,15 +106,6 @@ not ok 2 - first line of the input valid # todo some data
 ok 2 read the rest of the file
 END_TAP
 
-is $parser->parse_errors, 1, 'No plan, no error if V<13';
-
-$parser = _parser(<<'END_TAP');
-TAP version 13
-ok 1 - input file opened
-not ok 2 - first line of the input valid # todo some data
-ok 2 read the rest of the file
-END_TAP
-
 is $parser->parse_errors, 2,
   'Having two errors in the TAP should result in two errors (duh)';
 my $expected = [
@@ -125,7 +116,6 @@ is_deeply [ $parser->parse_errors ], $expected,
   '... and they should be the correct errors';
 
 $parser = _parser(<<'END_TAP');
-TAP version 13
 ok 1 - input file opened
 not ok 2 - first line of the input valid # todo some data
 ok 3 read the rest of the file

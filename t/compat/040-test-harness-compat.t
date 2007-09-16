@@ -13,7 +13,6 @@ use Test::Harness qw(execute_tests);
 local $ENV{HARNESS_PERL_SWITCHES};
 
 {
-
     # if the harness wants to save the resulting TAP we shouldn't
     # do it for our internal calls
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
@@ -105,6 +104,14 @@ local $ENV{HARNESS_PERL_SWITCHES};
                     'name'   => 't/sample-tests/no_nums',
                     'wstat'  => ''
                 },
+                't/sample-tests/no_output' => {
+                    'canon'  => '??',
+                    'estat'  => '',
+                    'failed' => '??',
+                    'max'    => '??',
+                    'name'   => 't/sample-tests/no_output',
+                    'wstat'  => ''
+                },
                 't/sample-tests/simple_fail' => {
                     'canon'  => '2 5',
                     'estat'  => '',
@@ -157,10 +164,10 @@ local $ENV{HARNESS_PERL_SWITCHES};
                 }
             },
             'totals' => {
-                'bad'         => 12,
+                'bad'         => 13,
                 'bonus'       => 1,
                 'files'       => 28,
-                'good'        => 16,
+                'good'        => 15,
                 'max'         => 77,
                 'ok'          => 78,
                 'skipped'     => 2,
@@ -393,13 +400,22 @@ local $ENV{HARNESS_PERL_SWITCHES};
             }
         },
         'no_output' => {
-            'failed' => {},
+            'failed' => {
+                't/sample-tests/no_output' => {
+                    'canon'  => '??',
+                    'estat'  => '',
+                    'failed' => '??',
+                    'max'    => '??',
+                    'name'   => 't/sample-tests/no_output',
+                    'wstat'  => ''
+                }
+            },
             'todo'   => {},
             'totals' => {
-                'bad'         => 0,
+                'bad'         => 1,
                 'bonus'       => 0,
                 'files'       => 1,
-                'good'        => 1,
+                'good'        => 0,
                 'max'         => 0,
                 'ok'          => 0,
                 'skipped'     => 0,

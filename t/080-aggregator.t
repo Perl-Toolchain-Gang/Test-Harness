@@ -197,7 +197,6 @@ ok $agg->has_problems,
 $agg = TAP::Parser::Aggregator->new();
 
 $tap = <<'END_TAP';
-TAP version 13
 1..-1
 END_TAP
 
