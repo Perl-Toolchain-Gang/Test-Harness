@@ -172,19 +172,6 @@ sub _closures {
     my $plan            = '';
     my $newline_printed = 0;
 
-    my $should_display = sub {
-        my $result = shift;
-
-        # Always output directives
-        return $result->has_directive if $directives;
-
-        return 1
-          if ( $result->is_test && $failures && !$result->is_ok )
-          || ( $verbose && !$failures );
-
-        return 0;
-    };
-
     return {
         header => sub {
             $formatter->_output($pretty)
@@ -192,8 +179,7 @@ sub _closures {
         },
 
         result => sub {
-            my $result  = shift;
-            my $planned = $parser->tests_planned;
+            my $result = shift;
 
             if ( $result->is_bailout ) {
                 $formatter->_failure_output(
@@ -204,6 +190,9 @@ sub _closures {
 
             return if $really_quiet;
 
+            my $planned = $parser->tests_planned;
+            my $is_test = $result->is_test;
+
             # These are used in close_test - but only if $really_quiet
             # is false - so it's safe to only set them here unless that
             # relationship changes.
@@ -211,27 +200,29 @@ sub _closures {
             $plan = '/' . ( $planned || 0 ) . ' ' unless $plan;
             $output = $formatter->_get_output_method($parser);
 
-            if ( $show_count and $result->is_test ) {
+            if ( $show_count and $is_test ) {
                 my $number = $result->number;
 
                 my $ceiling = $number / 5;
                 $print_step *= 2 while $print_step < $ceiling;
 
                 unless ( $number % $print_step ) {
-                    $formatter->$output( "\r" . $pretty . $number . $plan );
+                    $formatter->$output("\r$pretty$number$plan");
                 }
             }
 
-            if ( $should_display->($result) ) {
-                unless ( $newline_printed || $quiet ) {
+            if (!$quiet
+                && (   ( $verbose && !$failures )
+                    || ( $is_test && $failures && !$result->is_ok )
+                    || ( $result->has_directive && $directives ) )
+              )
+            {
+                unless ($newline_printed) {
                     $formatter->_output("\n");
                     $newline_printed = 1;
                 }
-
-                unless ($quiet) {
-                    $output_result->($result);
-                    $formatter->_output("\n");
-                }
+                $output_result->($result);
+                $formatter->_output("\n");
             }
         },
 
