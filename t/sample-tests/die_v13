@@ -1,0 +1,3 @@
+print "TAP version 13\n";
+eval "use vmsish 'hushed'" if ($^O eq 'VMS');
+exit 1;  # exit because die() can be noisy

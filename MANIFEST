@@ -89,8 +89,10 @@ t/sample-tests/descriptive
 t/sample-tests/descriptive_trailing
 t/sample-tests/die
 t/sample-tests/die_head_end
+t/sample-tests/die_head_end_v13
 t/sample-tests/die_last_minute
 t/sample-tests/die_unfinished
+t/sample-tests/die_v13
 t/sample-tests/duplicates
 t/sample-tests/empty
 t/sample-tests/escape_eol
