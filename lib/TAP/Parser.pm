@@ -958,7 +958,6 @@ sub _make_state_table {
         version => {
             act => sub {
                 my ($version) = @_;
-                local *__ANON__ = '__ANON__bad_version_handler';
                 $self->_add_error(
                     "If TAP version is present it must be the first line of output"
                 );
@@ -971,7 +970,6 @@ sub _make_state_table {
         plan => {
             act => sub {
                 my ($plan) = @_;
-                local *__ANON__ = '__ANON__plan_handler';
                 $self->tests_planned( $plan->tests_planned );
                 $self->plan( $plan->plan );
             },
@@ -979,45 +977,48 @@ sub _make_state_table {
         test => {
             act => sub {
                 my ($test) = @_;
-                local *__ANON__ = '__ANON__test_handler';
 
-                $self->in_todo( $test->has_todo );
-                $self->{tests_run}++;
+                my ( $has_todo, $number, $tests_run )
+                  = ( $test->has_todo, $test->number, ++$self->{tests_run} );
+
+                $self->in_todo($has_todo);
                 if ( defined( my $tests_planned = $self->tests_planned ) ) {
-                    if ( $self->tests_run > $tests_planned ) {
+                    if ( $tests_run > $tests_planned ) {
                         $test->is_unplanned(1);
                     }
                 }
 
-                if ( $test->number ) {
-                    if ( $test->number != $self->tests_run ) {
-                        my $number = $test->number;
-                        my $count  = $self->tests_run;
+                if ($number) {
+                    if ( $number != $tests_run ) {
+                        my $count = $tests_run;
                         $self->_add_error(
                             "Tests out of sequence.  Found ($number) but expected ($count)"
                         );
                     }
                 }
                 else {
-                    $test->_number( $self->tests_run );
+                    $test->_number( $number = $tests_run );
                 }
 
-                my $num = $test->number;
+                push @{ $self->{todo} } => $number if $has_todo;
+                push @{ $self->{todo_passed} } => $number
+                  if $test->todo_passed;
+                push @{ $self->{skipped} } => $number if $test->has_skip;
 
-                push @{ $self->{todo} }        => $num if $test->has_todo;
-                push @{ $self->{todo_passed} } => $num if $test->todo_passed;
-                push @{ $self->{passed} }      => $num if $test->is_ok;
-                push @{ $self->{actual_passed} } => $num
-                  if $test->is_actual_ok;
-                push @{ $self->{skipped} } => $num if $test->has_skip;
+                push @{ $self->{ $test->is_ok ? 'passed' : 'failed' } } =>
+                  $number;
+                push @{
+                    $self->{
+                        $test->is_actual_ok
+                        ? 'actual_passed'
+                        : 'actual_failed'
+                      }
+                  } => $number;
 
-                push @{ $self->{actual_failed} } => $num
-                  if !$test->is_actual_ok;
-                push @{ $self->{failed} } => $num if !$test->is_ok;
             },
         },
         yaml => {
-            act => sub {},
+            act => sub { },
         },
     );
 
@@ -1031,7 +1032,6 @@ sub _make_state_table {
             version => {
                 act => sub {
                     my ($version) = @_;
-                    local *__ANON__ = '__ANON__version_handler';
                     my $ver_num = $version->version;
                     if ( $ver_num <= $DEFAULT_TAP_VERSION ) {
                         my $ver_min = $DEFAULT_TAP_VERSION + 1;
@@ -1064,7 +1064,6 @@ sub _make_state_table {
             plan => {
                 act => sub {
                     my ($version) = @_;
-                    local *__ANON__ = '__ANON__multiple_plan_handler';
                     $self->_add_error(
                         "More than one plan found in TAP output");
                 },
@@ -1254,9 +1253,9 @@ Delete and return the spool.
 =cut
 
 sub delete_spool {
-  my $self = shift;
+    my $self = shift;
 
-  delete($self->{_spool});
+    delete( $self->{_spool} );
 }
 
 ##############################################################################
