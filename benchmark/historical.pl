@@ -32,6 +32,7 @@ my $revs = <<REVISIONS;
     546 Another small speed hike
     547 More minor speed-ups
     548 Banish accessor bloat
+    554 More accessor shaving
 REVISIONS
 
 # parse it out into a map and list
@@ -68,7 +69,7 @@ foreach my $rev (@revs) {
         #do_svn(qw(up -q), "$rev/benchmark");
     }
     else {
-        system('cp', '-a', 'trunk', $rev) and die "ack $? $!";
+        system('cp', '-r', 'trunk', $rev) and die "ack $? $!";
         do_svn(qw(up -q -r ), $rev, "$rev/lib", "$rev/bin");
     }
 
