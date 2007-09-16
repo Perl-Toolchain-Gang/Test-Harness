@@ -60,7 +60,6 @@ my %language_for;
     my $num          = qr/\d+/;
     my $plan_handler = sub {
         my ( $self, $line ) = @_;
-        local *__ANON__ = '__ANON__plan_token_handler';
         my $tests_planned = $1;
         my $explanation   = $2;
         my $skip
@@ -78,7 +77,6 @@ my %language_for;
             syntax  => qr/^TAP\s+version\s+(\d+)\s*\z/i,
             handler => sub {
                 my ( $self, $line ) = @_;
-                local *__ANON__ = '__ANON__version_token_handler';
                 my $version = $1;
                 return $self->_make_version_token( $line, $version, );
             },
@@ -102,7 +100,6 @@ my %language_for;
             syntax  => qr/^($ok) \s* ($num)? \s* (.*) \z/x,
             handler => sub {
                 my ( $self, $line ) = @_;
-                local *__ANON__ = '__ANON__test_token_handler';
                 my ( $ok, $num, $desc ) = ( $1, $2, $3 );
                 my ( $dir, $explanation ) = ( '', '' );
                 if ($desc =~ m/^ ( [^\\\#]* (?: \\. [^\\\#]* )* ) 
@@ -121,7 +118,6 @@ my %language_for;
             syntax  => qr/^#(.*)/,
             handler => sub {
                 my ( $self, $line ) = @_;
-                local *__ANON__ = '__ANON__comment_token_handler';
                 my $comment = $1;
                 return $self->_make_comment_token( $line, $comment );
             },
@@ -130,7 +126,6 @@ my %language_for;
             syntax  => qr/^Bail out!\s*(.*)/,
             handler => sub {
                 my ( $self, $line ) = @_;
-                local *__ANON__ = '__ANON__bailout_token_handler';
                 my $explanation = $1;
                 return $self->_make_bailout_token( $line, $explanation );
             },
@@ -147,7 +142,6 @@ my %language_for;
             syntax  => qr/^ (\s+) (---.*) $/x,
             handler => sub {
                 my ( $self, $line ) = @_;
-                local *__ANON__ = '__ANON__yaml_token_handler';
                 my ( $pad, $marker ) = ( $1, $2 );
                 return $self->_make_yaml_token( $pad, $marker );
             },
