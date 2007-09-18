@@ -579,6 +579,7 @@ sub _open_spool {
         my $spool_handle = IO::Handle->new;
         open( $spool_handle, ">$spool" )
           or $self->_croak(" Can't write $spool ( $! ) ");
+
         return $spool_handle;
     }
 
