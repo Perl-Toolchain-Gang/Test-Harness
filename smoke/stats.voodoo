@@ -1,0 +1,6 @@
+---
+svn: /opt/local/bin/svn
+work: ~/.tapx-stats
+description: MacBook Pro
+repository: http://svn.hexten.net/tapx/trunk
+first: 73
