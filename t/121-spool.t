@@ -33,7 +33,8 @@ BEGIN {
                     return CORE::open( $handle, $_[1] );
                 }
                 else {
-                    return CORE::open( $handle, $_[1], @_[ 2 .. $#_ ] );
+                    die;
+                    # return CORE::open( $handle, $_[1], @_[ 2 .. $#_ ] );
                 }
             }
         }
