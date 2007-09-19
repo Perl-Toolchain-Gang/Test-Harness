@@ -33,8 +33,7 @@ BEGIN {
                     return CORE::open( $handle, $_[1] );
                 }
                 else {
-                    die;
-                    # return CORE::open( $handle, $_[1], @_[ 2 .. $#_ ] );
+                    die "Can't open with more than two args";
                 }
             }
         }
