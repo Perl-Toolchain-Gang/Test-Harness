@@ -365,7 +365,7 @@ sub print_version {
     my $self = shift;
     printf(
         "TAP::Harness v%s and Perl v%vd\n",
-        $Tap::Harness::VERSION, $^V
+        $TAP::Harness::VERSION, $^V
     );
 }
 
