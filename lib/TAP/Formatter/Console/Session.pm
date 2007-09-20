@@ -241,10 +241,10 @@ sub _closures {
                         my $end_time   = $parser->end_time;
                         if ( defined $start_time and defined $end_time ) {
                             my $elapsed = $end_time - $start_time;
-                            $time_report
-                              = $self->time_is_hires
-                              ? sprintf( ' %5.3f s', $elapsed )
-                              : sprintf( ' %8s s', $elapsed || '<1' );
+                            $time_report =
+                                $self->time_is_hires
+                                    ? sprintf( ' %8d ms', $elapsed * 1000 )
+                                    : sprintf( ' %8s s', $elapsed || '<1' );
                         }
                     }
 
