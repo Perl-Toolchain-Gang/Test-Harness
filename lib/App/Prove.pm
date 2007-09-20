@@ -118,7 +118,7 @@ sub process_args {
             't' => \$self->{taint_warn},
             'W' => \$self->{warnings_fail},
             'w' => \$self->{warnings_warn},
-        );
+        ) or exit(1);
 
         # Stash the remainder of argv for later
         $self->{argv} = [@ARGV];

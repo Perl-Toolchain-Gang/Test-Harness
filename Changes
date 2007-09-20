@@ -5,6 +5,7 @@ Revision history for TAP-Parser
         - Relaxed strict parsing of skip plan for pre v13 TAP.
         - Elapsed hi-res time is now displayed in integer milliseconds
           instead of fractional seconds.
+        - prove stops running if any command-line switches are invalid.
 
 2.99_02 2007-09-07
         - Ensure prove (and App::Prove) sort any recursively
