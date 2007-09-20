@@ -20,6 +20,7 @@ prove - Run tests through a TAP harness.
 =head1 OPTIONS
 
 Boolean options:
+
  -v,  --verbose     Print all test lines.
  -l,  --lib         Add 'lib' to the path for your tests (-Ilib).
  -b,  --blib        Add 'blib/lib' to the path for your tests (-Iblib/lib).
@@ -44,6 +45,7 @@ Boolean options:
  -H,  --man         Longer manpage for prove
 
 Options that take arguments:
+
  -I                 Library paths to include.
  -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
       --harness     Define test harness to use.  See TAP::Harness.
