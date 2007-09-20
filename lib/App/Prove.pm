@@ -70,6 +70,13 @@ BEGIN {
 
 =head3 C<process_args>
 
+  $prove->process_args(@args);
+
+Processes the command-line arguments and stashes the remainders in the
+C<$self->{args}> array-ref.
+
+Dies on invalid arguments.
+
 =cut
 
 sub process_args {
@@ -118,7 +125,7 @@ sub process_args {
             't' => \$self->{taint_warn},
             'W' => \$self->{warnings_fail},
             'w' => \$self->{warnings_warn},
-        ) or exit(1);
+        ) or croak("bad options");
 
         # Stash the remainder of argv for later
         $self->{argv} = [@ARGV];
