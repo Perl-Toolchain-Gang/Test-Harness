@@ -125,7 +125,7 @@ sub process_args {
             't' => \$self->{taint_warn},
             'W' => \$self->{warnings_fail},
             'w' => \$self->{warnings_warn},
-        ) or croak("bad options");
+        ) or croak( 'Unable to continue' );
 
         # Stash the remainder of argv for later
         $self->{argv} = [@ARGV];
