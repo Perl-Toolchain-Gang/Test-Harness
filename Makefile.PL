@@ -10,22 +10,26 @@ my $Have_Testcover = eval {
     1;
 };
 
-WriteMakefile(
+my %mm_args = (
     'NAME'         => 'Test::Harness',
     'VERSION_FROM' => 'lib/Test/Harness.pm',
     'PREREQ_PM'    => {
-	'File::Spec'	=> 0.8,
+        'File::Spec' => 0.8,
     },
     'INSTALLDIRS' => 'perl',
     'PL_FILES'    => {},
-    ($ExtUtils::MakeMaker::VERSION >= 6.31 ? (LICENSE         => 'perl') : ()),
     'test'        => { 'TESTS' => 't/*.t t/compat/*.t' },
-    'EXE_FILES'   => ["bin/prove"],
+    'EXE_FILES'   => ['bin/prove'],
 );
+
+if ( $ExtUtils::MakeMaker::VERSION >= 6.31 ) {
+    $mm_args{LICENSE} = 'perl';
+}
+WriteMakefile( %mm_args );
 
 {
     package MY;
-    
+
     sub postamble {
         if( $Have_Testcover ) {
             return testcover();
