@@ -85,7 +85,7 @@ BEGIN {    # making accessors
     use TAP::Parser;
 
     my $parser = TAP::Parser->new( { source => $source } );
-    
+
     while ( my $result = $parser->next ) {
         print $result->as_string;
     }
@@ -1101,15 +1101,15 @@ sub _make_state_table {
     );
 
     # Apply globals and defaults to state table
-    for my $name ( keys %states ) {
+    for my $name ( sort keys %states ) {
 
         # Merge with globals
         my $st = { %state_globals, %{ $states{$name} } };
 
         # Add defaults
-        for my $next ( keys %$st ) {
+        for my $next ( sort keys %{$st} ) {
             if ( my $default = $state_defaults{$next} ) {
-                for my $def ( keys %$default ) {
+                for my $def ( sort keys %{$default} ) {
                     $st->{$next}->{$def} ||= $default->{$def};
                 }
             }
