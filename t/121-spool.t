@@ -49,11 +49,10 @@ BEGIN {
 
 }
 
-# eval "require TAP::Harness";
-
 use TAP::Harness;
+use TAP::Parser;
 
-plan tests => 2;
+plan tests => 4;
 
 {
 
@@ -91,9 +90,41 @@ plan tests => 2;
 
     is @die, 1, 'open failed, die as expected';
 
-    my $spool = File::Spec->catfile(qw(t spool source_tests harness));
+    my $spoolDir = File::Spec->catfile( qw( t spool source_tests harness ) );
 
-    like pop @die, qr/ Can't write $spool [(] /, '...with expected message';
+    like pop @die, qr/ Can't write $spoolDir [(] /, '...with expected message';
 
-    # TODO do the close coverage, but we need to create a parser as well
+    # now make close fail
+
+    use Symbol;
+
+    my $spoolHandle = gensym;
+
+    my $tap = <<'END_TAP';
+1..1
+ok 1 - input file opened
+
+END_TAP
+
+    my $parser = TAP::Parser->new( {
+				    spool => $spoolHandle,
+				    stream => TAP::Parser::Iterator->new([ split /\n/ => $tap ])
+				   } );
+
+    @die = ();
+
+    eval {
+      local $SIG{__DIE__} = sub {push @die, @_ };
+
+      # use the broken CORE::close
+      $useOrigClose = 0;
+
+      TAP::Harness->_close_spool( $parser );
+
+      $useOrigClose = 1;
+    };
+
+    is @die, 1, 'close failed, die as expected';
+
+    like pop @die, qr/ Error closing TAP spool file[(] /, '...with expected message';
 }
