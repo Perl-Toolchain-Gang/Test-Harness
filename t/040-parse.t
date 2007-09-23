@@ -768,7 +768,7 @@ END_TAP
     is @errors, 1, 'test too high version number';
 
     like pop @errors,
-      qr/TAP specified version 14 but we don't about versions later than 13/,
+      qr/TAP specified version 14 but we don't know about versions later than 13/,
       '... and trapped expected version error';
 }
 

@@ -959,7 +959,7 @@ sub _make_state_table {
             act => sub {
                 my ($version) = @_;
                 $self->_add_error(
-                    "If TAP version is present it must be the first line of output"
+                    'If TAP version is present it must be the first line of output'
                 );
             },
         },
@@ -1042,7 +1042,7 @@ sub _make_state_table {
                     }
                     if ( $ver_num > $MAX_TAP_VERSION ) {
                         $self->_add_error(
-                                "TAP specified version $ver_num but we don't "
+                                "TAP specified version $ver_num but we don't know "
                               . "about versions later than $MAX_TAP_VERSION"
                         );
                         $ver_num = $MAX_TAP_VERSION;
@@ -1163,7 +1163,7 @@ sub _iter {
                 $next_state->($result);
 
                 if ( my $code = $self->_callback_for( $result->type ) ) {
-                    $_->($result) for @$code;
+                    $_->($result) for @{$code};
                 }
                 else {
                     $self->_make_callback( 'ELSE', $result );
@@ -1172,7 +1172,7 @@ sub _iter {
                 $self->_make_callback( 'ALL', $result );
 
                 # Echo TAP to spool file
-                print $spool $result->raw, "\n" if $spool;
+                print {$spool} $result->raw, "\n" if $spool;
             }
             else {
                 $self->exit( $stream->exit );
@@ -1196,7 +1196,7 @@ sub _iter {
                 $next_state->($result);
 
                 # Echo TAP to spool file
-                print $spool $result->raw, "\n" if $spool;
+                print {$spool} $result->raw, "\n" if $spool;
             }
             else {
                 $self->exit( $stream->exit );
@@ -1216,7 +1216,7 @@ sub _finish {
 
     # sanity checks
     if ( !$self->plan ) {
-        $self->_add_error("No plan found in TAP output");
+        $self->_add_error('No plan found in TAP output');
     }
     else {
         $self->is_good_plan(1) unless defined $self->is_good_plan;
