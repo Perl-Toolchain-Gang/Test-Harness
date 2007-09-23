@@ -24,9 +24,27 @@ sub ACTION_testreference {
 
 
 sub ACTION_testauthor {
-      my $self = shift;
-      $self->test_files('t', 'xt/author');
-      $self->generic_test( type => 'default' );
+    my $self = shift;
+    $self->test_files('t', 'xt/author');
+    $self->generic_test( type => 'default' );
+}
+
+
+sub ACTION_critic {
+    exec(qw(perlcritic -1 -q -profile perlcriticrc
+            bin/prove lib/), glob('t/*.t')
+    );
+}
+
+
+sub ACTION_tags {
+    exec(qw(ctags -f tags --recurse --totals
+         --exclude=blib
+         --exclude=.svn
+         --exclude='*~'
+         --languages=Perl
+         t/ lib/ bin/prove
+    ));
 }
 
 1;

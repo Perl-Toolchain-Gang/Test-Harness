@@ -1,14 +1,11 @@
 #!/usr/bin/perl -w
 
+# This Makefile.PL is provided for installation compatibility.
+# Extra developer actions are in the Build.PL.
+
 use ExtUtils::MakeMaker qw/WriteMakefile prompt/;
 
 use strict;
-
-my $Have_Testcover = eval {
-    require ExtUtils::MakeMaker::Coverage;
-    ExtUtils::MakeMaker::Coverage->import;
-    1;
-};
 
 my %mm_args = (
     'NAME'         => 'Test::Harness',
@@ -29,33 +26,6 @@ WriteMakefile( %mm_args );
 
 {
     package MY;
-
-    sub postamble {
-        my $tc;
-        if ( $Have_Testcover ) {
-            $tc = testcover();
-        }
-        else {
-            $tc = <<'EOF';
-testcover :
-	$(NOECHO) $(ECHO) To enable testcover, install ExtUtils::MakeMaker::Coverage and rerun Makefile.PL.
-EOF
-        }
-    return <<'EOF' . $tc;
-.PHONY: critic tags
-
-critic:
-	perlcritic -1 -q -profile perlcriticrc bin/prove lib/ t/*.t
-
-tags:
-	ctags -f tags --recurse --totals \
-		--exclude=blib \
-		--exclude=.svn \
-		--exclude='*~' \
-		--languages=Perl \
-		t/ lib/ bin/prove
-EOF
-    }
 
     use File::Spec;
     use Config;
