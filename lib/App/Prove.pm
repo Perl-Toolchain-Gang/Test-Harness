@@ -21,22 +21,15 @@ Version 2.99_03
 
 $VERSION = '2.99_03';
 
-=head1 METHODS
-
-=head2 Class Methods
-
-=head3 C<new>
-
-=cut
+my @ATTR;
 
 BEGIN {
-    my @ATTR = qw(
-      archive argv blib color directives exec failures formatter harness
-      includes jobs lib merge parse quiet really_quiet recurse backwards
-      shuffle taint_fail taint_warn timer verbose warnings_fail
-      warnings_warn
+    @ATTR = qw(
+        archive argv blib color directives exec failures formatter harness
+        includes jobs lib merge parse quiet really_quiet recurse backwards
+        shuffle taint_fail taint_warn timer verbose warnings_fail
+        warnings_warn
     );
-
     for my $attr (@ATTR) {
         no strict 'refs';
         *{ __PACKAGE__ . '::' . $attr } = sub {
@@ -46,26 +39,34 @@ BEGIN {
         };
     }
 
-    sub new {
-        my $class = shift;
-        my $args = shift || {};
+}
 
-        my $self = bless {
-            argv              => [],
-            includes          => [],
-            default_formatter => 'TAP::Harness::Formatter::Basic',
-        }, $class;
+=head1 METHODS
 
-        for my $attr (@ATTR) {
-            if ( exists $args->{$attr} ) {
+=head2 Class Methods
 
-                # TODO: Some validation here
-                $self->{$attr} = $args->{$attr};
-            }
+=head3 C<new>
+
+=cut
+
+sub new {
+    my $class = shift;
+    my $args = shift || {};
+
+    my $self = bless {
+        argv              => [],
+        includes          => [],
+        default_formatter => 'TAP::Harness::Formatter::Basic',
+    }, $class;
+
+    for my $attr (@ATTR) {
+        if ( exists $args->{$attr} ) {
+
+            # TODO: Some validation here
+            $self->{$attr} = $args->{$attr};
         }
-
-        return $self;
     }
+    return $self;
 }
 
 =head3 C<process_args>
