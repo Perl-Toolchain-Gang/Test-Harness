@@ -189,7 +189,7 @@ sub set_version {
     }
     else {
         require Carp;
-        Carp::croak "Unsupported syntax version: $version";
+        Carp::croak("Unsupported syntax version: $version");
     }
 }
 
