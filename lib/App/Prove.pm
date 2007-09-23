@@ -374,6 +374,8 @@ sub print_version {
         "TAP::Harness v%s and Perl v%vd\n",
         $TAP::Harness::VERSION, $^V
     );
+
+    return;
 }
 
 1;

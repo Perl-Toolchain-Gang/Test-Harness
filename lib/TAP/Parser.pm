@@ -1255,7 +1255,7 @@ Delete and return the spool.
 sub delete_spool {
     my $self = shift;
 
-    delete( $self->{_spool} );
+    return delete $self->{_spool};
 }
 
 ##############################################################################

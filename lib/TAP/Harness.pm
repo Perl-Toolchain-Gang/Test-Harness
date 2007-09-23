@@ -100,15 +100,14 @@ BEGIN {
     for my $method ( sort keys %VALIDATION_FOR ) {
         no strict 'refs';
         if ( $method eq 'lib' || $method eq 'switches' ) {
-            *$method = sub {
+            *{$method} = sub {
                 my $self = shift;
                 unless (@_) {
                     $self->{$method} ||= [];
-                    return
-                      wantarray ? @{ $self->{$method} } : $self->{$method};
+                    return wantarray ? @{ $self->{$method} } : $self->{$method};
                 }
                 $self->_croak("Too many arguments to method '$method'")
-                  if @_ > 1;
+                    if @_ > 1;
                 my $args = shift;
                 $args = [$args] unless ref $args;
                 $self->{$method} = $args;
@@ -116,7 +115,7 @@ BEGIN {
             };
         }
         else {
-            *$method = sub {
+            *{$method} = sub {
                 my $self = shift;
                 return $self->{$method} unless @_;
                 $self->{$method} = shift;
@@ -131,7 +130,7 @@ BEGIN {
 
     for my $method ( @AUTO_FORWARD, @FORMATTER_ARGS ) {
         no strict 'refs';
-        *$method = sub {
+        *{$method} = sub {
             my $self = shift;
             return $self->formatter->$method(@_);
         };
@@ -592,8 +591,10 @@ sub _close_spool {
 
     if ( my $spool_handle = $parser->delete_spool ) {
         close($spool_handle)
-          or $self->_croak(" Error closing TAP spool file( $! ) \n ");
+            or $self->_croak(" Error closing TAP spool file( $! ) \n ");
     }
+
+    return;
 }
 
 sub _croak {
@@ -602,6 +603,8 @@ sub _croak {
         $message = $self->_error;
     }
     $self->SUPER::_croak($message);
+
+    return;
 }
 
 =head1 REPLACING

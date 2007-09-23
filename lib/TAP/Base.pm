@@ -86,13 +86,15 @@ sub callback {
     my %ok_map = %{ $self->{ok_callbacks} };
 
     $self->_croak('No callbacks may be installed')
-      unless %ok_map;
+        unless %ok_map;
 
     $self->_croak( "Callback $event is not supported. Valid callbacks are "
           . join( ', ', sort keys %ok_map ) )
-      unless exists $ok_map{$event};
+        unless exists $ok_map{$event};
 
     push @{ $self->{code_for}{$event} }, $callback;
+
+    return;
 }
 
 sub _has_callbacks {
@@ -118,6 +120,8 @@ sub _croak {
     my ( $self, $message ) = @_;
     require Carp;
     Carp::croak($message);
+
+    return;
 }
 
 =head3 C<get_time>
@@ -126,7 +130,7 @@ Return the current time using Time::HiRes if available.
 
 =cut
 
-sub get_time { time() }
+sub get_time { return time() }
 
 =head3 C<time_is_hires>
 
@@ -134,6 +138,6 @@ Return true if the time returned by get_time is high resolution (i.e. if Time::H
 
 =cut
 
-sub time_is_hires {$GOT_TIME_HIRES}
+sub time_is_hires { return $GOT_TIME_HIRES }
 
 1;
