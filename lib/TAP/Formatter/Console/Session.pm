@@ -1,12 +1,7 @@
 package TAP::Formatter::Console::Session;
 
 use strict;
-use Benchmark;
-use File::Spec;
-use File::Path;
-
 use TAP::Base;
-use Carp;
 
 use vars qw($VERSION @ISA);
 
