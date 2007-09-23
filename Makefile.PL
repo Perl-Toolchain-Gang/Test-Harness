@@ -31,15 +31,20 @@ WriteMakefile( %mm_args );
     package MY;
 
     sub postamble {
-        if( $Have_Testcover ) {
-            return testcover();
+        my $tc;
+        if ( $Have_Testcover ) {
+            $tc = testcover();
         }
         else {
-            return q[
+            $tc = <<'EOF';
 testcover :
 	$(NOECHO) $(ECHO) To enable testcover, install ExtUtils::MakeMaker::Coverage and rerun Makefile.PL.
-];
+EOF
         }
+    return $tc . <<'EOF';
+critic:
+	perlcritic -1 -q -profile perlcriticrc bin/prove lib/ t/*.t
+EOF
     }
 
     use File::Spec;

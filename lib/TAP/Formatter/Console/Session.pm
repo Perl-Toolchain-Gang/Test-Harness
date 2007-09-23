@@ -170,7 +170,7 @@ sub _closures {
     return {
         header => sub {
             $formatter->_output($pretty)
-              unless $really_quiet;
+                unless $really_quiet;
         },
 
         result => sub {
@@ -293,7 +293,7 @@ sub _output_test_failure {
         $formatter->_failure_output(
             $total
             ? " All $total subtests passed "
-            : " No subtests run "
+            : ' No subtests run '
         );
     }
     else {
