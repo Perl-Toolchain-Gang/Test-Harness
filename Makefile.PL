@@ -41,9 +41,19 @@ testcover :
 	$(NOECHO) $(ECHO) To enable testcover, install ExtUtils::MakeMaker::Coverage and rerun Makefile.PL.
 EOF
         }
-    return $tc . <<'EOF';
+    return <<'EOF' . $tc;
+.PHONY: critic tags
+
 critic:
 	perlcritic -1 -q -profile perlcriticrc bin/prove lib/ t/*.t
+
+tags:
+	ctags -f tags --recurse --totals \
+		--exclude=blib \
+		--exclude=.svn \
+		--exclude='*~' \
+		--languages=Perl \
+		t/ lib/ bin/prove
 EOF
     }
 
