@@ -2,13 +2,10 @@ package Test::Harness;
 
 require 5.00405;
 
-use TAP::Harness;
-use TAP::Parser::Aggregator;
+use TAP::Harness ();
+use TAP::Parser::Aggregator ();
 
-#use Test::Harness::Straps;
 use Exporter;
-use Benchmark;
-use Config;
 use strict;
 
 # TODO: Emulate at least some of these

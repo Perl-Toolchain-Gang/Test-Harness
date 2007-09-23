@@ -3,13 +3,13 @@ package TAP::Parser;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Base;
-use TAP::Parser::Grammar;
-use TAP::Parser::Result;
-use TAP::Parser::Source;
-use TAP::Parser::Source::Perl;
-use TAP::Parser::Iterator;
-use Carp;
+use TAP::Base ();
+use TAP::Parser::Grammar ();
+use TAP::Parser::Result ();
+use TAP::Parser::Source ();
+use TAP::Parser::Source::Perl ();
+use TAP::Parser::Iterator ();
+use Carp ();
 
 @ISA = qw(TAP::Base);
 
