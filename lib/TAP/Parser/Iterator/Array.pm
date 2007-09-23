@@ -1,7 +1,7 @@
 package TAP::Parser::Iterator::Array;
 
 use strict;
-use TAP::Parser::Iterator;
+use TAP::Parser::Iterator ();
 use vars qw($VERSION @ISA);
 @ISA     = 'TAP::Parser::Iterator';
 

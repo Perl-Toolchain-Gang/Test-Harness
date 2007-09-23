@@ -2,7 +2,7 @@ package TAP::Parser::Iterator::Process;
 
 use strict;
 
-use TAP::Parser::Iterator;
+use TAP::Parser::Iterator ();
 
 use vars qw($VERSION @ISA);
 
