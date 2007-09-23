@@ -162,10 +162,11 @@ sub _closures {
 
     my $output_result = $self->_get_output_result;
 
-    my $print_step      = 1;
     my $output          = '_output';
     my $plan            = '';
     my $newline_printed = 0;
+
+    my $last_status_printed = 0;
 
     return {
         header => sub {
@@ -197,12 +198,12 @@ sub _closures {
 
             if ( $show_count and $is_test ) {
                 my $number = $result->number;
+                my $now = CORE::time;
 
-                my $ceiling = $number / 5;
-                $print_step *= 2 while $print_step < $ceiling;
-
-                unless ( $number % $print_step ) {
+                # Print status on first number, and roughly once per second
+                if ( ($number == 1) || ($last_status_printed != $now) ) {
                     $formatter->$output("\r$pretty$number$plan");
+                    $last_status_printed = $now;
                 }
             }
 
