@@ -2,10 +2,9 @@ package TAP::Parser::Grammar;
 
 use strict;
 use vars qw($VERSION);
-use Carp;
 
-use TAP::Parser::Result;
-use TAP::Parser::YAMLish::Reader;
+use TAP::Parser::Result ();
+use TAP::Parser::YAMLish::Reader ();
 
 =head1 NAME
 
@@ -102,7 +101,7 @@ my %language_for;
                 my ( $self, $line ) = @_;
                 my ( $ok, $num, $desc ) = ( $1, $2, $3 );
                 my ( $dir, $explanation ) = ( '', '' );
-                if ($desc =~ m/^ ( [^\\\#]* (?: \\. [^\\\#]* )* ) 
+                if ($desc =~ m/^ ( [^\\\#]* (?: \\. [^\\\#]* )* )
                        \# \s* (SKIP|TODO) \b \s* (.*) $/ix
                   )
                 {
@@ -168,7 +167,7 @@ my %language_for;
 =head3 C<set_version>
 
   $grammar->set_version(13);
-  
+
 Tell the grammar which TAP syntax version to support. The lowest
 supported version is 12. Although 'TAP version' isn't valid version 12
 syntax it is accepted so that higher version numbers may be parsed.
@@ -189,7 +188,8 @@ sub set_version {
         $self->_order_tokens;
     }
     else {
-        croak "Unsupported syntax version: $version";
+        require Carp;
+        Carp::croak "Unsupported syntax version: $version";
     }
 }
 
@@ -198,8 +198,8 @@ sub _order_tokens {
     my $self = shift;
 
     my %copy           = %{ $self->{tokens} };
-    my @ordered_tokens = grep defined,
-      map { delete $copy{$_} } qw(simple_test test comment plan);
+    my @ordered_tokens = grep { defined }
+        map { delete $copy{$_} } qw( simple_test test comment plan );
     push @ordered_tokens, values %copy;
 
     $self->{ordered_tokens} = \@ordered_tokens;
@@ -423,22 +423,22 @@ L<TAP::Parser::Result::Unknown>.  It is I<not> a parse error.
 
 A formal grammar would look similar to the following:
 
- (* 
-     For the time being, I'm cheating on the EBNF by allowing 
+ (*
+     For the time being, I'm cheating on the EBNF by allowing
      certain terms to be defined by POSIX character classes by
      using the following syntax:
- 
+
        digit ::= [:digit:]
- 
+
      As far as I am aware, that's not valid EBNF.  Sue me.  I
-     didn't know how to write "char" otherwise (Unicode issues).  
+     didn't know how to write "char" otherwise (Unicode issues).
      Suggestions welcome.
  *)
- 
- tap            ::= version? { comment | unknown } leading_plan lines 
-                    | 
+
+ tap            ::= version? { comment | unknown } leading_plan lines
+                    |
                     lines trailing_plan {comment}
- 
+
  version        ::= 'TAP version ' positiveInteger {positiveInteger} "\n"
 
  leading_plan   ::= plan skip_directive? "\n"
@@ -446,17 +446,17 @@ A formal grammar would look similar to the following:
  trailing_plan  ::= plan "\n"
 
  plan           ::= '1..' nonNegativeInteger
- 
+
  lines          ::= line {line}
 
  line           ::= (comment | test | unknown | bailout ) "\n"
- 
+
  test           ::= status positiveInteger? description? directive?
- 
+
  status         ::= 'not '? 'ok '
- 
+
  description    ::= (character - (digit | '#')) {character - '#'}
- 
+
  directive      ::= todo_directive | skip_directive
 
  todo_directive ::= hash_mark 'TODO' ' ' {character}
@@ -472,12 +472,12 @@ A formal grammar would look similar to the following:
  unknown        ::= { (character - "\n") }
 
  (* POSIX character classes and other terminals *)
- 
+
  digit              ::= [:digit:]
  character          ::= ([:print:] - "\n")
  positiveInteger    ::= ( digit - '0' ) {digit}
  nonNegativeInteger ::= digit {digit}
- 
+
 
 =cut
 

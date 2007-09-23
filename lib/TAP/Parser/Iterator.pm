@@ -3,9 +3,9 @@ package TAP::Parser::Iterator;
 use strict;
 use vars qw($VERSION);
 
-use TAP::Parser::Iterator::Array;
-use TAP::Parser::Iterator::Stream;
-use TAP::Parser::Iterator::Process;
+use TAP::Parser::Iterator::Array ();
+use TAP::Parser::Iterator::Stream ();
+use TAP::Parser::Iterator::Process ();
 
 =head1 NAME
 

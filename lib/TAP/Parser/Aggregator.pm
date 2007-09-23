@@ -1,7 +1,6 @@
 package TAP::Parser::Aggregator;
 
 use strict;
-use Carp;
 use Benchmark;
 use vars qw($VERSION);
 
@@ -24,14 +23,14 @@ $VERSION = '2.99_03';
     my $aggregate = TAP::Parser::Aggregator->new;
     $aggregate->add( 't/00-load.t', $load_parser );
     $aggregate->add( 't/10-lex.t',  $lex_parser  );
-    
+
     my $summary = <<'END_SUMMARY';
     Passed:  %s
     Failed:  %s
     Unexpectedly succeeded: %s
     END_SUMMARY
-    printf $summary, 
-           scalar $aggregate->passed, 
+    printf $summary,
+           scalar $aggregate->passed,
            scalar $aggregate->failed,
            scalar $aggregate->todo_passed;
 
@@ -218,8 +217,10 @@ afterwards.
 
 sub elapsed {
     my $self = shift;
-    croak "Can't call elapsed without first calling start and then stop"
-      unless defined $self->{start_time} && defined $self->{end_time};
+
+    require Carp;
+    Carp::croak q{Can't call elapsed without first calling start and then stop}
+        unless defined $self->{start_time} && defined $self->{end_time};
     return timediff( $self->{end_time}, $self->{start_time} );
 }
 
@@ -345,7 +346,7 @@ succeeded.  Will now issue a warning and call C<todo_passed>.
 
 sub todo_failed {
     warn
-      '"todo_failed" is deprecated.  Please use "todo_passed".  See the docs.';
+        '"todo_failed" is deprecated.  Please use "todo_passed".  See the docs.';
     goto &todo_passed;
 }
 
