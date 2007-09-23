@@ -3,36 +3,11 @@ use Module::Build;
 use 5.005;
 
 use File::Spec;
-use lib File::Spec->canonpath('lib/');    # use our self to install
+use lib 'inc', File::Spec->canonpath('lib/');    # use our self to install
 
-# NOTE: make this actually be inc/MyBuilder.pm if it gets any bigger
-my $build_class = Module::Build->subclass(
-    class => 'inc::MyBuilder',
-    code  => <<'    SUBCLASS',
-      sub ACTION_testprove {
-          my $self = shift;
-          $self->depends_on('code');
-          exec($^X, '-Iblib/lib', 'bin/prove', '-r');
-      }
-      sub ACTION_testreference {
-          my $self = shift;
-          $self->depends_on('code');
-          my $ref = 'reference/Test-Harness-2.64';
-          exec($^X,
-            (-e $ref ? ("-I$ref/lib", "$ref/bin/prove") : qw(-S prove) ),
-            '-Iblib/lib', '-r', 't'
-          );
-      }
-      sub ACTION_testauthor {
-          my $self = shift;
-          $self->test_files('t', 'xt/author');
-          $self->generic_test( type => 'default' );
-      }
-    SUBCLASS
-);
+use MyBuilder;
 
-
-my $builder = $build_class->new(
+my $builder = MyBuilder->new(
     module_name => 'Test::Harness',
     license     => 'perl',
     installdirs => 'core',

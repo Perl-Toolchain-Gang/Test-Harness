@@ -13,6 +13,7 @@ examples/t/10-stuff.t
 examples/t/ruby.t
 examples/test_urls.txt
 HACKING.pod
+inc/MyBuilder.pm
 lib/App/Prove.pm
 lib/TAP/Base.pm
 lib/TAP/Formatter/Color.pm
@@ -43,6 +44,7 @@ lib/Test/Harness.pm
 Makefile.PL
 MANIFEST
 META.yml
+perlcriticrc
 README
 t/000-load.t
 t/010-base.t
