@@ -86,7 +86,7 @@ sub _initialize {
         $self->{$name} = delete $arg_for{$name};
     }
 
-    if ( my @props = keys %arg_for ) {
+    if ( my @props = sort keys %arg_for ) {
         $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
     }
 
