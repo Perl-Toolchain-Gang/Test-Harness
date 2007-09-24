@@ -1,7 +1,6 @@
 package TAP::Formatter::Console::ParallelSession;
 
 use strict;
-use Benchmark;
 use File::Spec;
 use File::Path;
 use TAP::Formatter::Console::Session;

@@ -224,6 +224,21 @@ sub elapsed {
     return timediff( $self->{end_time}, $self->{start_time} );
 }
 
+=head3 C<elapsed_timestr>
+
+Returns a formatted string representing the runtime returned by
+C<elapsed()>.  This lets the caller not worry about Benchmark.
+
+=cut
+
+sub elapsed_timestr {
+    my $self = shift;
+
+    my $elapsed = $self->elapsed;
+
+    return timestr( $elapsed );
+}
+
 =head3 C<all_passed>
 
 Return true if all the tests passed and no parse errors were detected.

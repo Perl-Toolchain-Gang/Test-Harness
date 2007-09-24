@@ -1,7 +1,6 @@
 package TAP::Formatter::Console;
 
 use strict;
-use Benchmark;
 use File::Spec;
 use File::Path;
 
@@ -283,7 +282,7 @@ sub summary {
     my @t     = $aggregate->descriptions;
     my $tests = \@t;
 
-    my $runtime = timestr( $aggregate->elapsed );
+    my $runtime = $aggregate->elapsed_timestr;
 
     my $total  = $aggregate->total;
     my $passed = $aggregate->passed;
