@@ -236,7 +236,7 @@ sub _get_args {
     $args{errors} = 1 if $self->parse;
 
     # defined but zero-length exec runs test files as binaries
-    $args{exec} = [ split( / /, $self->exec ) ] if ( defined( $self->exec ) );
+    $args{exec} = [ split( /\s+/, $self->exec ) ] if ( defined( $self->exec ) );
 
     if ($formatter_class) {
         $args{formatter} = $formatter_class->new;
