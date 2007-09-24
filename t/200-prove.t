@@ -48,13 +48,18 @@ package main;
 
 my ( @ATTR, %DEFAULT_ASSERTION, @SCHEDULE );
 
-BEGIN {
+# see the "ACTUAL TEST" section at the bottom
+
+BEGIN {    # START PLAN
+
+    # list of attributes
     @ATTR = qw(
       archive argv blib color directives exec failures formatter harness
       includes lib merge parse quiet really_quiet recurse backwards
       shuffle taint_fail taint_warn verbose warnings_fail warnings_warn
     );
 
+    # what we expect if the 'expect' hash does not define it
     %DEFAULT_ASSERTION = map { $_ => undef } @ATTR;
 
     $DEFAULT_ASSERTION{includes} = $DEFAULT_ASSERTION{argv}
@@ -64,6 +69,17 @@ BEGIN {
       qw(simple simple_yaml);
     my $dummy_test = $dummy_tests[0];
 
+    ########################################################################
+    # declarations - this drives all of the subtests.
+    # The cheatsheet follows.
+    # required: name, expect
+    # optional:
+    #   args       - arguments to constructor
+    #   switches   - command-line switches
+    #   runlog     - causes code to run, must match FakeProve's _log attr
+    #   run_error  - depends on 'runlog' (if missing, asserts no error)
+    #   extra      - follow-up check (sub) from runlog
+    #   class      - defaults to FakeProve
     @SCHEDULE = (
         {   name   => 'Create empty',
             expect => {}
@@ -1084,6 +1100,8 @@ BEGIN {
         # },
 
     );
+    # END SCHEDULE
+    ########################################################################
 
     my $extra_plan = 0;
     for my $test (@SCHEDULE) {
@@ -1093,8 +1111,9 @@ BEGIN {
     }
 
     plan tests => @SCHEDULE * ( 3 + @ATTR ) + $extra_plan;
-}
+}    # END PLAN
 
+# ACTUAL TEST
 for my $test (@SCHEDULE) {
     my $name = $test->{name};
     my $class = $test->{class} || 'FakeProve';
