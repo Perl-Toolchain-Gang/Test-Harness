@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 41;
+use Test::More tests => 38;
 
 use TAP::Base;
 
@@ -11,7 +11,7 @@ use TAP::Base;
 
     # No callbacks allowed
     can_ok 'TAP::Base', 'new';
-    ok my $base = TAP::Base->new(), 'object creation succeeds';
+    my $base = TAP::Base->new();
     isa_ok $base, 'TAP::Base', 'object of correct type';
     foreach my $method (qw(callback _croak _callback_for _initialize)) {
         can_ok $base, $method;
@@ -62,7 +62,7 @@ sub _initialize {
 
 package main;
 {
-    ok my $base = CallbackOK->new(), 'object creation succeeds';
+    my $base = CallbackOK->new();
     isa_ok $base, 'TAP::Base';
 
     eval {
@@ -110,15 +110,14 @@ package main;
 {
     my ( $nice, $other ) = ( 0, 0 );
 
-    ok my $base = CallbackOK->new(
+    my $base = CallbackOK->new(
         {   callbacks => {
                 nice_event => sub { $nice++ }
             }
         }
-      ),
-      'object creation with callback succeeds';
+      );
 
-    isa_ok $base, 'TAP::Base';
+    isa_ok $base, 'TAP::Base', 'object creation with callback succeeds';
 
     eval {
         $base->callback(

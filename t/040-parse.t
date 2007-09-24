@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 265;
+use Test::More tests => 263;
 use IO::Capture;
 
 use File::Spec;
@@ -48,8 +48,7 @@ not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
 END_TAP
 
 can_ok $PARSER, 'new';
-ok my $parser = $PARSER->new( { tap => $tap } ),
-  '... and calling it should succeed';
+my $parser = $PARSER->new( { tap => $tap } );
 isa_ok $parser, $PARSER, '... and the object it returns';
 
 ok $ENV{TAP_VERSION}, 'TAP_VERSION env variable should be set';
@@ -340,9 +339,8 @@ END_TAP
 my $aref = [ split /\n/ => $tap ];
 
 can_ok $PARSER, 'new';
-ok $parser = $PARSER->new( { stream => TAP::Parser::Iterator->new($aref) } ),
-  '... and calling it should succeed';
-isa_ok $parser, $PARSER, '... and the object it returns';
+$parser = $PARSER->new( { stream => TAP::Parser::Iterator->new($aref) } );
+isa_ok $parser, $PARSER, '... and calling it should succeed';
 
 # results() is sane?
 

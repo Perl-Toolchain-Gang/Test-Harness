@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 82;
+use Test::More tests => 81;
 
 use TAP::Parser::Grammar;
 use TAP::Parser::Iterator::Array;
@@ -34,7 +34,7 @@ package main;
 
 my $stream = SS->new;
 can_ok $GRAMMAR, 'new';
-ok my $grammar = $GRAMMAR->new($stream), '... and calling it should succeed';
+my $grammar = $GRAMMAR->new($stream);
 isa_ok $grammar, $GRAMMAR, '... and the object it returns';
 
 # Note:  all methods are actually class methods.  See the docs for the reason
