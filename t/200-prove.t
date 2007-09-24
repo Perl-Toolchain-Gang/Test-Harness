@@ -889,6 +889,57 @@ BEGIN {    # START PLAN
             ],
         },
 
+        # Executing one word (why would it be a -s though?)
+        {   name => 'Switch --exec -s',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--exec', '-s', $dummy_test ],
+            expect   => {exec => '-s'},
+            runlog   => [
+                [   _runtests =>
+                    {exec => ['-s']},
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        # multi-part exec
+        {   name => 'Switch --exec "/foo/bar/perl -Ilib"',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--exec', '/foo/bar/perl -Ilib', $dummy_test ],
+            expect   => {exec => '/foo/bar/perl -Ilib'},
+            runlog   => [
+                [   _runtests =>
+                    {exec => [qw(/foo/bar/perl -Ilib)]},
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+        # null exec (run tests as compiled binaries)
+        {   name => 'Switch --exec ""',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '--exec', '', $dummy_test ],
+            expect => {
+                exec => # ick, must workaround the || default bit with a sub
+                  sub { my $val = shift; defined($val) and !length($val) }
+              },
+            runlog   => [
+                [   _runtests =>
+                    {exec => []},
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        # TODO
         # Hmm, that doesn't work...
         # {   name => 'Switch -h',
         #     args => {
@@ -1063,20 +1114,6 @@ BEGIN {    # START PLAN
         #         argv => [qw( one two three )],
         #     },
         #     switches => [ '-e', $dummy_test ],
-        #     expect   => {},
-        #     runlog   => [
-        #         [   {},
-        #             'TAP::Harness',
-        #             $dummy_test
-        #         ]
-        #     ],
-        # },
-        #
-        # {   name => 'Switch --exec=-s',
-        #     args => {
-        #         argv => [qw( one two three )],
-        #     },
-        #     switches => [ '--exec=-s', $dummy_test ],
         #     expect   => {},
         #     runlog   => [
         #         [   {},
