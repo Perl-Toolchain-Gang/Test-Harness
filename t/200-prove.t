@@ -76,10 +76,11 @@ BEGIN {    # START PLAN
     # optional:
     #   args       - arguments to constructor
     #   switches   - command-line switches
-    #   runlog     - causes code to run, must match FakeProve's _log attr
+    #   runlog     - expected results of internal calls to _runtests, must
+    #                match FakeProve's _log attr
     #   run_error  - depends on 'runlog' (if missing, asserts no error)
-    #   extra      - follow-up check (sub) from runlog
-    #   class      - defaults to FakeProve
+    #   extra      - follow-up check to handle exceptional cleanup / verification
+    #   class      - The App::Prove subclass to test. Defaults to FakeProve
     @SCHEDULE = (
         {   name   => 'Create empty',
             expect => {}
