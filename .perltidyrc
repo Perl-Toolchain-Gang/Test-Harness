@@ -15,6 +15,5 @@
 -wbb="% + - * / x != == >= <= =~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x=" # break before all operators
 
 --space-after-keyword='and or eq ne'
---nospace-after-keyword='if else elsif until unless while for foreach return switch case given when'
 
 --want-break-after='. << >> -> ^^ || and or'
