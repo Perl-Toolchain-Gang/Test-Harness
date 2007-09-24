@@ -1,8 +1,7 @@
 -boc   # break at old comma points (i.e., keep yer frickin' hands off my commas)
--l=78  # max line width is 78 columns
+-l=72  # max line width is 78 columns
 -i=4   # indent level is 4 columns
 -ci=2  # continuation indent is 2 columns
--st    # output to STDOUT
 -se    # errors to STDERR
 -vt=2  # minimum vertical tightness
 -cti=0 # no extra indentation for closing brackets
@@ -14,3 +13,8 @@
 -nolq  # don't outdent long quoted strings
 -nola  # don't outdent labels
 -wbb="% + - * / x != == >= <= =~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x=" # break before all operators
+
+--space-after-keyword='and or eq ne'
+--nospace-after-keyword='if else elsif until unless while for foreach return switch case given when'
+
+--want-break-after='. << >> -> ^^ || and or'
