@@ -33,14 +33,14 @@ Iterate through it, of course.
 =cut
 
 sub new {
-    my ( $proto, $thing ) = @_;
+    my($proto, $thing) = @_;
 
     my $self = {};
-    if ( ref $thing eq 'GLOB' ) {
+    if( ref $thing eq 'GLOB' ) {
         bless $self, 'Test::Harness::Iterator::FH';
         $self->{fh} = $thing;
     }
-    elsif ( ref $thing eq 'ARRAY' ) {
+    elsif( ref $thing eq 'ARRAY' ) {
         bless $self, 'Test::Harness::Iterator::ARRAY';
         $self->{idx}   = 0;
         $self->{array} = $thing;
@@ -53,7 +53,6 @@ sub new {
 }
 
 package Test::Harness::Iterator::FH;
-
 sub next {
     my $fh = $_[0]->{fh};
 
@@ -61,11 +60,11 @@ sub next {
     return scalar <$fh>;
 }
 
-package Test::Harness::Iterator::ARRAY;
 
+package Test::Harness::Iterator::ARRAY;
 sub next {
     my $self = shift;
-    return $self->{array}->[ $self->{idx}++ ];
+    return $self->{array}->[$self->{idx}++];
 }
 
 "Steve Peters, Master Of True Value Finding, was here.";
