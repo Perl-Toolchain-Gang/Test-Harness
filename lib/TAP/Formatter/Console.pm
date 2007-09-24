@@ -1,11 +1,7 @@
 package TAP::Formatter::Console;
 
 use strict;
-use File::Spec;
-use File::Path;
-
-use TAP::Base;
-use Carp;
+use TAP::Base ();
 
 use vars qw($VERSION @ISA);
 
@@ -85,8 +81,8 @@ sub _initialize {
     my @verb_adj = grep {$_} map { delete $arg_for{$_} ? $verb_map{$_} : 0 }
       keys %verb_map;
 
-    croak "Only one of verbose, quiet, really_quiet should be specified"
-      if 1 < @verb_adj;
+    $self->_croak( 'Only one of verbose, quiet or really_quiet should be specified' )
+      if @verb_adj > 1;
 
     $self->verbosity( shift @verb_adj || 0 );
 
@@ -254,7 +250,7 @@ sub open_test {
       : 'TAP::Formatter::Console::Session';
 
     eval "require $class";
-    croak $@ if $@;
+    $self->_croak( $@ ) if $@;
 
     my $session = $class->new(
         {   name      => $test,
