@@ -38,7 +38,7 @@ BEGIN {
     );
     for my $attr (@ATTR) {
         no strict 'refs';
-        *{ __PACKAGE__ . '::' . $attr } = sub {
+        *$attr = sub {
             my $self = shift;
             croak "$attr is read-only" if @_;
             $self->{$attr};
@@ -235,8 +235,9 @@ sub _get_args {
 
     $args{errors} = 1 if $self->parse;
 
-    $args{exec} = length( $self->exec ) ? [ split( / /, $self->exec ) ] : []
-      if ( defined( $self->exec ) );
+    if ( defined( $self->exec ) ) {
+        $args{exec} = $self->exec ? [ split( / /, $self->exec ) ] : []
+    }
 
     if ($formatter_class) {
         $args{formatter} = $formatter_class->new;
