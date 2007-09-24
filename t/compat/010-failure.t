@@ -30,9 +30,7 @@ BEGIN {
 
     {
         local $SIG{__DIE__} = prepare_for_death();
-        eval {
-            _runtests( File::Spec->catfile( $sample_tests, "simple" ) );
-        };
+        eval { _runtests( File::Spec->catfile( $sample_tests, "simple" ) ); };
         ok( !$@, "simple lives" );
         is( $died, 0, "Death never happened" );
     }
@@ -40,8 +38,7 @@ BEGIN {
     {
         local $SIG{__DIE__} = prepare_for_death();
         eval {
-            _runtests(
-                File::Spec->catfile( $sample_tests, "too_many" ) );
+            _runtests( File::Spec->catfile( $sample_tests, "too_many" ) );
         };
         ok( $@, "$@" );
         ok( $@ =~ m[Failed 1/1], "too_many dies" );

@@ -70,12 +70,11 @@ can_ok $result, 'type';
 is $result->type, 'plan', '... and it should report the correct type';
 ok $result->is_plan, '... and it should identify itself as a plan';
 is $result->plan, '1..7', '... and identify the plan';
-ok !$result->directive, '... and this plan should not have a directive';
+ok !$result->directive,   '... and this plan should not have a directive';
 ok !$result->explanation, '... or a directive explanation';
 is $result->as_string, '1..7',
   '... and have the correct string representation';
-is $result->raw, '1..7',
-  '... and raw() should return the original line';
+is $result->raw, '1..7', '... and raw() should return the original line';
 
 # a normal, passing test
 
@@ -103,8 +102,7 @@ is $test->raw, 'ok 1 - input file opened',
 
 my $unknown = shift @results;
 isa_ok $unknown, $UNKNOWN;
-is $unknown->type, 'unknown',
-  '... and it should report the correct type';
+is $unknown->type, 'unknown', '... and it should report the correct type';
 ok $unknown->is_unknown, '... and it should identify itself as unknown';
 is $unknown->as_string,  '... this is junk',
   '... and its string representation should be returned verbatim';
@@ -117,15 +115,14 @@ my $failed = shift @results;
 isa_ok $failed, $TEST;
 is $failed->type, 'test', '... and it should report the correct type';
 ok $failed->is_test, '... and it should identify itself as a test';
-is $failed->ok,    'not ok', '... and it should have the correct ok()';
-ok $failed->is_ok, '... and TODO tests should always pass';
+is $failed->ok,      'not ok', '... and it should have the correct ok()';
+ok $failed->is_ok,   '... and TODO tests should always pass';
 ok !$failed->is_actual_ok,
   '... and the correct boolean version of is_actual_ok ()';
 is $failed->number, 2, '... and have the correct failed number';
 is $failed->description, 'first line of the input valid',
   '... and the correct description';
-is $failed->directive, 'TODO',
-  '... and should have the correct directive';
+is $failed->directive, 'TODO', '... and should have the correct directive';
 is $failed->explanation, 'some data',
   '... and the correct directive explanation';
 ok !$failed->has_skip, '... and it is not a SKIPped failed';
@@ -133,19 +130,16 @@ ok $failed->has_todo, '... but it is a TODO succeeded';
 is $failed->as_string,
   'not ok 2 first line of the input valid # TODO some data',
   '... and its string representation should be correct';
-is $failed->raw,
-  'not ok first line of the input valid # todo some data',
+is $failed->raw, 'not ok first line of the input valid # todo some data',
   '... and raw() should return the original line';
 
 # comments
 
 my $comment = shift @results;
 isa_ok $comment, $COMMENT;
-is $comment->type, 'comment',
-  '... and it should report the correct type';
-ok $comment->is_comment,
-  '... and it should identify itself as a comment';
-is $comment->comment, 'this is a comment',
+is $comment->type, 'comment', '... and it should report the correct type';
+ok $comment->is_comment, '... and it should identify itself as a comment';
+is $comment->comment,    'this is a comment',
   '... and you should be able to fetch the comment';
 is $comment->as_string, '# this is a comment',
   '... and have the correct string representation';
@@ -241,14 +235,12 @@ ok $bonus->is_actual_ok,
 is $bonus->number, 6, '... and have the correct failed number';
 is $bonus->description, '- you shall not pass!',
   '... and the correct description';
-is $bonus->directive, 'TODO',
-  '... and should have the correct directive';
+is $bonus->directive, 'TODO', '... and should have the correct directive';
 is $bonus->explanation, 'should have failed',
   '... and the correct directive explanation';
 ok !$bonus->has_skip, '... and it is not a SKIPped failed';
-ok $bonus->has_todo, '... but it is a TODO succeeded';
-is $bonus->as_string,
-  'ok 6 - you shall not pass! # TODO should have failed',
+ok $bonus->has_todo,  '... but it is a TODO succeeded';
+is $bonus->as_string, 'ok 6 - you shall not pass! # TODO should have failed',
   '... and its string representation should be correct';
 is $bonus->raw, 'ok 6 - you shall not pass! # TODO should have failed',
   '... and raw() should return the original line';
@@ -262,15 +254,14 @@ isa_ok $passed, $TEST;
 can_ok $passed, 'todo_passed';
 is $passed->type, 'test', 'TODO tests should parse correctly';
 ok $passed->is_test, '... and it should identify itself as a test';
-is $passed->ok,    'not ok', '... and it should have the correct ok()';
-ok $passed->is_ok, '... and TODO tests should always pass';
+is $passed->ok,      'not ok', '... and it should have the correct ok()';
+ok $passed->is_ok,   '... and TODO tests should always pass';
 ok !$passed->is_actual_ok,
   '... and the correct boolean version of is_actual_ok ()';
 is $passed->number, 7, '... and have the correct passed number';
 is $passed->description, '- Gandalf wins.  Game over.',
   '... and the correct description';
-is $passed->directive, 'TODO',
-  '... and should have the correct directive';
+is $passed->directive, 'TODO', '... and should have the correct directive';
 is $passed->explanation, "'bout time!",
   '... and the correct directive explanation';
 ok !$passed->has_skip, '... and it is not a SKIPped passed';
@@ -278,8 +269,7 @@ ok $passed->has_todo, '... but it is a TODO succeeded';
 is $passed->as_string,
   "not ok 7 - Gandalf wins.  Game over. # TODO 'bout time!",
   '... and its string representation should be correct';
-is $passed->raw,
-  "not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!",
+is $passed->raw, "not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!",
   '... and raw() should return the original line';
 ok !$passed->todo_passed,
   '... todo_passed() should not pass for TODO tests which failed';
@@ -294,8 +284,7 @@ is_deeply [ $parser->passed ], [ 1, 2, 3, 5, 6, 7 ],
 
 can_ok $parser, 'failed';
 is $parser->failed, 1, '... and the correct number of failed tests';
-is_deeply [ $parser->failed ], [4],
-  '... and get a list of the failed tests';
+is_deeply [ $parser->failed ], [4], '... and get a list of the failed tests';
 
 can_ok $parser, 'actual_passed';
 is $parser->actual_passed, 4,
@@ -324,8 +313,8 @@ is_deeply [ $parser->skipped ], [5],
 # check the plan
 
 can_ok $parser, 'plan';
-is $parser->plan, '1..7', '... and we should have the correct plan';
-is $parser->tests_planned, 7, '... and the correct number of tests';
+is $parser->plan,          '1..7', '... and we should have the correct plan';
+is $parser->tests_planned, 7,      '... and the correct number of tests';
 
 # "Unexpectedly succeeded"
 can_ok $parser, 'todo_passed';
@@ -350,8 +339,7 @@ END_TAP
 my $aref = [ split /\n/ => $tap ];
 
 can_ok $PARSER, 'new';
-$parser
-  = $PARSER->new( { stream => TAP::Parser::Iterator->new($aref) } );
+$parser = $PARSER->new( { stream => TAP::Parser::Iterator->new($aref) } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 
 # results() is sane?
@@ -369,8 +357,7 @@ ok $result->is_plan,   '... and it should identify itself as a plan';
 is $result->plan,      '1..2', '... and identify the plan';
 is $result->as_string, '1..2',
   '... and have the correct string representation';
-is $result->raw, '1..2',
-  '... and raw() should return the original line';
+is $result->raw, '1..2', '... and raw() should return the original line';
 
 # a normal, passing test
 
@@ -398,8 +385,7 @@ is $test->raw, 'ok 1 - input file opened',
 
 $unknown = shift @results;
 isa_ok $unknown, $UNKNOWN;
-is $unknown->type, 'unknown',
-  '... and it should report the correct type';
+is $unknown->type, 'unknown', '... and it should report the correct type';
 ok $unknown->is_unknown, '... and it should identify itself as unknown';
 is $unknown->as_string,  '',
   '... and its string representation should be returned verbatim';
@@ -409,8 +395,7 @@ is $unknown->raw, '', '... and raw() should return the original line';
 
 $unknown = shift @results;
 isa_ok $unknown, $UNKNOWN;
-is $unknown->type, 'unknown',
-  '... and it should report the correct type';
+is $unknown->type, 'unknown', '... and it should report the correct type';
 ok $unknown->is_unknown, '... and it should identify itself as unknown';
 is $unknown->as_string,  '',
   '... and its string representation should be returned verbatim';
@@ -494,8 +479,7 @@ END_TAP
 
         my @spooled = tied(*SPOOL)->dump();
 
-        is @spooled, 24,
-          'coverage testing for spool attribute of parser';
+        is @spooled, 24, 'coverage testing for spool attribute of parser';
         is join( '', @spooled ), $tap, "spooled tap matches";
     }
 
@@ -512,8 +496,7 @@ END_TAP
 
         my @spooled = tied(*SPOOL)->dump();
 
-        is @spooled, 24,
-          'coverage testing for spool attribute of parser';
+        is @spooled, 24, 'coverage testing for spool attribute of parser';
         is join( '', @spooled ), $tap, "spooled tap matches";
     }
 }
@@ -570,8 +553,7 @@ END_TAP
 
     is @die, 1, 'coverage testing for _initialize';
 
-    like pop @die,
-      qr/"source" and "exec" are mutually exclusive options/,
+    like pop @die, qr/"source" and "exec" are mutually exclusive options/,
       '...and it failed as expected';
 }
 
@@ -648,8 +630,7 @@ END_TAP
     # coverage test of perl source with switches
 
     my $parser = TAP::Parser->new(
-        {   source =>
-              File::Spec->catfile( 't', 'sample-tests', 'simple' ),
+        {   source => File::Spec->catfile( 't', 'sample-tests', 'simple' ),
         }
     );
 
@@ -706,8 +687,8 @@ END_TAP
 
     ok $parser->has_problems;
 
-# Now wait and exit are hard to do in an OS platform-independent way, so
-# we won't even bother
+    # Now wait and exit are hard to do in an OS platform-independent way, so
+    # we won't even bother
 
     $tap = <<'END_TAP';
 TAP version 13
@@ -819,7 +800,7 @@ END_TAP
     # we're going to bash the internals a bit (but using the API as
     # much as possible) to force grammar->tokenise() to fail
 
-# firstly we'll create a stream that dies when its next_raw method is called
+  # firstly we'll create a stream that dies when its next_raw method is called
 
     package TAP::Parser::Iterator::Dies;
 

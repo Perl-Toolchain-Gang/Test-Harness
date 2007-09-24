@@ -89,8 +89,7 @@ my $storedata = sub {
     my @lines = split( /\n/, $data );
 
     # the last (only) yaml marker
-    my @markers
-      = grep( { $lines[$_] =~ m/^---(?:\s|$)/ } 0 .. $#lines );
+    my @markers = grep( { $lines[$_] =~ m/^---(?:\s|$)/ } 0 .. $#lines );
     my @yaml = map( { $lines[$_] } $markers[-1] .. $#lines );
     my ($hash) = YAML::Load( join( "\n", @yaml, '' ) );
     if ( $rev eq 'prove' ) {
@@ -172,8 +171,8 @@ print map( {
 sub check_cache {
     my ($cached_file) = @_;
     if ( -e $cached_file ) {
-        open( my $fh, '<', $cached_file ) or
-          die "cannot open cache $cached_file $!";
+        open( my $fh, '<', $cached_file )
+          or die "cannot open cache $cached_file $!";
         my $data = do { local $/; <$fh> };
         return ($data);
     }
@@ -191,10 +190,9 @@ sub run_rev {
     IPC::Run::run(
         [@command],
         '>' =>
-          sub { $out .= join( '', @_ ); print $fh @_; print @_ },  # tee
+          sub { $out .= join( '', @_ ); print $fh @_; print @_ },    # tee
         '2>' => \$err,
-      ) or
-      die "now what $? $! $err";
+    )               or die "now what $? $! $err";
     chdir($basedir) or die $!;
     return ($out);
 }
@@ -202,8 +200,8 @@ sub run_rev {
 sub do_svn {
     my @command = @_;
     $ENV{NOSVN} and return;
-    system( 'svn', @command ) and
-      die "svn @command failed $? $!";
+    system( 'svn', @command )
+      and die "svn @command failed $? $!";
 }
 
 # vim:ts=4:sw=4:et:sta

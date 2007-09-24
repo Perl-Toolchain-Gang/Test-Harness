@@ -2,7 +2,6 @@
 -l=78  # max line width is 78 columns
 -i=4   # indent level is 4 columns
 -ci=2  # continuation indent is 2 columns
--st    # output to STDOUT
 -se    # errors to STDERR
 -vt=2  # minimum vertical tightness
 -cti=0 # no extra indentation for closing brackets

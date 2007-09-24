@@ -108,7 +108,9 @@ sub _clear_line {
 sub _output_ruler {
     my $self      = shift;
     my $formatter = $self->formatter;
-    my $context   = $shared{$formatter};
+    return if $formatter->really_quiet;
+
+    my $context = $shared{$formatter};
 
     # Too much boilerplate!
     my $ruler = sprintf( "===( %7d )", $context->{tests} );
@@ -136,8 +138,9 @@ sub result {
 
     if ( $result->is_bailout ) {
         $formatter->_failure_output(
-            "Bailout called.  Further testing stopped:  " .
-              $result->explanation . "\n" );
+                "Bailout called.  Further testing stopped:  "
+              . $result->explanation
+              . "\n" );
     }
 
     # $self->_plan( '/' . ( $planned || 0 ) . ' ' ) unless $self->_plan;
@@ -200,10 +203,15 @@ sub close_test {
     my $formatter = $self->formatter;
     my $context   = $shared{$formatter};
 
-    $self->_clear_line;
+    unless ( $formatter->really_quiet ) {
+        $self->_clear_line;
 
-    # my $output = $self->_output_method;
-    $formatter->_output( $formatter->_format_name( $self->name ), ' ' );
+        # my $output = $self->_output_method;
+        $formatter->_output(
+            $formatter->_format_name( $self->name ),
+            ' '
+        );
+    }
 
     if ( $parser->has_problems ) {
         $self->_output_test_failure($parser);

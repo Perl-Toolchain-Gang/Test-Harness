@@ -30,8 +30,7 @@ Getopt::Long::GetOptions(
     'named!',
     'prove!',
     'runtests!',
-  ) or
-  die "bad options";
+) or die "bad options";
 
 if (0) {    # header
     my @mods = qw(
@@ -55,15 +54,13 @@ if (0) {    # header
 
 # for historical benchmarks
 # (because we renamed this, but had both once)
-my $prove_or_runtests
-  = ( -e 'bin/runtests' ? 'bin/runtests' : 'bin/prove' );
+my $prove_or_runtests = ( -e 'bin/runtests' ? 'bin/runtests' : 'bin/prove' );
 
 my $tmp_dir = File::Temp::tempdir(
     'tapx-' . 'X' x 8,
     TMPDIR  => 1,
     CLEANUP => 1,
-  ) .
-  '/';
+) . '/';
 
 my $pwd = Cwd::getcwd();
 chdir($tmp_dir) or die "cannot get into $tmp_dir $!";
@@ -71,14 +68,18 @@ mkdir('t')      or die "cannot create t directory $!";
 
 # just checking raw output handling speed
 my $thetest
-  = 'my $n = ' . $knobs{num_lines} . ';' . q(print "1..$n\n";) .
-  q(print "ok $_) . ( $knobs{named} ? ' whee' : '' ) .
-  q(\n" for (1..$n);) . q(# print "#$0";);
+  = 'my $n = '
+  . $knobs{num_lines} . ';'
+  . q(print "1..$n\n";)
+  . q(print "ok $_)
+  . ( $knobs{named} ? ' whee' : '' )
+  . q(\n" for (1..$n);)
+  . q(# print "#$0";);
 
 for my $num ( 1 .. $knobs{num_test_files} ) {
     my $testfile = sprintf( 't/%02d-test.t', $num );
-    open( my $fh, '>', $testfile ) or
-      die "cannot open '$testfile' for writing $!";
+    open( my $fh, '>', $testfile )
+      or die "cannot open '$testfile' for writing $!";
     print $fh $thetest;
 }
 
@@ -132,8 +133,7 @@ if ( $knobs{noisy} ) {
 }
 
 my $res = {
-    (   $knobs{prove}
-        ? time_this( prove => sub { system(@prove) and die; } )
+    (   $knobs{prove} ? time_this( prove => sub { system(@prove) and die; } )
         : ()
     ),
     (   $knobs{runtests}

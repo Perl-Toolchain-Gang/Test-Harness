@@ -20,8 +20,8 @@ my $VERSION = 0.004;
 # Reopen STDIN.
 use IO::Pty;
 my $pty = IO::Pty->new;
-open( STDIN, "<&" . $pty->slave->fileno() ) ||
-  die "Couldn't reopen STDIN for reading, $!\n";
+open( STDIN, "<&" . $pty->slave->fileno() )
+  || die "Couldn't reopen STDIN for reading, $!\n";
 
 GetOptions(
     'v|verbose' => \my $VERBOSE,
@@ -139,25 +139,24 @@ sub test_and_report {
         die "Illegal filter spec: $filter\n"
           unless $filter =~ /^all|passed|failed$/;
 
-        my $verbose
-          = exists $mail->{verbose} ? $mail->{verbose} : $failed;
-        my $to = $mail->{email};
-        my @to = 'ARRAY' eq ref $to ? @$to : ($to);
+        my $verbose = exists $mail->{verbose} ? $mail->{verbose} : $failed;
+        my $to      = $mail->{email};
+        my @to      = 'ARRAY' eq ref $to ? @$to : ($to);
 
         next
-          unless $filter eq 'all' ||
-              $filter eq ( $failed ? 'failed' : 'passed' );
+          unless $filter eq 'all'
+              || $filter eq ( $failed ? 'failed' : 'passed' );
 
         my $msg = Mail::Send->new;
         $msg->to(@to);
-        $msg->subject( fail_pass( !$failed ) .
-              ": Test report for $task->{name} r$cur_rev (" . hostname .
-              ")" );
+        $msg->subject( fail_pass( !$failed )
+              . ": Test report for $task->{name} r$cur_rev ("
+              . hostname
+              . ")" );
 
         my $fh = $msg->open;
 
-        print $fh
-          "To obtain this release use the following command:\n\n";
+        print $fh "To obtain this release use the following command:\n\n";
         print $fh "  svn checkout -r$cur_rev $task->{svn}\n\n";
 
         if ( my $desc = $Config->{global}->{description} ) {

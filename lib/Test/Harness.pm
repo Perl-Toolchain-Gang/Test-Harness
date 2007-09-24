@@ -140,8 +140,7 @@ sub _canon {
 
     while ( $pos < $count ) {
         my $end = $pos + 1;
-        $end++
-          while $end < $count && $list[$end] <= $list[ $end - 1 ] + 1;
+        $end++ while $end < $count && $list[$end] <= $list[ $end - 1 ] + 1;
         push @ranges, ( $end == $pos + 1 )
           ? $list[$pos]
           : join( '-', $list[$pos], $list[ $end - 1 ] );
@@ -272,14 +271,14 @@ sub execute_tests {
             my $huh_errors  = $ok_seq  ? undef : '??';
 
             $failedtests{$test} = {
-                'canon' => $huh_planned ||
-                  $huh_errors ||
-                  _canon(@failed) ||
-                  '??',
+                'canon' => $huh_planned
+                  || $huh_errors
+                  || _canon(@failed)
+                  || '??',
                 'estat'  => $estat,
-                'failed' => $huh_planned ||
-                  $huh_errors ||
-                  scalar @failed,
+                'failed' => $huh_planned
+                  || $huh_errors
+                  || scalar @failed,
                 'max' => $huh_planned || $planned,
                 'name'  => $test,
                 'wstat' => $wstat

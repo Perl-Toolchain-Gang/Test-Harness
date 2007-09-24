@@ -44,8 +44,10 @@ use TAP::Base;
             }
         );
     };
-    like( $@, qr/No callbacks/,
-        'no callbacks in constructor croaks OK' );
+    like(
+        $@, qr/No callbacks/,
+        'no callbacks in constructor croaks OK'
+    );
 }
 
 package CallbackOK;
@@ -80,8 +82,8 @@ package main;
 
     eval {
         $base->callback( other_event => sub { $other-- } );
-        $base->callback(
-            nice_event => sub { $nice++; return shift() . 'OK' } );
+        $base->callback( nice_event => sub { $nice++; return shift() . 'OK' }
+        );
     };
 
     ok( !$@, 'callbacks installed OK' );
@@ -159,8 +161,7 @@ package main;
     my $status = undef;
 
     # Stack another callback
-    $base->callback( other_event => sub { $status = 'OK'; return 'Aye' }
-    );
+    $base->callback( other_event => sub { $status = 'OK'; return 'Aye' } );
 
     my $new_cbs = $base->_callback_for('other_event');
     is( ref $new_cbs, 'ARRAY', 'callbacks type ok' );

@@ -106,8 +106,8 @@ sub get_stream {
     my $self     = shift;
     my @switches = $self->_switches;
 
-    my @command = $self->_get_command_for_switches(@switches) or
-      $self->_croak("No command found!");
+    my @command = $self->_get_command_for_switches(@switches)
+      or $self->_croak("No command found!");
 
     # Nasty kludge. It might be nicer if we got the libs separately
     # although at least this way we find any -I switches that were
@@ -195,8 +195,8 @@ sub _switches {
     my %found_switch = map { $_ => 0 } @switches;
 
     # remove duplicate switches
-    @switches = grep { defined $_ && $_ ne '' && !$found_switch{$_}++ }
-      @switches;
+    @switches
+      = grep { defined $_ && $_ ne '' && !$found_switch{$_}++ } @switches;
     return @switches;
 }
 
@@ -227,8 +227,8 @@ sub _filtered_inc {
 
 {
 
-# cache this to avoid repeatedly shelling out to Perl.  This really speeds
-# up TAP::Parser.
+    # cache this to avoid repeatedly shelling out to Perl.  This really speeds
+    # up TAP::Parser.
     my @inc;
 
     sub _default_inc {

@@ -28,8 +28,8 @@ for my $test (@schedule) {
     isa_ok $cons, 'TAP::Formatter::Console';
     my $method = $test->{method};
     can_ok $cons, $method;
-    is_deeply [ $cons->$method( $test->{in}->() ) ],
-      [ $test->{out}->() ], $name;
+    is_deeply [ $cons->$method( $test->{in}->() ) ], [ $test->{out}->() ],
+      $name;
 }
 
 #### Color tests ####

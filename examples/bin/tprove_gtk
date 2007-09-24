@@ -36,8 +36,10 @@ if (@ARGV) {
     @tests = @ARGV;
 }
 else {
-    find( sub { -f && /\.t$/ && push @tests => $File::Find::name },
-        "t" );
+    find(
+        sub { -f && /\.t$/ && push @tests => $File::Find::name },
+        "t"
+    );
 }
 
 pipe( my $reader, my $writer );
@@ -206,12 +208,12 @@ sub create_view {
 
     my $model = Gtk2::ListStore->new(
 
-  #  filename     total     run       pass      fail      skip      todo
+        #  filename     total     run       pass      fail      skip      todo
         qw(Glib::String Glib::Int Glib::Int Glib::Int Glib::Int Glib::Int Glib::Int)
     );
     my $view = Gtk2::TreeView->new($model);
 
-# ------------------------------------------------------------------------- #
+ # ------------------------------------------------------------------------- #
 
     my $column_filename = Gtk2::TreeViewColumn->new_with_attributes(
         "Filename",
@@ -222,7 +224,7 @@ sub create_view {
     $column_filename->set_expand(TRUE);
     $view->append_column($column_filename);
 
-# ------------------------------------------------------------------------- #
+ # ------------------------------------------------------------------------- #
 
     my $renderer_progress = Gtk2::CellRendererProgress->new();
     my $column_progress   = Gtk2::TreeViewColumn->new_with_attributes(
@@ -261,7 +263,7 @@ sub create_view {
     );
     $view->append_column($column_progress);
 
-# ------------------------------------------------------------------------- #
+ # ------------------------------------------------------------------------- #
 
     my @count_columns = (
         [ "Pass", COLUMN_PASS ],
@@ -285,7 +287,7 @@ sub create_view {
         $view->append_column($column);
     }
 
-# ------------------------------------------------------------------------- #
+ # ------------------------------------------------------------------------- #
 
     $scroller->add($view);
     $vbox->pack_start( $scroller, TRUE, TRUE, 0 );
@@ -310,8 +312,7 @@ sub _callback_reader {
     if ( $condition & "in" || $condition & "pri" ) {
         my $data = <$reader>;
 
-        if ( $data !~
-            /^[^\t]+ \t \d+ \t \d+ \t \d+ \t \d+ \t \d+ \t \d+$/x )
+        if ( $data !~ /^[^\t]+ \t \d+ \t \d+ \t \d+ \t \d+ \t \d+ \t \d+$/x )
         {
             return TRUE;
         }
@@ -461,8 +462,9 @@ sub analyze {
         }
 
         else {
-            warn "Unknown result type `" . $line->type() . "´: " .
-              $line->as_string();
+            warn "Unknown result type `"
+              . $line->type() . "´: "
+              . $line->as_string();
         }
 
         my $string = join "\t", $test, @{$result};

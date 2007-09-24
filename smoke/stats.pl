@@ -217,8 +217,7 @@ sub parse_coverage {
                 $rec->{File} = resolve_coverage_name(
                     $proj,
                     delete $rec->{File}
-                  ) or
-                  return;
+                ) or return;
                 $cb->($rec);
             },
         },
@@ -244,9 +243,9 @@ sub parse_coverage {
                 TEST:
                 for my $te ( 'ARRAY' eq ref $test ? @$test : $test ) {
                     next if $te->{match} && $line !~ $te->{match};
-                    $state = $te->{goto} ||
-                      $te->{continue} ||
-                      die "Missing goto/continue in $state\n";
+                    $state = $te->{goto}
+                      || $te->{continue}
+                      || die "Missing goto/continue in $state\n";
                     redo STATE if $te->{continue};
                     last TEST;
                 }

@@ -125,8 +125,7 @@ sub add {
     while ( my ( $summary, $method ) = each %SUMMARY_METHOD_FOR ) {
         if ( my $count = $parser->$method() ) {
             $self->{$summary} += $count;
-            push @{ $self->{"descriptions_for_$summary"} } =>
-              $description;
+            push @{ $self->{"descriptions_for_$summary"} } => $description;
         }
     }
 
@@ -160,8 +159,8 @@ sub parsers {
     my $descriptions = $self->{parse_order};
     my @parsers      = @{ $self->{parser_for} }{@$descriptions};
 
-# Note:  Because of the way context works, we must assign the parsers to
-# the @parsers array or else this method does not work as documented.
+    # Note:  Because of the way context works, we must assign the parsers to
+    # the @parsers array or else this method does not work as documented.
     return @parsers;
 }
 
@@ -343,11 +342,11 @@ parse errors, bad exit/wait status, etc.
 
 sub has_problems {
     my $self = shift;
-    return $self->failed ||
-      $self->todo_passed ||
-      $self->parse_errors ||
-      $self->exit ||
-      $self->wait;
+    return $self->failed
+      || $self->todo_passed
+      || $self->parse_errors
+      || $self->exit
+      || $self->wait;
 }
 
 ##############################################################################

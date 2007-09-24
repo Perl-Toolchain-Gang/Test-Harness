@@ -79,8 +79,7 @@ BEGIN {
                 { isa => 'TAP::Parser::Result::Version', },
                 { isa => 'TAP::Parser::Result::Plan', },
                 {   isa         => 'TAP::Parser::Result::Test',
-                    description => eval
-                      qq{"Everything is fine \\x{263a}"}
+                    description => eval qq{"Everything is fine \\x{263a}"}
                 },
             ],
         }

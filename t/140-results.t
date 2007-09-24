@@ -47,8 +47,7 @@ like $warning, qr/^\Qpassed() is deprecated.  Please use "is_ok()"/,
 
 can_ok RESULT, 'new';
 eval { RESULT->new( { type => 'no_such_type' } ) };
-ok my $error = $@,
-  '... and calling it with an unknown class should fail';
+ok my $error = $@, '... and calling it with an unknown class should fail';
 like $error, qr/^Could not determine class for.*no_such_type/s,
   '... with an appropriate error message';
 
@@ -214,8 +213,8 @@ $test = run_tests(
             description => '... and this test is fine',
             directive   => 'TODO',
             explanation => 'why not?',
-            raw  => 'not ok 5 and this test is fine # TODO why not?',
-            type => 'test',
+            raw         => 'not ok 5 and this test is fine # TODO why not?',
+            type        => 'test',
         },
     },
     {   is_test      => 1,
@@ -268,7 +267,6 @@ sub run_method_tests {
     }
     while ( my ( $method, $value ) = each %$value_for ) {
         can_ok $result, $method;
-        is $result->$method(), $value,
-          "... and $method should be correct";
+        is $result->$method(), $value, "... and $method should be correct";
     }
 }

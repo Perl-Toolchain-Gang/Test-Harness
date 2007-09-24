@@ -81,8 +81,8 @@ sub save_handle {
     my $outfile = temp_file_name();
 
     local *SAVEOUT;
-    open SAVEOUT, ">&" . fileno($handle) or
-      die "Can't save output handle: $!";
+    open SAVEOUT, ">&" . fileno($handle)
+      or die "Can't save output handle: $!";
     open $handle, "> $outfile" or die "Can't create $outfile: $!";
 
     eval { $subr->() };

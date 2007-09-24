@@ -77,8 +77,7 @@ sub _enc_scalar {
     if ( $val =~ /$ESCAPE_CHAR/ ) {
         $val =~ s/\\/\\\\/g;
         $val =~ s/"/\\"/g;
-        $val
-          =~ s/ ( [\x00-\x1f] ) / '\\' . $UNPRINTABLE[ ord($1) ] /gex;
+        $val =~ s/ ( [\x00-\x1f] ) / '\\' . $UNPRINTABLE[ ord($1) ] /gex;
         return qq{"$val"};
     }
 
@@ -117,8 +116,10 @@ sub _write_obj {
             if (@$obj) {
                 $self->_put($prefix);
                 for my $value (@$obj) {
-                    $self->_write_obj( $pad . '-', $value,
-                        $indent + 1 );
+                    $self->_write_obj(
+                        $pad . '-', $value,
+                        $indent + 1
+                    );
                 }
             }
             else {

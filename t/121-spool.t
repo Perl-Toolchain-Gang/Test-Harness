@@ -16,7 +16,7 @@ my $useOrigClose;
 BEGIN {
     $useOrigOpen = $useOrigClose = 1;
 
-   # taken from http://www.perl.com/pub/a/2002/06/11/threads.html?page=2
+    # taken from http://www.perl.com/pub/a/2002/06/11/threads.html?page=2
 
     *CORE::GLOBAL::open = \&my_open;
 
@@ -90,8 +90,7 @@ plan tests => 4;
 
     is @die, 1, 'open failed, die as expected';
 
-    my $spoolDir
-      = File::Spec->catfile(qw( t spool source_tests harness ));
+    my $spoolDir = File::Spec->catfile(qw( t spool source_tests harness ));
 
     like pop @die, qr/ Can't write $spoolDir [(] /,
       '...with expected message';
@@ -109,9 +108,8 @@ ok 1 - input file opened
 END_TAP
 
     my $parser = TAP::Parser->new(
-        {   spool => $spoolHandle,
-            stream =>
-              TAP::Parser::Iterator->new( [ split /\n/ => $tap ] )
+        {   spool  => $spoolHandle,
+            stream => TAP::Parser::Iterator->new( [ split /\n/ => $tap ] )
         }
     );
 

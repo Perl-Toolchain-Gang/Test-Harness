@@ -40,8 +40,7 @@ ok
 END_TAP
 
 can_ok $parser, 'parse_errors';
-is scalar $parser->parse_errors, 2,
-  '... and we should have two parse errors';
+is scalar $parser->parse_errors, 2, '... and we should have two parse errors';
 
 is [ $parser->parse_errors ]->[0],
   'Plan (1..3) must be at the beginning or end of the TAP output',
@@ -58,8 +57,7 @@ ok 3 - read the rest of the file
 # yo quiero tests!
 1..3
 END_TAP
-ok !$parser->parse_errors,
-  '... but test plan-like data can be in a comment';
+ok !$parser->parse_errors, '... but test plan-like data can be in a comment';
 
 $parser = _parser(<<'END_TAP');
 ok 1 - input file opened
@@ -137,8 +135,7 @@ END_TAP
 
 is $parser->parse_errors, 1,
   'Having more than one plan should cause an error';
-is + ( $parser->parse_errors )[0],
-  'More than one plan found in TAP output',
+is + ( $parser->parse_errors )[0], 'More than one plan found in TAP output',
   '... with a correct error message';
 
 can_ok $parser, 'is_good_plan';

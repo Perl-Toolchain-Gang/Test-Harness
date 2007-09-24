@@ -58,8 +58,7 @@ if ($baseline) {
                 {
                     my $delta = $cur_time - $base_time;
                     my $color
-                      = (
-                        abs($delta) > ( $cur_time + $base_time ) / 50 )
+                      = ( abs($delta) > ( $cur_time + $base_time ) / 50 )
                       ? ( $delta > 0 )
                           ? RED
                           : GREEN

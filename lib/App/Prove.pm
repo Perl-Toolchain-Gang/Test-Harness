@@ -136,8 +136,7 @@ sub process_args {
                 ? App::Prove::Plugins->switches
                 : ()
             ),
-          ) or
-          croak('Unable to continue');
+        ) or croak('Unable to continue');
 
         # Stash the remainder of argv for later
         $self->{argv} = [@ARGV];
@@ -155,8 +154,9 @@ sub _help {
     # XXX Getopt::Long is being helpy
     local $SIG{__DIE__} = sub { warn @_; $self->_exit; };
     if ($err) {
-        die 'Please install Pod::Usage for the --help option ' .
-          '(or try `perldoc prove`.)' . "\n ($@)";
+        die 'Please install Pod::Usage for the --help option '
+          . '(or try `perldoc prove`.)'
+          . "\n ($@)";
     }
 
     Pod::Usage::pod2usage( { -verbose => 1 } );
@@ -184,7 +184,7 @@ sub _get_args {
     }
 
     if ( $self->archive ) {
-        eval("sub TAP::Harness::Archive::auto_inherit {1}"); # wink,wink
+        eval("sub TAP::Harness::Archive::auto_inherit {1}");    # wink,wink
         $self->require_harness( archive => 'TAP::Harness::Archive' );
         $args{archive} = $self->archive;
     }
@@ -235,8 +235,7 @@ sub _get_args {
 
     $args{errors} = 1 if $self->parse;
 
-    $args{exec}
-      = length( $self->exec ) ? [ split( / /, $self->exec ) ] : []
+    $args{exec} = length( $self->exec ) ? [ split( / /, $self->exec ) ] : []
       if ( defined( $self->exec ) );
 
     if ($formatter_class) {

@@ -47,14 +47,12 @@ my @V13 = ( @V12, 'yaml' );
 can_ok $grammar, 'token_types';
 ok my @types = sort( $grammar->token_types ),
   '... and calling it should succeed (v12)';
-is_deeply \@types, \@V12,
-  '... and return the correct token types (v12)';
+is_deeply \@types, \@V12, '... and return the correct token types (v12)';
 
 $grammar->set_version(13);
 ok @types = sort( $grammar->token_types ),
   '... and calling it should succeed (v13)';
-is_deeply \@types, \@V13,
-  '... and return the correct token types (v13)';
+is_deeply \@types, \@V13, '... and return the correct token types (v13)';
 
 can_ok $grammar, 'syntax_for';
 can_ok $grammar, 'handler_for';
@@ -306,12 +304,12 @@ is_deeply $token, $expected,
 {
     my $grammar = $GRAMMAR->new;
 
-    my $plan = '1..1 # SKIP with explanation'
-      ;    # trigger warning in _make_plan_token
+    my $plan
+      = '1..1 # SKIP with explanation';  # trigger warning in _make_plan_token
 
     my $method = $handler_for{'plan'};
 
-    $plan =~ $syntax_for{'plan'};    # perform regex to populate $1, $2
+    $plan =~ $syntax_for{'plan'};        # perform regex to populate $1, $2
 
     my @warn;
 
