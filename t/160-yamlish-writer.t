@@ -102,7 +102,8 @@ BEGIN {
         },
         {   name => 'Nested hash',
             in   => {
-                one => '1', two => '2', more => { three => '3', four => '4' }
+                one => '1', two => '2',
+                more => { three => '3', four => '4' }
             },
             out => [
                 '---',

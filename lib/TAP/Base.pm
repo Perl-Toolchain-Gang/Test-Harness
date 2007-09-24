@@ -66,7 +66,9 @@ sub _initialize {
     $self->{ok_callbacks} = \%ok_map;
 
     if ( exists $arg_for->{callbacks} ) {
-        while ( my ( $event, $callback ) = each %{ $arg_for->{callbacks} } ) {
+        while ( my ( $event, $callback )
+            = each %{ $arg_for->{callbacks} } )
+        {
             $self->callback( $event, $callback );
         }
     }
@@ -86,11 +88,12 @@ sub callback {
     my %ok_map = %{ $self->{ok_callbacks} };
 
     $self->_croak('No callbacks may be installed')
-        unless %ok_map;
+      unless %ok_map;
 
-    $self->_croak( "Callback $event is not supported. Valid callbacks are "
-          . join( ', ', sort keys %ok_map ) )
-        unless exists $ok_map{$event};
+    $self->_croak(
+        "Callback $event is not supported. Valid callbacks are " .
+          join( ', ', sort keys %ok_map ) )
+      unless exists $ok_map{$event};
 
     push @{ $self->{code_for}{$event} }, $callback;
 

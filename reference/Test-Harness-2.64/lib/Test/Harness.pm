@@ -10,17 +10,16 @@ use Benchmark;
 use Config;
 use strict;
 
-
 use vars qw(
-    $VERSION 
-    @ISA @EXPORT @EXPORT_OK 
-    $Verbose $Switches $Debug
-    $verbose $switches $debug
-    $Columns
-    $Timer
-    $ML $Last_ML_Print
-    $Strap
-    $has_time_hires
+  $VERSION
+  @ISA @EXPORT @EXPORT_OK
+  $Verbose $Switches $Debug
+  $verbose $switches $debug
+  $Columns
+  $Timer
+  $ML $Last_ML_Print
+  $Strap
+  $has_time_hires
 );
 
 BEGIN {
@@ -45,10 +44,11 @@ $VERSION = '2.64';
 *switches = *Switches;
 *debug    = *Debug;
 
-$ENV{HARNESS_ACTIVE} = 1;
+$ENV{HARNESS_ACTIVE}  = 1;
 $ENV{HARNESS_VERSION} = $VERSION;
 
 END {
+
     # For VMS.
     delete $ENV{HARNESS_ACTIVE};
     delete $ENV{HARNESS_VERSION};
@@ -58,48 +58,56 @@ my $Files_In_Dir = $ENV{HARNESS_FILELEAK_IN_DIR};
 
 # Stolen from Params::Util
 sub _CLASS {
-    (defined $_[0] and ! ref $_[0] and $_[0] =~ m/^[^\W\d]\w*(?:::\w+)*$/s) ? $_[0] : undef;
+    ( defined $_[0] and
+          !ref $_[0] and
+          $_[0] =~ m/^[^\W\d]\w*(?:::\w+)*$/s ) ? $_[0] : undef;
 }
 
 # Strap Overloading
 if ( $ENV{HARNESS_STRAPS_CLASS} ) {
     die 'Set HARNESS_STRAP_CLASS, singular, not HARNESS_STRAPS_CLASS';
 }
-my $HARNESS_STRAP_CLASS  = $ENV{HARNESS_STRAP_CLASS} || 'Test::Harness::Straps';
+my $HARNESS_STRAP_CLASS = $ENV{HARNESS_STRAP_CLASS} ||
+  'Test::Harness::Straps';
 if ( $HARNESS_STRAP_CLASS =~ /\.pm$/ ) {
+
     # "Class" is actually a filename, that should return the
     # class name as its true return value.
     $HARNESS_STRAP_CLASS = require $HARNESS_STRAP_CLASS;
     if ( !_CLASS($HARNESS_STRAP_CLASS) ) {
-        die "HARNESS_STRAP_CLASS '$HARNESS_STRAP_CLASS' is not a valid class name";
+        die
+          "HARNESS_STRAP_CLASS '$HARNESS_STRAP_CLASS' is not a valid class name";
     }
 }
 else {
+
     # It is a class name within the current @INC
     if ( !_CLASS($HARNESS_STRAP_CLASS) ) {
-        die "HARNESS_STRAP_CLASS '$HARNESS_STRAP_CLASS' is not a valid class name";
+        die
+          "HARNESS_STRAP_CLASS '$HARNESS_STRAP_CLASS' is not a valid class name";
     }
     eval "require $HARNESS_STRAP_CLASS";
     die $@ if $@;
 }
 if ( !$HARNESS_STRAP_CLASS->isa('Test::Harness::Straps') ) {
-    die "HARNESS_STRAP_CLASS '$HARNESS_STRAP_CLASS' must be a Test::Harness::Straps subclass";
+    die
+      "HARNESS_STRAP_CLASS '$HARNESS_STRAP_CLASS' must be a Test::Harness::Straps subclass";
 }
 
 $Strap = $HARNESS_STRAP_CLASS->new;
 
-sub strap { return $Strap };
+sub strap { return $Strap }
 
-@ISA = ('Exporter');
+@ISA       = ('Exporter');
 @EXPORT    = qw(&runtests);
 @EXPORT_OK = qw(&execute_tests $verbose $switches);
 
-$Verbose  = $ENV{HARNESS_VERBOSE} || 0;
-$Debug    = $ENV{HARNESS_DEBUG} || 0;
+$Verbose = $ENV{HARNESS_VERBOSE} || 0;
+$Debug   = $ENV{HARNESS_DEBUG}   || 0;
 $Switches = '-w';
-$Columns  = $ENV{HARNESS_COLUMNS} || $ENV{COLUMNS} || 80;
-$Columns--;             # Some shells have trouble with a full line of text.
-$Timer    = $ENV{HARNESS_TIMER} || 0;
+$Columns = $ENV{HARNESS_COLUMNS} || $ENV{COLUMNS} || 80;
+$Columns--;    # Some shells have trouble with a full line of text.
+$Timer = $ENV{HARNESS_TIMER} || 0;
 
 =head1 SYNOPSIS
 
@@ -232,21 +240,25 @@ one of the messages in the DIAGNOSTICS section.
 =cut
 
 sub runtests {
-    my(@tests) = @_;
+    my (@tests) = @_;
 
-    local ($\, $,);
+    local ( $\, $, );
 
-    my ($tot, $failedtests,$todo_passed) = execute_tests(tests => \@tests);
-    print get_results($tot, $failedtests,$todo_passed);
+    my ( $tot, $failedtests, $todo_passed )
+      = execute_tests( tests => \@tests );
+    print get_results( $tot, $failedtests, $todo_passed );
 
     my $ok = _all_ok($tot);
 
-    assert(($ok xor keys %$failedtests), 
-           q{ok status jives with $failedtests});
+    assert(
+        ( $ok xor keys %$failedtests ),
+        q{ok status jives with $failedtests}
+    );
 
-    if (! $ok) {
-        die("Failed $tot->{bad}/$tot->{tests} test programs. " .
-            "@{[$tot->{max} - $tot->{ok}]}/$tot->{max} subtests failed.\n");
+    if ( !$ok ) {
+        die( "Failed $tot->{bad}/$tot->{tests} test programs. " .
+              "@{[$tot->{max} - $tot->{ok}]}/$tot->{max} subtests failed.\n"
+        );
     }
 
     return $ok;
@@ -256,9 +268,10 @@ sub runtests {
 # Tells you if this test run is overall successful or not.
 
 sub _all_ok {
-    my($tot) = shift;
+    my ($tot) = shift;
 
-    return $tot->{bad} == 0 && ($tot->{max} || $tot->{skipped}) ? 1 : 0;
+    return $tot->{bad} == 0
+      && ( $tot->{max} || $tot->{skipped} ) ? 1 : 0;
 }
 
 # Returns all the files in a directory.  This is shorthand for backwards
@@ -317,32 +330,32 @@ C<$failed> should be empty if everything passed.
 =cut
 
 sub execute_tests {
-    my %args = @_;
-    my @tests = @{$args{tests}};
-    my $out = $args{out} || select();
+    my %args  = @_;
+    my @tests = @{ $args{tests} };
+    my $out   = $args{out} || select();
 
     # We allow filehandles that are symbolic refs
     no strict 'refs';
     _autoflush($out);
-    _autoflush(\*STDERR);
+    _autoflush( \*STDERR );
 
     my %failedtests;
     my %todo_passed;
 
     # Test-wide totals.
-    my(%tot) = (
-                bonus    => 0,
-                max      => 0,
-                ok       => 0,
-                files    => 0,
-                bad      => 0,
-                good     => 0,
-                tests    => scalar @tests,
-                sub_skipped  => 0,
-                todo     => 0,
-                skipped  => 0,
-                bench    => 0,
-               );
+    my (%tot) = (
+        bonus       => 0,
+        max         => 0,
+        ok          => 0,
+        files       => 0,
+        bad         => 0,
+        good        => 0,
+        tests       => scalar @tests,
+        sub_skipped => 0,
+        todo        => 0,
+        skipped     => 0,
+        bench       => 0,
+    );
 
     my @dir_files;
     @dir_files = _globdir $Files_In_Dir if defined $Files_In_Dir;
@@ -350,8 +363,8 @@ sub execute_tests {
 
     my $width = _leader_width(@tests);
     foreach my $tfile (@tests) {
-        $Last_ML_Print = 0;  # so each test prints at least once
-        my($leader, $ml) = _mk_leader($tfile, $width);
+        $Last_ML_Print = 0;    # so each test prints at least once
+        my ( $leader, $ml ) = _mk_leader( $tfile, $width );
         local $ML = $ml;
 
         print $out $leader;
@@ -359,20 +372,22 @@ sub execute_tests {
         $tot{files}++;
 
         $Strap->{_seen_header} = 0;
-        if ( $Test::Harness::Debug ) {
-            print $out "# Running: ", $Strap->_command_line($tfile), "\n";
+        if ($Test::Harness::Debug) {
+            print $out "# Running: ", $Strap->_command_line($tfile),
+              "\n";
         }
         my $test_start_time = $Timer ? time : 0;
         my $results = $Strap->analyze_file($tfile) or
-          do { warn $Strap->{error}, "\n";  next };
+          do { warn $Strap->{error}, "\n"; next };
         my $elapsed;
-        if ( $Timer ) {
+        if ($Timer) {
             $elapsed = time - $test_start_time;
-            if ( $has_time_hires ) {
-                $elapsed = sprintf( " %8d ms", $elapsed*1000 );
+            if ($has_time_hires) {
+                $elapsed = sprintf( " %8d ms", $elapsed * 1000 );
             }
             else {
-                $elapsed = sprintf( " %8s s", $elapsed ? $elapsed : "<1" );
+                $elapsed
+                  = sprintf( " %8s s", $elapsed ? $elapsed : "<1" );
             }
         }
         else {
@@ -380,11 +395,12 @@ sub execute_tests {
         }
 
         # state of the current test.
-        my @failed = grep { !$results->details->[$_-1]{ok} }
-                     1..@{$results->details};
-        my @todo_pass = grep { $results->details->[$_-1]{actual_ok} &&
-                               $results->details->[$_-1]{type} eq 'todo' }
-                        1..@{$results->details};
+        my @failed = grep { !$results->details->[ $_ - 1 ]{ok} }
+          1 .. @{ $results->details };
+        my @todo_pass = grep {
+                 $results->details->[ $_ - 1 ]{actual_ok}
+              && $results->details->[ $_ - 1 ]{type} eq 'todo'
+        } 1 .. @{ $results->details };
 
         my %test = (
             ok          => $results->ok,
@@ -410,101 +426,121 @@ sub execute_tests {
         my $wstatus = $results->wait;
 
         if ( $results->passing ) {
+
             # XXX Combine these first two
-            if ($test{max} and $test{skipped} + $test{bonus}) {
+            if ( $test{max} and $test{skipped} + $test{bonus} ) {
                 my @msg;
-                push(@msg, "$test{skipped}/$test{max} skipped: $test{skip_reason}")
-                    if $test{skipped};
-                if ($test{bonus}) {
-                    my ($txt, $canon) = _canondetail($test{todo},0,'TODO passed',
-                                                    @{$test{todo_pass}});
+                push( @msg,
+                    "$test{skipped}/$test{max} skipped: $test{skip_reason}"
+                ) if $test{skipped};
+                if ( $test{bonus} ) {
+                    my ( $txt, $canon ) = _canondetail(
+                        $test{todo}, 0, 'TODO passed',
+                        @{ $test{todo_pass} }
+                    );
                     $todo_passed{$tfile} = {
-                        canon   => $canon,
-                        max     => $test{todo},
-                        failed  => $test{bonus},
-                        name    => $tfile,
-                        estat   => '',
-                        wstat   => '',
+                        canon  => $canon,
+                        max    => $test{todo},
+                        failed => $test{bonus},
+                        name   => $tfile,
+                        estat  => '',
+                        wstat  => '',
                     };
 
-                    push(@msg, "$test{bonus}/$test{max} unexpectedly succeeded\n$txt");
+                    push( @msg,
+                        "$test{bonus}/$test{max} unexpectedly succeeded\n$txt"
+                    );
                 }
-                print $out "$test{ml}ok$elapsed\n        ".join(', ', @msg)."\n";
+                print $out "$test{ml}ok$elapsed\n        " .
+                  join( ', ', @msg ) . "\n";
             }
             elsif ( $test{max} ) {
                 print $out "$test{ml}ok$elapsed\n";
             }
-            elsif ( defined $test{skip_all} and length $test{skip_all} ) {
-                print $out "skipped\n        all skipped: $test{skip_all}\n";
+            elsif ( defined $test{skip_all} and length $test{skip_all} )
+            {
+                print $out
+                  "skipped\n        all skipped: $test{skip_all}\n";
                 $tot{skipped}++;
             }
             else {
-                print $out "skipped\n        all skipped: no reason given\n";
+                print $out
+                  "skipped\n        all skipped: no reason given\n";
                 $tot{skipped}++;
             }
             $tot{good}++;
         }
         else {
+
             # List unrun tests as failures.
-            if ($test{'next'} <= $test{max}) {
-                push @{$test{failed}}, $test{'next'}..$test{max};
+            if ( $test{'next'} <= $test{max} ) {
+                push @{ $test{failed} }, $test{'next'} .. $test{max};
             }
+
             # List overruns as failures.
             else {
                 my $details = $results->details;
-                foreach my $overrun ($test{max}+1..@$details) {
-                    next unless ref $details->[$overrun-1];
-                    push @{$test{failed}}, $overrun
+                foreach my $overrun ( $test{max} + 1 .. @$details ) {
+                    next unless ref $details->[ $overrun - 1 ];
+                    push @{ $test{failed} }, $overrun;
                 }
             }
 
             if ($wstatus) {
-                $failedtests{$tfile} = _dubious_return(\%test, \%tot, 
-                                                       $estatus, $wstatus);
+                $failedtests{$tfile} = _dubious_return(
+                    \%test,   \%tot,
+                    $estatus, $wstatus
+                );
                 $failedtests{$tfile}{name} = $tfile;
             }
             elsif ( $results->seen ) {
-                if (@{$test{failed}} and $test{max}) {
-                    my ($txt, $canon) = _canondetail($test{max},$test{skipped},'Failed',
-                                                    @{$test{failed}});
+                if ( @{ $test{failed} } and $test{max} ) {
+                    my ( $txt, $canon ) = _canondetail(
+                        $test{max}, $test{skipped}, 'Failed',
+                        @{ $test{failed} }
+                    );
                     print $out "$test{ml}$txt";
-                    $failedtests{$tfile} = { canon   => $canon,
-                                             max     => $test{max},
-                                             failed  => scalar @{$test{failed}},
-                                             name    => $tfile, 
-                                             estat   => '',
-                                             wstat   => '',
-                                           };
+                    $failedtests{$tfile} = {
+                        canon  => $canon,
+                        max    => $test{max},
+                        failed => scalar @{ $test{failed} },
+                        name   => $tfile,
+                        estat  => '',
+                        wstat  => '',
+                    };
                 }
                 else {
-                    print $out "Don't know which tests failed: got $test{ok} ok, ".
-                          "expected $test{max}\n";
-                    $failedtests{$tfile} = { canon   => '??',
-                                             max     => $test{max},
-                                             failed  => '??',
-                                             name    => $tfile, 
-                                             estat   => '', 
-                                             wstat   => '',
-                                           };
+                    print $out
+                      "Don't know which tests failed: got $test{ok} ok, "
+                      . "expected $test{max}\n";
+                    $failedtests{$tfile} = {
+                        canon  => '??',
+                        max    => $test{max},
+                        failed => '??',
+                        name   => $tfile,
+                        estat  => '',
+                        wstat  => '',
+                    };
                 }
                 $tot{bad}++;
             }
             else {
                 print $out "FAILED before any test output arrived\n";
                 $tot{bad}++;
-                $failedtests{$tfile} = { canon       => '??',
-                                         max         => '??',
-                                         failed      => '??',
-                                         name        => $tfile,
-                                         estat       => '', 
-                                         wstat       => '',
-                                       };
+                $failedtests{$tfile} = {
+                    canon  => '??',
+                    max    => '??',
+                    failed => '??',
+                    name   => $tfile,
+                    estat  => '',
+                    wstat  => '',
+                };
             }
         }
 
-        if (defined $Files_In_Dir) {
+        if ( defined $Files_In_Dir ) {
             my @new_dir_files = _globdir $Files_In_Dir;
-            if (@new_dir_files != @dir_files) {
+            if ( @new_dir_files != @dir_files ) {
                 my %f;
                 @f{@new_dir_files} = (1) x @new_dir_files;
                 delete @f{@dir_files};
@@ -513,18 +549,18 @@ sub execute_tests {
                 @dir_files = @new_dir_files;
             }
         }
-    } # foreach test
-    $tot{bench} = timediff(new Benchmark, $run_start_time);
+    }    # foreach test
+    $tot{bench} = timediff( new Benchmark, $run_start_time );
 
     $Strap->_restore_PERL5LIB;
 
-    return(\%tot, \%failedtests, \%todo_passed);
+    return ( \%tot, \%failedtests, \%todo_passed );
 }
 
 # Turns on autoflush for the handle passed
 sub _autoflush {
     my $flushy_fh = shift;
-    my $old_fh = select $flushy_fh;
+    my $old_fh    = select $flushy_fh;
     $| = 1;
     select $old_fh;
 }
@@ -543,21 +579,21 @@ The C<$width> is the width of the "yada/blah.." string.
 =cut
 
 sub _mk_leader {
-    my($te, $width) = @_;
+    my ( $te, $width ) = @_;
     chomp($te);
     $te =~ s/\.\w+$/./;
 
-    if ($^O eq 'VMS') {
+    if ( $^O eq 'VMS' ) {
         $te =~ s/^.*\.t\./\[.t./s;
     }
-    my $leader = "$te" . '.' x ($width - length($te));
+    my $leader = "$te" . '.' x ( $width - length($te) );
     my $ml = "";
 
     if ( -t STDOUT and not $ENV{HARNESS_NOTTY} and not $Verbose ) {
-        $ml = "\r" . (' ' x 77) . "\r$leader"
+        $ml = "\r" . ( ' ' x 77 ) . "\r$leader";
     }
 
-    return($leader, $ml);
+    return ( $leader, $ml );
 }
 
 =for private _leader_width
@@ -570,21 +606,22 @@ longest test name.
 =cut
 
 sub _leader_width {
-    my $maxlen = 0;
+    my $maxlen    = 0;
     my $maxsuflen = 0;
     foreach (@_) {
         my $suf    = /\.(\w+)$/ ? $1 : '';
         my $len    = length;
         my $suflen = length $suf;
-        $maxlen    = $len    if $len    > $maxlen;
+        $maxlen    = $len    if $len > $maxlen;
         $maxsuflen = $suflen if $suflen > $maxsuflen;
     }
+
     # + 3 : we want three dots between the test name and the "ok"
     return $maxlen + 3 - $maxsuflen;
 }
 
 sub get_results {
-    my $tot = shift;
+    my $tot         = shift;
     my $failedtests = shift;
     my $todo_passed = shift;
 
@@ -592,60 +629,69 @@ sub get_results {
 
     my $bonusmsg = _bonusmsg($tot);
 
-    if (_all_ok($tot)) {
+    if ( _all_ok($tot) ) {
         $out .= "All tests successful$bonusmsg.\n";
-        if ($tot->{bonus}) {
-            my($fmt_top, $fmt) = _create_fmts("Passed TODO",$todo_passed);
+        if ( $tot->{bonus} ) {
+            my ( $fmt_top, $fmt )
+              = _create_fmts( "Passed TODO", $todo_passed );
+
             # Now write to formats
-            $out .= swrite( $fmt_top );
-            for my $script (sort keys %{$todo_passed||{}}) {
+            $out .= swrite($fmt_top);
+            for my $script ( sort keys %{ $todo_passed || {} } ) {
                 my $Curtest = $todo_passed->{$script};
-                $out .= swrite( $fmt, @{ $Curtest }{qw(name estat wstat max failed canon)} );
+                $out .= swrite( $fmt, @{$Curtest}
+                      {qw(name estat wstat max failed canon)} );
             }
         }
     }
-    elsif (!$tot->{tests}){
+    elsif ( !$tot->{tests} ) {
         die "FAILED--no tests were run for some reason.\n";
     }
-    elsif (!$tot->{max}) {
-        my $blurb = $tot->{tests}==1 ? "script" : "scripts";
-        die "FAILED--$tot->{tests} test $blurb could be run, ".
-            "alas--no output ever seen\n";
+    elsif ( !$tot->{max} ) {
+        my $blurb = $tot->{tests} == 1 ? "script" : "scripts";
+        die "FAILED--$tot->{tests} test $blurb could be run, " .
+          "alas--no output ever seen\n";
     }
     else {
-        my $subresults = sprintf( " %d/%d subtests failed.",
-                              $tot->{max} - $tot->{ok}, $tot->{max} );
+        my $subresults = sprintf(
+            " %d/%d subtests failed.",
+            $tot->{max} - $tot->{ok}, $tot->{max}
+        );
 
-        my($fmt_top, $fmt1, $fmt2) = _create_fmts("Failed Test",$failedtests);
+        my ( $fmt_top, $fmt1, $fmt2 )
+          = _create_fmts( "Failed Test", $failedtests );
 
         # Now write to formats
-        $out .= swrite( $fmt_top );
-        for my $script (sort keys %$failedtests) {
+        $out .= swrite($fmt_top);
+        for my $script ( sort keys %$failedtests ) {
             my $Curtest = $failedtests->{$script};
-            $out .= swrite( $fmt1, @{ $Curtest }{qw(name estat wstat max failed canon)} );
+            $out .= swrite( $fmt1,
+                @{$Curtest}{qw(name estat wstat max failed canon)} );
             $out .= swrite( $fmt2, $Curtest->{canon} );
         }
-        if ($tot->{bad}) {
+        if ( $tot->{bad} ) {
             $bonusmsg =~ s/^,\s*//;
             $out .= "$bonusmsg.\n" if $bonusmsg;
-            $out .= "Failed $tot->{bad}/$tot->{tests} test scripts.$subresults\n";
+            $out
+              .= "Failed $tot->{bad}/$tot->{tests} test scripts.$subresults\n";
         }
     }
 
-    $out .= sprintf("Files=%d, Tests=%d, %s\n",
-           $tot->{files}, $tot->{max}, timestr($tot->{bench}, 'nop'));
+    $out .= sprintf(
+        "Files=%d, Tests=%d, %s\n",
+        $tot->{files}, $tot->{max}, timestr( $tot->{bench}, 'nop' )
+    );
     return $out;
 }
 
 sub swrite {
     my $format = shift;
     $^A = '';
-    formline($format,@_);
+    formline( $format, @_ );
     my $out = $^A;
     $^A = '';
     return $out;
 }
-
 
 my %Handlers = (
     header  => \&header_handler,
@@ -653,42 +699,42 @@ my %Handlers = (
     bailout => \&bailout_handler,
 );
 
-$Strap->set_callback(\&strap_callback);
+$Strap->set_callback( \&strap_callback );
+
 sub strap_callback {
-    my($self, $line, $type, $totals) = @_;
+    my ( $self, $line, $type, $totals ) = @_;
     print $line if $Verbose;
 
     my $meth = $Handlers{$type};
-    $meth->($self, $line, $type, $totals) if $meth;
-};
-
+    $meth->( $self, $line, $type, $totals ) if $meth;
+}
 
 sub header_handler {
-    my($self, $line, $type, $totals) = @_;
+    my ( $self, $line, $type, $totals ) = @_;
 
     warn "Test header seen more than once!\n" if $self->{_seen_header};
 
     $self->{_seen_header}++;
 
     warn "1..M can only appear at the beginning or end of tests\n"
-      if $totals->seen && ($totals->max < $totals->seen);
-};
+      if $totals->seen && ( $totals->max < $totals->seen );
+}
 
 sub test_handler {
-    my($self, $line, $type, $totals) = @_;
+    my ( $self, $line, $type, $totals ) = @_;
 
-    my $curr = $totals->seen;
-    my $next = $self->{'next'};
-    my $max  = $totals->max;
+    my $curr   = $totals->seen;
+    my $next   = $self->{'next'};
+    my $max    = $totals->max;
     my $detail = $totals->details->[-1];
 
-    if( $detail->{ok} ) {
+    if ( $detail->{ok} ) {
         _print_ml_less("ok $curr/$max");
 
-        if( $detail->{type} eq 'skip' ) {
+        if ( $detail->{type} eq 'skip' ) {
             $totals->set_skip_reason( $detail->{reason} )
               unless defined $totals->skip_reason;
-            $totals->set_skip_reason( 'various reasons' )
+            $totals->set_skip_reason('various reasons')
               if $totals->skip_reason ne $detail->{reason};
         }
     }
@@ -696,28 +742,27 @@ sub test_handler {
         _print_ml("NOK $curr/$max");
     }
 
-    if( $curr > $next ) {
+    if ( $curr > $next ) {
         print "Test output counter mismatch [test $curr]\n";
     }
-    elsif( $curr < $next ) {
-        print "Confused test output: test $curr answered after ".
-              "test ", $next - 1, "\n";
+    elsif ( $curr < $next ) {
+        print "Confused test output: test $curr answered after " .
+          "test ", $next - 1, "\n";
     }
 
-};
+}
 
 sub bailout_handler {
-    my($self, $line, $type, $totals) = @_;
+    my ( $self, $line, $type, $totals ) = @_;
 
-    die "FAILED--Further testing stopped" .
-      ($self->{bailout_reason} ? ": $self->{bailout_reason}\n" : ".\n");
-};
-
+    die "FAILED--Further testing stopped" . ( $self->{bailout_reason}
+        ? ": $self->{bailout_reason}\n"
+        : ".\n" );
+}
 
 sub _print_ml {
     print join '', $ML, @_ if $ML;
 }
-
 
 # Print updates only once per second.
 sub _print_ml_less {
@@ -729,124 +774,126 @@ sub _print_ml_less {
 }
 
 sub _bonusmsg {
-    my($tot) = @_;
+    my ($tot) = @_;
 
     my $bonusmsg = '';
-    $bonusmsg = (" ($tot->{bonus} subtest".($tot->{bonus} > 1 ? 's' : '').
-               " UNEXPECTEDLY SUCCEEDED)")
-        if $tot->{bonus};
+    $bonusmsg
+      = ( " ($tot->{bonus} subtest" . ( $tot->{bonus} > 1 ? 's' : '' ) .
+          " UNEXPECTEDLY SUCCEEDED)" )
+      if $tot->{bonus};
 
-    if ($tot->{skipped}) {
-        $bonusmsg .= ", $tot->{skipped} test"
-                     . ($tot->{skipped} != 1 ? 's' : '');
-        if ($tot->{sub_skipped}) {
-            $bonusmsg .= " and $tot->{sub_skipped} subtest"
-                         . ($tot->{sub_skipped} != 1 ? 's' : '');
+    if ( $tot->{skipped} ) {
+        $bonusmsg .= ", $tot->{skipped} test" .
+          ( $tot->{skipped} != 1 ? 's' : '' );
+        if ( $tot->{sub_skipped} ) {
+            $bonusmsg .= " and $tot->{sub_skipped} subtest" .
+              ( $tot->{sub_skipped} != 1 ? 's' : '' );
         }
         $bonusmsg .= ' skipped';
     }
-    elsif ($tot->{sub_skipped}) {
-        $bonusmsg .= ", $tot->{sub_skipped} subtest"
-                     . ($tot->{sub_skipped} != 1 ? 's' : '')
-                     . " skipped";
+    elsif ( $tot->{sub_skipped} ) {
+        $bonusmsg .= ", $tot->{sub_skipped} subtest" .
+          ( $tot->{sub_skipped} != 1 ? 's' : '' ) . " skipped";
     }
     return $bonusmsg;
 }
 
 # Test program go boom.
 sub _dubious_return {
-    my($test, $tot, $estatus, $wstatus) = @_;
+    my ( $test, $tot, $estatus, $wstatus ) = @_;
 
     my $failed = '??';
     my $canon  = '??';
 
-    printf "$test->{ml}dubious\n\tTest returned status $estatus ".
-           "(wstat %d, 0x%x)\n",
-           $wstatus,$wstatus;
+    printf "$test->{ml}dubious\n\tTest returned status $estatus " .
+      "(wstat %d, 0x%x)\n", $wstatus, $wstatus;
     print "\t\t(VMS status is $estatus)\n" if $^O eq 'VMS';
 
     $tot->{bad}++;
 
-    if ($test->{max}) {
-        if ($test->{'next'} == $test->{max} + 1 and not @{$test->{failed}}) {
+    if ( $test->{max} ) {
+        if ( $test->{'next'} == $test->{max} + 1 and
+            not @{ $test->{failed} } )
+        {
             print "\tafter all the subtests completed successfully\n";
-            $failed = 0;        # But we do not set $canon!
+            $failed = 0;    # But we do not set $canon!
         }
         else {
-            push @{$test->{failed}}, $test->{'next'}..$test->{max};
-            $failed = @{$test->{failed}};
-            (my $txt, $canon) = _canondetail($test->{max},$test->{skipped},'Failed',@{$test->{failed}});
-            print "DIED. ",$txt;
+            push @{ $test->{failed} }, $test->{'next'} .. $test->{max};
+            $failed = @{ $test->{failed} };
+            ( my $txt, $canon )
+              = _canondetail( $test->{max}, $test->{skipped}, 'Failed',
+                @{ $test->{failed} } );
+            print "DIED. ", $txt;
         }
     }
 
-    return { canon => $canon,  max => $test->{max} || '??',
-             failed => $failed, 
-             estat => $estatus, wstat => $wstatus,
-           };
+    return {
+        canon => $canon, max => $test->{max} || '??',
+        failed => $failed,
+        estat  => $estatus, wstat => $wstatus,
+    };
 }
 
-
 sub _create_fmts {
-    my $failed_str = shift;
+    my $failed_str  = shift;
     my $failedtests = shift;
 
-    my ($type) = split /\s/,$failed_str;
-    my $short = substr($type,0,4);
-    my $total = $short eq 'Pass' ? 'TODOs' : 'Total';
+    my ($type) = split /\s/, $failed_str;
+    my $short = substr( $type, 0, 4 );
+    my $total      = $short eq 'Pass' ? 'TODOs' : 'Total';
     my $middle_str = " Stat Wstat $total $short  ";
-    my $list_str = "List of $type";
+    my $list_str   = "List of $type";
 
     # Figure out our longest name string for formatting purposes.
     my $max_namelen = length($failed_str);
-    foreach my $script (keys %$failedtests) {
+    foreach my $script ( keys %$failedtests ) {
         my $namelen = length $failedtests->{$script}->{name};
         $max_namelen = $namelen if $namelen > $max_namelen;
     }
 
     my $list_len = $Columns - length($middle_str) - $max_namelen;
-    if ($list_len < length($list_str)) {
-        $list_len = length($list_str);
+    if ( $list_len < length($list_str) ) {
+        $list_len    = length($list_str);
         $max_namelen = $Columns - length($middle_str) - $list_len;
-        if ($max_namelen < length($failed_str)) {
+        if ( $max_namelen < length($failed_str) ) {
             $max_namelen = length($failed_str);
             $Columns = $max_namelen + length($middle_str) + $list_len;
         }
     }
 
-    my $fmt_top =   sprintf("%-${max_namelen}s", $failed_str)
-                  . $middle_str
-                  . $list_str . "\n"
-                  . "-" x $Columns
-                  . "\n";
+    my $fmt_top
+      = sprintf( "%-${max_namelen}s", $failed_str ) . $middle_str .
+      $list_str . "\n" . "-" x $Columns . "\n";
 
-    my $fmt1 =  "@" . "<" x ($max_namelen - 1)
-              . "  @>> @>>>> @>>>> @>>>  "
-              . "^" . "<" x ($list_len - 1) . "\n";
-    my $fmt2 =  "~~" . " " x ($Columns - $list_len - 2) . "^"
-              . "<" x ($list_len - 1) . "\n";
+    my $fmt1
+      = "@" . "<" x ( $max_namelen - 1 ) . "  @>> @>>>> @>>>> @>>>  " .
+      "^" . "<" x ( $list_len - 1 ) . "\n";
+    my $fmt2 = "~~" . " " x ( $Columns - $list_len - 2 ) . "^" .
+      "<" x ( $list_len - 1 ) . "\n";
 
-    return($fmt_top, $fmt1, $fmt2);
+    return ( $fmt_top, $fmt1, $fmt2 );
 }
 
 sub _canondetail {
-    my $max = shift;
+    my $max     = shift;
     my $skipped = shift;
-    my $type = shift;
-    my @detail = @_;
+    my $type    = shift;
+    my @detail  = @_;
     my %seen;
-    @detail = sort {$a <=> $b} grep !$seen{$_}++, @detail;
+    @detail = sort { $a <=> $b } grep !$seen{$_}++, @detail;
     my $detail = @detail;
     my @result = ();
-    my @canon = ();
+    my @canon  = ();
     my $min;
     my $last = $min = shift @detail;
     my $canon;
     my $uc_type = uc($type);
+
     if (@detail) {
-        for (@detail, $detail[-1]) { # don't forget the last one
-            if ($_ > $last+1 || $_ == $last) {
-                push @canon, ($min == $last) ? $last : "$min-$last";
+        for ( @detail, $detail[-1] ) {    # don't forget the last one
+            if ( $_ > $last + 1 || $_ == $last ) {
+                push @canon, ( $min == $last ) ? $last : "$min-$last";
                 $min = $_;
             }
             $last = $_;
@@ -860,31 +907,33 @@ sub _canondetail {
         $canon = $last;
     }
 
-    return (join("", @result), $canon)
-        if $type=~/todo/i;
+    return ( join( "", @result ), $canon )
+      if $type =~ /todo/i;
     push @result, "\t$type $detail/$max tests, ";
     if ($max) {
-	push @result, sprintf("%.2f",100*(1-$detail/$max)), "% okay";
+        push @result, sprintf( "%.2f", 100 * ( 1 - $detail / $max ) ),
+          "% okay";
     }
     else {
-	push @result, "?% okay";
+        push @result, "?% okay";
     }
-    my $ender = 's' x ($skipped > 1);
+    my $ender = 's' x ( $skipped > 1 );
     if ($skipped) {
         my $good = $max - $detail - $skipped;
-	my $skipmsg = " (less $skipped skipped test$ender: $good okay, ";
-	if ($max) {
-	    my $goodper = sprintf("%.2f",100*($good/$max));
-	    $skipmsg .= "$goodper%)";
+        my $skipmsg
+          = " (less $skipped skipped test$ender: $good okay, ";
+        if ($max) {
+            my $goodper = sprintf( "%.2f", 100 * ( $good / $max ) );
+            $skipmsg .= "$goodper%)";
         }
         else {
-	    $skipmsg .= "?%)";
-	}
-	push @result, $skipmsg;
+            $skipmsg .= "?%)";
+        }
+        push @result, $skipmsg;
     }
     push @result, "\n";
     my $txt = join "", @result;
-    return ($txt, $canon);
+    return ( $txt, $canon );
 }
 
 1;

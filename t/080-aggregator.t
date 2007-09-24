@@ -41,11 +41,13 @@ $parser2->run;
 
 can_ok 'TAP::Parser::Aggregator', 'new';
 my $agg = TAP::Parser::Aggregator->new;
-isa_ok $agg, 'TAP::Parser::Aggregator', '... and calling it should succeed';
+isa_ok $agg, 'TAP::Parser::Aggregator',
+  '... and calling it should succeed';
 
 can_ok $agg, 'add';
 ok $agg->add( 'tap1', $parser1 ), '... and calling it should succeed';
-ok $agg->add( 'tap2', $parser2 ), '... even if we add more than one parser';
+ok $agg->add( 'tap2', $parser2 ),
+  '... even if we add more than one parser';
 eval { $agg->add( 'tap1', $parser1 ) };
 like $@, qr/^You already have a parser for \Q(tap1)/,
   '... but trying to reuse a description should be fatal';
@@ -55,7 +57,8 @@ is scalar $agg->parsers, 2,
   '... and it should report how many parsers it has';
 is_deeply [ $agg->parsers ], [ $parser1, $parser2 ],
   '... or which parsers it has';
-is_deeply $agg->parsers('tap2'), $parser2, '... or reporting a single parser';
+is_deeply $agg->parsers('tap2'), $parser2,
+  '... or reporting a single parser';
 is_deeply [ $agg->parsers(qw(tap2 tap1)) ], [ $parser2, $parser1 ],
   '... or a group';
 
@@ -74,7 +77,8 @@ is_deeply [ $agg->failed ], [qw(tap1 tap2)],
   '... and be able to get their descriptions';
 
 can_ok $agg, 'todo';
-is $agg->todo, 4, '... and we should have the correct number of todo tests';
+is $agg->todo, 4,
+  '... and we should have the correct number of todo tests';
 is_deeply [ $agg->todo ], [qw(tap1 tap2)],
   '... and be able to get their descriptions';
 
@@ -100,7 +104,8 @@ is $agg->total, $agg->passed + $agg->failed,
   '... and we should have the correct number of total tests';
 
 can_ok $agg, 'has_problems';
-ok $agg->has_problems, '... and it should report true if there are problems';
+ok $agg->has_problems,
+  '... and it should report true if there are problems';
 
 # coverage testing
 

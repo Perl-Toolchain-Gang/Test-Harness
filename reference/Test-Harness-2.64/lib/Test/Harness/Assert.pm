@@ -6,9 +6,8 @@ use vars qw($VERSION @EXPORT @ISA);
 
 $VERSION = '0.02';
 
-@ISA = qw(Exporter);
+@ISA    = qw(Exporter);
 @EXPORT = qw(assert);
-
 
 =head1 NAME
 
@@ -39,9 +38,9 @@ If the expression is false the program aborts.
 =cut
 
 sub assert ($;$) {
-    my($assert, $name) = @_;
+    my ( $assert, $name ) = @_;
 
-    unless( $assert ) {
+    unless ($assert) {
         require Carp;
         my $msg = 'Assert failed';
         $msg .= " - '$name'" if defined $name;

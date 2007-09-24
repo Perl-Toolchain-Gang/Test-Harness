@@ -90,8 +90,8 @@ sub new {
     my $class = shift;
     my $args  = shift;
 
-    my @command = @{ delete $args->{command} || [] }
-      or die "Must supply a command to execute";
+    my @command = @{ delete $args->{command} || [] } or
+      die "Must supply a command to execute";
 
     my $merge = delete $args->{merge};
     my ( $pid, $err, $sel );
@@ -119,7 +119,9 @@ sub new {
         if ($IS_WIN32) {
             $err = $merge ? '' : '>&STDERR';
             eval {
-                $pid = open3( '<&STDIN', $out, $merge ? '' : $err, @command );
+                $pid
+                  = open3( '<&STDIN', $out, $merge ? '' : $err,
+                    @command );
             };
             die "Could not execute (@command): $@" if $@;
             if ( $] >= 5.006 ) {
@@ -139,8 +141,8 @@ sub new {
         $err = '';
         my $command
           = join( ' ', map { $_ =~ /\s/ ? qq{"$_"} : $_ } @command );
-        open( $out, "$command|" )
-          or die "Could not execute ($command): $!";
+        open( $out, "$command|" ) or
+          die "Could not execute ($command): $!";
     }
 
     my $self = bless {

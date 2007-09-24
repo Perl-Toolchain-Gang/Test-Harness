@@ -11,7 +11,8 @@ use Test::Harness;
 
 sub _all_ok {
     my ($tot) = shift;
-    return $tot->{bad} == 0 && ( $tot->{max} || $tot->{skipped} ) ? 1 : 0;
+    return $tot->{bad} == 0
+      && ( $tot->{max} || $tot->{skipped} ) ? 1 : 0;
 }
 
 {

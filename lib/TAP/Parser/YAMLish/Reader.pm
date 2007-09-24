@@ -16,8 +16,8 @@ my %UNESCAPES = (
     r => "\x0d", e => "\x1b", '\\' => '\\',
 );
 
-my $QQ_STRING    = qr{ " (?:\\. | [^"])* " }x;
-my $HASH_LINE    = qr{ ^ ($QQ_STRING|\S+) \s* : (?: \s+ (.+?) \s* )? $ }x;
+my $QQ_STRING = qr{ " (?:\\. | [^"])* " }x;
+my $HASH_LINE = qr{ ^ ($QQ_STRING|\S+) \s* : (?: \s+ (.+?) \s* )? $ }x;
 my $IS_HASH_KEY  = qr{ ^ [\w\'\"] }x;
 my $IS_END_YAML  = qr{ ^ \.\.\. \s* $ }x;
 my $IS_QQ_STRING = qr{ ^ $QQ_STRING $ }x;
@@ -49,7 +49,8 @@ sub read {
     # Which might not be a bad idea.
     my $dots = $self->_peek;
     die "Missing '...' at end of YAMLish"
-      unless defined $dots and $dots =~ $IS_END_YAML;
+      unless defined $dots and
+          $dots =~ $IS_END_YAML;
 
     delete $self->{reader};
     delete $self->{next};
@@ -153,7 +154,8 @@ sub _read_scalar {
             push @multiline, $next;
         }
 
-        return join( ( $string eq '>' ? ' ' : "\n" ), @multiline ) . "\n";
+        return
+          join( ( $string eq '>' ? ' ' : "\n" ), @multiline ) . "\n";
     }
 
     if ( $string =~ /^ ' (.*) ' $/x ) {
@@ -199,7 +201,10 @@ sub _read_array {
 
     while (1) {
         my ( $line, $indent ) = $self->_peek;
-        last if $indent < $limit || !defined $line || $line =~ $IS_END_YAML;
+        last
+          if $indent < $limit ||
+              !defined $line ||
+              $line =~ $IS_END_YAML;
 
         if ( $indent > $limit ) {
             die "Array line over-indented";
@@ -252,7 +257,10 @@ sub _read_hash {
         }
 
         ( $line, $indent ) = $self->_peek;
-        last if $indent < $limit || !defined $line || $line =~ $IS_END_YAML;
+        last
+          if $indent < $limit ||
+              !defined $line ||
+              $line =~ $IS_END_YAML;
     }
 
     return $hash;

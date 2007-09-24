@@ -2054,7 +2054,7 @@ my %samples = (
                 raw        => 'TAP version 13',
             },
             {   is_unknown => TRUE,
-                raw           => '1..0 # skipping: rope',
+                raw        => '1..0 # skipping: rope',
             },
         ],
         plan          => '',
@@ -2300,7 +2300,7 @@ my %samples = (
                 description   => "\# skipped on foobar system",
             },
             {   is_comment => TRUE,
-                comment    => '1234567890123456789012345678901234567890',
+                comment => '1234567890123456789012345678901234567890',
             },
             {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
@@ -2313,7 +2313,7 @@ my %samples = (
                 description   => "",
             },
             {   is_comment => TRUE,
-                comment    => '1234567890123456789012345678901234567890',
+                comment => '1234567890123456789012345678901234567890',
             },
             {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
@@ -2710,8 +2710,9 @@ my %samples = (
         is_good_plan  => TRUE,
         tests_planned => 5,
         tests_run     => 5,
-        parse_errors =>
-          ['If TAP version is present it must be the first line of output'],
+        parse_errors  => [
+            'If TAP version is present it must be the first line of output'
+        ],
         'exit'  => 0,
         wait    => 0,
         version => 12,
@@ -2727,14 +2728,15 @@ my %samples = (
             },
             {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
-                description   => 'Should parse as literal backslash --> \\',
-                passed        => TRUE,
-                is_ok         => TRUE,
-                is_test       => TRUE,
-                has_skip      => FALSE,
-                has_todo      => FALSE,
-                number        => 1,
-                is_unplanned  => FALSE,
+                description =>
+                  'Should parse as literal backslash --> \\',
+                passed       => TRUE,
+                is_ok        => TRUE,
+                is_test      => TRUE,
+                has_skip     => FALSE,
+                has_todo     => FALSE,
+                number       => 1,
+                is_unplanned => FALSE,
             },
             {   actual_passed => TRUE,
                 is_actual_ok  => TRUE,
@@ -2858,9 +2860,9 @@ for my $hide_fork ( 0 .. $can_open3 ) {
 
         next TEST if $need_open3 && ( $hide_fork || !$can_open3 );
 
-        # the following acrobatics are necessary to make it easy for the
-        # Test::Builder::failure_output() method to be overridden when
-        # TAP::Parser is not installed.  Otherwise, these tests will fail.
+      # the following acrobatics are necessary to make it easy for the
+      # Test::Builder::failure_output() method to be overridden when
+      # TAP::Parser is not installed.  Otherwise, these tests will fail.
         unshift @{ $args->{switches} }, '-Ilib';
 
         $args->{source} = File::Spec->catfile( $SAMPLE_TESTS, $test );
@@ -2881,7 +2883,8 @@ for my $hide_fork ( 0 .. $can_open3 ) {
         }
         else {
             while ( my ( $method, $answer ) = each %details ) {
-                if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
+                if ( my $handler = $HANDLER_FOR{ $answer || '' } )
+                {    # yuck
                     ok $handler->( $parser->$method() ),
                       "... and $method should return a reasonable value ($test)";
                 }
@@ -2913,8 +2916,8 @@ sub _vmsify_answer {
 
     return $answer unless $IsVMS;
 
-    if ( $method eq 'exit'
-        and exists $Unix2VMS_Exit_Codes{$answer} )
+    if ( $method eq 'exit' and
+        exists $Unix2VMS_Exit_Codes{$answer} )
     {
         $answer = $Unix2VMS_Exit_Codes{$answer};
     }
@@ -2930,8 +2933,8 @@ sub analyze_test {
     while ( defined( my $result = $parser->next ) ) {
 
         my $expected = shift @$results;
-        my $desc =
-            $result->is_test
+        my $desc
+          = $result->is_test
           ? $result->description
           : $result->raw;
         $desc = $result->plan if $result->is_plan && $desc =~ /SKIP/i;
@@ -2942,7 +2945,7 @@ sub analyze_test {
         $count++;
         while ( my ( $method, $answer ) = each %$expected ) {
 
-            if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
+            if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {  # yuck
                 ok $handler->( $result->$method() ),
                   "... and $method should return a reasonable value ($test)";
             }

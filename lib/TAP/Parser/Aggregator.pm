@@ -125,7 +125,8 @@ sub add {
     while ( my ( $summary, $method ) = each %SUMMARY_METHOD_FOR ) {
         if ( my $count = $parser->$method() ) {
             $self->{$summary} += $count;
-            push @{ $self->{"descriptions_for_$summary"} } => $description;
+            push @{ $self->{"descriptions_for_$summary"} } =>
+              $description;
         }
     }
 
@@ -159,8 +160,8 @@ sub parsers {
     my $descriptions = $self->{parse_order};
     my @parsers      = @{ $self->{parser_for} }{@$descriptions};
 
-    # Note:  Because of the way context works, we must assign the parsers to
-    # the @parsers array or else this method does not work as documented.
+# Note:  Because of the way context works, we must assign the parsers to
+# the @parsers array or else this method does not work as documented.
     return @parsers;
 }
 
@@ -219,8 +220,9 @@ sub elapsed {
     my $self = shift;
 
     require Carp;
-    Carp::croak q{Can't call elapsed without first calling start and then stop}
-        unless defined $self->{start_time} && defined $self->{end_time};
+    Carp::croak
+      q{Can't call elapsed without first calling start and then stop}
+      unless defined $self->{start_time} && defined $self->{end_time};
     return timediff( $self->{end_time}, $self->{start_time} );
 }
 
@@ -236,7 +238,7 @@ sub elapsed_timestr {
 
     my $elapsed = $self->elapsed;
 
-    return timestr( $elapsed );
+    return timestr($elapsed);
 }
 
 =head3 C<all_passed>
@@ -341,11 +343,11 @@ parse errors, bad exit/wait status, etc.
 
 sub has_problems {
     my $self = shift;
-    return $self->failed
-      || $self->todo_passed
-      || $self->parse_errors
-      || $self->exit
-      || $self->wait;
+    return $self->failed ||
+      $self->todo_passed ||
+      $self->parse_errors ||
+      $self->exit ||
+      $self->wait;
 }
 
 ##############################################################################
@@ -361,7 +363,7 @@ succeeded.  Will now issue a warning and call C<todo_passed>.
 
 sub todo_failed {
     warn
-        '"todo_failed" is deprecated.  Please use "todo_passed".  See the docs.';
+      '"todo_failed" is deprecated.  Please use "todo_passed".  See the docs.';
     goto &todo_passed;
 }
 

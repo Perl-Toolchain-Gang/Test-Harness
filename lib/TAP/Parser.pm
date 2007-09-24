@@ -3,13 +3,13 @@ package TAP::Parser;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Base ();
-use TAP::Parser::Grammar ();
-use TAP::Parser::Result ();
-use TAP::Parser::Source ();
+use TAP::Base                 ();
+use TAP::Parser::Grammar      ();
+use TAP::Parser::Result       ();
+use TAP::Parser::Source       ();
 use TAP::Parser::Source::Perl ();
-use TAP::Parser::Iterator ();
-use Carp ();
+use TAP::Parser::Iterator     ();
+use Carp                      ();
 
 @ISA = qw(TAP::Base);
 
@@ -64,7 +64,8 @@ BEGIN {    # making accessors
             *$method = sub {
                 my $self = shift;
                 return $self->{$method} unless @_;
-                unless ( ( ref $self ) =~ /^TAP::Parser/ ) { # trusted methods
+                unless ( ( ref $self ) =~ /^TAP::Parser/ )
+                {    # trusted methods
                     Carp::croak("$method() may not be set externally");
                 }
                 $self->{$method} = shift;
@@ -263,26 +264,26 @@ sub run {
 
 {
 
-    # of the following, anything beginning with an underscore is strictly
-    # internal and should not be exposed.
+   # of the following, anything beginning with an underscore is strictly
+   # internal and should not be exposed.
     my %initialize = (
-        version       => $DEFAULT_TAP_VERSION,
-        plan          => '',                    # the test plan (e.g., 1..3)
-        tap           => '',                    # the TAP
-        tests_run     => 0,                     # actual current test numbers
-        results       => [],                    # TAP parser results
-        skipped       => [],                    #
-        todo          => [],                    #
-        passed        => [],                    #
-        failed        => [],                    #
-        actual_failed => [],                    # how many tests really failed
-        actual_passed => [],                    # how many tests really passed
-        todo_passed  => [],    # tests which unexpectedly succeed
-        parse_errors => [],    # perfect TAP should have none
+        version   => $DEFAULT_TAP_VERSION,
+        plan      => '',                   # the test plan (e.g., 1..3)
+        tap       => '',                   # the TAP
+        tests_run => 0,                    # actual current test numbers
+        results   => [],                   # TAP parser results
+        skipped   => [],                   #
+        todo      => [],                   #
+        passed    => [],                   #
+        failed    => [],                   #
+        actual_failed => [],    # how many tests really failed
+        actual_passed => [],    # how many tests really passed
+        todo_passed   => [],    # tests which unexpectedly succeed
+        parse_errors  => [],    # perfect TAP should have none
     );
 
-    # We seem to have this list hanging around all over the place. We could
-    # probably get it from somewhere else to avoid the repetition.
+ # We seem to have this list hanging around all over the place. We could
+ # probably get it from somewhere else to avoid the repetition.
     my @legal_callback = qw(
       test
       version
@@ -299,8 +300,8 @@ sub run {
     sub _initialize {
         my ( $self, $arg_for ) = @_;
 
-        # everything here is basically designed to convert any TAP source to a
-        # stream.
+  # everything here is basically designed to convert any TAP source to a
+  # stream.
         $arg_for ||= {};
 
         $self->SUPER::_initialize( $arg_for, \@legal_callback );
@@ -315,14 +316,16 @@ sub run {
 
         if ( 1 < grep {defined} $stream, $tap, $source ) {
             $self->_croak(
-                "You may only choose one of 'stream', 'tap', or 'source'");
+                "You may only choose one of 'stream', 'tap', or 'source'"
+            );
         }
         if ( $source && $exec ) {
             $self->_croak(
                 '"source" and "exec" are mutually exclusive options');
         }
         if ($tap) {
-            $stream = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
+            $stream
+              = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
             my $source = TAP::Parser::Source->new;
@@ -850,10 +853,10 @@ failed, any TODO tests unexpectedly succeeded, or any parse errors occurred.
 
 sub has_problems {
     my $self = shift;
-    return $self->failed
-      || $self->parse_errors
-      || $self->wait
-      || $self->exit;
+    return $self->failed ||
+      $self->parse_errors ||
+      $self->wait ||
+      $self->exit;
 }
 
 =head3 C<version>
@@ -979,10 +982,13 @@ sub _make_state_table {
                 my ($test) = @_;
 
                 my ( $has_todo, $number, $tests_run )
-                  = ( $test->has_todo, $test->number, ++$self->{tests_run} );
+                  = ( $test->has_todo, $test->number,
+                    ++$self->{tests_run} );
 
                 $self->in_todo($has_todo);
-                if ( defined( my $tests_planned = $self->tests_planned ) ) {
+                if (defined( my $tests_planned = $self->tests_planned )
+                  )
+                {
                     if ( $tests_run > $tests_planned ) {
                         $test->is_unplanned(1);
                     }
@@ -1003,9 +1009,11 @@ sub _make_state_table {
                 push @{ $self->{todo} } => $number if $has_todo;
                 push @{ $self->{todo_passed} } => $number
                   if $test->todo_passed;
-                push @{ $self->{skipped} } => $number if $test->has_skip;
+                push @{ $self->{skipped} } => $number
+                  if $test->has_skip;
 
-                push @{ $self->{ $test->is_ok ? 'passed' : 'failed' } } =>
+                push
+                  @{ $self->{ $test->is_ok ? 'passed' : 'failed' } } =>
                   $number;
                 push @{
                     $self->{
@@ -1036,13 +1044,13 @@ sub _make_state_table {
                     if ( $ver_num <= $DEFAULT_TAP_VERSION ) {
                         my $ver_min = $DEFAULT_TAP_VERSION + 1;
                         $self->_add_error(
-                                "Explicit TAP version must be at least "
-                              . "$ver_min. Got version $ver_num" );
+                            "Explicit TAP version must be at least " .
+                              "$ver_min. Got version $ver_num" );
                         $ver_num = $DEFAULT_TAP_VERSION;
                     }
                     if ( $ver_num > $MAX_TAP_VERSION ) {
                         $self->_add_error(
-                                "TAP specified version $ver_num but we don't know "
+                            "TAP specified version $ver_num but we don't know "
                               . "about versions later than $MAX_TAP_VERSION"
                         );
                         $ver_num = $MAX_TAP_VERSION;
@@ -1094,8 +1102,8 @@ sub _make_state_table {
             plan => { goto => 'GOT_PLAN' },
         },
         UNPLANNED_AFTER_TEST => {
-            test => { act  => sub { }, continue => 'UNPLANNED' },
-            plan => { act  => sub { }, continue => 'UNPLANNED' },
+            test => { act => sub { }, continue => 'UNPLANNED' },
+            plan => { act => sub { }, continue => 'UNPLANNED' },
             yaml => { goto => 'PLANNED' },
         },
     );
@@ -1136,8 +1144,8 @@ sub _iter {
         my $type  = $token->type;
         my $count = 1;
         TRANS: {
-            my $state_spec = $state_table->{$state}
-              or die "Illegal state: ", $state;
+            my $state_spec = $state_table->{$state} or
+              die "Illegal state: ", $state;
 
             if ( my $next = $state_spec->{$type} ) {
                 if ( my $act = $next->{act} ) {
@@ -1162,7 +1170,8 @@ sub _iter {
             if ( defined $result ) {
                 $next_state->($result);
 
-                if ( my $code = $self->_callback_for( $result->type ) ) {
+                if ( my $code = $self->_callback_for( $result->type ) )
+                {
                     $_->($result) for @{$code};
                 }
                 else {

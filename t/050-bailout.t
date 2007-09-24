@@ -18,7 +18,8 @@ not ok 4 - this is a real failure
 Bail out!  We ran out of foobar.
 END_TAP
 my $parser = TAP::Parser->new( { tap => $tap } );
-isa_ok $parser, 'TAP::Parser', '... we should be able to parse bailed out tests';
+isa_ok $parser, 'TAP::Parser',
+  '... we should be able to parse bailed out tests';
 
 my @results;
 while ( my $result = $parser->next ) {
@@ -33,7 +34,8 @@ is_deeply [ $parser->passed ], [ 1, 2, 3 ],
 
 can_ok $parser, 'failed';
 is $parser->failed, 1, '... and the correct number of failed tests';
-is_deeply [ $parser->failed ], [4], '... and get a list of the failed tests';
+is_deeply [ $parser->failed ], [4],
+  '... and get a list of the failed tests';
 
 can_ok $parser, 'actual_passed';
 is $parser->actual_passed, 2,
@@ -50,7 +52,8 @@ is_deeply [ $parser->actual_failed ], [ 2, 4 ],
 can_ok $parser, 'todo';
 is $parser->todo, 1,
   '... and we should have the correct number of TODO tests';
-is_deeply [ $parser->todo ], [2], '... and get a list of the TODO tests';
+is_deeply [ $parser->todo ], [2],
+  '... and get a list of the TODO tests';
 
 ok !$parser->skipped,
   '... and we should have the correct number of skipped tests';
@@ -58,8 +61,8 @@ ok !$parser->skipped,
 # check the plan
 
 can_ok $parser, 'plan';
-is $parser->plan,          '1..4', '... and we should have the correct plan';
-is $parser->tests_planned, 4,      '... and the correct number of tests';
+is $parser->plan, '1..4', '... and we should have the correct plan';
+is $parser->tests_planned, 4, '... and the correct number of tests';
 
 # results() is sane?
 

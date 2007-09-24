@@ -461,8 +461,8 @@ sub can_ok ($@) {
     }
 
     my $name;
-    $name =
-      @methods == 1
+    $name
+      = @methods == 1
       ? "$class->can('$methods[0]')"
       : "$class->can(...)";
 
@@ -516,11 +516,13 @@ sub isa_ok ($$;$) {
     }
     else {
 
-        # We can't use UNIVERSAL::isa because we want to honor isa() overrides
+  # We can't use UNIVERSAL::isa because we want to honor isa() overrides
         local ( $@, $! );    # eval sometimes resets $!
         my $rslt = eval { $object->isa($class) };
         if ($@) {
-            if ( $@ =~ /^Can't call method "isa" on unblessed reference/ ) {
+            if ( $@
+                =~ /^Can't call method "isa" on unblessed reference/ )
+            {
                 if ( !UNIVERSAL::isa( $object, $class ) ) {
                     my $ref = ref $object;
                     $diag = "$obj_name isn't a '$class' it's a '$ref'";
@@ -856,7 +858,8 @@ sub todo_skip {
     unless ( defined $how_many ) {
 
         # $how_many can only be avoided when no_plan is in use.
-        _carp "todo_skip() needs to know \$how_many tests are in the block"
+        _carp
+          "todo_skip() needs to know \$how_many tests are in the block"
           unless $Test::Builder::No_Plan;
         $how_many = 1;
     }
@@ -951,8 +954,8 @@ sub _format_stack {
     my $out = "Structures begin differing at:\n";
     foreach my $idx ( 0 .. $#vals ) {
         my $val = $vals[$idx];
-        $vals[$idx] =
-            !defined $val ? 'undef'
+        $vals[$idx]
+          = !defined $val ? 'undef'
           : $val eq $DNE ? "Does not exist"
           :                "'$val'";
     }
@@ -1008,27 +1011,29 @@ sub _deep_check {
             $ok = 1;
         }
         else {
-            if (    UNIVERSAL::isa( $e1, 'ARRAY' )
-                and UNIVERSAL::isa( $e2, 'ARRAY' ) )
+            if ( UNIVERSAL::isa( $e1, 'ARRAY' ) and
+                UNIVERSAL::isa( $e2, 'ARRAY' ) )
             {
                 $ok = eq_array( $e1, $e2 );
             }
-            elsif ( UNIVERSAL::isa( $e1, 'HASH' )
-                and UNIVERSAL::isa( $e2, 'HASH' ) )
+            elsif ( UNIVERSAL::isa( $e1, 'HASH' ) and
+                UNIVERSAL::isa( $e2, 'HASH' ) )
             {
                 $ok = eq_hash( $e1, $e2 );
             }
-            elsif ( UNIVERSAL::isa( $e1, 'REF' )
-                and UNIVERSAL::isa( $e2, 'REF' ) )
+            elsif ( UNIVERSAL::isa( $e1, 'REF' ) and
+                UNIVERSAL::isa( $e2, 'REF' ) )
             {
-                push @Data_Stack, { type => 'REF', vals => [ $e1, $e2 ] };
+                push @Data_Stack,
+                  { type => 'REF', vals => [ $e1, $e2 ] };
                 $ok = _deep_check( $$e1, $$e2 );
                 pop @Data_Stack if $ok;
             }
-            elsif ( UNIVERSAL::isa( $e1, 'SCALAR' )
-                and UNIVERSAL::isa( $e2, 'SCALAR' ) )
+            elsif ( UNIVERSAL::isa( $e1, 'SCALAR' ) and
+                UNIVERSAL::isa( $e2, 'SCALAR' ) )
             {
-                push @Data_Stack, { type => 'REF', vals => [ $e1, $e2 ] };
+                push @Data_Stack,
+                  { type => 'REF', vals => [ $e1, $e2 ] };
                 $ok = _deep_check( $$e1, $$e2 );
             }
             else {
@@ -1060,7 +1065,8 @@ sub eq_hash {
         my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
         my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;
 
-        push @Data_Stack, { type => 'HASH', idx => $k, vals => [ $e1, $e2 ] };
+        push @Data_Stack,
+          { type => 'HASH', idx => $k, vals => [ $e1, $e2 ] };
         $ok = _deep_check( $e1, $e2 );
         pop @Data_Stack if $ok;
 
@@ -1090,7 +1096,8 @@ sub eq_set {
     return 0 unless @$a1 == @$a2;
 
     # There's faster ways to do this, but this is easiest.
-    return eq_array( [ sort _bogus_sort @$a1 ], [ sort _bogus_sort @$a2 ] );
+    return eq_array( [ sort _bogus_sort @$a1 ],
+        [ sort _bogus_sort @$a2 ] );
 }
 
 =back

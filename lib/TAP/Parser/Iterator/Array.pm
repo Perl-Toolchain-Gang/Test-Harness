@@ -3,7 +3,7 @@ package TAP::Parser::Iterator::Array;
 use strict;
 use TAP::Parser::Iterator ();
 use vars qw($VERSION @ISA);
-@ISA     = 'TAP::Parser::Iterator';
+@ISA = 'TAP::Parser::Iterator';
 
 =head1 NAME
 

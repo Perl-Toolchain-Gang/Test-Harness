@@ -24,8 +24,8 @@ BEGIN {
         no strict 'refs';
         *$method = sub {
             my $self = shift;
-            return ( $self->{_closures} ||= $self->_closures )->{$method}
-              ->(@_);
+            return ( $self->{_closures} ||= $self->_closures )
+              ->{$method}->(@_);
         };
     }
 }
@@ -87,7 +87,8 @@ sub _initialize {
     }
 
     if ( my @props = sort keys %arg_for ) {
-        $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
+        $self->_croak(
+            "Unknown arguments to TAP::Harness::new (@props)");
     }
 
     return $self;
@@ -171,7 +172,7 @@ sub _closures {
     return {
         header => sub {
             $formatter->_output($pretty)
-                unless $really_quiet;
+              unless $really_quiet;
         },
 
         result => sub {
@@ -179,9 +180,8 @@ sub _closures {
 
             if ( $result->is_bailout ) {
                 $formatter->_failure_output(
-                        "Bailout called.  Further testing stopped:  "
-                      . $result->explanation
-                      . "\n" );
+                    "Bailout called.  Further testing stopped:  " .
+                      $result->explanation . "\n" );
             }
 
             return if $really_quiet;
@@ -198,19 +198,21 @@ sub _closures {
 
             if ( $show_count and $is_test ) {
                 my $number = $result->number;
-                my $now = CORE::time;
+                my $now    = CORE::time;
 
-                # Print status on first number, and roughly once per second
-                if ( ($number == 1) || ($last_status_printed != $now) ) {
+             # Print status on first number, and roughly once per second
+                if ( ( $number == 1 ) ||
+                    ( $last_status_printed != $now ) )
+                {
                     $formatter->$output("\r$pretty$number$plan");
                     $last_status_printed = $now;
                 }
             }
 
             if (!$quiet
-                && (   ( $verbose && !$failures )
-                    || ( $is_test && $failures && !$result->is_ok )
-                    || ( $result->has_directive && $directives ) )
+                && ( ( $verbose && !$failures ) ||
+                    ( $is_test && $failures && !$result->is_ok ) ||
+                    ( $result->has_directive && $directives ) )
               )
             {
                 unless ($newline_printed) {
@@ -235,12 +237,13 @@ sub _closures {
                     if ( $formatter->timer ) {
                         my $start_time = $parser->start_time;
                         my $end_time   = $parser->end_time;
-                        if ( defined $start_time and defined $end_time ) {
+                        if ( defined $start_time and defined $end_time )
+                        {
                             my $elapsed = $end_time - $start_time;
-                            $time_report =
-                                $self->time_is_hires
-                                    ? sprintf( ' %8d ms', $elapsed * 1000 )
-                                    : sprintf( ' %8s s', $elapsed || '<1' );
+                            $time_report
+                              = $self->time_is_hires
+                              ? sprintf( ' %8d ms', $elapsed * 1000 )
+                              : sprintf( ' %8s s', $elapsed || '<1' );
                         }
                     }
 
@@ -256,8 +259,8 @@ sub _closures {
 
 sub _should_show_count {
 
-    # we need this because if someone tries to redirect the output, it can get
-    # very garbled from the carriage returns (\r) in the count line.
+# we need this because if someone tries to redirect the output, it can get
+# very garbled from the carriage returns (\r) in the count line.
     return !shift->formatter->verbose && -t STDOUT;
 }
 
@@ -286,8 +289,10 @@ sub _output_test_failure {
 
     if ( my $exit = $parser->exit ) {
         my $wstat = $parser->wait;
-        my $status = sprintf( "%d (wstat %d, 0x%x)", $exit, $wstat, $wstat );
-        $formatter->_failure_output(" Dubious, test returned $status\n");
+        my $status
+          = sprintf( "%d (wstat %d, 0x%x)", $exit, $wstat, $wstat );
+        $formatter->_failure_output(
+            " Dubious, test returned $status\n");
     }
 
     if ( $failed == 0 ) {

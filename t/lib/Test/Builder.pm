@@ -146,11 +146,13 @@ sub plan {
             return $self->expected_tests($arg);
         }
         elsif ( !defined $arg ) {
-            die "Got an undefined number of tests.  Looks like you tried to "
+            die
+              "Got an undefined number of tests.  Looks like you tried to "
               . "say how many tests you plan to run but made a mistake.\n";
         }
         elsif ( !$arg ) {
-            die "You said to run 0 tests!  You've got to run something.\n";
+            die
+              "You said to run 0 tests!  You've got to run something.\n";
         }
     }
 }
@@ -242,7 +244,8 @@ sub ok {
     my ( $self, $test, $name ) = @_;
 
     unless ($Have_Plan) {
-        die "You tried to run a test without a plan!  Gotta have a plan.\n";
+        die
+          "You tried to run a test without a plan!  Gotta have a plan.\n";
     }
 
     $Curr_Test++;
@@ -269,8 +272,7 @@ ERR
     $out .= " $Curr_Test" if $self->use_numbers;
 
     if ( defined $name ) {
-        $name
-          =~ s|#|\\#|g;   # # in a name can confuse Test::Harness.
+        $name =~ s|#|\\#|g;    # # in a name can confuse Test::Harness.
         $out .= " - $name";
     }
 
@@ -470,7 +472,8 @@ sub _regex_ok {
     else {
         $ok = $self->ok( 0, $name );
 
-        $self->diag("    '$regex' doesn't look much like a regex to me.");
+        $self->diag(
+            "    '$regex' doesn't look much like a regex to me.");
 
         return $ok;
     }
@@ -574,7 +577,8 @@ sub skip {
     $why ||= '';
 
     unless ($Have_Plan) {
-        die "You tried to run tests without a plan!  Gotta have a plan.\n";
+        die
+          "You tried to run tests without a plan!  Gotta have a plan.\n";
     }
 
     $Curr_Test++;
@@ -607,7 +611,8 @@ sub todo_skip {
     $why ||= '';
 
     unless ($Have_Plan) {
-        die "You tried to run tests without a plan!  Gotta have a plan.\n";
+        die
+          "You tried to run tests without a plan!  Gotta have a plan.\n";
     }
 
     $Curr_Test++;
@@ -883,8 +888,8 @@ sub _new_fh {
     my $fh;
     unless ( UNIVERSAL::isa( $file_or_fh, 'GLOB' ) ) {
         $fh = do { local *FH };
-        open $fh, ">$file_or_fh"
-          or die "Can't open test output log $file_or_fh: $!";
+        open $fh, ">$file_or_fh" or
+          die "Can't open test output log $file_or_fh: $!";
     }
     else {
         $fh = $file_or_fh;
@@ -1051,7 +1056,8 @@ error message.
 
 #'#
 sub _sanity_check {
-    _whoa( $Curr_Test < 0, 'Says here you ran a negative number of tests!' );
+    _whoa( $Curr_Test < 0,
+        'Says here you ran a negative number of tests!' );
     _whoa(
         !$Have_Plan and $Curr_Test,
         'Somehow your tests ran without a plan!'
@@ -1112,7 +1118,12 @@ $SIG{__DIE__} = sub {
     # with it.  Instead, we use caller.  This also means it runs under
     # 5.004!
     my $in_eval = 0;
-    for ( my $stack = 1; my $sub = ( CORE::caller($stack) )[3]; $stack++ ) {
+    for (
+        my $stack = 1;
+        my $sub   = ( CORE::caller($stack) )[3];
+        $stack++
+      )
+    {
         $in_eval = 1 if $sub =~ /^\(eval\)/;
     }
     $Test_Died = 1 unless $in_eval;
@@ -1136,7 +1147,8 @@ sub _ending {
             $Expected_Tests = $Curr_Test;
         }
 
-        my $num_failed = grep !$_, @Test_Results[ 0 .. $Expected_Tests - 1 ];
+        my $num_failed = grep !$_,
+          @Test_Results[ 0 .. $Expected_Tests - 1 ];
         $num_failed += abs( $Expected_Tests - @Test_Results );
 
         if ( $Curr_Test < $Expected_Tests ) {

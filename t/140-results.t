@@ -47,7 +47,8 @@ like $warning, qr/^\Qpassed() is deprecated.  Please use "is_ok()"/,
 
 can_ok RESULT, 'new';
 eval { RESULT->new( { type => 'no_such_type' } ) };
-ok my $error = $@, '... and calling it with an unknown class should fail';
+ok my $error = $@,
+  '... and calling it with an unknown class should fail';
 like $error, qr/^Could not determine class for.*no_such_type/s,
   '... with an appropriate error message';
 
@@ -213,23 +214,24 @@ $test = run_tests(
             description => '... and this test is fine',
             directive   => 'TODO',
             explanation => 'why not?',
-            raw         => 'not ok 5 and this test is fine # TODO why not?',
-            type        => 'test',
+            raw  => 'not ok 5 and this test is fine # TODO why not?',
+            type => 'test',
         },
     },
-    {   is_test       => 1,
-        type          => 'test',
-        ok            => 'not ok',
-        number        => 5,
-        description   => '... and this test is fine',
-        directive     => 'TODO',
-        explanation   => 'why not?',
-        is_ok         => 1,
-        is_actual_ok  => '',
-        todo_passed   => '',
-        has_skip      => '',
-        has_todo      => 1,
-        as_string     => 'not ok 5 ... and this test is fine # TODO why not?',
+    {   is_test      => 1,
+        type         => 'test',
+        ok           => 'not ok',
+        number       => 5,
+        description  => '... and this test is fine',
+        directive    => 'TODO',
+        explanation  => 'why not?',
+        is_ok        => 1,
+        is_actual_ok => '',
+        todo_passed  => '',
+        has_skip     => '',
+        has_todo     => 1,
+        as_string =>
+          'not ok 5 ... and this test is fine # TODO why not?',
         is_unplanned  => '',
         has_directive => 1,
     }
@@ -266,6 +268,7 @@ sub run_method_tests {
     }
     while ( my ( $method, $value ) = each %$value_for ) {
         can_ok $result, $method;
-        is $result->$method(), $value, "... and $method should be correct";
+        is $result->$method(), $value,
+          "... and $method should be correct";
     }
 }

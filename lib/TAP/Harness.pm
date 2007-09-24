@@ -104,10 +104,12 @@ BEGIN {
                 my $self = shift;
                 unless (@_) {
                     $self->{$method} ||= [];
-                    return wantarray ? @{ $self->{$method} } : $self->{$method};
+                    return wantarray
+                      ? @{ $self->{$method} }
+                      : $self->{$method};
                 }
                 $self->_croak("Too many arguments to method '$method'")
-                    if @_ > 1;
+                  if @_ > 1;
                 my $args = shift;
                 $args = [$args] unless ref $args;
                 $self->{$method} = $args;
@@ -184,7 +186,7 @@ sub inherit {
     my ( $i, @and )
       = grep { $your_isa->[$_] eq __PACKAGE__ } 0 .. $#$your_isa;
     if ( defined($i) ) {
-        splice( @$your_isa, $_, 1 ) for (@and);    # cleanup (should we?)
+        splice( @$your_isa, $_, 1 ) for (@and);   # cleanup (should we?)
         splice( @$your_isa, $i, 1, $base_class );
     }
     else {
@@ -358,7 +360,8 @@ Any keys for which the value is C<undef> will be ignored.
             # behaviour.
             my %formatter_args = ();
             for my $name (@FORMATTER_ARGS) {
-                if ( defined( my $property = delete $arg_for{$name} ) ) {
+                if ( defined( my $property = delete $arg_for{$name} ) )
+                {
                     $formatter_args{$name} = $property;
                 }
             }
@@ -370,7 +373,8 @@ Any keys for which the value is C<undef> will be ignored.
         }
 
         if ( my @props = sort keys %arg_for ) {
-            $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
+            $self->_croak(
+                "Unknown arguments to TAP::Harness::new (@props)");
         }
 
         return $self;
@@ -576,8 +580,8 @@ sub _open_spool {
         $self->_croak($@) if $@;
 
         my $spool_handle = IO::Handle->new;
-        open( $spool_handle, ">$spool" )
-          or $self->_croak(" Can't write $spool ( $! ) ");
+        open( $spool_handle, ">$spool" ) or
+          $self->_croak(" Can't write $spool ( $! ) ");
 
         return $spool_handle;
     }
@@ -590,8 +594,8 @@ sub _close_spool {
     my ($parser) = @_;
 
     if ( my $spool_handle = $parser->delete_spool ) {
-        close($spool_handle)
-            or $self->_croak(" Error closing TAP spool file( $! ) \n ");
+        close($spool_handle) or
+          $self->_croak(" Error closing TAP spool file( $! ) \n ");
     }
 
     return;

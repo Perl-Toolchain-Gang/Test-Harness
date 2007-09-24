@@ -13,6 +13,7 @@ use Test::Harness qw(execute_tests);
 local $ENV{HARNESS_PERL_SWITCHES};
 
 {
+
     # if the harness wants to save the resulting TAP we shouldn't
     # do it for our internal calls
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
@@ -789,11 +790,14 @@ local $ENV{HARNESS_PERL_SWITCHES};
         my $result = $results->{$test_key};
         SKIP: {
             if ( $result->{require} && $] < $result->{require} ) {
-                skip "Test requires Perl $result->{require}, we have $]", 4;
+                skip
+                  "Test requires Perl $result->{require}, we have $]",
+                  4;
             }
             my @test_names = split( /,/, $test_key );
             my @test_files
-              = map { File::Spec->catfile( $TEST_DIR, $_ ) } @test_names;
+              = map { File::Spec->catfile( $TEST_DIR, $_ ) }
+              @test_names;
 
             # For now we supress STDERR because it crufts up /our/ test
             # results. Should probably capture and analyse it.
@@ -814,10 +818,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
             my $lfailed = local_result( $result->{failed} );
             my $ltodo   = local_result( $result->{todo} );
 
-            is_deeply $tot, $result->{totals}, "totals match for $test_key";
+            is_deeply $tot, $result->{totals},
+              "totals match for $test_key";
             is_deeply $fail, $lfailed,
               "failure summary matches for $test_key";
-            is_deeply $todo, $ltodo, "todo summary matches for $test_key";
+            is_deeply $todo, $ltodo,
+              "todo summary matches for $test_key";
         }
     }
 }

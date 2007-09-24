@@ -1,10 +1,10 @@
 package NoFork;
 
 BEGIN {
-    *CORE::GLOBAL::fork = sub { die "you should not fork"};
+    *CORE::GLOBAL::fork = sub { die "you should not fork" };
 }
 use Config;
-tied(%Config)->{d_fork} = 0; # blatant lie
+tied(%Config)->{d_fork} = 0;    # blatant lie
 
 =begin TEST
 
@@ -17,4 +17,5 @@ Assuming not to much chdir:
 =cut
 
 1;
+
 # vim:ts=4:sw=4:et:sta

@@ -16,7 +16,7 @@ my $useOrigClose;
 BEGIN {
     $useOrigOpen = $useOrigClose = 1;
 
-    # taken from http://www.perl.com/pub/a/2002/06/11/threads.html?page=2
+   # taken from http://www.perl.com/pub/a/2002/06/11/threads.html?page=2
 
     *CORE::GLOBAL::open = \&my_open;
 
@@ -90,9 +90,11 @@ plan tests => 4;
 
     is @die, 1, 'open failed, die as expected';
 
-    my $spoolDir = File::Spec->catfile( qw( t spool source_tests harness ) );
+    my $spoolDir
+      = File::Spec->catfile(qw( t spool source_tests harness ));
 
-    like pop @die, qr/ Can't write $spoolDir [(] /, '...with expected message';
+    like pop @die, qr/ Can't write $spoolDir [(] /,
+      '...with expected message';
 
     # now make close fail
 
@@ -106,25 +108,28 @@ ok 1 - input file opened
 
 END_TAP
 
-    my $parser = TAP::Parser->new( {
-				    spool => $spoolHandle,
-				    stream => TAP::Parser::Iterator->new([ split /\n/ => $tap ])
-				   } );
+    my $parser = TAP::Parser->new(
+        {   spool => $spoolHandle,
+            stream =>
+              TAP::Parser::Iterator->new( [ split /\n/ => $tap ] )
+        }
+    );
 
     @die = ();
 
     eval {
-      local $SIG{__DIE__} = sub {push @die, @_ };
+        local $SIG{__DIE__} = sub { push @die, @_ };
 
-      # use the broken CORE::close
-      $useOrigClose = 0;
+        # use the broken CORE::close
+        $useOrigClose = 0;
 
-      TAP::Harness->_close_spool( $parser );
+        TAP::Harness->_close_spool($parser);
 
-      $useOrigClose = 1;
+        $useOrigClose = 1;
     };
 
     is @die, 1, 'close failed, die as expected';
 
-    like pop @die, qr/ Error closing TAP spool file[(] /, '...with expected message';
+    like pop @die, qr/ Error closing TAP spool file[(] /,
+      '...with expected message';
 }

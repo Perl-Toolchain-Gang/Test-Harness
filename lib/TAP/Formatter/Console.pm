@@ -22,8 +22,8 @@ BEGIN {
         stdout => sub {
             my ( $self, $ref ) = @_;
             $self->_croak("option 'stdout' needs a filehandle")
-              unless ( ref $ref || '' ) eq 'GLOB'
-              or eval { $ref->can('print') };
+              unless ( ref $ref || '' ) eq 'GLOB' or
+              eval { $ref->can('print') };
             return $ref;
         },
     );
@@ -78,11 +78,13 @@ sub _initialize {
     # Handle legacy verbose, quiet, really_quiet flags
     my %verb_map = ( verbose => 1, quiet => -1, really_quiet => -2, );
 
-    my @verb_adj = grep {$_} map { delete $arg_for{$_} ? $verb_map{$_} : 0 }
+    my @verb_adj
+      = grep {$_} map { delete $arg_for{$_} ? $verb_map{$_} : 0 }
       keys %verb_map;
 
-    $self->_croak( 'Only one of verbose, quiet or really_quiet should be specified' )
-      if @verb_adj > 1;
+    $self->_croak(
+        'Only one of verbose, quiet or really_quiet should be specified'
+    ) if @verb_adj > 1;
 
     $self->verbosity( shift @verb_adj || 0 );
 
@@ -250,7 +252,7 @@ sub open_test {
       : 'TAP::Formatter::Console::Session';
 
     eval "require $class";
-    $self->_croak( $@ ) if $@;
+    $self->_croak($@) if $@;
 
     my $session = $class->new(
         {   name      => $test,
@@ -306,22 +308,22 @@ sub summary {
                 "  TODO passed:   ", $test, $parser
             );
 
-            # ~TODO this cannot be the default
-            #$self->_output_summary_failure( 'skipped', "  Tests skipped: " );
+      # ~TODO this cannot be the default
+      #$self->_output_summary_failure( 'skipped', "  Tests skipped: " );
 
             if ( my $exit = $parser->exit ) {
                 $self->_summary_test_header( $test, $parser );
-                $self->_failure_output("  Non-zero exit status: $exit\n");
+                $self->_failure_output(
+                    "  Non-zero exit status: $exit\n");
             }
 
             if ( my @errors = $parser->parse_errors ) {
                 my $explain;
                 if ( @errors > $MAX_ERRORS && !$self->errors ) {
                     $explain
-                      = "Displayed the first $MAX_ERRORS of "
-                      . scalar(@errors)
-                      . " TAP syntax errors.\n"
-                      . "Re-run prove with the -p option to see them all.\n";
+                      = "Displayed the first $MAX_ERRORS of " .
+                      scalar(@errors) . " TAP syntax errors.\n" .
+                      "Re-run prove with the -p option to see them all.\n";
                     splice @errors, $MAX_ERRORS;
                 }
                 $self->_summary_test_header( $test, $parser );

@@ -15,7 +15,8 @@ my $ITER_ARRAY = "${ITER}::Array";
 my $stream = TAP::Parser::Iterator->new( \*DATA );
 isa_ok $stream, 'TAP::Parser::Iterator';
 my $parser = TAP::Parser->new( { stream => $stream } );
-isa_ok $parser, 'TAP::Parser', '... and creating a streamed parser should succeed';
+isa_ok $parser, 'TAP::Parser',
+  '... and creating a streamed parser should succeed';
 
 can_ok $parser, '_stream';
 is ref $parser->_stream, $ITER_FH,

@@ -22,22 +22,23 @@ my %mm_args = (
 if ( $ExtUtils::MakeMaker::VERSION >= 6.31 ) {
     $mm_args{LICENSE} = 'perl';
 }
-WriteMakefile( %mm_args );
+WriteMakefile(%mm_args);
 
 {
+
     package MY;
 
     use File::Spec;
     use Config;
 
     sub test_via_harness {
-        my ($self, $orig_perl, $tests) = @_;
+        my ( $self, $orig_perl, $tests ) = @_;
 
         my $perl5lib = join $Config{path_sep},
-                       grep { defined && length } 
-                            File::Spec->canonpath('lib/'), $ENV{PERL5LIB};
+          grep { defined && length } File::Spec->canonpath('lib/'),
+          $ENV{PERL5LIB};
 
         my $perl = "PERL5LIB=$perl5lib $orig_perl";
-        return $self->SUPER::test_via_harness($perl, $tests);
+        return $self->SUPER::test_via_harness( $perl, $tests );
     }
 }

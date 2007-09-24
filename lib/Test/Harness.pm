@@ -2,7 +2,7 @@ package Test::Harness;
 
 require 5.00405;
 
-use TAP::Harness ();
+use TAP::Harness            ();
 use TAP::Parser::Aggregator ();
 
 use Exporter;
@@ -103,7 +103,7 @@ sub runtests {
     my @tests = @_;
 
     # shield against -l
-    local ($\, $,);
+    local ( $\, $, );
 
     my $harness   = _new_harness();
     my $aggregate = TAP::Parser::Aggregator->new();
@@ -140,7 +140,8 @@ sub _canon {
 
     while ( $pos < $count ) {
         my $end = $pos + 1;
-        $end++ while $end < $count && $list[$end] <= $list[ $end - 1 ] + 1;
+        $end++
+          while $end < $count && $list[$end] <= $list[ $end - 1 ] + 1;
         push @ranges, ( $end == $pos + 1 )
           ? $list[$pos]
           : join( '-', $list[$pos], $list[ $end - 1 ] );
@@ -240,7 +241,7 @@ sub execute_tests {
     my %failedtests = ();
     my %todo_passed = ();
 
-    for my $test ( @tests ) {
+    for my $test (@tests) {
         my ($parser) = $aggregate->parsers($test);
 
         my @failed = $parser->failed;
@@ -271,12 +272,14 @@ sub execute_tests {
             my $huh_errors  = $ok_seq  ? undef : '??';
 
             $failedtests{$test} = {
-                'canon' => $huh_planned
-                  || $huh_errors
-                  || _canon(@failed)
-                  || '??',
+                'canon' => $huh_planned ||
+                  $huh_errors ||
+                  _canon(@failed) ||
+                  '??',
                 'estat'  => $estat,
-                'failed' => $huh_planned || $huh_errors || scalar @failed,
+                'failed' => $huh_planned ||
+                  $huh_errors ||
+                  scalar @failed,
                 'max' => $huh_planned || $planned,
                 'name'  => $test,
                 'wstat' => $wstat

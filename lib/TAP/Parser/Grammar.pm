@@ -3,7 +3,7 @@ package TAP::Parser::Grammar;
 use strict;
 use vars qw($VERSION);
 
-use TAP::Parser::Result ();
+use TAP::Parser::Result          ();
 use TAP::Parser::YAMLish::Reader ();
 
 =head1 NAME
@@ -85,14 +85,18 @@ my %language_for;
             handler => $plan_handler,
         },
 
-    # An optimization to handle the most common test lines without directives.
+        # An optimization to handle the most common test lines without
+        # directives.
         simple_test => {
             syntax  => qr/^($ok) \ ($num) (?:\ ([^#]+))? \z/x,
             handler => sub {
                 my ( $self, $line ) = @_;
                 my ( $ok, $num, $desc ) = ( $1, $2, $3 );
 
-                return $self->_make_test_token( $line, $ok, $num, $desc );
+                return $self->_make_test_token(
+                    $line, $ok, $num,
+                    $desc
+                );
               }
         },
         test => {
@@ -126,7 +130,10 @@ my %language_for;
             handler => sub {
                 my ( $self, $line ) = @_;
                 my $explanation = $1;
-                return $self->_make_bailout_token( $line, $explanation );
+                return $self->_make_bailout_token(
+                    $line,
+                    $explanation
+                );
             },
         },
     );
@@ -197,9 +204,9 @@ sub set_version {
 sub _order_tokens {
     my $self = shift;
 
-    my %copy           = %{ $self->{tokens} };
-    my @ordered_tokens = grep { defined }
-        map { delete $copy{$_} } qw( simple_test test comment plan );
+    my %copy = %{ $self->{tokens} };
+    my @ordered_tokens = grep {defined}
+      map { delete $copy{$_} } qw( simple_test test comment plan );
     push @ordered_tokens, values %copy;
 
     $self->{ordered_tokens} = \@ordered_tokens;

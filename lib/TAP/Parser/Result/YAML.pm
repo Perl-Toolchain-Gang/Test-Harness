@@ -57,6 +57,6 @@ Return the parsed YAML data for this result
 
 =cut
 
-sub data {shift->{data} }
+sub data { shift->{data} }
 
 1;

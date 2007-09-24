@@ -11,6 +11,7 @@ use vars qw($VERSION);
 
 BEGIN {
     eval { require App::Prove::Plugins; };
+
     # TODO maybe make noise about how you could have cool features.
 }
 
@@ -30,10 +31,10 @@ my @ATTR;
 
 BEGIN {
     @ATTR = qw(
-        archive argv blib color directives exec failures formatter harness
-        includes jobs lib merge parse quiet really_quiet recurse backwards
-        shuffle taint_fail taint_warn timer verbose warnings_fail
-        warnings_warn
+      archive argv blib color directives exec failures formatter harness
+      includes jobs lib merge parse quiet really_quiet recurse backwards
+      shuffle taint_fail taint_warn timer verbose warnings_fail
+      warnings_warn
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -134,8 +135,9 @@ sub process_args {
             (     App::Prove::Plugins->can('switches')
                 ? App::Prove::Plugins->switches
                 : ()
-              ),
-        ) or croak( 'Unable to continue' );
+            ),
+          ) or
+          croak('Unable to continue');
 
         # Stash the remainder of argv for later
         $self->{argv} = [@ARGV];
@@ -153,15 +155,14 @@ sub _help {
     # XXX Getopt::Long is being helpy
     local $SIG{__DIE__} = sub { warn @_; $self->_exit; };
     if ($err) {
-        die 'Please install Pod::Usage for the --help option '
-          . '(or try `perldoc prove`.)'
-          . "\n ($@)";
+        die 'Please install Pod::Usage for the --help option ' .
+          '(or try `perldoc prove`.)' . "\n ($@)";
     }
 
     Pod::Usage::pod2usage( { -verbose => 1 } );
 
     # XXX not sure about this one
-    App::Prove::Plugins->help if( App::Prove::Plugins->can('help') );
+    App::Prove::Plugins->help if ( App::Prove::Plugins->can('help') );
 }
 
 sub _color_default {
@@ -183,7 +184,7 @@ sub _get_args {
     }
 
     if ( $self->archive ) {
-        eval("sub TAP::Harness::Archive::auto_inherit {1}");    # wink,wink
+        eval("sub TAP::Harness::Archive::auto_inherit {1}"); # wink,wink
         $self->require_harness( archive => 'TAP::Harness::Archive' );
         $args{archive} = $self->archive;
     }
@@ -234,7 +235,8 @@ sub _get_args {
 
     $args{errors} = 1 if $self->parse;
 
-    $args{exec} = length( $self->exec ) ? [ split(/ /, $self->exec ) ] : []
+    $args{exec}
+      = length( $self->exec ) ? [ split( / /, $self->exec ) ] : []
       if ( defined( $self->exec ) );
 
     if ($formatter_class) {

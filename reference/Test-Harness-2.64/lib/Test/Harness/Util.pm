@@ -8,8 +8,8 @@ use File::Spec;
 use Exporter;
 use vars qw( @ISA @EXPORT @EXPORT_OK );
 
-@ISA = qw( Exporter );
-@EXPORT = ();
+@ISA       = qw( Exporter );
+@EXPORT    = ();
 @EXPORT_OK = qw( all_in shuffle blibdirs );
 
 =head1 NAME
@@ -49,26 +49,29 @@ Flag to say whether it should recurse.  Default to true.
 sub all_in {
     my $parms = shift;
     my %parms = (
-        start => ".",
+        start   => ".",
         recurse => 1,
         %$parms,
     );
 
-    my @hits = ();
+    my @hits  = ();
     my $start = $parms{start};
 
     local *DH;
     if ( opendir( DH, $start ) ) {
         my @files = sort readdir DH;
         closedir DH;
-        for my $file ( @files ) {
-            next if $file eq File::Spec->updir || $file eq File::Spec->curdir;
+        for my $file (@files) {
+            next
+              if $file eq File::Spec->updir ||
+                  $file eq File::Spec->curdir;
             next if $file eq ".svn";
             next if $file eq "CVS";
 
             my $currfile = File::Spec->catfile( $start, $file );
             if ( -d $currfile ) {
-                push( @hits, all_in( { %parms, start => $currfile } ) ) if $parms{recurse};
+                push( @hits, all_in( { %parms, start => $currfile } ) )
+                  if $parms{recurse};
             }
             else {
                 push( @hits, $currfile ) if $currfile =~ /\.t$/;
@@ -89,14 +92,14 @@ Returns a shuffled copy of I<@list>.
 =cut
 
 sub shuffle {
+
     # Fisher-Yates shuffle
     my $i = @_;
     while ($i) {
         my $j = rand $i--;
-        @_[$i, $j] = @_[$j, $i];
+        @_[ $i, $j ] = @_[ $j, $i ];
     }
 }
-
 
 =head2 blibdir()
 
@@ -106,25 +109,26 @@ Finds all the blib directories.  Stolen directly from blib.pm
 
 sub blibdirs {
     my $dir = File::Spec->curdir;
-    if ($^O eq 'VMS') {
-        ($dir = VMS::Filespec::unixify($dir)) =~ s-/\z--;
+    if ( $^O eq 'VMS' ) {
+        ( $dir = VMS::Filespec::unixify($dir) ) =~ s-/\z--;
     }
     my $archdir = "arch";
     if ( $^O eq "MacOS" ) {
+
         # Double up the MP::A so that it's not used only once.
         $archdir = $MacPerl::Architecture = $MacPerl::Architecture;
     }
 
     my $i = 5;
-    while ($i--) {
-        my $blib      = File::Spec->catdir( $dir, "blib" );
+    while ( $i-- ) {
+        my $blib      = File::Spec->catdir( $dir,  "blib" );
         my $blib_lib  = File::Spec->catdir( $blib, "lib" );
         my $blib_arch = File::Spec->catdir( $blib, $archdir );
 
         if ( -d $blib && -d $blib_arch && -d $blib_lib ) {
-            return ($blib_arch,$blib_lib);
+            return ( $blib_arch, $blib_lib );
         }
-        $dir = File::Spec->catdir($dir, File::Spec->updir);
+        $dir = File::Spec->catdir( $dir, File::Spec->updir );
     }
     warn "$0: Cannot find blib\n";
     return;

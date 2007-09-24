@@ -40,7 +40,10 @@ my @schedule = (
         subclass => 'TAP::Parser::Iterator::Process',
         source   => {
             command => [
-                $^X, File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' )
+                $^X,
+                File::Spec->catfile(
+                    't', 'sample-tests', 'out_err_mix'
+                )
             ],
             merge    => 1,
             setup    => $setup,
@@ -96,12 +99,14 @@ for my $test (@schedule) {
           "$name: ... and it should be undef before we are done ($subclass)";
 
         can_ok $iter, 'next';
-        is $iter->next, 'one', "$name: next() should return the first result";
+        is $iter->next, 'one',
+          "$name: next() should return the first result";
 
         is $iter->next, 'two',
           "$name: next() should return the second result";
 
-        is $iter->next, '', "$name: next() should return the third result";
+        is $iter->next, '',
+          "$name: next() should return the third result";
 
         is $iter->next, 'three',
           "$name: next() should return the fourth result";
@@ -112,7 +117,8 @@ for my $test (@schedule) {
         is $iter->exit, 0,
           "$name: ... and exit should now return 0 ($subclass)";
 
-        is $iter->wait, 0, "$name: wait should also now return 0 ($subclass)";
+        is $iter->wait, 0,
+          "$name: wait should also now return 0 ($subclass)";
 
         if ( my $after = $test->{after} ) {
             $after->();
@@ -186,7 +192,9 @@ SKIP: {
     my $parser = TAP::Parser::Iterator->new(
         {   command => [
                 $^X,
-                File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' )
+                File::Spec->catfile(
+                    't', 'sample-tests', 'out_err_mix'
+                )
             ],
             merge => 1,
         }

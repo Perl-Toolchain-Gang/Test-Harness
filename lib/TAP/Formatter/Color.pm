@@ -24,7 +24,7 @@ BEGIN {
             my $bg = eval '$BG_BLACK';
 
             *set_color = sub {
-                my ($self, $output, $color) = @_;
+                my ( $self, $output, $color ) = @_;
 
                 my $var;
                 if ( $color eq 'reset' ) {
@@ -53,7 +53,7 @@ BEGIN {
         }
         else {
             *set_color = sub {
-                my ($self, $output, $color) = @_;
+                my ( $self, $output, $color ) = @_;
                 $output->( color($color) );
             };
         }
@@ -110,6 +110,7 @@ sub new {
     my $class = shift;
 
     if ($NO_COLOR) {
+
         # shorten that message a bit
         ( my $error = $NO_COLOR ) =~ s/ in \@INC .*//s;
         warn "Note: Cannot run tests in color: $error\n";

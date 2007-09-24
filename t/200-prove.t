@@ -60,7 +60,8 @@ BEGIN {
     $DEFAULT_ASSERTION{includes} = $DEFAULT_ASSERTION{argv}
       = sub { 'ARRAY' eq ref shift };
 
-    my @dummy_tests = map { File::Spec->catdir( 't', 'sample-tests', $_ ) }
+    my @dummy_tests
+      = map { File::Spec->catdir( 't', 'sample-tests', $_ ) }
       qw(simple simple_yaml);
     my $dummy_test = $dummy_tests[0];
 
@@ -1099,7 +1100,8 @@ for my $test (@SCHEDULE) {
     my $name = $test->{name};
     my $class = $test->{class} || 'FakeProve';
 
-    ok my $app = $class->new( exists $test->{args} ? $test->{args} : () ),
+    ok my $app
+      = $class->new( exists $test->{args} ? $test->{args} : () ),
       "$name: App::Prove created OK";
 
     isa_ok $app, 'App::Prove';
@@ -1127,7 +1129,8 @@ for my $test (@SCHEDULE) {
               "$name: $attr has the expected value";
         }
         elsif ( 'Regexp' eq ref $assertion ) {
-            $is_ok = like $val, $assertion, "$name: $attr matches $assertion";
+            $is_ok = like $val, $assertion,
+              "$name: $attr matches $assertion";
         }
         else {
             $is_ok = is_deeply $val, $assertion,
@@ -1157,7 +1160,8 @@ for my $test (@SCHEDULE) {
                 $extra->($gotlog);
             }
 
-            unless ( is_deeply $gotlog, $runlog, "$name: run results match" )
+            unless ( is_deeply $gotlog, $runlog,
+                "$name: run results match" )
             {
                 use Data::Dumper;
                 diag Dumper( { wanted => $runlog, got => $gotlog } );

@@ -42,7 +42,8 @@ like $@, qr/\QUnknown arguments to TAP::Harness::new (no_such_key)/,
   '... and calling it with bad keys should fail';
 
 eval { $HARNESS->new( { lib => 'aint_no_such_lib' } ) };
-ok my $error = $@, '... and calling it with a non-existent lib should fail';
+ok my $error = $@,
+  '... and calling it with a non-existent lib should fail';
 like $error, qr/^\QNo such lib (aint_no_such_lib)/,
   '... with an appropriate error message';
 
@@ -66,7 +67,8 @@ foreach my $test_args ( get_arg_sets() ) {
     while ( my ( $property, $test ) = each %$test_args ) {
         my $value = $test->{out};
         can_ok $harness, $property;
-        is_deeply scalar $harness->$property(), $value, $test->{test_name};
+        is_deeply scalar $harness->$property(), $value,
+          $test->{test_name};
     }
 }
 
@@ -116,7 +118,8 @@ foreach my $test_args ( get_arg_sets() ) {
     my $summary          = pop @output;
     my $expected_summary = qr{^Files=1, Tests=1,  \d+ wallclock secs};
 
-    is_deeply \@output, \@expected, '... and the output should be correct';
+    is_deeply \@output, \@expected,
+      '... and the output should be correct';
     like $status, $expected_status,
       '... and the status line should be correct';
     like $summary, $expected_summary,
@@ -139,7 +142,8 @@ foreach my $test_args ( get_arg_sets() ) {
     $summary          = pop @output;
     $expected_summary = qr/^Files=1, Tests=1,  \d+ wallclock secs/;
 
-    is_deeply \@output, \@expected, '... and the output should be correct';
+    is_deeply \@output, \@expected,
+      '... and the output should be correct';
     like $status, $expected_status,
       '... and the status line should be correct';
     like $summary, $expected_summary,
@@ -160,7 +164,8 @@ foreach my $test_args ( get_arg_sets() ) {
     $summary          = pop @output;
     $expected_summary = qr/^Files=1, Tests=1,  \d+ wallclock secs/;
 
-    is_deeply \@output, \@expected, '... and the output should be correct';
+    is_deeply \@output, \@expected,
+      '... and the output should be correct';
     like $status, $expected_status,
       '... and the status line should be correct';
     like $summary, $expected_summary,
@@ -261,7 +266,8 @@ foreach my $test_args ( get_arg_sets() ) {
     # only show directives
 
     @output = ();
-    _runtests( $harness_directives, 't/source_tests/harness_directives' );
+    _runtests( $harness_directives,
+        't/source_tests/harness_directives' );
 
     chomp(@output);
 
@@ -272,20 +278,21 @@ foreach my $test_args ( get_arg_sets() ) {
         'ok',
         'All tests successful.',
 
-        # ~TODO {{{ this should be an option
-        #'Test Summary Report',
-        #'-------------------',
-        #'t/source_tests/harness_directives (Wstat: 0 Tests: 3 Failed: 0)',
-        #'Tests skipped:',
-        #'3',
-        # }}}
+     # ~TODO {{{ this should be an option
+     #'Test Summary Report',
+     #'-------------------',
+     #'t/source_tests/harness_directives (Wstat: 0 Tests: 3 Failed: 0)',
+     #'Tests skipped:',
+     #'3',
+     # }}}
     );
 
     $status           = pop @output;
     $summary          = pop @output;
     $expected_summary = qr/^Files=1, Tests=3,  \d+ wallclock secs/;
 
-    is_deeply \@output, \@expected, '... and the output should be correct';
+    is_deeply \@output, \@expected,
+      '... and the output should be correct';
     like $summary, $expected_summary,
       '... and the report summary should look correct';
 
@@ -394,7 +401,8 @@ foreach my $test_args ( get_arg_sets() ) {
     like $status, qr{^Result: FAIL$},
       '... and the status line should be correct';
     $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
-    is_deeply \@output, \@expected, '... and the output should be correct';
+    is_deeply \@output, \@expected,
+      '... and the output should be correct';
 
     # check the status output for no tests
 
@@ -418,7 +426,8 @@ foreach my $test_args ( get_arg_sets() ) {
     like $status, qr{^Result: NOTESTS$},
       '... and the status line should be correct';
     $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
-    is_deeply \@output, \@expected, '... and the output should be correct';
+    is_deeply \@output, \@expected,
+      '... and the output should be correct';
 
     #XXXX
 }
@@ -462,7 +471,8 @@ SKIP: {
 
     _runtests(
         $harness,
-        't/source_tests/harness_complain',    # will get mad if run with args
+        't/source_tests/harness_complain'
+        ,    # will get mad if run with args
         't/source_tests/harness',
     );
 
@@ -470,8 +480,9 @@ SKIP: {
     my $status = pop @output;
     like $status, qr{^Result: PASS$},
       '... and the status line should be correct';
-    pop @output;                              # get rid of summary line
-    is( $output[-1], "All tests successful.\n", 'No exec accumulation' );
+    pop @output;    # get rid of summary line
+    is( $output[-1], "All tests successful.\n",
+        'No exec accumulation' );
 }
 
 sub trim {
@@ -493,33 +504,35 @@ sub get_arg_sets {
             test_name => '... a single lib switch should be correct'
         },
         verbosity => {
-            in        => 1,
-            out       => 1,
-            test_name => '... and we should be able to set verbosity to 1'
+            in  => 1,
+            out => 1,
+            test_name =>
+              '... and we should be able to set verbosity to 1'
         },
 
-        # verbose => {
-        #     in        => 1,
-        #     out       => 1,
-        #     test_name => '... and we should be able to set verbose to true'
-        # },
+   # verbose => {
+   #     in        => 1,
+   #     out       => 1,
+   #     test_name => '... and we should be able to set verbose to true'
+   # },
       },
       { lib => {
-            in        => [ 'lib',        't' ],
-            out       => liblist( 'lib', 't' ),
+            in  => [ 'lib',        't' ],
+            out => liblist( 'lib', 't' ),
             test_name => '... multiple lib switches should be correct'
         },
         verbosity => {
-            in        => 0,
-            out       => 0,
-            test_name => '... and we should be able to set verbosity to 0'
+            in  => 0,
+            out => 0,
+            test_name =>
+              '... and we should be able to set verbosity to 0'
         },
 
-        # verbose => {
-        #     in        => 0,
-        #     out       => 0,
-        #     test_name => '... and we should be able to set verbose to false'
-        # },
+  # verbose => {
+  #     in        => 0,
+  #     out       => 0,
+  #     test_name => '... and we should be able to set verbose to false'
+  # },
       },
       { switches => {
             in  => [ '-T', '-w', '-T' ],
@@ -527,27 +540,30 @@ sub get_arg_sets {
             test_name => '... duplicate switches should be omitted',
         },
         failures => {
-            in        => 1,
-            out       => 1,
-            test_name => '... and we should be able to set failures to true',
+            in  => 1,
+            out => 1,
+            test_name =>
+              '... and we should be able to set failures to true',
         },
         verbosity => {
-            in        => -1,
-            out       => -1,
-            test_name => '... and we should be able to set verbosity to -1'
+            in  => -1,
+            out => -1,
+            test_name =>
+              '... and we should be able to set verbosity to -1'
         },
 
-        # quiet => {
-        #     in        => 1,
-        #     out       => 1,
-        #     test_name => '... and we should be able to set quiet to false'
-        # },
+    # quiet => {
+    #     in        => 1,
+    #     out       => 1,
+    #     test_name => '... and we should be able to set quiet to false'
+    # },
       },
 
       { verbosity => {
-            in        => -2,
-            out       => -2,
-            test_name => '... and we should be able to set verbosity to -2'
+            in  => -2,
+            out => -2,
+            test_name =>
+              '... and we should be able to set verbosity to -2'
         },
 
         # really_quiet => {
@@ -557,15 +573,17 @@ sub get_arg_sets {
         #       '... and we should be able to set really_quiet to true',
         # },
         exec => {
-            in        => $^X,
-            out       => $^X,
-            test_name => '... and we should be able to set the executable',
+            in  => $^X,
+            out => $^X,
+            test_name =>
+              '... and we should be able to set the executable',
         },
       },
       { switches => {
-            in        => 'T',
-            out       => ['-T'],
-            test_name => '... leading dashes (-) on switches are optional',
+            in  => 'T',
+            out => ['-T'],
+            test_name =>
+              '... leading dashes (-) on switches are optional',
         },
       },
       { switches => {
@@ -574,9 +592,10 @@ sub get_arg_sets {
             test_name => '... we should be able to set switches',
         },
         failures => {
-            in        => 1,
-            out       => 1,
-            test_name => '... and we should be able to set failures to true'
+            in  => 1,
+            out => 1,
+            test_name =>
+              '... and we should be able to set failures to true'
         },
       };
 }
@@ -716,11 +735,11 @@ sub _runtests {
 
     # normal tests in verbose mode
 
-    my $parser
-      = $harness->runtests(
+    my $parser = $harness->runtests(
         File::Spec->catfile(qw (t source_tests harness )) );
 
-    isa_ok $parser, 'TAP::Parser::Aggregator', '... runtests returns the aggregate';
+    isa_ok $parser, 'TAP::Parser::Aggregator',
+      '... runtests returns the aggregate';
 
     ok -e File::Spec->catfile(
         $ENV{PERL_TEST_HARNESS_DUMP_TAP},

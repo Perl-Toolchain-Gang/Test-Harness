@@ -28,7 +28,7 @@ Test::Harness::Results.
 
 sub new {
     my $class = shift;
-    my $self  = bless {}, $class;
+    my $self = bless {}, $class;
 
     return $self;
 }
@@ -89,78 +89,89 @@ Each of the following fields has a getter and setter method.
 =cut
 
 sub set_wait { my $self = shift; $self->{wait} = shift }
+
 sub wait {
     my $self = shift;
     return $self->{wait} || 0;
 }
 
 sub set_skip_all { my $self = shift; $self->{skip_all} = shift }
+
 sub skip_all {
     my $self = shift;
     return $self->{skip_all};
 }
 
-sub inc_max { my $self = shift; $self->{max} += (@_ ? shift : 1) }
+sub inc_max { my $self = shift; $self->{max} += ( @_ ? shift : 1 ) }
+
 sub max {
     my $self = shift;
     return $self->{max} || 0;
 }
 
 sub set_passing { my $self = shift; $self->{passing} = shift }
+
 sub passing {
     my $self = shift;
     return $self->{passing} || 0;
 }
 
-sub inc_ok { my $self = shift; $self->{ok} += (@_ ? shift : 1) }
+sub inc_ok { my $self = shift; $self->{ok} += ( @_ ? shift : 1 ) }
+
 sub ok {
     my $self = shift;
     return $self->{ok} || 0;
 }
 
 sub set_exit { my $self = shift; $self->{exit} = shift }
+
 sub exit {
     my $self = shift;
     return $self->{exit} || 0;
 }
 
 sub inc_bonus { my $self = shift; $self->{bonus}++ }
+
 sub bonus {
     my $self = shift;
     return $self->{bonus} || 0;
 }
 
 sub set_skip_reason { my $self = shift; $self->{skip_reason} = shift }
+
 sub skip_reason {
     my $self = shift;
     return $self->{skip_reason} || 0;
 }
 
 sub inc_skip { my $self = shift; $self->{skip}++ }
+
 sub skip {
     my $self = shift;
     return $self->{skip} || 0;
 }
 
 sub inc_todo { my $self = shift; $self->{todo}++ }
+
 sub todo {
     my $self = shift;
     return $self->{todo} || 0;
 }
 
 sub inc_seen { my $self = shift; $self->{seen}++ }
+
 sub seen {
     my $self = shift;
     return $self->{seen} || 0;
 }
 
 sub set_details {
-    my $self = shift;
-    my $index = shift;
+    my $self    = shift;
+    my $index   = shift;
     my $details = shift;
 
-    my $array = ($self->{details} ||= []);
-    $array->[$index-1] = $details;
+    my $array = ( $self->{details} ||= [] );
+    $array->[ $index - 1 ] = $details;
 }
 
 sub details {

@@ -124,9 +124,9 @@ sub _output_ruler {
 
 sub result {
     my ( $self, $result ) = @_;
-    my $parser      = $self->parser;
-    my $formatter   = $self->formatter;
-    my $context     = $shared{$formatter};
+    my $parser    = $self->parser;
+    my $formatter = $self->formatter;
+    my $context   = $shared{$formatter};
 
     $self->_refresh;
 
@@ -136,9 +136,8 @@ sub result {
 
     if ( $result->is_bailout ) {
         $formatter->_failure_output(
-                "Bailout called.  Further testing stopped:  "
-              . $result->explanation
-              . "\n" );
+            "Bailout called.  Further testing stopped:  " .
+              $result->explanation . "\n" );
     }
 
     # $self->_plan( '/' . ( $planned || 0 ) . ' ' ) unless $self->_plan;
@@ -202,6 +201,7 @@ sub close_test {
     my $context   = $shared{$formatter};
 
     $self->_clear_line;
+
     # my $output = $self->_output_method;
     $formatter->_output( $formatter->_format_name( $self->name ), ' ' );
 
