@@ -47,4 +47,14 @@ sub ACTION_tags {
     ));
 }
 
+sub ACTION_tidy {
+    my $self = shift;
+    
+    my $pms = $self->find_pm_files;
+    for my $file (keys %$pms) {
+        system('perltidy', '-b', $file);
+        unlink("$file.bak") if $? == 0;
+    }
+}
+
 1;
