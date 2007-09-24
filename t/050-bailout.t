@@ -17,8 +17,8 @@ ok 3 - read the rest of the file
 not ok 4 - this is a real failure
 Bail out!  We ran out of foobar.
 END_TAP
-ok my $parser = TAP::Parser->new( { tap => $tap } ),
-  '... we should be able to parse bailed out tests';
+my $parser = TAP::Parser->new( { tap => $tap } );
+isa_ok $parser, 'TAP::Parser', '... we should be able to parse bailed out tests';
 
 my @results;
 while ( my $result = $parser->next ) {

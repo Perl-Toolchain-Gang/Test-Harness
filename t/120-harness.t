@@ -10,7 +10,7 @@ use TAP::Harness;
 
 my $HARNESS = 'TAP::Harness';
 
-plan tests => 99;
+plan tests => 98;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -716,12 +716,11 @@ sub _runtests {
 
     # normal tests in verbose mode
 
-    ok my $parser
+    my $parser
       = $harness->runtests(
-        File::Spec->catfile(qw (t source_tests harness )) ),
-      '... runtests returns the aggregate';
+        File::Spec->catfile(qw (t source_tests harness )) );
 
-    isa_ok $parser, 'TAP::Parser::Aggregator';
+    isa_ok $parser, 'TAP::Parser::Aggregator', '... runtests returns the aggregate';
 
     ok -e File::Spec->catfile(
         $ENV{PERL_TEST_HARNESS_DUMP_TAP},

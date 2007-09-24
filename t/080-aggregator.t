@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 65;
+use Test::More tests => 64;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -40,9 +40,8 @@ my $parser2 = TAP::Parser->new( { tap => $tap } );
 $parser2->run;
 
 can_ok 'TAP::Parser::Aggregator', 'new';
-ok my $agg = TAP::Parser::Aggregator->new,
-  '... and calling it should succeed';
-isa_ok $agg, 'TAP::Parser::Aggregator', '... and the object it returns';
+my $agg = TAP::Parser::Aggregator->new;
+isa_ok $agg, 'TAP::Parser::Aggregator', '... and calling it should succeed';
 
 can_ok $agg, 'add';
 ok $agg->add( 'tap1', $parser1 ), '... and calling it should succeed';

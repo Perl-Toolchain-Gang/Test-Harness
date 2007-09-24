@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 263;
+use Test::More tests => 262;
 use IO::Capture;
 
 use File::Spec;
@@ -55,7 +55,7 @@ ok $ENV{TAP_VERSION}, 'TAP_VERSION env variable should be set';
 
 # results() is sane?
 
-ok my @results = _get_results($parser), 'The parser should return results';
+my @results = _get_results($parser);
 is scalar @results, 12, '... and there should be one for each line';
 
 my $version = shift @results;
