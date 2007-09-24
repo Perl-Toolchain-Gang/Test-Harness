@@ -9,6 +9,11 @@ use Carp;
 
 use vars qw($VERSION);
 
+BEGIN {
+    eval { require App::Prove::Plugins; };
+    # TODO maybe make noise about how you could have cool features.
+}
+
 =head1 NAME
 
 App::Prove - the guts of the C<prove> command.
@@ -126,6 +131,10 @@ sub process_args {
             't' => \$self->{taint_warn},
             'W' => \$self->{warnings_fail},
             'w' => \$self->{warnings_warn},
+            (     App::Prove::Plugins->can('switches')
+                ? App::Prove::Plugins->switches
+                : ()
+              ),
         ) or croak( 'Unable to continue' );
 
         # Stash the remainder of argv for later
@@ -150,6 +159,9 @@ sub _help {
     }
 
     Pod::Usage::pod2usage( { -verbose => 1 } );
+
+    # XXX not sure about this one
+    App::Prove::Plugins->help if( App::Prove::Plugins->can('help') );
 }
 
 sub _color_default {
@@ -222,7 +234,7 @@ sub _get_args {
 
     $args{errors} = 1 if $self->parse;
 
-    $args{exec} = length( $self->exec ) ? [ split( / /, $self->exec ) ] : []
+    $args{exec} = length( $self->exec ) ? [ split(/ /, $self->exec ) ] : []
       if ( defined( $self->exec ) );
 
     if ($formatter_class) {
