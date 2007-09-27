@@ -90,7 +90,8 @@ plan tests => 4;
 
     is @die, 1, 'open failed, die as expected';
 
-    my $spoolDir = quotemeta(File::Spec->catfile(qw( t spool source_tests harness )));
+    my $spoolDir
+      = quotemeta( File::Spec->catfile(qw( t spool source_tests harness )) );
 
     like pop @die, qr/ Can't write $spoolDir [(] /,
       '...with expected message';
