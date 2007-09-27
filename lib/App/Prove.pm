@@ -27,6 +27,9 @@ Version 2.99_03
 
 $VERSION = '2.99_03';
 
+my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
+my $NEED_GLOB = $IS_WIN32;
+
 my @ATTR;
 
 BEGIN {
@@ -168,8 +171,7 @@ sub _help {
 sub _color_default {
     my $self = shift;
 
-    return -t STDOUT
-      && !( $^O =~ /MSWin32/ );
+    return -t STDOUT && !$IS_WIN32;
 }
 
 sub _get_args {
@@ -236,7 +238,8 @@ sub _get_args {
     $args{errors} = 1 if $self->parse;
 
     # defined but zero-length exec runs test files as binaries
-    $args{exec} = [ split( /\s+/, $self->exec ) ] if ( defined( $self->exec ) );
+    $args{exec} = [ split( /\s+/, $self->exec ) ]
+      if ( defined( $self->exec ) );
 
     if ($formatter_class) {
         $args{formatter} = $formatter_class->new;
@@ -311,6 +314,12 @@ sub _get_tests {
     my @argv = @_;
     my ( @tests, %tests );
     @argv = 't' unless @argv;
+
+    # Do globbing on Win32.
+    if ($NEED_GLOB) {
+        @argv = map { glob "$_" } @argv;
+    }
+
     foreach my $arg (@argv) {
         if ( '-' eq $arg ) {
             push @argv => <STDIN>;
