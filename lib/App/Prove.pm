@@ -17,7 +17,7 @@ BEGIN {
 
 =head1 NAME
 
-App::Prove - the guts of the C<prove> command.
+App::Prove - The guts of the C<prove> command.
 
 =head1 VERSION
 
