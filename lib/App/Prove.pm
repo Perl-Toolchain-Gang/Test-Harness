@@ -100,9 +100,8 @@ sub process_args {
     # Allow cuddling the paths with the -I
     @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @args;
 
-    my $help_sub = sub { $self->_help; $self->_exit };
-
     {
+        my $help_sub = sub { $self->_help; $self->_exit };
         local @ARGV = @args;
         Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
         GetOptions(
