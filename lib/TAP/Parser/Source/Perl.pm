@@ -71,14 +71,14 @@ sub source_file {
 
 =head3 C<switches>
 
- my $switches = $perl->switches;
- my @switches = $perl->switches;
- $perl->switches(\@switches);
+  my $switches = $perl->switches;
+  my @switches = $perl->switches;
+  $perl->switches( \@switches );
 
 Getter/setter for the additional switches to pass to the perl executable.  One
 common switch would be to set an include directory:
 
- $perl->switches('-Ilib');
+  $perl->switches( ['-Ilib'] );
 
 =cut
 
