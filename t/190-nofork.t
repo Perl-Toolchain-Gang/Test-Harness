@@ -12,7 +12,7 @@ use Test::More (
     ? 'no_plan'
     : ( 'skip_all' => 'your system already has no fork' )
 );
-use IO::Capture;    # for util
+use IO::c55Capture;    # for util
 
 use TAP::Harness;
 
@@ -39,7 +39,7 @@ my $mod = 'TAP::Parser::Iterator::Process';
 }
 
 {                                # and make sure we can run a test
-    my $capture = IO::Capture->new_handle;
+    my $capture = IO::c55Capture->new_handle;
     local *STDERR;
     my $harness = TAP::Harness->new(
         {   really_quiet => 1,

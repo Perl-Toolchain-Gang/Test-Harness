@@ -4,7 +4,7 @@ use strict;
 use lib 't/lib';
 
 use Test::More tests => 262;
-use IO::Capture;
+use IO::c55Capture;
 
 use File::Spec;
 
@@ -450,7 +450,7 @@ is scalar $parser->passed, 2,
 {
 
     # set a spool to write to
-    tie local *SPOOL, 'IO::Capture';
+    tie local *SPOOL, 'IO::c55Capture';
 
     my $tap = <<'END_TAP';
 TAP version 13

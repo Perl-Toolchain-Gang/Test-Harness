@@ -4,7 +4,7 @@ use strict;
 use lib 't/lib';
 
 use Test::More;
-use IO::Capture;
+use IO::c55Capture;
 
 use TAP::Harness;
 
@@ -434,7 +434,7 @@ SKIP: {
         skip "no '$cat'", 2;
     }
 
-    my $capture = IO::Capture->new_handle;
+    my $capture = IO::c55Capture->new_handle;
     my $harness = TAP::Harness->new(
         {   really_quiet => 1,
             stdout       => $capture,
@@ -455,7 +455,7 @@ SKIP: {
 
 # catches "exec accumulates arguments" issue (r77)
 {
-    my $capture = IO::Capture->new_handle;
+    my $capture = IO::c55Capture->new_handle;
     my $harness = TAP::Harness->new(
         {   really_quiet => 1,
             stdout       => $capture,

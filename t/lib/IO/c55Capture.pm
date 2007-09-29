@@ -1,10 +1,10 @@
-package IO::Capture;
+package IO::c55Capture;
 
 use IO::Handle;
 
 =head1 Name
 
-t/lib/IO::Capture - a wafer-thin test support package
+t/lib/IO::c55Capture - a wafer-thin test support package
 
 =head1 Why!?
 
@@ -15,14 +15,14 @@ Compatibility with 5.5.3 and no external dependencies.
 Works with a global filehandle:
 
     # set a spool to write to
-    tie local *STDOUT, 'IO::Capture';
+    tie local *STDOUT, 'IO::c55Capture';
     ...
     # clear and retrieve buffer list
     my @spooled = tied(*STDOUT)->dump();
 
 Or, a lexical (and autocreated) filehandle:
 
-    my $capture = IO::Capture->new_handle;
+    my $capture = IO::c55Capture->new_handle;
     ...
     my @output = tied($$capture)->dump;
 

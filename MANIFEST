@@ -78,7 +78,7 @@ t/data/catme.1
 t/data/sample.yml
 t/lib/Dev/Null.pm
 t/lib/if.pm
-t/lib/IO/Capture.pm
+t/lib/IO/c55Capture.pm
 t/lib/NoFork.pm
 t/lib/Test/Builder.pm
 t/lib/Test/More.pm
