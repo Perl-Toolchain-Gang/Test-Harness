@@ -76,11 +76,13 @@ t/compat/040-test-harness-compat.t
 t/compat/060-version.t
 t/data/catme.1
 t/data/sample.yml
+t/inc.t
 t/lib/Dev/Null.pm
 t/lib/if.pm
 t/lib/IO/c55Capture.pm
 t/lib/NoFork.pm
 t/lib/Test/Builder.pm
+t/lib/Test/Builder/Module.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
 t/sample-tests/bailout
