@@ -7,6 +7,7 @@
 use strict;
 use lib 't/lib';
 
+use Test::More skip_all => 'this should be a compat test';
 use Test::More tests => 2;
 
 use Data::Dumper;
