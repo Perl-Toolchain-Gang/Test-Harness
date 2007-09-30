@@ -181,9 +181,7 @@ sub _switches {
     return unless defined $shebang;
 
     my $taint = ( $shebang =~ /^#!.*\bperl.*\s-\w*([Tt]+)/ );
-    push( @switches, "-$1" ) if $taint;
-
-    push @switches, map {"-I$_"} $self->_filtered_inc;
+    push @switches, "-$1", map {"-I$_"} $self->_filtered_inc if $taint;
 
     # Quote the argument if there's any whitespace in it, or if
     # we're VMS, since VMS requires all parms quoted.  Also, don't quote
