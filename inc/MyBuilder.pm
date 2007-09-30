@@ -17,6 +17,8 @@ sub ACTION_testcrufty {
 sub ACTION_test {
     my $self = shift;
 
+    $self->depends_on('code');
+
     my $tests = $self->find_test_files;
     unless (@$tests) {
         $self->log_info("No tests defined.\n");
