@@ -5,15 +5,14 @@ BEGIN {
     @ISA = qw(Module::Build);
 }
 
-# should *maybe* work iff we get the compatibility layer right
-sub ACTION_testcrufty {
+# Test with Test::Harness
+sub ACTION_test_with_harness {
     my $self = shift;
 
     $self->SUPER::ACTION_test(@_);
 }
 
-# Let's just forget about trying to use the compatibility layer to
-# self-test.
+# Test with TAP::Harness instead of Test::Harness
 sub ACTION_test {
     my $self = shift;
 
