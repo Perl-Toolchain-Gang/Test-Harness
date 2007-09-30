@@ -33,12 +33,15 @@ WriteMakefile(%mm_args);
 
     sub test_via_harness {
         my ( $self, $orig_perl, $tests ) = @_;
+        #die "tests: $tests";
 
         my $perl5lib = join $Config{path_sep},
           grep { defined && length } File::Spec->canonpath('lib/'),
           $ENV{PERL5LIB};
 
-        my $perl = "PERL5LIB=$perl5lib $orig_perl";
-        return $self->SUPER::test_via_harness( $perl, $tests );
+        # yes, maybe this is sneaky, but the test_via_harness is broken
+        # unless we are meta-compatible
+        my $perl = "PERL5LIB=$perl5lib $orig_perl -Ilib bin/prove -Ilib";
+        return $self->SUPER::test_via_script( $perl, $tests );
     }
 }
