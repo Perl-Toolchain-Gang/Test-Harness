@@ -15,7 +15,8 @@ sub _all_ok {
       && ( $tot->{max} || $tot->{skipped} ) ? 1 : 0;
 }
 
-{
+TODO: {
+    local $TODO = '@INC needs to be addressed in the compatibility layer';
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
 
     push @INC, 'examples';
