@@ -141,6 +141,7 @@ t/source_tests/harness_complain
 t/source_tests/harness_directives
 t/source_tests/harness_failure
 t/source_tests/source
+t/taint.t
 xt/author/pod-coverage.t
 xt/author/pod.t
 xt/author/stdin.t
