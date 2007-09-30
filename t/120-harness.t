@@ -10,7 +10,7 @@ use TAP::Harness;
 
 my $HARNESS = 'TAP::Harness';
 
-plan tests => 98;
+plan tests => 96;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -42,14 +42,10 @@ like $@, qr/\QUnknown arguments to TAP::Harness::new (no_such_key)/,
   '... and calling it with bad keys should fail';
 
 eval { $HARNESS->new( { lib => 'aint_no_such_lib' } ) };
-ok my $error = $@, '... and calling it with a non-existent lib should fail';
-like $error, qr/^\QNo such lib (aint_no_such_lib)/,
-  '... with an appropriate error message';
+is $@, '', '... and calling it with a non-existent lib is fine';
 
 eval { $HARNESS->new( { lib => [qw/bad_lib_1 bad_lib_2/] } ) };
-ok $error = $@, '... and calling it with non-existent libs should fail';
-like $error, qr/^\QNo such libs (bad_lib_1 bad_lib_2)/,
-  '... with an appropriate error message';
+is $@, '', '... and calling it with non-existent libs is fine';
 
 ok my $harness = $HARNESS->new,
   'Calling new() without arguments should succeed';
@@ -486,7 +482,7 @@ sub trim {
 }
 
 sub liblist {
-    return [ map { '-I' . File::Spec->rel2abs($_) } @_ ];
+    return [ map { "-I$_" } @_ ];
 }
 
 sub get_arg_sets {
@@ -513,7 +509,7 @@ sub get_arg_sets {
       { lib => {
             in        => [ 'lib',        't' ],
             out       => liblist( 'lib', 't' ),
-            test_name => '... multiple lib switches should be correct'
+            test_name => '... multiple lib dirs should be correct'
         },
         verbosity => {
             in        => 0,
@@ -529,8 +525,8 @@ sub get_arg_sets {
       },
       { switches => {
             in  => [ '-T', '-w', '-T' ],
-            out => [ '-T', '-w' ],
-            test_name => '... duplicate switches should be omitted',
+            out => [ '-T', '-w', '-T' ],
+            test_name => '... duplicate switches should remain',
         },
         failures => {
             in  => 1,
@@ -572,9 +568,9 @@ sub get_arg_sets {
       },
       { switches => {
             in  => 'T',
-            out => ['-T'],
+            out => ['T'],
             test_name =>
-              '... leading dashes (-) on switches are optional',
+              '... leading dashes (-) on switches are not optional',
         },
       },
       { switches => {

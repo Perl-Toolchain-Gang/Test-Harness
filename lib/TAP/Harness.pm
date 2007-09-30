@@ -71,26 +71,11 @@ BEGIN {
         lib => sub {
             my ( $self, $libs ) = @_;
             $libs = [$libs] unless 'ARRAY' eq ref $libs;
-            my @bad_libs;
-            for my $lib (@$libs) {
-                unless ( -d $lib ) {
-                    push @bad_libs, $lib;
-                }
-            }
-            if (@bad_libs) {
-                my $dirs = 'lib';
-                $dirs .= 's' if @bad_libs > 1;
-                $self->_error("No such $dirs (@bad_libs)");
-            }
-            return [ map { '-I' . File::Spec->rel2abs($_) } @$libs ];
+
+            return [ map { "-I$_" } @$libs ];
         },
         switches => sub {
-            my ( $self, $switches ) = @_;
-            $switches = [$switches] unless 'ARRAY' eq ref $switches;
-            my @switches = map { /^-/ ? $_ : "-$_" } @$switches;
-            my %found = map { $_ => 0 } @switches;
-            @switches = grep { !$found{$_}++ } @switches;
-            return \@switches;
+            shift; shift;
         },
         exec      => sub { shift; shift },
         merge     => sub { shift; shift },
