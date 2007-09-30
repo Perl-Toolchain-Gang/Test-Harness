@@ -35,7 +35,7 @@ sub ACTION_test {
 sub ACTION_testprove {
     my $self = shift;
     $self->depends_on('code');
-    exec( $^X, '-Iblib/lib', 'bin/prove', '-I', 'blib/lib', '-r' );
+    exec( $^X, '-Iblib/lib', 'bin/prove', '-b', '-r' );
 }
 
 sub ACTION_testreference {
