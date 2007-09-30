@@ -41,7 +41,8 @@ WriteMakefile(%mm_args);
 
         # yes, maybe this is sneaky, but the test_via_harness is broken
         # unless we are meta-compatible
-        my $perl = "PERL5LIB=$perl5lib $orig_perl -Ilib bin/prove -Ilib";
+        my $perl = 
+            qq[PERL5LIB=$perl5lib $orig_perl "-Iblib/lib" bin/prove];
         return $self->SUPER::test_via_script( $perl, $tests );
     }
 }
