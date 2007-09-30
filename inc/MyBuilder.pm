@@ -54,8 +54,8 @@ sub ACTION_testreference {
 
 sub ACTION_testauthor {
     my $self = shift;
-    $self->test_files( 't', 'xt/author' );
-    $self->generic_test( type => 'default' );
+    $self->test_files( 'xt/author' );
+    $self->ACTION_test;
 }
 
 sub ACTION_critic {
