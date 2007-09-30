@@ -209,6 +209,9 @@ sub _switches {
     return @switches;
 }
 
+
+# Get the parts of @INC which are changed from the stock list AND
+# preserve reordering of stock directories.
 sub _filtered_inc {
     my $self = shift;
     my @inc  = @_;
@@ -227,11 +230,24 @@ sub _filtered_inc {
         s/[\\\/+]$// foreach @inc;
     }
 
-    my %seen;
-    $seen{$_}++ foreach $self->_default_inc;
-    @inc = grep !$seen{$_}++, @inc;
+    my @default_inc = $self->_default_inc;
 
-    return @inc;
+    my @new_inc;
+    my %seen;
+    for my $dir (@inc) {
+        next if $seen{$dir}++;
+                
+        if( $dir eq ($default_inc[0] || '') ) {
+            shift @default_inc;
+        }
+        else {
+            push @new_inc, $dir;
+        }
+        
+        shift @default_inc while @default_inc and $seen{$default_inc[0]};
+    }
+
+    return @new_inc;
 }
 
 {

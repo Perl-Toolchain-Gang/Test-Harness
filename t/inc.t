@@ -9,11 +9,16 @@ use lib 't/lib';
 
 use Test::More tests => 2;
 
-# Ensure we include code-time changes to @INC
-use lib "wibble";
-
 use Data::Dumper;
 use TAP::Harness;
+
+
+# Change @INC so we ensure it's preserved.
+use lib 'wibble';
+
+# Put a stock directory near the beginning.
+use lib $INC[$#INC-2];
+
 
 my $inc = Data::Dumper->new([\@INC])->Terse(1)->Purity(1)->Dump;
 my $taint_inc = 
@@ -34,8 +39,9 @@ is_deeply(
     [_strip_dups(@{%s})],
     '@INC propegated to test'
 ) or do {
-    diag join ",\n", @INC;
-    diag "%s";
+    diag join ",\n", _strip_dups(@INC);
+    diag '-----------------';
+    diag join ",\n", _strip_dups(@{%s});
 };
 END
 
