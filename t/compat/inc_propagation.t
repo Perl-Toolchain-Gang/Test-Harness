@@ -11,7 +11,7 @@ use Test::More skip_all => 'this should be a compat test';
 use Test::More tests => 2;
 
 use Data::Dumper;
-use TAP::Harness;
+use Test::Harness;
 
 
 # Change @INC so we ensure it's preserved.
@@ -56,8 +56,7 @@ close TEST;
 END { 1 while unlink 'inc_check_taint.t.tmp', 'inc_check.t.tmp'; }
 
 for my $test ( 'inc_check_taint.t.tmp', 'inc_check.t.tmp' ) {
-    my $parser = TAP::Parser->new({ source => $test });
-    1 while $parser->next;
-    ok !$parser->failed, $test;
+    my($tot, $failed) = Test::Harness::execute_tests( tests => [$test] );
+    is $tot->{bad}, 0;
 }
 1;

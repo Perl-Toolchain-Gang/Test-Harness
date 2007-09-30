@@ -2,11 +2,15 @@ package Test::Harness;
 
 require 5.00405;
 
+use strict;
+
+use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
+use constant IS_VMS   => ( $^O eq 'VMS' );
+
 use TAP::Harness            ();
 use TAP::Parser::Aggregator ();
 
 use Exporter;
-use strict;
 
 # TODO: Emulate at least some of these
 use vars qw(
@@ -171,6 +175,8 @@ sub _new_harness {
         }
     }
 
+    push @lib, _filtered_inc();
+
     my $args = {
         verbose    => $Verbose,
         timer      => $Timer,
@@ -180,6 +186,57 @@ sub _new_harness {
     };
 
     return TAP::Harness->new($args);
+}
+
+
+# Get the parts of @INC which are changed from the stock list AND
+# preserve reordering of stock directories.
+sub _filtered_inc {
+    my @inc = @INC;
+
+    if (IS_VMS) {
+
+        # VMS has a 255-byte limit on the length of %ENV entries, so
+        # toss the ones that involve perl_root, the install location
+        @inc = grep !/perl_root/i, @inc;
+
+    }
+    elsif (IS_WIN32) {
+
+        # Lose any trailing backslashes in the Win32 paths
+        s/[\\\/+]$// foreach @inc;
+    }
+
+    my @default_inc = _default_inc();
+
+    my @new_inc;
+    my %seen;
+    for my $dir (@inc) {
+        next if $seen{$dir}++;
+                
+        if( $dir eq ($default_inc[0] || '') ) {
+            shift @default_inc;
+        }
+        else {
+            push @new_inc, $dir;
+        }
+        
+        shift @default_inc while @default_inc and $seen{$default_inc[0]};
+    }
+
+    return @new_inc;
+}
+
+{
+    # Cache this to avoid repeatedly shelling out to Perl.
+    my @inc;
+
+    sub _default_inc {
+        return @inc if @inc;
+        my $perl = $ENV{HARNESS_PERL} || $^X;
+        chomp( @inc = `$perl -le "print join qq[\\n], \@INC"` );
+        return @inc;
+    }
 }
 
 sub _check_sequence {
