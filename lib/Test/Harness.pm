@@ -160,12 +160,9 @@ sub _new_harness {
         $Switches .= ' ' . $env_sw if ( length($env_sw) );
     }
 
-    # pass-thru the current process @INC for compatibility
-    my @lib = TAP::Parser::Source::Perl->new->filtered_inc;
-    my @switches;
-
     # This is a bit crufty. The switches have all been joined into a
     # single string so we have to try and recover them.
+    my ( @lib, @switches );
     for my $opt ( split( /\s+(?=-)/, $Switches ) ) {
         if ( $opt =~ /^ -I (.*) $ /x ) {
             push @lib, $1;
