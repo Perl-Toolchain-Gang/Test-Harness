@@ -24,11 +24,6 @@ sub ACTION_test {
         return;
     }
 
-    # We want to break the longstanding tradition of pushing the LHS
-    # @INC into the RHS processes.  At least, only push the ones which
-    # aren't in the LHS's perl's @INC because the RHS perl might be a
-    # different version.
-
     # TODO verbose and stuff
 
     require TAP::Harness;
