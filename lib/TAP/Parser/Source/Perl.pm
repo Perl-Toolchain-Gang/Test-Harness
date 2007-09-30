@@ -203,9 +203,7 @@ sub _switches {
 sub _filtered_inc {
     my $self = shift;
     my @inc  = @_;
-
-    # XXX not here, but in the compatibility layer *only*
-    #@inc = @INC unless @inc;
+    @inc = @INC unless @inc;
 
     if (IS_VMS) {
 
