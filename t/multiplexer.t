@@ -131,7 +131,11 @@ for my $test (@schedule) {
     my @sources = $test->{sources}->();
     my $mux     = TAP::Parser::Multiplexer->new;
 
+    my $count = @sources;
     $mux->add(@$_) for @sources;
+
+    is $mux->parsers, $count, "$name: count OK";
+
     while ( my ( $parser, $stash, $result ) = $mux->next ) {
 
         # use Data::Dumper;

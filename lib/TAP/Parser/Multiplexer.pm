@@ -48,6 +48,7 @@ sub new {
     return bless {
         select => IO::Select->new,
         avid   => [],                # Parsers that can't select
+        count  => 0,
     }, $class;
 }
 
@@ -79,6 +80,8 @@ sub add {
         for my $h (@handles) {
             $sel->add( [ $h, $parser, $stash, @filenos ] );
         }
+
+        $self->{count}++;
     }
     else {
         push @{ $self->{avid} }, [ $parser, $stash ];
@@ -95,7 +98,7 @@ Returns the number of parsers.
 
 sub parsers {
     my $self = shift;
-    return $self->{select}->count + scalar @{ $self->{avid} };
+    return $self->{count} + scalar @{ $self->{avid} };
 }
 
 sub _iter {
@@ -125,6 +128,7 @@ sub _iter {
 
         unless ( defined $result ) {
             $sel->remove(@handles);
+            $self->{count}--;
 
             # Force another can_read - we may now have removed a handle
             # thought to have been ready.
