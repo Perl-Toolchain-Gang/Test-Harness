@@ -22,7 +22,7 @@ sub run_test_file {
 
     my $p = TAP::Parser->new( { source => $test_file } );
     1 while $p->next;
-    ok !$p->failed;
+    ok !$p->has_problems;
 
     unlink $test_file;
 }
@@ -33,9 +33,10 @@ sub run_test_file {
     run_test_file(<<'END');
 #!/usr/bin/perl -T
 
+use lib 't/lib';
 use Test::More tests => 1;
 
-is( $INC[0], 'wibble' ) or diag join "\n,", @INC;
+is( $INC[1], 'wibble' ) or diag join "\n,", @INC;
 END
 }
 
@@ -47,9 +48,10 @@ END
     run_test_file(<<'END');
 #!/usr/bin/perl -T
 
+use lib 't/lib';
 use Test::More tests => 1;
 
-is( $INC[0], 'wibble' ) or diag join "\n,", @INC;
+is( $INC[1], 'wibble' ) or diag join "\n,", @INC;
 END
 }
 
