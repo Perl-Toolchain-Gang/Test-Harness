@@ -28,6 +28,7 @@ lib/TAP/Parser/Iterator.pm
 lib/TAP/Parser/Iterator/Array.pm
 lib/TAP/Parser/Iterator/Process.pm
 lib/TAP/Parser/Iterator/Stream.pm
+lib/TAP/Parser/Multiplexer.pm
 lib/TAP/Parser/Result.pm
 lib/TAP/Parser/Result/Bailout.pm
 lib/TAP/Parser/Result/Comment.pm
@@ -72,6 +73,7 @@ t/lib/Test/Builder.pm
 t/lib/Test/Builder/Module.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
+t/multiplexer.t
 t/nofork.t
 t/parse.t
 t/premature-bailout.t

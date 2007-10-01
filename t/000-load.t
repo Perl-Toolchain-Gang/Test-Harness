@@ -3,40 +3,42 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 48;
+use Test::More tests => 50;
 
 BEGIN {
+    # TAP::Parser must come first
     my @classes = qw(
       TAP::Parser
+      TAP::Base
+      TAP::Formatter::Color
+      TAP::Formatter::Console
+      TAP::Formatter::Console::ParallelSession
+      TAP::Formatter::Console::Session
+      TAP::Harness
       TAP::Parser::Aggregator
       TAP::Parser::Grammar
       TAP::Parser::Iterator::Array
       TAP::Parser::Iterator::Process
       TAP::Parser::Iterator::Stream
+      TAP::Parser::Multiplexer
       TAP::Parser::Result
+      TAP::Parser::Result::Bailout
       TAP::Parser::Result::Comment
       TAP::Parser::Result::Plan
       TAP::Parser::Result::Test
       TAP::Parser::Result::Unknown
-      TAP::Parser::Result::Bailout
       TAP::Parser::Result::Version
       TAP::Parser::Source
       TAP::Parser::Source::Perl
       TAP::Parser::YAMLish::Reader
       TAP::Parser::YAMLish::Writer
-      TAP::Harness
-      TAP::Base
-      TAP::Formatter::Color
-      TAP::Formatter::Console
-      TAP::Formatter::Console::Session
-      TAP::Formatter::Console::ParallelSession
       Test::Harness
     );
 
     foreach my $class (@classes) {
         use_ok $class;
         is $class->VERSION, TAP::Parser->VERSION,
-          "... and it should have the correct version";
+          "... and $class should have the correct version";
     }
     diag("Testing Test::Harness $Test::Harness::VERSION, Perl $], $^X");
 }

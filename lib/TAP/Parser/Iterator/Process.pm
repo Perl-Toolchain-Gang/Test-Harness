@@ -12,8 +12,6 @@ use Config;
 use IO::Handle;
 
 my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
-my $IS_MACOS = ( $^O eq 'MacOS' );
-my $IS_VMS   = ( $^O eq 'VMS' );
 
 =head1 NAME
 
@@ -263,6 +261,19 @@ sub _finish {
     }
 
     return $self;
+}
+
+=head3 C<get_select_handles>
+
+Return a list of filehandles that may be used upstream in a select()
+call to signal that this Iterator is ready. Iterators that are not
+handle based should return an empty list.
+
+=cut
+
+sub get_select_handles {
+    my $self = shift;
+    return grep defined, ( $self->{out}, $self->{err} );
 }
 
 1;

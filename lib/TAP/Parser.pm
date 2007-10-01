@@ -315,7 +315,7 @@ sub run {
 
         if ( 1 < grep {defined} $stream, $tap, $source ) {
             $self->_croak(
-                "You may only choose one of 'stream', 'tap', or 'source'" );
+                "You may only choose one of 'stream', 'tap', or 'source'");
         }
         if ( $source && $exec ) {
             $self->_croak(
@@ -1124,6 +1124,15 @@ sub _make_state_table {
 
     return \%states;
 }
+
+=item C<get_select_handles>
+
+Get an a list of file handles which can be passed to C<select> to
+determine the readiness of this parser.
+
+=cut
+
+sub get_select_handles { shift->_stream->get_select_handles }
 
 sub _iter {
     my $self        = shift;

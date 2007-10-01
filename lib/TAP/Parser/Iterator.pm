@@ -102,4 +102,14 @@ any effect for I/O handle based streams.
 
 sub handle_unicode { }
 
+=head3 C<get_select_handles>
+
+Return a list of filehandles that may be used upstream in a select()
+call to signal that this Iterator is ready. Iterators that are not
+handle based should return an empty list.
+
+=cut
+
+sub get_select_handles { return }
+
 1;
