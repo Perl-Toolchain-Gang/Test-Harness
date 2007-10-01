@@ -135,7 +135,7 @@ sub _iter {
         }
 
         return ( $parser, $stash, $result );
-      }
+    };
 }
 
 =head3 C<next>
