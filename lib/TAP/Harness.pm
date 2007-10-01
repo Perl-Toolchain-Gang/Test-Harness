@@ -418,9 +418,8 @@ sub aggregate_tests {
 
             # Keep multiplexer topped up
             while ( @tests && $mux->parsers < $jobs ) {
-                my $test    = shift @tests;
-                my $parser  = $self->make_parser($test);
-                my $session = $self->formatter->open_test( $test, $parser );
+                my $test = shift @tests;
+                my ( $parser, $session ) = $self->make_parser($test);
                 $mux->add( $parser, [ $session, $test ] );
             }
 
@@ -442,8 +441,7 @@ sub aggregate_tests {
     }
     else {
         for my $test (@tests) {
-            my $parser = $self->make_parser($test);
-            my $session = $self->formatter->open_test( $test, $parser );
+            my ( $parser, $session ) = $self->make_parser($test);
 
             while ( defined( my $result = $parser->next ) ) {
                 $session->result($result);
@@ -451,8 +449,6 @@ sub aggregate_tests {
             }
 
             $self->finish_parser( $parser, $session );
-
-            # my $parser = $self->_runtest($test);
             $aggregate->add( $test, $parser );
         }
     }
@@ -537,7 +533,11 @@ sub _get_parser_args {
 
 =head3 C<make_parser>
 
-Make a new parser. Typically used and/or overridden in subclasses.
+Make a new parser and display formatter session. Typically used and/or
+overridden in subclasses.
+
+    my ( $parser, $session ) = $harness->make_parser;
+
 
 =cut
 
@@ -547,8 +547,9 @@ sub make_parser {
     my $parser = TAP::Parser->new( $self->_get_parser_args($test) );
 
     $self->_make_callback( 'made_parser', $parser );
+    my $session = $self->formatter->open_test( $test, $parser );
 
-    return $parser;
+    return ( $parser, $session );
 }
 
 =head3 C<finish_parser>
