@@ -234,7 +234,7 @@ sub close_test {
     $self->_need_refresh;
 
     unless (@$active) {
-        $self->formatter->_output("\n");
+        # $self->formatter->_output("\n");
         delete $shared{$formatter};
     }
 }

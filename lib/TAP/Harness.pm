@@ -80,6 +80,7 @@ BEGIN {
         merge     => sub { shift; shift },
         formatter => sub { shift; shift },
         jobs      => sub { shift; shift },
+        fork      => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -403,6 +404,91 @@ Tests will be run in the order found.
 
 =cut
 
+sub _aggregate_forked {
+    my ( $self, $aggregate, @tests ) = @_;
+
+    eval { require Parallel::Iterator };
+
+    croak "Parallel::Iterator required for --fork option ($@)"
+      if $@;
+
+    my $jobs = $self->jobs;
+
+    my $iter = Parallel::Iterator::iterate(
+        { workers => $jobs && $jobs > 1 ? $jobs : 0 },
+        sub {
+            my ( $id, $test ) = @_;
+
+            my ( $parser, $session ) = $self->make_parser($test);
+
+            while ( defined( my $result = $parser->next ) ) {
+                exit 1 if $result->is_bailout;
+            }
+
+            $self->finish_parser( $parser, $session );
+
+            # Can't serialise coderefs...
+            delete $parser->{_iter};
+            delete $parser->{_stream};
+            delete $parser->{_grammar};
+            return $parser;
+        },
+        \@tests
+    );
+
+    while ( my ( $id, $parser ) = $iter->() ) {
+        $aggregate->add( $tests[$id], $parser );
+    }
+}
+
+sub _aggregate_parallel {
+    my ( $self, $aggregate, @tests ) = @_;
+
+    my $jobs = $self->jobs;
+    my $mux  = TAP::Parser::Multiplexer->new;
+
+    RESULT: {
+
+        # Keep multiplexer topped up
+        while ( @tests && $mux->parsers < $jobs ) {
+            my $test = shift @tests;
+            my ( $parser, $session ) = $self->make_parser($test);
+            $mux->add( $parser, [ $session, $test ] );
+        }
+
+        if ( my ( $parser, $stash, $result ) = $mux->next ) {
+            my ( $session, $test ) = @$stash;
+            if ( defined $result ) {
+                $session->result($result);
+                exit 1 if $result->is_bailout;
+            }
+            else {
+
+                # End of parser. Automatically removed from the mux.
+                $self->finish_parser( $parser, $session );
+                $aggregate->add( $test, $parser );
+            }
+            redo RESULT;
+        }
+    }
+}
+
+sub _aggregate_single {
+    my ( $self, $aggregate, @tests ) = @_;
+
+    for my $test (@tests) {
+        my ( $parser, $session ) = $self->make_parser($test);
+
+        while ( defined( my $result = $parser->next ) ) {
+            $session->result($result);
+            exit 1 if $result->is_bailout;
+        }
+
+        $self->finish_parser( $parser, $session );
+        $aggregate->add( $test, $parser );
+    }
+}
+
 sub aggregate_tests {
     my ( $self, $aggregate, @tests ) = @_;
 
@@ -411,47 +497,18 @@ sub aggregate_tests {
     $self->formatter->prepare(@tests);
     $aggregate->start;
 
-    if ( $jobs > 1 ) {
-        my $mux = TAP::Parser::Multiplexer->new;
-
-        RESULT: {
-
-            # Keep multiplexer topped up
-            while ( @tests && $mux->parsers < $jobs ) {
-                my $test = shift @tests;
-                my ( $parser, $session ) = $self->make_parser($test);
-                $mux->add( $parser, [ $session, $test ] );
-            }
-
-            if ( my ( $parser, $stash, $result ) = $mux->next ) {
-                my ( $session, $test ) = @$stash;
-                if ( defined $result ) {
-                    $session->result($result);
-                    exit 1 if $result->is_bailout;
-                }
-                else {
-
-                    # End of parser. Automatically removed from the mux.
-                    $self->finish_parser( $parser, $session );
-                    $aggregate->add( $test, $parser );
-                }
-                redo RESULT;
-            }
+    if ( $self->jobs > 1 ) {
+        if ( $self->fork ) {
+            $self->_aggregate_forked( $aggregate, @tests );
+        }
+        else {
+            $self->_aggregate_parallel( $aggregate, @tests );
         }
     }
     else {
-        for my $test (@tests) {
-            my ( $parser, $session ) = $self->make_parser($test);
-
-            while ( defined( my $result = $parser->next ) ) {
-                $session->result($result);
-                exit 1 if $result->is_bailout;
-            }
-
-            $self->finish_parser( $parser, $session );
-            $aggregate->add( $test, $parser );
-        }
+        $self->_aggregate_single( $aggregate, @tests );
     }
+
     $aggregate->stop;
 
 }
@@ -461,6 +518,12 @@ sub aggregate_tests {
 Returns the number of concurrent test runs the harness is handling. For the default
 harness this value is always 1. A parallel harness such as L<TAP::Harness::Parallel>
 will override this to return the number of jobs it is handling.
+
+=head3 C<fork>
+
+If true the harness will attempt to fork and run the parser for each
+test in a separate process. Currently this option requires
+L<Parallel::Iterator> to be installed.
 
 =cut
 

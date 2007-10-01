@@ -34,10 +34,10 @@ my @ATTR;
 
 BEGIN {
     @ATTR = qw(
-      archive argv blib color directives exec failures formatter harness
-      includes jobs lib merge parse quiet really_quiet recurse backwards
-      shuffle taint_fail taint_warn timer verbose warnings_fail
-      warnings_warn
+      archive argv blib color directives exec failures fork formatter
+      harness includes jobs lib merge parse quiet really_quiet recurse
+      backwards shuffle taint_fail taint_warn timer verbose
+      warnings_fail warnings_warn
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -116,6 +116,7 @@ sub process_args {
             'formatter=s' => \$self->{formatter},
             'r|recurse'   => \$self->{recurse},
             'reverse'     => \$self->{backwards},
+            'fork'        => \$self->{fork},
             'p|parse'     => \$self->{parse},
             'q|quiet'     => \$self->{quiet},
             'Q|QUIET'     => \$self->{really_quiet},
@@ -192,6 +193,10 @@ sub _get_args {
 
     if ( my $jobs = $self->jobs ) {
         $args{jobs} = $jobs;
+    }
+
+    if ( my $fork = $self->fork ) {
+        $args{fork} = $fork;
     }
 
     if ( my $harness_opt = $self->harness ) {
@@ -422,6 +427,8 @@ __END__
 =item C<exec>
 
 =item C<failures>
+
+=item C<fork>
 
 =item C<formatter>
 
