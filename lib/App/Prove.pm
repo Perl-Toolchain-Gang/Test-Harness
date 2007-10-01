@@ -191,7 +191,6 @@ sub _get_args {
     }
 
     if ( my $jobs = $self->jobs ) {
-        $self->require_harness( jobs => 'TAP::Harness::Parallel' );
         $args{jobs} = $jobs;
     }
 

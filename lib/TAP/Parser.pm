@@ -53,7 +53,6 @@ BEGIN {    # making accessors
         in_todo
         start_time
         end_time
-        stash
         )
       )
     {
@@ -831,11 +830,6 @@ Returns the time when the Parser was created.
 =head3 C<end_time>
 
 Returns the time when the end of TAP input was seen.
-
-=head3 C<stash>
-
-Per-parser stash. This is opaque to the parser itself but may be used to
-associate an object with the lifecycle of the parser.
 
 =head3 C<has_problems>
 

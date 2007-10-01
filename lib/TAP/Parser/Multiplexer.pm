@@ -71,16 +71,13 @@ sub add {
     my @handles = $parser->get_select_handles;
     if (@handles) {
         my $sel = $self->{select};
-        for my $h (@handles) {
 
-            # We have to turn handles into file numbers here because by
-            # the time we want to remove them from our IO::Select they
-            # will already have been closed by the iterator.
-            $sel->add(
-                [   $h, $parser, $stash,
-                    map { fileno $_ } @handles
-                ]
-            );
+        # We have to turn handles into file numbers here because by
+        # the time we want to remove them from our IO::Select they
+        # will already have been closed by the iterator.
+        my @filenos = map { fileno $_ } @handles;
+        for my $h (@handles) {
+            $sel->add( [ $h, $parser, $stash, @filenos ] );
         }
     }
     else {

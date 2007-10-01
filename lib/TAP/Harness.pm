@@ -10,6 +10,7 @@ use IO::Handle;
 use TAP::Base;
 use TAP::Parser;
 use TAP::Parser::Aggregator;
+use TAP::Parser::Multiplexer;
 use TAP::Formatter::Console;
 
 use vars qw($VERSION @ISA);
@@ -72,14 +73,13 @@ BEGIN {
             my ( $self, $libs ) = @_;
             $libs = [$libs] unless 'ARRAY' eq ref $libs;
 
-            return [ map { "-I$_" } @$libs ];
+            return [ map {"-I$_"} @$libs ];
         },
-        switches => sub {
-            shift; shift;
-        },
+        switches  => sub { shift; shift },
         exec      => sub { shift; shift },
         merge     => sub { shift; shift },
         formatter => sub { shift; shift },
+        jobs      => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -110,20 +110,13 @@ BEGIN {
         }
     }
 
-    # TODO scrub the tests and eliminate this bit {{{
-    my @AUTO_FORWARD = qw(
-      _longest
-    );
-
-    for my $method ( @AUTO_FORWARD, @FORMATTER_ARGS ) {
+    for my $method (@FORMATTER_ARGS) {
         no strict 'refs';
         *{$method} = sub {
             my $self = shift;
             return $self->formatter->$method(@_);
         };
     }
-
-    # }}}
 }
 
 ##############################################################################
@@ -337,20 +330,21 @@ Any keys for which the value is C<undef> will be ignored.
             }
         }
 
+        $self->jobs(1) unless defined $self->jobs;
+
         unless ( $self->formatter ) {
 
             # This is a little bodge to preserve legacy behaviour. In
             # the old days we didn't get given a formatter - so in that
             # case we'll make our own formatter that provides default
             # behaviour.
-            my %formatter_args = ();
+            my %formatter_args = ( jobs => $self->jobs );
             for my $name (@FORMATTER_ARGS) {
                 if ( defined( my $property = delete $arg_for{$name} ) ) {
                     $formatter_args{$name} = $property;
                 }
             }
 
-            $formatter_args{jobs} = $self->jobs;
             $self->formatter(
                 TAP::Formatter::Console->new( \%formatter_args ) );
 
@@ -412,11 +406,55 @@ Tests will be run in the order found.
 sub aggregate_tests {
     my ( $self, $aggregate, @tests ) = @_;
 
+    my $jobs = $self->jobs;
+
     $self->formatter->prepare(@tests);
     $aggregate->start;
-    for my $test (@tests) {
-        my $parser = $self->_runtest($test);
-        $aggregate->add( $test, $parser );
+
+    if ( $jobs > 1 ) {
+        my $mux = TAP::Parser::Multiplexer->new;
+
+        RESULT: {
+
+            # Keep multiplexer topped up
+            while ( @tests && $mux->parsers < $jobs ) {
+                my $test    = shift @tests;
+                my $parser  = $self->make_parser($test);
+                my $session = $self->formatter->open_test( $test, $parser );
+                $mux->add( $parser, [ $session, $test ] );
+            }
+
+            if ( my ( $parser, $stash, $result ) = $mux->next ) {
+                my ( $session, $test ) = @$stash;
+                if ( defined $result ) {
+                    $session->result($result);
+                    exit 1 if $result->is_bailout;
+                }
+                else {
+
+                    # End of parser. Automatically removed from the mux.
+                    $self->finish_parser( $parser, $session );
+                    $aggregate->add( $test, $parser );
+                }
+                redo RESULT;
+            }
+        }
+    }
+    else {
+        for my $test (@tests) {
+            my $parser = $self->make_parser($test);
+            my $session = $self->formatter->open_test( $test, $parser );
+
+            while ( defined( my $result = $parser->next ) ) {
+                $session->result($result);
+                exit 1 if $result->is_bailout;
+            }
+
+            $self->finish_parser( $parser, $session );
+
+            # my $parser = $self->_runtest($test);
+            $aggregate->add( $test, $parser );
+        }
     }
     $aggregate->stop;
 
@@ -429,8 +467,6 @@ harness this value is always 1. A parallel harness such as L<TAP::Harness::Paral
 will override this to return the number of jobs it is handling.
 
 =cut
-
-sub jobs {1}
 
 ##############################################################################
 
@@ -511,23 +547,8 @@ sub make_parser {
     my $parser = TAP::Parser->new( $self->_get_parser_args($test) );
 
     $self->_make_callback( 'made_parser', $parser );
-    $parser->stash( $self->formatter->open_test( $test, $parser ) );
 
     return $parser;
-}
-
-sub _runtest {
-    my ( $self, $test ) = @_;
-
-    my $parser  = $self->make_parser($test);
-    my $session = $parser->stash;
-
-    while ( defined( my $result = $parser->next ) ) {
-        $session->result($result);
-        exit 1 if $result->is_bailout;
-    }
-
-    return $self->finish_parser($parser);
 }
 
 =head3 C<finish_parser>
@@ -538,13 +559,11 @@ subclasses. The parser isn't destroyed as a result of this.
 =cut
 
 sub finish_parser {
-    my ( $self, $parser ) = @_;
+    my ( $self, $parser, $session ) = @_;
 
-    $parser->stash->close_test;
+    $session->close_test;
     $self->_close_spool($parser);
 
-    # Avoid circularity
-    $parser->stash(undef);
     return $parser;
 }
 
