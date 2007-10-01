@@ -1125,7 +1125,7 @@ sub _make_state_table {
     return \%states;
 }
 
-=item C<get_select_handles>
+=head3 C<get_select_handles>
 
 Get an a list of file handles which can be passed to C<select> to
 determine the readiness of this parser.
