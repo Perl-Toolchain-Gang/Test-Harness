@@ -412,10 +412,8 @@ sub _aggregate_forked {
     croak "Parallel::Iterator required for --fork option ($@)"
       if $@;
 
-    my $jobs = $self->jobs;
-
     my $iter = Parallel::Iterator::iterate(
-        { workers => $jobs && $jobs > 1 ? $jobs : 0 },
+        { workers => $self->jobs || 1 },
         sub {
             my ( $id, $test ) = @_;
 
