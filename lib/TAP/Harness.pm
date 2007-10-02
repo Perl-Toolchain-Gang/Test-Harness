@@ -413,7 +413,7 @@ sub _aggregate_forked {
       if $@;
 
     my $iter = Parallel::Iterator::iterate(
-        { workers => $self->jobs || 1 },
+        { workers => $self->jobs || 0 },
         sub {
             my ( $id, $test ) = @_;
 
