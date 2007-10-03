@@ -40,7 +40,7 @@ BEGIN {
     );
 
     foreach my $class (@classes) {
-        use_ok $class;
+        use_ok $class or BAIL_OUT("Could not load $class");
         is $class->VERSION, TAP::Parser->VERSION,
           "... and $class should have the correct version";
     }
