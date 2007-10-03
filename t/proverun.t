@@ -138,10 +138,10 @@ for my $test (@SCHEDULE) {
     my @log = get_log();
 
     # Bodge: we don't know what pathname will be used for the exe so we
-    # transform it into something we hope will be stable.
+    # obliterate it here. Need to test that it's sane.
     for my $call (@log) {
         if ( 'HASH' eq ref $call->[2] && exists $call->[2]->{command} ) {
-            $call->[2]->{command}->[0] =~ s/.*?(\w+)$/\U$1/;
+            $call->[2]->{command}->[0] = 'PERL';
         }
     }
 
