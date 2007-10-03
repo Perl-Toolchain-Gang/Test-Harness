@@ -101,6 +101,22 @@ sub process_args {
     @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @args;
 
     {
+
+        # ugh, teach Getopt::Long how to propagate an error
+        my @error;
+        local *main::__DEFAULT__ = sub {
+            local $SIG{__DIE__};
+            die @_ unless ( defined($^S) );
+            if ($^S) {
+                my @mess
+                  = grep( /^\s*eval /, split( /\n/, Carp::longmess() ) );
+                die @_ unless ( $mess[0] =~ m/Getopt.Long/ );
+            }
+            local *main::__DEFAULT__;
+            @error = @_;
+            die "!FINISH";
+        };    # end horrid fix
+
         my $help_sub = sub { $self->_help; $self->_exit };
         local @ARGV = @args;
         Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
@@ -124,6 +140,7 @@ sub process_args {
             'm|merge'     => \$self->{merge},
             'I=s@'        => $self->{includes},
             'directives'  => \$self->{directives},
+            'die'         => sub { die "dead" }, # XXX temporary
             'h|help|?'    => $help_sub,
             'H|man'       => $help_sub,
             'V|version'   => sub { $self->print_version; $self->_exit },
@@ -140,6 +157,7 @@ sub process_args {
                 : ()
             ),
         ) or croak('Unable to continue');
+        @error and die @error;
 
         # Stash the remainder of argv for later
         $self->{argv} = [@ARGV];
@@ -154,12 +172,11 @@ sub _help {
     eval('use Pod::Usage 1.12 ()');
     my $err = $@;
 
-    # XXX Getopt::Long is being helpy
-    local $SIG{__DIE__} = sub { warn @_; $self->_exit; };
     if ($err) {
+        $err =~ s/( at \(eval.*)$//s;
         die 'Please install Pod::Usage for the --help option '
           . '(or try `perldoc prove`.)'
-          . "\n ($@)";
+          . "\n ($err)";
     }
 
     Pod::Usage::pod2usage( { -verbose => 1 } );
