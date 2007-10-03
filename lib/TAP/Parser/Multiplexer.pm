@@ -30,6 +30,10 @@ $VERSION = '2.99_03';
 =head1 DESCRIPTION
 
 C<TAP::Parser::Multiplexer> gathers input from multiple TAP::Parsers.
+Internally it calls select on the input file handles for those parsers
+to wait for one or more of them to have input available.
+
+See L<TAP::Harness> for an example of its use.
 
 =head1 METHODS
 
@@ -92,7 +96,8 @@ sub add {
 
   my $count   = $mux->parsers;
 
-Returns the number of parsers.
+Returns the number of parsers. Parsers are removed from the multiplexer
+when their input is exhausted.
 
 =cut
 
@@ -146,6 +151,23 @@ containing the parser from which the result came, the stash that
 corresponds with that parser and the result.
 
     my ( $parser, $stash, $result ) = $mux->next;
+
+If C<$result> is undefined the corresponding parser has reached the end
+of its input (and will automatically be removed from the multiplexer).
+
+When all parsers are exhausted an empty list will be returned.
+
+    if ( my ( $parser, $stash, $result ) = $mux->next ) {
+        if ( ! defined $result ) {
+            # End of this parser
+        }
+        else {
+            # Process result
+        }
+    }
+    else {
+        # All parsers finished
+    }
 
 =cut
 
