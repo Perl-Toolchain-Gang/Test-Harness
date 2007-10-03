@@ -82,7 +82,7 @@ sub _initialize {
       keys %verb_map;
 
     $self->_croak(
-        'Only one of verbose, quiet or really_quiet should be specified' )
+        'Only one of verbose, quiet or really_quiet should be specified')
       if @verb_adj > 1;
 
     $self->verbosity( shift @verb_adj || 0 );

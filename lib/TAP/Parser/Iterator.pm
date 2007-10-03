@@ -110,6 +110,6 @@ handle based should return an empty list.
 
 =cut
 
-sub get_select_handles { return }
+sub get_select_handles {return}
 
 1;

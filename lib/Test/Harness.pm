@@ -5,7 +5,7 @@ require 5.00405;
 use strict;
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
-use constant IS_VMS   => ( $^O eq 'VMS' );
+use constant IS_VMS => ( $^O eq 'VMS' );
 
 use TAP::Harness            ();
 use TAP::Parser::Aggregator ();
@@ -187,7 +187,6 @@ sub _new_harness {
     return TAP::Harness->new($args);
 }
 
-
 # Get the parts of @INC which are changed from the stock list AND
 # preserve reordering of stock directories.
 sub _filtered_inc {
@@ -212,21 +211,22 @@ sub _filtered_inc {
     my %seen;
     for my $dir (@inc) {
         next if $seen{$dir}++;
-                
-        if( $dir eq ($default_inc[0] || '') ) {
+
+        if ( $dir eq ( $default_inc[0] || '' ) ) {
             shift @default_inc;
         }
         else {
             push @new_inc, $dir;
         }
-        
-        shift @default_inc while @default_inc and $seen{$default_inc[0]};
+
+        shift @default_inc while @default_inc and $seen{ $default_inc[0] };
     }
 
     return @new_inc;
 }
 
 {
+
     # Cache this to avoid repeatedly shelling out to Perl.
     my @inc;
 
