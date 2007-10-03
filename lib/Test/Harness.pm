@@ -77,9 +77,11 @@ $Timer = $ENV{HARNESS_TIMER} || 0;
 
 =head1 DESCRIPTION
 
-This module exists to provide L<TAP::Harness> with an interface that is
-somewhat backwards compatible with L<Test::Harness> 2.xx. If you're
-writing new code consider using L<TAP::Harness> directly instead.
+Although the L<Test::Harness> distribution takes its name from this
+module for historical reasons it exists only to provide L<TAP::Harness>
+with an interface that is somewhat backwards compatible with
+L<Test::Harness> 2.xx. If you're writing new code consider using
+L<TAP::Harness> directly instead.
 
 Emulation is provided for C<runtests> and C<execute_tests> but the
 pluggable 'Straps' interface that previous versions of L<Test::Harness>
