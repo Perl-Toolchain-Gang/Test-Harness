@@ -19,7 +19,7 @@ use vars qw($VERSION @ISA);
 
 =head1 NAME
 
-TAP::Harness - Run Perl test scripts with statistics
+TAP::Harness - Run test scripts with statistics
 
 =head1 VERSION
 
@@ -149,8 +149,21 @@ C<auto_inherit()> method is true.)
 
   $class->inherit($base_class);
 
-This typically means that $class isa TAP::Harness, though it may
-ultimately work for additional schemes.
+This allows multiple classes all of which inherit directly from
+C<TAP::Harness> to be stacked:
+
+    package Foo;
+    our @ISA = qw( TAP::Harness );
+
+    package Bar;
+    our @ISA = qw( TAP::Harness );
+
+    TAP::Harness->inherit('Foo');
+    Foo->inherit('Bar');
+
+Would create an inheritancece chain like this:
+
+    Bar ISA Foo ISA TAP::Harness
 
 =cut
 
