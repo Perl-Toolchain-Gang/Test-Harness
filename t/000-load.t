@@ -1,6 +1,7 @@
 #!/usr/bin/perl -wT
 
 use strict;
+use lib 't/lib';
 
 use File::Spec;
 use File::Find;
