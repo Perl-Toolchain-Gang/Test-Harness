@@ -1,4 +1,4 @@
-Revision history for TAP-Parser
+Revision history for Test::Harness
 
 2.99_03
         - Refactored all display specific code out of TAP::Harness.
