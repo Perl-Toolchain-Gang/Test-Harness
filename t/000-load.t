@@ -4,7 +4,8 @@ use strict;
 
 use File::Spec;
 use File::Find;
-use Test::More tests => 56;
+use Test::More;
+use constant DISTRIBUTION => 'TAP::Parser';
 
 sub file_to_pm {
     my ( $dir, $file ) = @_;
@@ -16,7 +17,7 @@ sub file_to_pm {
 
     # untaint that puppy!
     my ($package) = $_package =~ /^([\w]+(?:::[\w]+)*)$/;
-    return 'TAP::Parser' eq $package ? () : $package;
+    return DISTRIBUTION eq $package ? () : $package;
 }
 
 BEGIN {
@@ -32,11 +33,11 @@ BEGIN {
         },
         $dir,
     );
+    plan tests => 2 + 2 * @classes;
 
-    # TAP::Parser must come first
-    foreach my $class ( 'TAP::Parser', sort @classes ) {
+    foreach my $class ( DISTRIBUTION, sort @classes ) {
         use_ok $class or BAIL_OUT("Could not load $class");
-        is $class->VERSION, TAP::Parser->VERSION,
+        is $class->VERSION, DISTRIBUTION->VERSION,
           "... and $class should have the correct version";
     }
     diag("Testing Test::Harness $Test::Harness::VERSION, Perl $], $^X");
