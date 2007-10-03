@@ -7,6 +7,14 @@ Revision history for TAP-Parser
           instead of fractional seconds.
         - prove stops running if any command-line switches are invalid.
         - prove -v would try to print an undef.
+        - Added support for multiplexed and forked parallel tests. Use
+          prove -j 9 to run tests in parallel and prove -j 9 --fork to
+          fork. These features are experimental.
+        - Rationalized the management of the environment that we give to
+          test scripts (PERL5LIB, PERL5OPT, switches.
+        - Fixed handling of STDIO (we no longer close it) for test
+          scripts.
+        - Performance enhancements. Parser is now 30% - 40% faster.
 
 2.99_02 2007-09-07
         - Ensure prove (and App::Prove) sort any recursively
