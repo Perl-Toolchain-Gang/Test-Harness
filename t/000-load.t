@@ -35,7 +35,7 @@ BEGIN {
 
     # TAP::Parser must come first
     foreach my $class ( 'TAP::Parser', sort @classes ) {
-        use_ok $class;
+        use_ok $class or BAIL_OUT("Could not load $class");
         is $class->VERSION, TAP::Parser->VERSION,
           "... and $class should have the correct version";
     }
