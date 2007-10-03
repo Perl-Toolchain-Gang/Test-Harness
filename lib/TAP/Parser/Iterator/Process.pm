@@ -276,20 +276,4 @@ sub get_select_handles {
     return grep defined, ( $self->{out}, $self->{err} );
 }
 
-=head3 C<is_ready>
-
-Returns true if the stream has data ready to be read.
-
-=for developers
-This is not valid for instances of this object which do not have an
-open3, but a runtime $has_no_sel conditional seems clunky.
-
-=cut
-
-sub is_ready {
-    my $self = shift;
-
-    return $self->{sel}->can_read(0) ? 1 : 0;
-}
-
 1;

@@ -244,21 +244,6 @@ sub next {
 
 ##############################################################################
 
-=head3 C<next_nonblock>
-
-Just like C<next()>, but returns 0 as a "come back later" answer.
-
-=cut
-
-sub next_nonblock {
-    my $self = shift;
-
-    return 0 unless($self->_stream->is_ready);
-    $self->next;
-}
-
-##############################################################################
-
 =head3 C<run>
 
   $parser->run;

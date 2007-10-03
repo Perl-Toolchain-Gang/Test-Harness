@@ -100,73 +100,50 @@ sub process_args {
     # Allow cuddling the paths with the -I
     @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @args;
 
-    my $help_sub = sub { $self->_help; $self->_exit };
-    my @options = (
-        'v|verbose'   => \$self->{verbose},
-        'f|failures'  => \$self->{failures},
-        'l|lib'       => \$self->{lib},
-        'b|blib'      => \$self->{blib},
-        's|shuffle'   => \$self->{shuffle},
-        'color!'      => \$self->{color},
-        'c'           => \$self->{color},
-        'harness=s'   => \$self->{harness},
-        'formatter=s' => \$self->{formatter},
-        'r|recurse'   => \$self->{recurse},
-        'reverse'     => \$self->{backwards},
-        'fork'        => \$self->{fork},
-        'p|parse'     => \$self->{parse},
-        'q|quiet'     => \$self->{quiet},
-        'Q|QUIET'     => \$self->{really_quiet},
-        'e|exec=s'    => \$self->{exec},
-        'm|merge'     => \$self->{merge},
-        'I=s@'        => $self->{includes},
-        'directives'  => \$self->{directives},
-        'die'         => sub { die "dead" }, # XXX temporary
-        'h|help|?'    => $help_sub,
-        'H|man'       => $help_sub,
-        'V|version'   => sub { $self->print_version; $self->_exit },
-        'a|archive=s' => \$self->{archive},
-        'j|jobs=i'    => \$self->{jobs},
-        'timer'       => \$self->{timer},
+    {
+        my $help_sub = sub { $self->_help; $self->_exit };
+        local @ARGV = @args;
+        Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
+        GetOptions(
+            'v|verbose'   => \$self->{verbose},
+            'f|failures'  => \$self->{failures},
+            'l|lib'       => \$self->{lib},
+            'b|blib'      => \$self->{blib},
+            's|shuffle'   => \$self->{shuffle},
+            'color!'      => \$self->{color},
+            'c'           => \$self->{color},
+            'harness=s'   => \$self->{harness},
+            'formatter=s' => \$self->{formatter},
+            'r|recurse'   => \$self->{recurse},
+            'reverse'     => \$self->{backwards},
+            'fork'        => \$self->{fork},
+            'p|parse'     => \$self->{parse},
+            'q|quiet'     => \$self->{quiet},
+            'Q|QUIET'     => \$self->{really_quiet},
+            'e|exec=s'    => \$self->{exec},
+            'm|merge'     => \$self->{merge},
+            'I=s@'        => $self->{includes},
+            'directives'  => \$self->{directives},
+            'h|help|?'    => $help_sub,
+            'H|man'       => $help_sub,
+            'V|version'   => sub { $self->print_version; $self->_exit },
+            'a|archive=s' => \$self->{archive},
+            'j|jobs=i'    => \$self->{jobs},
+            'timer'       => \$self->{timer},
 
-        'T' => \$self->{taint_fail},
-        't' => \$self->{taint_warn},
-        'W' => \$self->{warnings_fail},
-        'w' => \$self->{warnings_warn},
-        (     App::Prove::Plugins->can('switches')
-            ? App::Prove::Plugins->switches
-            : ()
-        ),
-    );
+            'T' => \$self->{taint_fail},
+            't' => \$self->{taint_warn},
+            'W' => \$self->{warnings_fail},
+            'w' => \$self->{warnings_warn},
+            (     App::Prove::Plugins->can('switches')
+                ? App::Prove::Plugins->switches
+                : ()
+            ),
+        ) or croak('Unable to continue');
 
-    $self->_get_options(\@args, @options);
-    # Stash the remainder of argv for later
-    $self->{argv} = [@args];
-}
-
-# modifies $args in-place ala @ARGV
-sub _get_options {
-    my ( $self, $args, @options ) = @_;
-
-    # ugh, teach Getopt::Long how to propagate an error
-    my @error;
-    local *main::__DEFAULT__ = sub {
-        local $SIG{__DIE__};
-        die @_ unless ( defined($^S) );
-        if ($^S) {
-            my @mess = grep( /^\s*eval /, split( /\n/, Carp::longmess() ) );
-            die @_ unless ( $mess[0] =~ m/Getopt.Long/ );
-        }
-        local *main::__DEFAULT__;
-        @error = @_;
-        die "!FINISH";
-    };    # end horrid fix
-
-    local @ARGV = @$args;
-    Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
-    GetOptions(@options) or croak('Unable to continue');
-    @error and die @error;
-    @$args = @ARGV;
+        # Stash the remainder of argv for later
+        $self->{argv} = [@ARGV];
+    }
 }
 
 sub _exit { exit( $_[1] || 0 ) }
@@ -177,11 +154,12 @@ sub _help {
     eval('use Pod::Usage 1.12 ()');
     my $err = $@;
 
+    # XXX Getopt::Long is being helpy
+    local $SIG{__DIE__} = sub { warn @_; $self->_exit; };
     if ($err) {
-        $err =~ s/( at \(eval.*)$//s;
         die 'Please install Pod::Usage for the --help option '
           . '(or try `perldoc prove`.)'
-          . "\n ($err)";
+          . "\n ($@)";
     }
 
     Pod::Usage::pod2usage( { -verbose => 1 } );
