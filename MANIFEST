@@ -78,6 +78,7 @@ t/nofork.t
 t/parse.t
 t/premature-bailout.t
 t/prove.t
+t/proverun.t
 t/regression.t
 t/results.t
 t/sample-tests/bailout
