@@ -1,4 +1,4 @@
-Revision history for Test::Harness
+Revision history for Test-Harness
 
 2.99_03
         - Refactored all display specific code out of TAP::Harness.
@@ -12,7 +12,7 @@ Revision history for Test::Harness
           fork. These features are experimental.
         - Rationalized the management of the environment that we give to
           test scripts (PERL5LIB, PERL5OPT, switches.
-        - Fixed handling of STDIO (we no longer close it) for test
+        - Fixed handling of STDIN (we no longer close it) for test
           scripts.
         - Performance enhancements. Parser is now 30% - 40% faster.
 

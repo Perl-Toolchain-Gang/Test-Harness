@@ -58,7 +58,7 @@ sub new {
 
 =head3 C<add>
 
-  $mux->add( $$parser, $stash );
+  $mux->add( $parser, $stash );
 
 Add a TAP::Parser to the multiplexer. C<$stash> is an optional opaque
 reference that will be returned from C<next> along with the parser and
