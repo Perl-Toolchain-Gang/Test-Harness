@@ -47,7 +47,6 @@ BEGIN {
             $self->{$attr};
         };
     }
-
 }
 
 =head1 METHODS
@@ -144,6 +143,8 @@ sub process_args {
         # Stash the remainder of argv for later
         $self->{argv} = [@ARGV];
     }
+
+    return;
 }
 
 sub _exit { exit( $_[1] || 0 ) }
@@ -166,6 +167,8 @@ sub _help {
 
     # XXX not sure about this one
     App::Prove::Plugins->help if ( App::Prove::Plugins->can('help') );
+
+    return;
 }
 
 sub _color_default {
@@ -186,7 +189,7 @@ sub _get_args {
     }
 
     if ( $self->archive ) {
-        eval("sub TAP::Harness::Archive::auto_inherit {1}");    # wink,wink
+        eval( 'sub TAP::Harness::Archive::auto_inherit {1}' );    # wink,wink
         $self->require_harness( archive => 'TAP::Harness::Archive' );
         $args{archive} = $self->archive;
     }
@@ -217,11 +220,11 @@ sub _get_args {
     }
 
     if ( $self->taint_fail && $self->taint_warn ) {
-        die "-t and -T are mutually exclusive";
+        die '-t and -T are mutually exclusive';
     }
 
     if ( $self->warnings_fail && $self->warnings_warn ) {
-        die "-w and -W are mutually exclusive";
+        die '-w and -W are mutually exclusive';
     }
 
     for my $a (qw( lib switches )) {
@@ -264,6 +267,8 @@ sub run {
     @tests = reverse @tests if $self->backwards;
 
     $self->_runtests( $self->_get_args, @tests );
+
+    return;
 }
 
 sub _runtests {
@@ -272,6 +277,8 @@ sub _runtests {
     my $aggregator = $harness->runtests(@tests);
 
     $self->_exit( $aggregator->has_problems ? 1 : 0 );
+
+    return;
 }
 
 sub _get_switches {
@@ -370,6 +377,7 @@ sub _shuffle {
         my $j = rand $i--;
         @_[ $i, $j ] = @_[ $j, $i ];
     }
+    return;
 }
 
 =head3 C<require_harness>
@@ -388,6 +396,8 @@ sub require_harness {
     $class->inherit( $self->{harness_class} );
 
     $self->{harness_class} = $class;
+
+    return;
 }
 
 =head3 C<print_version>

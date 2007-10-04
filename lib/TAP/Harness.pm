@@ -185,7 +185,7 @@ sub inherit {
 
         # TODO we really shouldn't get here, but the grep should do
         # something more interesting -- e.g. with isa()
-        croak("cannot inherit() without isa TAP::Harness");
+        croak('cannot inherit() without isa TAP::Harness');
 
         # if we weren't there already, be nice like 'use base'
         push( @$your_isa, $base_class );
@@ -450,6 +450,8 @@ sub _aggregate_forked {
     while ( my ( $id, $parser ) = $iter->() ) {
         $aggregate->add( $tests[$id], $parser );
     }
+
+    return;
 }
 
 sub _aggregate_parallel {
@@ -459,7 +461,6 @@ sub _aggregate_parallel {
     my $mux  = TAP::Parser::Multiplexer->new;
 
     RESULT: {
-
         # Keep multiplexer topped up
         while ( @tests && $mux->parsers < $jobs ) {
             my $test = shift @tests;
@@ -482,6 +483,8 @@ sub _aggregate_parallel {
             redo RESULT;
         }
     }
+
+    return;
 }
 
 sub _aggregate_single {
@@ -498,6 +501,8 @@ sub _aggregate_single {
         $self->finish_parser( $parser, $session );
         $aggregate->add( $test, $parser );
     }
+
+    return;
 }
 
 sub aggregate_tests {
@@ -522,6 +527,7 @@ sub aggregate_tests {
 
     $aggregate->stop;
 
+    return;
 }
 
 =head3 C<jobs>

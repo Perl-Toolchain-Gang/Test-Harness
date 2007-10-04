@@ -1143,7 +1143,7 @@ sub _iter {
         my $count = 1;
         TRANS: {
             my $state_spec = $state_table->{$state}
-              or die "Illegal state: ", $state;
+              or die "Illegal state: $state";
 
             if ( my $next = $state_spec->{$type} ) {
                 if ( my $act = $next->{act} ) {
