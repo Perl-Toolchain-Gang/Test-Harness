@@ -9,12 +9,6 @@ use Carp;
 
 use vars qw($VERSION);
 
-BEGIN {
-    eval { require App::Prove::Plugins; };
-
-    # TODO maybe make noise about how you could have cool features.
-}
-
 =head1 NAME
 
 App::Prove - Implements the C<prove> command.
@@ -37,7 +31,7 @@ BEGIN {
       archive argv blib color directives exec failures fork formatter
       harness includes jobs lib merge parse quiet really_quiet recurse
       backwards shuffle taint_fail taint_warn timer verbose
-      warnings_fail warnings_warn
+      warnings_fail warnings_warn show_help show_man show_version
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -100,9 +94,10 @@ sub process_args {
     @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @args;
 
     {
-        my $help_sub = sub { $self->_help; $self->_exit };
         local @ARGV = @args;
         Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
+
+        # Don't add coderefs to GetOptions
         GetOptions(
             'v|verbose'   => \$self->{verbose},
             'f|failures'  => \$self->{failures},
@@ -123,21 +118,16 @@ sub process_args {
             'm|merge'     => \$self->{merge},
             'I=s@'        => $self->{includes},
             'directives'  => \$self->{directives},
-            'h|help|?'    => $help_sub,
-            'H|man'       => $help_sub,
-            'V|version'   => sub { $self->print_version; $self->_exit },
+            'h|help|?'    => \$self->{show_help},
+            'H|man'       => \$self->{show_man},
+            'V|version'   => \$self->{show_version},
             'a|archive=s' => \$self->{archive},
             'j|jobs=i'    => \$self->{jobs},
             'timer'       => \$self->{timer},
-
-            'T' => \$self->{taint_fail},
-            't' => \$self->{taint_warn},
-            'W' => \$self->{warnings_fail},
-            'w' => \$self->{warnings_warn},
-            (     App::Prove::Plugins->can('switches')
-                ? App::Prove::Plugins->switches
-                : ()
-            ),
+            'T'           => \$self->{taint_fail},
+            't'           => \$self->{taint_warn},
+            'W'           => \$self->{warnings_fail},
+            'w'           => \$self->{warnings_warn},
         ) or croak('Unable to continue');
 
         # Stash the remainder of argv for later
@@ -150,23 +140,16 @@ sub process_args {
 sub _exit { exit( $_[1] || 0 ) }
 
 sub _help {
-    my $self = shift;
+    my ( $self, $verbosity ) = @_;
 
     eval('use Pod::Usage 1.12 ()');
-    my $err = $@;
-
-    # XXX Getopt::Long is being helpy
-    local $SIG{__DIE__} = sub { warn @_; $self->_exit; };
-    if ($err) {
+    if ( my $err = $@ ) {
         die 'Please install Pod::Usage for the --help option '
           . '(or try `perldoc prove`.)'
           . "\n ($@)";
     }
 
-    Pod::Usage::pod2usage( { -verbose => 1 } );
-
-    # XXX not sure about this one
-    App::Prove::Plugins->help if ( App::Prove::Plugins->can('help') );
+    Pod::Usage::pod2usage( { -verbose => $verbosity } );
 
     return;
 }
@@ -189,7 +172,7 @@ sub _get_args {
     }
 
     if ( $self->archive ) {
-        eval( 'sub TAP::Harness::Archive::auto_inherit {1}' );    # wink,wink
+        eval('sub TAP::Harness::Archive::auto_inherit {1}');    # wink,wink
         $self->require_harness( archive => 'TAP::Harness::Archive' );
         $args{archive} = $self->archive;
     }
@@ -261,12 +244,23 @@ sub _get_args {
 sub run {
     my $self = shift;
 
-    my @tests = $self->_get_tests( @{ $self->argv } );
+    if ( $self->show_help ) {
+        $self->_help(1);
+    }
+    elsif ( $self->show_man ) {
+        $self->_help(2);
+    }
+    elsif ( $self->show_version ) {
+        $self->print_version;
+    }
+    else {
+        my @tests = $self->_get_tests( @{ $self->argv } );
 
-    $self->_shuffle(@tests) if $self->shuffle;
-    @tests = reverse @tests if $self->backwards;
+        $self->_shuffle(@tests) if $self->shuffle;
+        @tests = reverse @tests if $self->backwards;
 
-    $self->_runtests( $self->_get_args, @tests );
+        $self->_runtests( $self->_get_args, @tests );
+    }
 
     return;
 }
@@ -459,6 +453,12 @@ __END__
 =item C<really_quiet>
 
 =item C<recurse>
+
+=item C<show_help>
+
+=item C<show_man>
+
+=item C<show_version>
 
 =item C<shuffle>
 
