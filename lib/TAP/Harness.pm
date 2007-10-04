@@ -596,7 +596,8 @@ This is a bit clunky and will be cleaned up in a later release.
 sub _get_parser_args {
     my ( $self, $test ) = @_;
     my %args = ();
-    my @switches = $self->lib if $self->lib;
+    my @switches;
+    @switches = $self->lib if $self->lib;
     push @switches => $self->switches if $self->switches;
     $args{switches} = \@switches;
     $args{spool}    = $self->_open_spool($test);
