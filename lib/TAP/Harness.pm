@@ -149,21 +149,26 @@ C<auto_inherit()> method is true.)
 
   $class->inherit($base_class);
 
-This allows multiple classes all of which inherit directly from
-C<TAP::Harness> to be stacked:
+This allows multiple classes, all of which inherit directly from
+C<TAP::Harness>, to be stacked:
 
     package Foo;
     our @ISA = qw( TAP::Harness );
+    use constant auto_inherit => 1;
 
     package Bar;
     our @ISA = qw( TAP::Harness );
+    use constant auto_inherit => 1;
 
-    TAP::Harness->inherit('Foo');
-    Foo->inherit('Bar');
+    Bar->inherit('Foo');
 
-Would create an inheritancece chain like this:
+Would create an inheritance chain like this:
 
     Bar ISA Foo ISA TAP::Harness
+
+This feature is only a temporary measure to allow experimentation with
+customizations.  The programmer is advised to be aware of which other
+subclasses are involved and what they do.
 
 =cut
 
