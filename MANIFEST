@@ -74,6 +74,7 @@ t/lib/Test/Builder/Module.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
 t/multiplexer.t
+t/nofork-mux.t
 t/nofork.t
 t/parse.t
 t/premature-bailout.t

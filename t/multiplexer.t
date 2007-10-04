@@ -8,6 +8,12 @@ use Test::More qw( no_plan );
 use File::Spec;
 use TAP::Parser;
 use TAP::Parser::Multiplexer;
+use TAP::Parser::Iterator::Process;
+
+my $fork_desc
+  = TAP::Parser::Iterator::Process->_use_open3
+  ? 'fork'
+  : 'nofork';
 
 my @schedule = (
     {   name => 'Single non-selectable source',
@@ -127,7 +133,7 @@ my @schedule = (
 );
 
 for my $test (@schedule) {
-    my $name    = $test->{name};
+    my $name    = "$test->{name} ($fork_desc)";
     my @sources = $test->{sources}->();
     my $mux     = TAP::Parser::Multiplexer->new;
 
@@ -154,3 +160,5 @@ for my $test (@schedule) {
     }
     is $mux->parsers, 0, "$name: All used up";
 }
+
+1;
