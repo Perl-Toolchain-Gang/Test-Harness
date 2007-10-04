@@ -46,6 +46,18 @@ sub _shuffle {
 
 package main;
 
+{
+    my @import_log = ();
+
+    sub test_log_import { push @import_log, [@_] }
+
+    sub get_import_log {
+        my @log = @import_log;
+        @import_log = ();
+        return @log;
+    }
+}
+
 my ( @ATTR, %DEFAULT_ASSERTION, @SCHEDULE );
 
 # see the "ACTUAL TEST" section at the bottom
@@ -70,17 +82,17 @@ BEGIN {    # START PLAN
     my $dummy_test = $dummy_tests[0];
 
     ########################################################################
-    # declarations - this drives all of the subtests.
-    # The cheatsheet follows.
-    # required: name, expect
-    # optional:
-    #   args       - arguments to constructor
-    #   switches   - command-line switches
-    #   runlog     - expected results of internal calls to _runtests, must
-    #                match FakeProve's _log attr
-    #   run_error  - depends on 'runlog' (if missing, asserts no error)
-    #   extra      - follow-up check to handle exceptional cleanup / verification
-    #   class      - The App::Prove subclass to test. Defaults to FakeProve
+ # declarations - this drives all of the subtests.
+ # The cheatsheet follows.
+ # required: name, expect
+ # optional:
+ #   args       - arguments to constructor
+ #   switches   - command-line switches
+ #   runlog     - expected results of internal calls to _runtests, must
+ #                match FakeProve's _log attr
+ #   run_error  - depends on 'runlog' (if missing, asserts no error)
+ #   extra      - follow-up check to handle exceptional cleanup / verification
+ #   class      - The App::Prove subclass to test. Defaults to FakeProve
     @SCHEDULE = (
         {   name   => 'Create empty',
             expect => {}
@@ -895,10 +907,9 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--exec', '-s', $dummy_test ],
-            expect   => {exec => '-s'},
+            expect   => { exec      => '-s' },
             runlog   => [
-                [   _runtests =>
-                    {exec => ['-s']},
+                [   _runtests => { exec => ['-s'] },
                     'TAP::Harness',
                     $dummy_test
                 ]
@@ -911,28 +922,121 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--exec', '/foo/bar/perl -Ilib', $dummy_test ],
-            expect   => {exec => '/foo/bar/perl -Ilib'},
+            expect   => { exec      => '/foo/bar/perl -Ilib' },
             runlog   => [
-                [   _runtests =>
-                    {exec => [qw(/foo/bar/perl -Ilib)]},
+                [   _runtests => { exec => [qw(/foo/bar/perl -Ilib)] },
                     'TAP::Harness',
                     $dummy_test
                 ]
             ],
         },
+
         # null exec (run tests as compiled binaries)
-        {   name => 'Switch --exec ""',
-            args => {
+        {   name     => 'Switch --exec ""',
+            switches => [ '--exec', '', $dummy_test ],
+            expect   => {
+                exec =>   # ick, must workaround the || default bit with a sub
+                  sub { my $val = shift; defined($val) and !length($val) }
+            },
+            runlog => [
+                [   _runtests => { exec => [] },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        # Plugins
+        {   name     => 'Load plugin',
+            switches => [ '-P', 'Dummy', $dummy_test ],
+            args     => {
                 argv => [qw( one two three )],
             },
-            switches => [ '--exec', '', $dummy_test ],
             expect => {
-                exec => # ick, must workaround the || default bit with a sub
-                  sub { my $val = shift; defined($val) and !length($val) }
-              },
-            runlog   => [
-                [   _runtests =>
-                    {exec => []},
+                plugins => ['Dummy'],
+            },
+            extra => sub {
+                my @loaded = get_import_log();
+                is_deeply \@loaded, [ ['App::Prove::Plugin::Dummy'] ],
+                  "Plugin loaded OK";
+            },
+            plan   => 1,
+            runlog => [
+                [   '_runtests',
+                    {},
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name     => 'Load plugin (args)',
+            switches => [ '-P', 'Dummy=cracking,cheese,gromit', $dummy_test ],
+            args     => {
+                argv => [qw( one two three )],
+            },
+            expect => {
+                plugins => ['Dummy'],
+            },
+            extra => sub {
+                my @loaded = get_import_log();
+                is_deeply \@loaded,
+                  [ [   'App::Prove::Plugin::Dummy', 'cracking', 'cheese',
+                        'gromit'
+                    ]
+                  ],
+                  "Plugin loaded OK";
+            },
+            plan   => 1,
+            runlog => [
+                [   '_runtests',
+                    {},
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name     => 'Load plugin (explicit path)',
+            switches => [ '-P', 'App::Prove::Plugin::Dummy', $dummy_test ],
+            args     => {
+                argv => [qw( one two three )],
+            },
+            expect => {
+                plugins => ['Dummy'],
+            },
+            extra => sub {
+                my @loaded = get_import_log();
+                is_deeply \@loaded, [ ['App::Prove::Plugin::Dummy'] ],
+                  "Plugin loaded OK";
+            },
+            plan   => 1,
+            runlog => [
+                [   '_runtests',
+                    {},
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name     => 'Load module',
+            switches => [ '-M', 'App::Prove::Plugin::Dummy', $dummy_test ],
+            args     => {
+                argv => [qw( one two three )],
+            },
+            expect => {
+                plugins => ['Dummy'],
+            },
+            extra => sub {
+                my @loaded = get_import_log();
+                is_deeply \@loaded, [ ['App::Prove::Plugin::Dummy'] ],
+                  "Plugin loaded OK";
+            },
+            plan   => 1,
+            runlog => [
+                [   '_runtests',
+                    {},
                     'TAP::Harness',
                     $dummy_test
                 ]
@@ -1138,6 +1242,7 @@ BEGIN {    # START PLAN
         # },
 
     );
+
     # END SCHEDULE
     ########################################################################
 

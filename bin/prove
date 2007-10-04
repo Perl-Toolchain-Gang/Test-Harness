@@ -48,6 +48,8 @@ Boolean options:
 Options that take arguments:
 
  -I                 Library paths to include.
+ -P                 Load plugin (searches App::Prove::Plugin::*.)
+ -M                 Load a module.
  -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
       --harness     Define test harness to use.  See TAP::Harness.
       --formatter   Result formatter to use. See TAP::Harness.

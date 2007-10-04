@@ -24,12 +24,14 @@ $VERSION = '2.99_03';
 my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
 my $NEED_GLOB = $IS_WIN32;
 
+use constant PLUGINS => 'App::Prove::Plugin';
+
 my @ATTR;
 
 BEGIN {
     @ATTR = qw(
       archive argv blib color directives exec failures fork formatter
-      harness includes jobs lib merge parse quiet really_quiet recurse
+      harness includes modules plugins jobs lib merge parse quiet really_quiet recurse
       backwards shuffle taint_fail taint_warn timer verbose
       warnings_fail warnings_warn show_help show_man show_version
     );
@@ -58,6 +60,8 @@ sub new {
     my $self = bless {
         argv              => [],
         includes          => [],
+        modules           => [],
+        plugins           => [],
         default_formatter => 'TAP::Harness::Formatter::Basic',
     }, $class;
 
@@ -117,6 +121,8 @@ sub process_args {
             'e|exec=s'    => \$self->{exec},
             'm|merge'     => \$self->{merge},
             'I=s@'        => $self->{includes},
+            'M=s@'        => $self->{modules},
+            'P=s@'        => $self->{plugins},
             'directives'  => \$self->{directives},
             'h|help|?'    => \$self->{show_help},
             'H|man'       => \$self->{show_man},
@@ -237,6 +243,46 @@ sub _get_args {
     return ( \%args, $self->{harness_class} );
 }
 
+sub _find_module {
+    my ( $self, $class, @search ) = @_;
+
+    croak "Bad module name $class"
+      unless $class =~ /^ \w+ (?: :: \w+ ) *$/x;
+
+    for my $pfx (@search) {
+        my $name = join( '::', $pfx, $class );
+        print "$name\n";
+        eval "require $name";
+        return $name unless $@;
+    }
+
+    eval "require $class";
+    return $class unless $@;
+    return;
+}
+
+sub _load_extension {
+    my ( $self, $class, @search ) = @_;
+
+    my @args = ();
+    if ( $class =~ /^(.*?)=(.*)/ ) {
+        $class = $1;
+        @args = split( /,/, $2 );
+    }
+
+    if ( my $name = $self->_find_module( $class, @search ) ) {
+        $name->import(@args);
+    }
+    else {
+        croak "Can't load module $class";
+    }
+}
+
+sub _load_extensions {
+    my ( $self, $ext, @search ) = @_;
+    $self->_load_extension( $_, @search ) for @$ext;
+}
+
 =head3 C<run>
 
 =cut
@@ -254,6 +300,10 @@ sub run {
         $self->print_version;
     }
     else {
+
+        $self->_load_extensions( $self->modules );
+        $self->_load_extensions( $self->plugins, PLUGINS );
+
         my @tests = $self->_get_tests( @{ $self->argv } );
 
         $self->_shuffle(@tests) if $self->shuffle;
@@ -446,7 +496,11 @@ __END__
 
 =item C<merge>
 
+=item C<modules>
+
 =item C<parse>
+
+=item C<plugins>
 
 =item C<quiet>
 

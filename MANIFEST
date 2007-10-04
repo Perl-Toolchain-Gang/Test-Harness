@@ -65,6 +65,7 @@ t/errors.t
 t/grammar.t
 t/harness.t
 t/iterators.t
+t/lib/App/Prove/Plugin/Dummy.pm
 t/lib/Dev/Null.pm
 t/lib/if.pm
 t/lib/IO/c55Capture.pm
