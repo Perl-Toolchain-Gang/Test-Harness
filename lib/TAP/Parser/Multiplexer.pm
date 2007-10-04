@@ -4,6 +4,8 @@ use strict;
 use IO::Select;
 use vars qw($VERSION);
 
+use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
+
 =head1 NAME
 
 TAP::Parser::Multiplexer - Multiplex multiple TAP::Parsers
@@ -73,7 +75,7 @@ the next result.
 sub add {
     my ( $self, $parser, $stash ) = @_;
 
-    my @handles = $parser->get_select_handles;
+    my @handles = IS_WIN32 ? () : $parser->get_select_handles;
     if (@handles) {
         my $sel = $self->{select};
 
@@ -125,6 +127,8 @@ sub _iter {
 
         unless (@ready) {
             return unless $sel->count;
+
+            # TODO: Win32 doesn't do select properly on handles...
             @ready = $sel->can_read;
         }
 
