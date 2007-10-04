@@ -24,7 +24,7 @@ BEGIN {
                     {   merge   => undef,
                         command => [
                             'PERL',
-                            't/sample-tests/simple'
+                            $sample_test
                           ]
 
                     }
