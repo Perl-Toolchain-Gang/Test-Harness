@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 64;
+use Test::More tests => 70;
 
 use TAP::Parser;
 use TAP::Parser::Iterator;
@@ -21,7 +21,11 @@ ok 5 # skip we have no description
 END_TAP
 
 my $stream = TAP::Parser::Iterator->new( [ split /\n/ => $tap ] );
+isa_ok $stream, 'TAP::Parser::Iterator';
+
 my $parser1 = TAP::Parser->new( { stream => $stream } );
+isa_ok $parser1, 'TAP::Parser';
+
 $parser1->run;
 
 $tap = <<'END_TAP';
@@ -37,11 +41,12 @@ not ok 7 - Gandalf wins.  Game over.  # TODO 'bout time!
 END_TAP
 
 my $parser2 = TAP::Parser->new( { tap => $tap } );
+isa_ok $parser2, 'TAP::Parser';
 $parser2->run;
 
 can_ok 'TAP::Parser::Aggregator', 'new';
 my $agg = TAP::Parser::Aggregator->new;
-isa_ok $agg, 'TAP::Parser::Aggregator', '... and calling it should succeed';
+isa_ok $agg, 'TAP::Parser::Aggregator';
 
 can_ok $agg, 'add';
 ok $agg->add( 'tap1', $parser1 ), '... and calling it should succeed';
@@ -171,6 +176,7 @@ like pop(@warn),
 # 1. !failed && todo_passed
 
 $agg = TAP::Parser::Aggregator->new();
+isa_ok $agg, 'TAP::Parser::Aggregator';
 
 $tap = <<'END_TAP';
 1..1
@@ -178,6 +184,7 @@ ok 1 - you shall not pass! # TODO should have failed
 END_TAP
 
 my $parser3 = TAP::Parser->new( { tap => $tap } );
+isa_ok $parser3, 'TAP::Parser';
 $parser3->run;
 
 $agg->add( 'tap3', $parser3 );
@@ -200,6 +207,7 @@ $tap = <<'END_TAP';
 END_TAP
 
 my $parser4 = TAP::Parser->new( { tap => $tap } );
+isa_ok $parser4, 'TAP::Parser';
 $parser4->run;
 
 $agg->add( 'tap4', $parser4 );
