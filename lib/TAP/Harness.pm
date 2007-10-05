@@ -11,7 +11,6 @@ use TAP::Base;
 use TAP::Parser;
 use TAP::Parser::Aggregator;
 use TAP::Parser::Multiplexer;
-use TAP::Formatter::Console;
 
 use vars qw($VERSION @ISA);
 
@@ -75,12 +74,13 @@ BEGIN {
 
             return [ map {"-I$_"} @$libs ];
         },
-        switches  => sub { shift; shift },
-        exec      => sub { shift; shift },
-        merge     => sub { shift; shift },
-        formatter => sub { shift; shift },
-        jobs      => sub { shift; shift },
-        fork      => sub { shift; shift },
+        switches        => sub { shift; shift },
+        exec            => sub { shift; shift },
+        merge           => sub { shift; shift },
+        formatter_class => sub { shift; shift },
+        formatter       => sub { shift; shift },
+        jobs            => sub { shift; shift },
+        fork            => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -263,39 +263,15 @@ TAP is fine.  You can use this argument to specify the name of the program
 If C<merge> is true the harness will create parsers that merge STDOUT
 and STDERR together for any processes they start.
 
+=item * C<formatter_class>
+
+The name of the class to use to format output. The default is
+L<TAP::Formatter::Console>.
+
 =item * C<formatter>
 
-If set C<formatter> must be an object that is capable of formatting
-individual items from the TAP stream. For each type of item it is
-capable of formatting it must expose a method called format_I<type>.
-
-For example:
-
-    sub format_yaml {
-        my ($self, $harness, $result, $prev_result) = @_;
-        # Format the item and return a string
-        return _format_yaml_line( $result, $prev_result );
-    }
-
-The formatting method is called with three arguments in addition to $self:
-
-=over
-
-=item C<$harness>
-
-The test harness.
-
-=item C<$result>
-
-The result which we should format.
-
-=item C<$prev_result>
-
-The previous result. This is necessary in the case of, for example,
-C<format_yaml> which will want to know whether the preceding test passed
-or failed.
-
-=back
+If set C<formatter> must be an object that is capable of formatting the
+TAP output. See L<TAP::Formatter::Console> for an example.
 
 =item * C<errors>
 
@@ -353,6 +329,15 @@ Any keys for which the value is C<undef> will be ignored.
 
         unless ( $self->formatter ) {
 
+            $self->formatter_class( my $class = $self->formatter_class
+                  || 'TAP::Formatter::Console' );
+
+            croak "Bad module name $class"
+              unless $class =~ /^ \w+ (?: :: \w+ ) *$/x;
+
+            eval "require $class";
+            $self->_croak("Can't load $class") if $@;
+
             # This is a little bodge to preserve legacy behaviour. In
             # the old days we didn't get given a formatter - so in that
             # case we'll make our own formatter that provides default
@@ -364,8 +349,7 @@ Any keys for which the value is C<undef> will be ignored.
                 }
             }
 
-            $self->formatter(
-                TAP::Formatter::Console->new( \%formatter_args ) );
+            $self->formatter( $class->new( \%formatter_args ) );
 
         }
 
@@ -466,6 +450,7 @@ sub _aggregate_parallel {
     my $mux  = TAP::Parser::Multiplexer->new;
 
     RESULT: {
+
         # Keep multiplexer topped up
         while ( @tests && $mux->parsers < $jobs ) {
             my $test = shift @tests;

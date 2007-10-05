@@ -58,10 +58,10 @@ sub new {
     my $args = shift || {};
 
     my $self = bless {
-        argv              => [],
-        includes          => [],
-        modules           => [],
-        plugins           => [],
+        argv     => [],
+        includes => [],
+        modules  => [],
+        plugins  => [],
     }, $class;
 
     for my $attr (@ATTR) {
@@ -194,11 +194,8 @@ sub _get_args {
         $self->require_harness( harness => $harness_opt );
     }
 
-    my $formatter_class;
-    if ( $self->formatter ) {
-        $formatter_class = $self->formatter;
-        eval "use $formatter_class";
-        die "Cannot use formatter ($formatter_class): $@" if $@;
+    if ( my $formatter = $self->formatter ) {
+        $args{formatter_class} = $formatter;
     }
 
     if ( $self->taint_fail && $self->taint_warn ) {
@@ -228,10 +225,6 @@ sub _get_args {
     # defined but zero-length exec runs test files as binaries
     $args{exec} = [ split( /\s+/, $self->exec ) ]
       if ( defined( $self->exec ) );
-
-    if ($formatter_class) {
-        $args{formatter} = $formatter_class->new;
-    }
 
     return ( \%args, $self->{harness_class} );
 }

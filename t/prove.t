@@ -296,15 +296,10 @@ BEGIN {    # START PLAN
             expect => {
                 formatter => 'TAP::Harness',
             },
-            extra => sub {
-                my $log       = shift;
-                my $formatter = delete $log->[0]->[1]->{formatter};
-                isa_ok $formatter, 'TAP::Harness',;
-            },
-            plan   => 1,
             runlog => [
                 [   '_runtests',
-                    {},
+                    { formatter_class => 'TAP::Harness'
+                    },
                     'TAP::Harness',
                     'one', 'two', 'three'
                 ]
