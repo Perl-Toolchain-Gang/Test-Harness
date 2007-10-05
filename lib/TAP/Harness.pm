@@ -338,10 +338,9 @@ Any keys for which the value is C<undef> will be ignored.
             eval "require $class";
             $self->_croak("Can't load $class") if $@;
 
-            # This is a little bodge to preserve legacy behaviour. In
-            # the old days we didn't get given a formatter - so in that
-            # case we'll make our own formatter that provides default
-            # behaviour.
+            # This is a little bodge to preserve legacy behaviour. It's
+            # pretty horrible that we know which args are destined for
+            # the formatter.
             my %formatter_args = ( jobs => $self->jobs );
             for my $name (@FORMATTER_ARGS) {
                 if ( defined( my $property = delete $arg_for{$name} ) ) {
@@ -350,7 +349,6 @@ Any keys for which the value is C<undef> will be ignored.
             }
 
             $self->formatter( $class->new( \%formatter_args ) );
-
         }
 
         if ( my @props = sort keys %arg_for ) {
