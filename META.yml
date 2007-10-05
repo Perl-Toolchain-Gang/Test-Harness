@@ -22,14 +22,20 @@ provides:
   TAP::Base:
     file: lib/TAP/Base.pm
     version: 2.99_03
-  TAP::Harness:
-    file: lib/TAP/Harness.pm
-    version: 2.99_03
   TAP::Formatter::Color:
-    file: lib/TAP/Harness/Color.pm
+    file: lib/TAP/Formatter/Color.pm
     version: 2.99_03
   TAP::Formatter::Console:
-    file: lib/TAP/Harness/ConsoleOutput.pm
+    file: lib/TAP/Formatter/Console.pm
+    version: 2.99_03
+  TAP::Formatter::Console::ParallelSession:
+    file: lib/TAP/Formatter/Console/ParallelSession.pm
+    version: 2.99_03
+  TAP::Formatter::Console::Session:
+    file: lib/TAP/Formatter/Console/Session.pm
+    version: 2.99_03
+  TAP::Harness:
+    file: lib/TAP/Harness.pm
     version: 2.99_03
   TAP::Parser:
     file: lib/TAP/Parser.pm
@@ -51,6 +57,9 @@ provides:
     version: 2.99_03
   TAP::Parser::Iterator::Stream:
     file: lib/TAP/Parser/Iterator/Stream.pm
+    version: 2.99_03
+  TAP::Parser::Multiplexer:
+    file: lib/TAP/Parser/Multiplexer.pm
     version: 2.99_03
   TAP::Parser::Result:
     file: lib/TAP/Parser/Result.pm
