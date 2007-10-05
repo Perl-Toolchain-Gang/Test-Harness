@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 34;
+use Test::More tests => 30;
 
 use File::Spec;
 
@@ -15,8 +15,8 @@ my $test = File::Spec->catfile( 't', 'source_tests', 'source' );
 my $perl = $^X;
 
 can_ok 'TAP::Parser::Source', 'new';
-ok my $source = TAP::Parser::Source->new, '... and calling it should succeed';
-isa_ok $source, 'TAP::Parser::Source', '... and the object it returns';
+my $source = TAP::Parser::Source->new;
+isa_ok $source, 'TAP::Parser::Source';
 
 can_ok $source, 'source';
 eval { $source->source("$perl -It/lib $test") };
@@ -27,18 +27,16 @@ ok $source->source( [ $perl, '-It/lib', '-T', $test ] ),
   '... and calling it with valid args should succeed';
 
 can_ok $source, 'get_stream';
-ok my $stream = $source->get_stream, '... and calling it should succeed';
+my $stream = $source->get_stream;
 
-isa_ok $stream, 'TAP::Parser::Iterator::Process',
-  '... and the object it returns';
+isa_ok $stream, 'TAP::Parser::Iterator::Process', 'get_stream returns the right object';
 can_ok $stream, 'next';
 is $stream->next, '1..1', '... and the first line should be correct';
 is $stream->next, 'ok 1', '... as should the second';
 ok !$stream->next, '... and we should have no more results';
 
 can_ok 'TAP::Parser::Source::Perl', 'new';
-ok $source = TAP::Parser::Source::Perl->new,
-  '... and calling it should succeed';
+$source = TAP::Parser::Source::Perl->new;
 isa_ok $source, 'TAP::Parser::Source::Perl', '... and the object it returns';
 
 can_ok $source, 'source_file';
@@ -46,7 +44,7 @@ ok $source->source_file($test),
   '... and calling it with valid args should succeed';
 
 can_ok $source, 'get_stream';
-ok $stream = $source->get_stream, '... and calling it should succeed';
+$stream = $source->get_stream;
 
 isa_ok $stream, 'TAP::Parser::Iterator::Process',
   '... and the object it returns';
