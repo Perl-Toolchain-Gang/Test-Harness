@@ -75,7 +75,7 @@ the next result.
 sub add {
     my ( $self, $parser, $stash ) = @_;
 
-    if ( IS_WIN32 && ( my @handles = $parser->get_select_handles ) ) {
+    if ( !IS_WIN32 && ( my @handles = $parser->get_select_handles ) ) {
         my $sel = $self->{select};
 
         # We have to turn handles into file numbers here because by
