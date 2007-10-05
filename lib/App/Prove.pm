@@ -62,7 +62,6 @@ sub new {
         includes          => [],
         modules           => [],
         plugins           => [],
-        default_formatter => 'TAP::Harness::Formatter::Basic',
     }, $class;
 
     for my $attr (@ATTR) {
@@ -200,12 +199,6 @@ sub _get_args {
         $formatter_class = $self->formatter;
         eval "use $formatter_class";
         die "Cannot use formatter ($formatter_class): $@" if $@;
-    }
-
-    unless ($formatter_class) {
-        my $class = $self->{default_formatter};
-        eval "use $class";
-        $formatter_class = $class unless $@;
     }
 
     if ( $self->taint_fail && $self->taint_warn ) {
