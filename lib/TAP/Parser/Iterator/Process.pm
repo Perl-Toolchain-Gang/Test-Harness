@@ -273,7 +273,7 @@ handle based should return an empty list.
 
 sub get_select_handles {
     my $self = shift;
-    return grep defined, ( $self->{out}, $self->{err} );
+    return grep $_, ( $self->{out}, $self->{err} );
 }
 
 1;
