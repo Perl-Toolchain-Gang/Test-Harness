@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use DBI;
-use Cwd;
+use Cwd qw( realpath getcwd );
 use Archive::Any;
 use File::Temp qw(tempfile tempdir);
 use File::Copy;
@@ -15,14 +15,23 @@ my $verbose     = 0;
 my $MAX_SECONDS = 300;
 my $MAKE        = 'make';
 
+my $MINICPANRC = glob '~/.minicpanrc';
+
 # XXX should point to your minicpan distributions
-my $DISTRIBUTIONS = '/Users/ovid/code/minicpan/authors/id/';
+my $DISTRIBUTIONS
+  = -f $MINICPANRC
+  ? File::Spec->catdir(
+    _mini_rc($MINICPANRC)->{local}, 'authors',
+    'id'
+  )
+  : '/Users/ovid/code/minicpan/authors/id/';
+
 #my $DISTRIBUTIONS = '/Users/ovid/code/minicpan/authors/id/O/OV/OVID';
 
 # XXX should point to the harnesses you want to test against
-my @harnesses = qw(
-  /Users/ovid/code/harnesses/Test-Harness-2.64/lib
-  /Users/ovid/code/harnesses/Test-Harness-2.99_03/lib
+my @harnesses = map realpath($_), qw(
+  reference/Test-Harness-2.64/lib
+  lib
 );
 
 # XXX change anything below this at your peril
@@ -53,10 +62,10 @@ sub build {
     my ( $harness, $harness_id, $distribution ) = @_;
     my $cwd = getcwd;
     chdir $distribution;
-    my $command =
-        -f 'Build.PL'    ? "perl -I$harness Build.PL && ./Build test"
+    my $command
+      = -f 'Build.PL'    ? "perl -I$harness Build.PL && ./Build test"
       : -f 'Makefile.PL' ? "perl -I$harness Makefile.PL && $MAKE test"
-      : warn "Don't know how to build $distribution";
+      :                    warn "Don't know how to build $distribution";
     return unless $command;
     my @results;
     eval {
@@ -77,8 +86,8 @@ sub build {
         $passfail = 'No results';
     }
     else {
-        $passfail =
-          ( grep { /All tests successful/ } @results )
+        $passfail
+          = ( grep {/All tests successful/} @results )
           ? 'PASS'
           : 'FAIL';
     }
@@ -99,10 +108,10 @@ sub save_result {
       AND  package_id = ?
     END_SQL
     my $sql;
-    if (
-        @{
-            $dbh->selectall_arrayref( $results, undef, $harness_id,
-                $package_id )
+    if (@{  $dbh->selectall_arrayref(
+                $results, undef, $harness_id,
+                $package_id
+            )
         }
       )
     {
@@ -136,8 +145,10 @@ sub get_package_id {
 
 sub _get_package_id {
     my $package = shift;
-    my $id = $dbh->selectcol_arrayref( 'SELECT id FROM packages WHERE name = ?',
-        undef, $package );
+    my $id      = $dbh->selectcol_arrayref(
+        'SELECT id FROM packages WHERE name = ?',
+        undef, $package
+    );
     return $id->[0] if $id;
     return;
 }
@@ -158,9 +169,10 @@ sub get_version_id {
 
 sub _get_version_id {
     my $version = shift;
-    my $id      =
-      $dbh->selectcol_arrayref( 'SELECT id FROM harnesses WHERE version = ?',
-        undef, $version );
+    my $id      = $dbh->selectcol_arrayref(
+        'SELECT id FROM harnesses WHERE version = ?',
+        undef, $version
+    );
     return $id->[0] if $id;
     return;
 }
@@ -190,6 +202,23 @@ sub extract_archive {
     return $distribution[-1];
 }
 
+sub _mini_rc {
+    my $file   = shift;
+    my $config = {};
+    open my $fh, '<', $file or die "Can't read $file ($!)\n";
+    while ( defined( my $line = <$fh> ) ) {
+        chomp $line;
+        next if $line =~ /^\s*?(?:#.*)?$/;
+        if ( $line =~ /^(\S+):\s+(.+)$/ ) {
+            $config->{$1} = $2;
+        }
+        else {
+            warn "Unrecognised line: $line\n";
+        }
+    }
+    return $config;
+}
+
 {
     my $dbh;
 
@@ -201,8 +230,8 @@ sub extract_archive {
                 "dbi:SQLite:dbname=harness_runs.db",
                 "", "", { RaiseError => 1 },
             ) or die $DBI::errstr;
-            my $tables =
-              $dbh->selectall_arrayref('select tbl_name from sqlite_master');
+            my $tables = $dbh->selectall_arrayref(
+                'select tbl_name from sqlite_master');
             unless (@$tables) {
                 local $/ = ';';
                 while ( defined( my $create_table = <DATA> ) ) {
