@@ -1,6 +1,6 @@
 Revision history for Test-Harness
 
-2.99_03
+2.99_03 2007-10-06
         - Refactored all display specific code out of TAP::Harness.
         - Relaxed strict parsing of skip plan for pre v13 TAP.
         - Elapsed hi-res time is now displayed in integer milliseconds
@@ -12,7 +12,7 @@ Revision history for Test-Harness
           fork. These features are experimental and currently
           unavailable on Windows.
         - Rationalized the management of the environment that we give to
-          test scripts (PERL5LIB, PERL5OPT, switches.
+          test scripts (PERL5LIB, PERL5OPT, switches).
         - Fixed handling of STDIN (we no longer close it) for test
           scripts.
         - Performance enhancements. Parser is now 30% - 40% faster.
