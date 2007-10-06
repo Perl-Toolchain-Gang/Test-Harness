@@ -20,10 +20,7 @@ my $MINICPANRC = glob '~/.minicpanrc';
 # XXX should point to your minicpan distributions
 my $DISTRIBUTIONS
   = -f $MINICPANRC
-  ? File::Spec->catdir(
-    _mini_rc($MINICPANRC)->{local}, 'authors',
-    'id'
-  )
+  ? File::Spec->catdir( _mini_rc($MINICPANRC)->{local}, 'authors', 'id' )
   : '/Users/ovid/code/minicpan/authors/id/';
 
 #my $DISTRIBUTIONS = '/Users/ovid/code/minicpan/authors/id/O/OV/OVID';
