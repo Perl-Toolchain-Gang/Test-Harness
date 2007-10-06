@@ -180,16 +180,16 @@ sub _get_version_id {
 sub extract_archive {
     my $file = shift;
     my ( undef, undef, $dist ) = splitpath($file);
-    my ( undef, $tempfile ) = tempfile(
+    my $tempfile = File::Temp->new(
         SUFFIX => '.tar.gz',
         UNLINK => 1,
     );
     my $tempdir = tempdir( CLEANUP => 1 );
 
-    copy( $file, $tempfile )
+    copy( $file, "$tempfile" )
       or warn "Could not copy ($file) to ($tempfile): $!";
 
-    my $archive = Archive::Any->new($tempfile);
+    my $archive = Archive::Any->new("$tempfile");
     foreach my $is_bad (qw(is_naughty is_impolite)) {
         if ( $archive->$is_bad ) {
             warn "Archive $is_bad.  Skipping\n";
