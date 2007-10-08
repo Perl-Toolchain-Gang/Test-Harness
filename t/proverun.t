@@ -25,7 +25,9 @@ BEGIN {
                         command => [
                             'PERL',
                             $sample_test
-                          ]
+                        ],
+                        setup    => \'CODE',
+                        teardown => \'CODE',
 
                     }
                 ]

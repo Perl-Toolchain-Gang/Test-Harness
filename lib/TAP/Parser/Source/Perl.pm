@@ -108,13 +108,47 @@ sub get_stream {
 
     my @switches = $self->_switches;
 
+    # Nasty kludge. It might be nicer if we got the libs separately
+    # although at least this way we find any -I switches that were
+    # supplied other then as explicit libs.
+    # We filter out any names containing colons because they will break
+    # PERL5LIB
+    my @libs;
+    for ( grep { $_ !~ /:/ } @switches ) {
+        push @libs, $1 if / ^ ['"]? -I (.*?) ['"]? $ /x;
+    }
+
+    my $previous = $ENV{PERL5LIB};
+    if ($previous) {
+        push @libs, split( /:/, $previous );
+    }
+
+    my $setup = sub {
+        if (@libs) {
+            $ENV{PERL5LIB} = join( ':', @libs );
+        }
+    };
+
+    # Cargo culted from comments seen elsewhere about VMS / environment
+    # variables. I don't know if this is actually necessary.
+    my $teardown = sub {
+        if ($previous) {
+            $ENV{PERL5LIB} = $previous;
+        }
+        else {
+            delete $ENV{PERL5LIB};
+        }
+    };
+
     # Taint mode ignores environment variables so we must retranslate
     # PERL5LIB as -I switches and place PERL5OPT on the command line
     # in order that it be seen.
     if ( grep { $_ eq "-T" } @switches ) {
         push @switches,
-          $self->_libs2switches( split /:/,
-            $ENV{PERL5LIB} || $ENV{PERLLIB} || '' );
+          $self->_libs2switches(
+            split /:/,
+            $ENV{PERL5LIB} || $ENV{PERLLIB} || ''
+          );
 
         push @switches, $ENV{PERL5OPT} || ();
     }
@@ -123,8 +157,10 @@ sub get_stream {
       or $self->_croak("No command found!");
 
     return TAP::Parser::Iterator->new(
-        {   command => \@command,
-            merge   => $self->merge,
+        {   command  => \@command,
+            merge    => $self->merge,
+            setup    => $setup,
+            teardown => $teardown,
         }
     );
 }
