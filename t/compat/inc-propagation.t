@@ -30,17 +30,20 @@ my $taint_inc =
 my $test_template = <<'END';
 #!/usr/bin/perl %s
 
-use Test::More tests => 1;
+use Test::More tests => 2;
 
 sub _strip_dups {
     my %%dups;
     return grep { !$dups{$_}++ } @_;
 }
 
+# Make sure we did something sensible with PERL5LIB
+like $ENV{PERL5LIB}, qr{wibble};
+
 is_deeply(
     [_strip_dups(@INC)],
     [_strip_dups(@{%s})],
-    '@INC propegated to test'
+    '@INC propagated to test'
 ) or do {
     diag join ",\n", _strip_dups(@INC);
     diag '-----------------';
