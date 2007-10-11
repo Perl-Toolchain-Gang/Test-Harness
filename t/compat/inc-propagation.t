@@ -34,7 +34,8 @@ use Test::More tests => 2;
 
 sub _strip_dups {
     my %%dups;
-    return grep { !$dups{$_}++ } @_;
+    # Drop '.' which sneaks in on some platforms
+    return grep { $_ ne '.' } grep { !$dups{$_}++ } @_;
 }
 
 # Make sure we did something sensible with PERL5LIB

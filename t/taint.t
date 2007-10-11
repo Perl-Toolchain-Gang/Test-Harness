@@ -36,7 +36,7 @@ sub run_test_file {
 use lib 't/lib';
 use Test::More tests => 1;
 
-is( $INC[1], 'wibble' ) or diag join "\n,", @INC;
+is( $INC[1], 'wibble' ) or diag join "\n", @INC;
 END
 }
 
@@ -51,7 +51,7 @@ END
 use lib 't/lib';
 use Test::More tests => 1;
 
-is( $INC[1], 'wibble' ) or diag join "\n,", @INC;
+is( $INC[1], 'wibble' ) or diag join "\n", @INC;
 END
 }
 
