@@ -28,4 +28,6 @@
 ^benchmark/
 ^reference/
 ^misc/
-tmon.out
+^tmon.out$
+^harness_runs.db$
+
