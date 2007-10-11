@@ -250,7 +250,7 @@ sub all_passed {
     my $self = shift;
     return $self->total
       && $self->total == $self->passed
-      && !$self->has_problems;
+      && !$self->has_errors;
 }
 
 =head3 C<get_status>
