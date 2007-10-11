@@ -5,6 +5,10 @@ Revision history for Test-Harness
           tests are seen.
         - Fixed bug where 'Result: FAIL' would be printed at the end of a test
           run if there were unexpectedly succeeding tests.
+        - Added -M, -P switches to allow arbitrary modules to be loaded
+          by prove. We haven't yet defined what they'll do once they
+          load but it's a start...
+        - Added testing under simulated non-forking platforms.
 
 2.99_03 2007-10-06
         - Refactored all display specific code out of TAP::Harness.
