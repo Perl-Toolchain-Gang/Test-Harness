@@ -1,6 +1,7 @@
 package TAP::Parser::Source::Perl;
 
 use strict;
+use Config;
 use vars qw($VERSION @ISA);
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
@@ -119,13 +120,14 @@ sub get_stream {
     }
 
     my $previous = $ENV{PERL5LIB};
+    my $path_sep = $Config{path_sep};
     if ($previous) {
-        push @libs, split( /:/, $previous );
+        push @libs, split( /$path_sep/, $previous );
     }
 
     my $setup = sub {
         if (@libs) {
-            $ENV{PERL5LIB} = join( ':', @libs );
+            $ENV{PERL5LIB} = join( $path_sep, @libs );
         }
     };
 
