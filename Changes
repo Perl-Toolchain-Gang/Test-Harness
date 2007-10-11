@@ -1,5 +1,9 @@
 Revision history for Test-Harness
 
+2.99_04
+        - Fixed bug where 'Result: FAIL' would be printed at the end of a test
+          run if there were unexpectedly succeeding tests.
+
 2.99_03 2007-10-06
         - Refactored all display specific code out of TAP::Harness.
         - Relaxed strict parsing of skip plan for pre v13 TAP.
