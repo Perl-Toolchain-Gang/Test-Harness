@@ -1,6 +1,6 @@
 Revision history for Test-Harness
 
-2.99_04
+2.99_04 2007-10-11
         - Fixed bug where 'All tests successful' would not be printed if bonus
           tests are seen.
         - Fixed bug where 'Result: FAIL' would be printed at the end of a test
