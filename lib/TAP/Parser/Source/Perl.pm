@@ -108,6 +108,8 @@ sub get_stream {
     my @extra_libs;
 
     my @switches = $self->_switches;
+    my $path_sep = $Config{path_sep};
+    my $path_pat = qr{$path_sep};
 
     # Nasty kludge. It might be nicer if we got the libs separately
     # although at least this way we find any -I switches that were
@@ -115,14 +117,13 @@ sub get_stream {
     # We filter out any names containing colons because they will break
     # PERL5LIB
     my @libs;
-    for ( grep { $_ !~ /:/ } @switches ) {
+    for ( grep { $_ !~ $path_pat } @switches ) {
         push @libs, $1 if / ^ ['"]? -I (.*?) ['"]? $ /x;
     }
 
     my $previous = $ENV{PERL5LIB};
-    my $path_sep = $Config{path_sep};
     if ($previous) {
-        push @libs, split( /$path_sep/, $previous );
+        push @libs, split( $path_pat, $previous );
     }
 
     my $setup = sub {
@@ -148,7 +149,7 @@ sub get_stream {
     if ( grep { $_ eq "-T" } @switches ) {
         push @switches,
           $self->_libs2switches(
-            split /:/,
+            split $path_pat,
             $ENV{PERL5LIB} || $ENV{PERLLIB} || ''
           );
 
