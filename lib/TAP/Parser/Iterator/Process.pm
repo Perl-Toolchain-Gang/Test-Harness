@@ -253,6 +253,10 @@ sub _finish {
         $status = $?;
     }
 
+    # Sometimes we get -1 on Windows. Presumably that means status not
+    # available.
+    $status = 0 if $status == -1;
+
     $self->{wait} = $status;
     $self->{exit} = $self->_wait2exit($status);
 
