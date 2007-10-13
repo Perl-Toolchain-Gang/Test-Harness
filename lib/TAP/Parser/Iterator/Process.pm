@@ -255,7 +255,7 @@ sub _finish {
 
     # Sometimes we get -1 on Windows. Presumably that means status not
     # available.
-    $status = 0 if $status == -1;
+    $status = 0 if $IS_WIN32 && $status == -1;
 
     $self->{wait} = $status;
     $self->{exit} = $self->_wait2exit($status);
