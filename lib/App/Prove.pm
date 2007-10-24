@@ -353,7 +353,12 @@ sub _get_tests {
     my $self = shift;
     my @argv = @_;
     my ( @tests, %tests );
-    @argv = 't' unless @argv;
+
+    unless (@argv) {
+        croak "No tests named and 't' directory not found"
+          unless -d 't';
+        @argv = 't';
+    }
 
     # Do globbing on Win32.
     if ($NEED_GLOB) {
