@@ -2,6 +2,7 @@ package TAP::Formatter::Console;
 
 use strict;
 use TAP::Base ();
+use POSIX qw(strftime);
 
 use vars qw($VERSION @ISA);
 
@@ -226,7 +227,15 @@ sub _format_name {
         $extra = length $1;
     }
     my $periods = '.' x ( $self->_longest + $extra + 4 - length $test );
-    return "$name$periods";
+
+    if ( $self->timer ) {
+        my $stamp = strftime "[%H:%M:%S]", localtime;
+        return "$stamp $name$periods";
+    }
+    else {
+        return "$name$periods";
+    }
+
 }
 
 =head3 C<open_test>
