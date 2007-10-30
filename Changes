@@ -1,5 +1,12 @@
 Revision history for Test-Harness
 
+2.99_05 2007-10-30
+        - Fix for occasional rogue -1 exit code on Windows.
+        - Fix for @INC handling under CPANPLUS.
+        - Added real time to prove --timer output
+        - Improved prove error message in case where 't' not found and
+          no tests named.
+
 2.99_04 2007-10-11
         - Fixed bug where 'All tests successful' would not be printed if bonus
           tests are seen.
