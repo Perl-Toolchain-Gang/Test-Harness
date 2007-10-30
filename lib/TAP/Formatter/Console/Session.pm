@@ -231,7 +231,13 @@ sub _closures {
                 $formatter->$output("\r$spaces\r$pretty");
             }
 
-            unless ( $parser->has_problems ) {
+            if ( my $skip_all = $parser->skip_all ) {
+                $formatter->_output("skipped: $skip_all\n");
+            }
+            elsif ( $parser->has_problems ) {
+                $self->_output_test_failure($parser);
+            }
+            else {
                 unless ($really_quiet) {
                     my $time_report = '';
                     if ( $formatter->timer ) {
@@ -248,9 +254,6 @@ sub _closures {
 
                     $formatter->_output("ok$time_report\n");
                 }
-            }
-            else {
-                $self->_output_test_failure($parser);
             }
         },
     };
