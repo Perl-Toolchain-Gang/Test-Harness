@@ -1,5 +1,9 @@
 Revision history for Test-Harness
 
+2.99_06
+        - Added skip_all method to TAP::Parser.
+        - Display reason for skipped tests.
+
 2.99_05 2007-10-30
         - Fix for occasional rogue -1 exit code on Windows.
         - Fix for @INC handling under CPANPLUS.
