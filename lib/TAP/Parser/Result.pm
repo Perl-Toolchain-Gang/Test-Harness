@@ -27,11 +27,11 @@ TAP::Parser::Result - TAP::Parser output
 
 =head1 VERSION
 
-Version 2.99_06
+Version 2.99_07
 
 =cut
 
-$VERSION = '2.99_06';
+$VERSION = '2.99_07';
 
 =head2 DESCRIPTION
 
