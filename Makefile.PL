@@ -31,7 +31,8 @@ package MY;
 # own code rather than the incumbent. If we don't do this we end up
 # loading a confused mixture of installed and new modules.
 sub test_via_harness {
-    my($self, $perl, $tests) = @_;
-    return qq{\t$perl -I\$(INST_LIB) -I\$(INST_ARCHLIB) "-MExtUtils::Command::MM" }.
-           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
+    my ( $self, $perl, $tests ) = @_;
+
+    return $self->SUPER::test_via_harness(
+        "$perl -I\$(INST_LIB) -I\$(INST_ARCHLIB)", $tests );
 }
