@@ -186,7 +186,7 @@ sub _get_command {
 
 sub _libs2switches {
     my $self = shift;
-    return map {"-I$_"} @_;
+    return map {"-I$_"} grep {$_} @_;
 }
 
 sub _switches {
