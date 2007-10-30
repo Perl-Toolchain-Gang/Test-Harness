@@ -2047,6 +2047,7 @@ my %samples = (
         'exit'        => 0,
         wait          => 0,
         version       => 12,
+        skip_all      => 'rope',
     },
     skipall_v13 => {
         results => [
@@ -2101,6 +2102,7 @@ my %samples = (
         'exit'        => 0,
         wait          => 0,
         version       => 12,
+        skip_all      => '(no reason given)',
     },
     todo_misparse => {
         results => [
