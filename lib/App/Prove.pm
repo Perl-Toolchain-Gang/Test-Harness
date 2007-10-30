@@ -15,11 +15,11 @@ App::Prove - Implements the C<prove> command.
 
 =head1 VERSION
 
-Version 2.99_05
+Version 2.99_06
 
 =cut
 
-$VERSION = '2.99_05';
+$VERSION = '2.99_06';
 
 my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
 my $NEED_GLOB = $IS_WIN32;

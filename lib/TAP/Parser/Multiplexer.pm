@@ -12,11 +12,11 @@ TAP::Parser::Multiplexer - Multiplex multiple TAP::Parsers
 
 =head1 VERSION
 
-Version 2.99_05
+Version 2.99_06
 
 =cut
 
-$VERSION = '2.99_05';
+$VERSION = '2.99_06';
 
 =head1 SYNOPSIS
 
