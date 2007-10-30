@@ -5,6 +5,7 @@ use IO::Select;
 use vars qw($VERSION);
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
+use constant IS_VMS => ( $^O eq 'VMS' );
 
 =head1 NAME
 
@@ -75,7 +76,10 @@ the next result.
 sub add {
     my ( $self, $parser, $stash ) = @_;
 
-    if ( !IS_WIN32 && ( my @handles = $parser->get_select_handles ) ) {
+    if (   !IS_WIN32
+        && !IS_VMS
+        && ( my @handles = $parser->get_select_handles ) )
+    {
         my $sel = $self->{select};
 
         # We have to turn handles into file numbers here because by
