@@ -40,7 +40,7 @@ BEGIN {
         eval {
             _runtests( File::Spec->catfile( $sample_tests, "too_many" ) );
         };
-        ok( $@, "$@" );
+        ok( $@, "error OK" );
         ok( $@ =~ m[Failed 1/1], "too_many dies" );
         is( $died, 1, "Death happened" );
     }

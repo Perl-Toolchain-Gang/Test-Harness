@@ -78,18 +78,6 @@ sub _initialize {
 
     $self->verbosity(0);
 
-    # # Handle legacy verbose, quiet, really_quiet flags
-    # my %verb_map = ( verbose => 1, quiet => -1, really_quiet => -2, );
-    #
-    # my @verb_adj = grep {$_} map { delete $arg_for{$_} ? $verb_map{$_} : 0 }
-    #   keys %verb_map;
-    #
-    # $self->_croak(
-    #     'Only one of verbose, quiet or really_quiet should be specified')
-    #   if @verb_adj > 1;
-    #
-    # $self->verbosity( shift @verb_adj || 0 );
-
     for my $name ( keys %VALIDATION_FOR ) {
         my $property = delete $arg_for{$name};
         if ( defined $property ) {
@@ -116,6 +104,7 @@ sub _initialize {
 sub verbose      { shift->verbosity >= 1 }
 sub quiet        { shift->verbosity <= -1 }
 sub really_quiet { shift->verbosity <= -2 }
+sub silent       { shift->verbosity <= -3 }
 
 =head1 METHODS
 
@@ -142,7 +131,7 @@ Set the verbosity level.
 
 =item * C<verbose>
 
-Print individual test results to STDOUT.
+Printing individual test results to STDOUT.
 
 =item * C<timer>
 
@@ -154,11 +143,15 @@ Only show test failures (this is a no-op if C<verbose> is selected).
 
 =item * C<quiet>
 
-Suppress some test output (mostly failures while tests are running).
+Suppressing some test output (mostly failures while tests are running).
 
 =item * C<really_quiet>
 
-Suppress everything but the tests summary.
+Suppressing everything but the tests summary.
+
+=item * C<silent>
+
+Suppressing all output.
 
 =item * C<errors>
 
@@ -287,6 +280,9 @@ an aggregate.
 
 sub summary {
     my ( $self, $aggregate ) = @_;
+    
+    return if $self->silent;
+    
     my @t     = $aggregate->descriptions;
     my $tests = \@t;
 
