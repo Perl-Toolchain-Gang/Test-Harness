@@ -34,5 +34,5 @@ sub test_via_harness {
     my ( $self, $perl, $tests ) = @_;
 
     return $self->SUPER::test_via_harness(
-        "$perl -I\$(INST_LIB) -I\$(INST_ARCHLIB)", $tests );
+        qq{$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)"}, $tests );
 }
