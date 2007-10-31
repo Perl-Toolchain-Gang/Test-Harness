@@ -352,6 +352,9 @@ sub _get_lib {
         push @libs, @{ $self->includes };
     }
 
+    #24926
+    @libs = map { File::Spec->rel2abs($_) } @libs;
+
     # Huh?
     return @libs ? \@libs : ();
 }
