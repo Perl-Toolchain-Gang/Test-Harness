@@ -470,7 +470,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   switches  => ['T'],
+                    {   switches  => ['-T'],
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -488,7 +488,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   switches  => ['t'],
+                    {   switches  => ['-t'],
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -523,7 +523,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   switches  => ['W'],
+                    {   switches  => ['-W'],
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -541,7 +541,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   switches  => ['w'],
+                    {   switches  => ['-w'],
                         verbosity => 0
                     },
                     'TAP::Harness',
