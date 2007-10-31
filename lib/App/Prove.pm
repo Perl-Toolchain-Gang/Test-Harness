@@ -403,7 +403,10 @@ sub _expand_dir {
     my @tests;
     if ( $self->recurse ) {
         find(
-            sub { -f && /\.t$/ && push @tests => $File::Find::name },
+            {   follow => 1,    #21938
+                wanted =>
+                  sub { -f && /\.t$/ && push @tests => $File::Find::name }
+            },
             $dir
         );
     }
