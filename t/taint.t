@@ -6,7 +6,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 3;
+use Test::More ( $^O eq 'VMS' ? ( skip_all => 'VMS' ) : ( tests => 3 ) );
 
 use Config;
 use TAP::Parser;

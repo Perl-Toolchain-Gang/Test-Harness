@@ -776,6 +776,20 @@ local $ENV{HARNESS_PERL_SWITCHES};
         return $new;
     }
 
+    sub vague_status {
+        my $hash = shift;
+        return $hash unless $^O eq 'VMS';
+
+        while ( my ( $file, $want ) = each %$hash ) {
+            for ( qw( estat wstat ) ) {
+                if ( exists $want->{$_} ) {
+                    $want->{$_} = $want->{$_} ? 1 : 0;
+                }
+            }
+        }
+        return $hash
+    }
+
     {
         local $^W = 0;
 
@@ -798,27 +812,34 @@ local $ENV{HARNESS_PERL_SWITCHES};
 
             # For now we supress STDERR because it crufts up /our/ test
             # results. Should probably capture and analyse it.
-            local *OLDERR;
+            local ( *OLDERR, *OLDOUT );
             open OLDERR, '>&STDERR' or die $!;
+            open OLDOUT, '>&STDOUT' or die $!;
             my $devnull = File::Spec->devnull;
             open STDERR, ">$devnull" or die $!;
+            open STDOUT, ">$devnull" or die $!;
 
             my ( $tot, $fail, $todo, $harness, $aggregate )
               = execute_tests( tests => \@test_files );
 
             open STDERR, '>&OLDERR' or die $!;
+            open STDOUT, '>&OLDOUT' or die $!;
 
             my $bench = delete $tot->{bench};
             isa_ok $bench, 'Benchmark';
 
             # Localise filenames in failed, todo
-            my $lfailed = local_result( $result->{failed} );
-            my $ltodo   = local_result( $result->{todo} );
+            my $lfailed = vague_status( local_result( $result->{failed} ) );
+            my $ltodo   = vague_status( local_result( $result->{todo} ) );
+
+            # use Data::Dumper;
+            # diag Dumper( [ $lfailed, $ltodo ] );
 
             is_deeply $tot, $result->{totals}, "totals match for $test_key";
-            is_deeply $fail, $lfailed,
+            is_deeply vague_status($fail), $lfailed,
               "failure summary matches for $test_key";
-            is_deeply $todo, $ltodo, "todo summary matches for $test_key";
+            is_deeply vague_status($todo), $ltodo,
+              "todo summary matches for $test_key";
         }
     }
 }

@@ -17,6 +17,7 @@ sub _all_ok {
 
 {
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
+    local $Test::Harness::Verbose = -9;
 
     push @INC, 'examples';
 

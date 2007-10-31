@@ -1133,7 +1133,7 @@ my %samples = (
         tests_planned => undef,
         tests_run     => 0,
         parse_errors  => [ 'No plan found in TAP output', ],
-        'exit'        => 1,
+        'exit'        => NOT_ZERO,
         wait          => NOT_ZERO,
     },
     die_head_end => {
@@ -1195,7 +1195,7 @@ my %samples = (
         tests_planned => undef,
         tests_run     => 4,
         parse_errors  => [ 'No plan found in TAP output', ],
-        'exit'        => 1,
+        'exit'        => NOT_ZERO,
         wait          => NOT_ZERO,
     },
     die_last_minute => {
@@ -1264,7 +1264,7 @@ my %samples = (
         tests_planned => 4,
         tests_run     => 4,
         parse_errors  => [],
-        'exit'        => 1,
+        'exit'        => NOT_ZERO,
         wait          => NOT_ZERO,
     },
     bignum => {

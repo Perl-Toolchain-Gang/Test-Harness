@@ -3,15 +3,13 @@
 # Test that @INC is propogated from the harness process to the test
 # process.
 
-
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 2;
+use Test::More ( $^O eq 'VMS' ? ( skip_all => 'VMS' ) : ( tests => 2 ) );
 
 use Data::Dumper;
 use Test::Harness;
-
 
 # Change @INC so we ensure it's preserved.
 use lib 'wibble';
@@ -23,9 +21,10 @@ use lib 'wibble';
 # Put a stock directory near the beginning.
 # use lib $INC[$#INC-2];
 
-my $inc = Data::Dumper->new([\@INC])->Terse(1)->Purity(1)->Dump;
-my $taint_inc = 
-  Data::Dumper->new([[grep { $_ ne '.' } @INC]])->Terse(1)->Purity(1)->Dump;
+my $inc = Data::Dumper->new( [ \@INC ] )->Terse(1)->Purity(1)->Dump;
+my $taint_inc
+  = Data::Dumper->new( [ [ grep { $_ ne '.' } @INC ] ] )->Terse(1)->Purity(1)
+  ->Dump;
 
 my $test_template = <<'END';
 #!/usr/bin/perl %s
@@ -62,7 +61,7 @@ close TEST;
 END { 1 while unlink 'inc_check_taint.t.tmp', 'inc_check.t.tmp'; }
 
 for my $test ( 'inc_check_taint.t.tmp', 'inc_check.t.tmp' ) {
-    my($tot, $failed) = Test::Harness::execute_tests( tests => [$test] );
+    my ( $tot, $failed ) = Test::Harness::execute_tests( tests => [$test] );
     is $tot->{bad}, 0;
 }
 1;
