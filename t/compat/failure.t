@@ -50,6 +50,12 @@ sub _runtests {
     my (@tests) = @_;
 
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
+    local $ENV{HARNESS_VERBOSE}            = 0;
+    local $ENV{HARNESS_DEBUG}              = 0;
+    local $ENV{HARNESS_TIMER}              = 0;
+
+    local $Test::Harness::Verbose = -9;
+
     runtests(@tests);
 }
 

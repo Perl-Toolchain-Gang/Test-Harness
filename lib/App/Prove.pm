@@ -212,11 +212,18 @@ sub _get_args {
         $args{$a} = $val if defined $val;
     }
 
-    for my $a (qw( merge verbose failures timer )) {
-        $args{$a} = $self->$a() if $self->$a();
-    }
+    # Handle verbose, quiet, really_quiet flags
+    my %verb_map = ( verbose => 1, quiet => -1, really_quiet => -2, );
 
-    for my $a (qw( quiet really_quiet directives )) {
+    my @verb_adj = grep {$_} map { $self->$_() ? $verb_map{$_} : 0 }
+      keys %verb_map;
+
+    die "Only one of verbose, quiet or really_quiet should be specified\n"
+      if @verb_adj > 1;
+
+    $args{verbosity} = shift @verb_adj || 0;
+
+    for my $a (qw( merge failures timer directives )) {
         $args{$a} = 1 if $self->$a();
     }
 

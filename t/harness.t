@@ -79,11 +79,11 @@ foreach my $test_args ( get_arg_sets() ) {
             trim($_)
           } @_;
     };
-    my $harness            = TAP::Harness->new( { verbose      => 1 } );
-    my $harness_whisper    = TAP::Harness->new( { quiet        => 1 } );
-    my $harness_mute       = TAP::Harness->new( { really_quiet => 1 } );
-    my $harness_directives = TAP::Harness->new( { directives   => 1 } );
-    my $harness_failures   = TAP::Harness->new( { failures     => 1 } );
+    my $harness            = TAP::Harness->new( { verbosity  => 1 } );
+    my $harness_whisper    = TAP::Harness->new( { verbosity  => -1 } );
+    my $harness_mute       = TAP::Harness->new( { verbosity  => -2 } );
+    my $harness_directives = TAP::Harness->new( { directives => 1 } );
+    my $harness_failures   = TAP::Harness->new( { failures   => 1 } );
 
     colorize($harness);
 
@@ -432,9 +432,9 @@ SKIP: {
 
     my $capture = IO::c55Capture->new_handle;
     my $harness = TAP::Harness->new(
-        {   really_quiet => 1,
-            stdout       => $capture,
-            exec         => [$cat],
+        {   verbosity => -2,
+            stdout    => $capture,
+            exec      => [$cat],
         }
     );
 
@@ -453,9 +453,9 @@ SKIP: {
 {
     my $capture = IO::c55Capture->new_handle;
     my $harness = TAP::Harness->new(
-        {   really_quiet => 1,
-            stdout       => $capture,
-            exec         => [$^X]
+        {   verbosity => -2,
+            stdout    => $capture,
+            exec      => [$^X]
         }
     );
 
@@ -482,7 +482,7 @@ sub trim {
 }
 
 sub liblist {
-    return [ map { "-I$_" } @_ ];
+    return [ map {"-I$_"} @_ ];
 }
 
 sub get_arg_sets {
@@ -524,8 +524,8 @@ sub get_arg_sets {
         # },
       },
       { switches => {
-            in  => [ '-T', '-w', '-T' ],
-            out => [ '-T', '-w', '-T' ],
+            in        => [ '-T', '-w', '-T' ],
+            out       => [ '-T', '-w', '-T' ],
             test_name => '... duplicate switches should remain',
         },
         failures => {
@@ -715,7 +715,7 @@ sub _runtests {
           if $ENV{PERL_TEST_HARNESS_DUMP_TAP};
     }
 
-    my $harness = TAP::Harness->new( { really_quiet => 1 } );
+    my $harness = TAP::Harness->new( { verbosity => -2 } );
 
     can_ok $harness, 'runtests';
 

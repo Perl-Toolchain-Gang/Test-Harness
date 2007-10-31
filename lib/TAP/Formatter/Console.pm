@@ -76,17 +76,19 @@ sub _initialize {
     $self->SUPER::_initialize($arg_for);
     my %arg_for = %$arg_for;    # force a shallow copy
 
-    # Handle legacy verbose, quiet, really_quiet flags
-    my %verb_map = ( verbose => 1, quiet => -1, really_quiet => -2, );
+    $self->verbosity(0);
 
-    my @verb_adj = grep {$_} map { delete $arg_for{$_} ? $verb_map{$_} : 0 }
-      keys %verb_map;
-
-    $self->_croak(
-        'Only one of verbose, quiet or really_quiet should be specified')
-      if @verb_adj > 1;
-
-    $self->verbosity( shift @verb_adj || 0 );
+    # # Handle legacy verbose, quiet, really_quiet flags
+    # my %verb_map = ( verbose => 1, quiet => -1, really_quiet => -2, );
+    #
+    # my @verb_adj = grep {$_} map { delete $arg_for{$_} ? $verb_map{$_} : 0 }
+    #   keys %verb_map;
+    #
+    # $self->_croak(
+    #     'Only one of verbose, quiet or really_quiet should be specified')
+    #   if @verb_adj > 1;
+    #
+    # $self->verbosity( shift @verb_adj || 0 );
 
     for my $name ( keys %VALIDATION_FOR ) {
         my $property = delete $arg_for{$name};

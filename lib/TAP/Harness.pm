@@ -63,8 +63,7 @@ sub _error {
 BEGIN {
 
     @FORMATTER_ARGS = qw(
-      directives verbose verbosity timer failures errors quiet
-      really_quiet stdout color
+      directives verbosity timer failures errors stdout color
     );
 
     %VALIDATION_FOR = (
@@ -212,11 +211,13 @@ hashref whose allowed keys are:
 
 =item * C<verbosity>
 
-Set the verbosity level.
+Set the verbosity level:
 
-=item * C<verbose>
-
-Print individual test results to STDOUT.
+     1   verbose        Print individual test results to STDOUT.
+     0   normal
+    -1   quiet          Suppress some test output (mostly failures 
+                        while tests are running).
+    -2   really quiet   Suppress everything but the tests summary.
 
 =item * C<timer>
 
@@ -241,14 +242,6 @@ sense in the context of tests written in Perl.
 =item * C<color>
 
 Attempt to produce color output.
-
-=item * C<quiet>
-
-Suppress some test output (mostly failures while tests are running).
-
-=item * C<really_quiet>
-
-Suppress everything but the tests summary.
 
 =item * C<exec>
 

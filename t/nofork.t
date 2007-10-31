@@ -42,9 +42,9 @@ my $mod = 'TAP::Parser::Iterator::Process';
     my $capture = IO::c55Capture->new_handle;
     local *STDERR;
     my $harness = TAP::Harness->new(
-        {   really_quiet => 1,
-            switches     => [ '-It/lib', "-MNoFork" ],
-            stdout       => $capture,
+        {   verbosity => -2,
+            switches  => [ '-It/lib', "-MNoFork" ],
+            stdout    => $capture,
         }
     );
     $harness->runtests('t/sample-tests/simple');

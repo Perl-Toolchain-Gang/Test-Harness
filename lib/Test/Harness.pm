@@ -21,10 +21,11 @@ use vars qw(
   $Columns
   $Directives
   $Timer
-  $ML $Last_ML_Print
   $Strap
   $has_time_hires
 );
+
+# $ML $Last_ML_Print
 
 BEGIN {
     eval q{use Time::HiRes 'time'};
@@ -177,11 +178,11 @@ sub _new_harness {
     push @lib, _filtered_inc();
 
     my $args = {
-        verbose    => $Verbose,
         timer      => $Timer,
         directives => $Directives,
         lib        => \@lib,
         switches   => \@switches,
+        verbosity  => $Verbose,
     };
 
     return TAP::Harness->new($args);
