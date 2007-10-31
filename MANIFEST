@@ -56,6 +56,7 @@ t/compat/failure.t
 t/compat/inc-propagation.t
 t/compat/inc_taint.t
 t/compat/nonumbers.t
+t/compat/regression.t
 t/compat/test-harness-compat.t
 t/compat/version.t
 t/console.t
