@@ -4,7 +4,7 @@ global:
     - /usr/bin/perl
   status: /home/andy/.smoke-tapx-vms
   svn: /usr/bin/svn
-  work: /home/andy/.smoke-work
+  work: /home/andy/.smoke-work-vms
 tasks:
   - mailto:
       - email: tapx-commit@hexten.net
