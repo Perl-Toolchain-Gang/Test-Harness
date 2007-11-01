@@ -17,7 +17,6 @@ tasks:
     script:
       - yes n | %PERL% Build.PL
       - ./Build
-      - ./Build test
       - ./Build dist
       - %PERL% smoke/testdrive.pl Test-Harness-*.tar.gz
       - ./Build distclean
