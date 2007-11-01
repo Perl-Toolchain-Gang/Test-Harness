@@ -8,7 +8,7 @@ global:
 tasks:
   - mailto:
       - email: andy@hexten.net
-        filter: failed
+        filter: all
         verbose: 1
     name: TAP::Parser
     script:
