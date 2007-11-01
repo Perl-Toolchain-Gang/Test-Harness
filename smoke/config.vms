@@ -13,7 +13,7 @@ tasks:
       - email: tapx-dev@hexten.net
         filter: failed
         verbose: 1
-    name: TAP::Parser
+    name: TAP::Parser on VMS
     script:
       - yes n | %PERL% Build.PL
       - ./Build
