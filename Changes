@@ -1,5 +1,12 @@
 Revision history for Test-Harness
 
+2.99_07 2007-11-01
+        - Fix for #21938: Unable to handle circular links
+        - Fix for #24926: prove -b and -l should use absolute paths
+        - Fixed prove switches. Big oops. How the hell did we miss that?
+        - Consolidated quiet, really_quiet, verbose into verbosity.
+        - Various VMS related fixes to tests
+
 2.99_06 2007-10-30
         - Added skip_all method to TAP::Parser.
         - Display reason for skipped tests.

@@ -324,16 +324,16 @@ sub _get_switches {
 
     # notes that -T or -t must be at the front of the switches!
     if ( $self->taint_fail ) {
-        push @switches, 'T';
+        push @switches, '-T';
     }
     elsif ( $self->taint_warn ) {
-        push @switches, 't';
+        push @switches, '-t';
     }
     if ( $self->warnings_fail ) {
-        push @switches, 'W';
+        push @switches, '-W';
     }
     elsif ( $self->warnings_warn ) {
-        push @switches, 'w';
+        push @switches, '-w';
     }
 
     return @switches ? \@switches : ();
@@ -351,6 +351,9 @@ sub _get_lib {
     if ( @{ $self->includes } ) {
         push @libs, @{ $self->includes };
     }
+
+    #24926
+    @libs = map { File::Spec->rel2abs($_) } @libs;
 
     # Huh?
     return @libs ? \@libs : ();
@@ -400,7 +403,10 @@ sub _expand_dir {
     my @tests;
     if ( $self->recurse ) {
         find(
-            sub { -f && /\.t$/ && push @tests => $File::Find::name },
+            {   follow => 1,    #21938
+                wanted =>
+                  sub { -f && /\.t$/ && push @tests => $File::Find::name }
+            },
             $dir
         );
     }

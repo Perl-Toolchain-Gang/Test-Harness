@@ -4,6 +4,7 @@ use strict;
 use lib 't/lib';
 
 use Test::More;
+use File::Spec;
 
 use App::Prove;
 
@@ -39,6 +40,11 @@ sub _shuffle {
 }
 
 package main;
+
+sub mabs {
+    my $ar = shift;
+    return [ map { File::Spec->rel2abs($_) } @$ar ];
+}
 
 {
     my @import_log = ();
@@ -202,7 +208,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   lib       => ['blib/lib'],
+                    {   lib => mabs( ['blib/lib'] ),
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -314,7 +320,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   lib       => [qw( four five six )],
+                    {   lib => mabs( [qw( four five six )] ),
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -332,7 +338,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   lib       => ['lib'],
+                    {   lib => mabs( ['lib'] ),
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -386,7 +392,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   verbosity => -1
+                    { verbosity => -1
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -403,7 +409,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   verbosity => -2
+                    { verbosity => -2
                     },
                     'TAP::Harness',
                     'one', 'two', 'three'
@@ -470,7 +476,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   switches  => ['T'],
+                    {   switches  => ['-T'],
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -488,7 +494,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   switches  => ['t'],
+                    {   switches  => ['-t'],
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -523,7 +529,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   switches  => ['W'],
+                    {   switches  => ['-W'],
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -541,7 +547,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   switches  => ['w'],
+                    {   switches  => ['-w'],
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -629,7 +635,7 @@ BEGIN {    # START PLAN
             expect   => { lib   => 1 },
             runlog   => [
                 [   '_runtests',
-                    {   lib       => ['lib'],
+                    {   lib => mabs( ['lib'] ),
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -646,7 +652,7 @@ BEGIN {    # START PLAN
             expect   => { lib      => 1 },
             runlog   => [
                 [   '_runtests',
-                    {   lib       => ['lib'],
+                    {   lib => mabs( ['lib'] ),
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -663,7 +669,7 @@ BEGIN {    # START PLAN
             expect   => { blib  => 1 },
             runlog   => [
                 [   '_runtests',
-                    {   lib       => ['blib/lib'],
+                    {   lib => mabs( ['blib/lib'] ),
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -680,7 +686,7 @@ BEGIN {    # START PLAN
             expect   => { blib      => 1 },
             runlog   => [
                 [   '_runtests',
-                    {   lib       => ['blib/lib'],
+                    {   lib => mabs( ['blib/lib'] ),
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -827,7 +833,7 @@ BEGIN {    # START PLAN
             expect   => { quiet => 1 },
             runlog   => [
                 [   '_runtests',
-                    {   verbosity => -1
+                    { verbosity => -1
                     },
                     'TAP::Harness',
                     $dummy_test
