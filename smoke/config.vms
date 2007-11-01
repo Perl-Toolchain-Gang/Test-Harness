@@ -1,0 +1,22 @@
+---
+global:
+  perls:
+    - /usr/bin/perl
+  status: /home/andy/.smoke-tapx-vms
+  svn: /usr/bin/svn
+  work: /home/andy/.smoke-work
+tasks:
+  - mailto:
+      - email: andy@hexten.net
+        filter: failed
+        verbose: 1
+    name: TAP::Parser
+    script:
+      - yes n | %PERL% Build.PL
+      - ./Build
+      - ./Build test
+      - ./Build dist
+      - %PERL% smoke/testdrive.pl Test-Harness-*.tar.gz
+      - ./Build distclean
+    subdir: trunk
+    svn: http://svn.hexten.net/tapx/trunk
