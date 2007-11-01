@@ -7,8 +7,11 @@ global:
   work: /home/andy/.smoke-work
 tasks:
   - mailto:
-      - email: andy@hexten.net
+      - email: tapx-commit@hexten.net
         filter: all
+        verbose: 1
+      - email: tapx-dev@hexten.net
+        filter: failed
         verbose: 1
     name: TAP::Parser
     script:
