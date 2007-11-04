@@ -124,7 +124,8 @@ sub delete_any {
 sub upload {
     my ( $host, $user, $pass, $file ) = @_;
 
-    my $ftp = Net::FTP->new( $host, Passive => 1 );
+    my $ftp = Net::FTP->new( $host, Passive => 1 )
+      or die "FTP connect to $host failed";
 
     $ftp->login( $user, $pass ) or die "FTP login failed";
     $ftp->binary;
