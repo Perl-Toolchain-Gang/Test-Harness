@@ -8,9 +8,10 @@ use Net::Telnet;
 $| = 1;
 
 use constant TESTDRIVERC => glob('~/.testdriverc');
-use constant HOST        => 'td183.testdrive.hp.com';
 use constant CLEANUP     => qr{^TEST-HARNESS-[^;]+;\d+\s*$}i;
 use constant LOG         => 'misc/vms/tp_vms-maketest';
+
+my @HOSTS = ( 'td183.testdrive.hp.com', 'td184.testdrive.hp.com' );
 
 my %cfg = ();
 open my $rc, '<', TESTDRIVERC or die "Can't open ", TESTDRIVERC, " ($!)\n";
@@ -26,7 +27,12 @@ my $pass = $cfg{pass} or die "No pass in .testdriverc\n";
 
 my $tarball = shift;
 
-my @logs = test_it( HOST, $user, $pass, $tarball, CLEANUP );
+my @logs;
+for my $host (@HOSTS) {
+    eval { @logs = test_it( $host, $user, $pass, $tarball, CLEANUP ) };
+    last unless $@;
+    print "$@\n";
+}
 
 my @results = ();
 for ( map {@$_} @logs ) {
