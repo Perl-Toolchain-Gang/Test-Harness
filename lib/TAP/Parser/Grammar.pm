@@ -81,7 +81,7 @@ my %language_for;
             },
         },
         plan => {
-            syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\S*\s*(.*))?\z/i,
+            syntax  => qr/^1\.\.(\d+)\s*(?:#\s*SKIP\S*\s*(.*))?\z/i,
             handler => $plan_handler,
         },
 
