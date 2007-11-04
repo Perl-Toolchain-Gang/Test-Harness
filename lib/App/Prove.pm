@@ -67,6 +67,9 @@ BEGIN {
 
 =head3 C<new>
 
+Create a new C<App::Prove>. Optionally a hash ref of attribute
+initializers may be passed.
+
 =cut
 
 sub new {
@@ -94,8 +97,8 @@ sub new {
 
   $prove->process_args(@args);
 
-Processes the command-line arguments and stashes the remainders in the
-C<$self->{args}> array-ref.
+Processes the command-line arguments. Attributes will be set
+appropriately. Any filenames may be found in the C<argv> attribute.
 
 Dies on invalid arguments.
 
@@ -293,6 +296,15 @@ sub _load_extensions {
 
 =head3 C<run>
 
+Perform whatever actions the command line args specified. The C<prove>
+command line tool consists of the following code:
+
+    use App::Prove;
+
+    my $app = App::Prove->new;
+    $app->process_args(@ARGV);
+    $app->run;
+
 =cut
 
 sub run {
@@ -464,6 +476,9 @@ sub require_harness {
 
 =head3 C<print_version>
 
+Display the version numbers of the loaded L<TAP::Harness> and the
+current Perl.
+
 =cut
 
 sub print_version {
@@ -477,6 +492,8 @@ sub print_version {
 }
 
 1;
+
+# vim:ts=4:sw=4:et:sta
 
 __END__
 
@@ -551,5 +568,3 @@ calling C<run>.
 =item C<warnings_warn>
 
 =back
-
-# vim:ts=4:sw=4:et:sta
