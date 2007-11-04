@@ -193,7 +193,6 @@ sub _get_args {
     }
 
     if ( $self->archive ) {
-        eval('sub TAP::Harness::Archive::auto_inherit {1}');    # wink,wink
         $self->require_harness( archive => 'TAP::Harness::Archive' );
         $args{archive} = $self->archive;
     }
@@ -446,7 +445,7 @@ sub _shuffle {
 
 =head3 C<require_harness>
 
-Load a harness class and add it to the inheritance chain.
+Load a harness replacement class.
 
   $prove->require_harness($for => $class_name);
 
@@ -457,7 +456,6 @@ sub require_harness {
 
     eval("require $class");
     die "$class is required to use the --$for feature: $@" if $@;
-    $class->inherit( $self->{harness_class} );
 
     $self->{harness_class} = $class;
 
