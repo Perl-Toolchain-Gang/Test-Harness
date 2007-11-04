@@ -21,6 +21,22 @@ Version 2.99_08
 
 $VERSION = '2.99_08';
 
+=head1 DESCRIPTION
+
+L<Test::Harness> provides a command, C<prove>, which runs a TAP based
+test suite and prints a report. The C<prove> command is a minimal
+wrapper around an instance of this module.
+
+=head1 SYNOPSIS
+
+    use App::Prove;
+
+    my $app = App::Prove->new;
+    $app->process_args(@ARGV);
+    $app->run;
+
+=cut
+
 my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
 my $NEED_GLOB = $IS_WIN32;
 
@@ -467,6 +483,10 @@ sub print_version {
 __END__
 
 =head2 Attributes
+
+After command line parsing the following attributes reflect the values
+of the corresponding command line switches. They may be altered before
+calling C<run>.
 
 =over
 
