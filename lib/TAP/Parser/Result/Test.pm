@@ -14,11 +14,11 @@ TAP::Parser::Result::Test - Test result token.
 
 =head1 VERSION
 
-Version 2.99_08
+Version 2.99_09
 
 =cut
 
-$VERSION = '2.99_08';
+$VERSION = '2.99_09';
 
 =head1 DESCRIPTION
 
