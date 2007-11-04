@@ -1195,9 +1195,7 @@ sub _iter {
                 $self->wait( $stream->wait );
                 $self->_finish;
 
-                if ( my $code = $self->_callback_for('EOF') ) {
-                    $_->($self) for @$code;
-                }
+                $self->_make_callback( 'EOF', $result );
             }
 
             return $result;
