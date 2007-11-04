@@ -74,30 +74,10 @@ Output test preamble
 
 sub header {
     my $self = shift;
-
-    # my $formatter = $self->formatter;
-    #
-    # $formatter->_output( $self->_pretty_name )
-    #   unless $formatter->really_quiet;
-    #
-    # $self->_newline_printed(0);
-
-    # $self->formatter->_output( "Starting ", $self->name, "\n" );
     $self->_need_refresh;
 }
 
 sub _refresh {
-
-    # my $self      = shift;
-    # my $formatter = $self->formatter;
-    # my $context   = $shared{$formatter};
-    # if ( delete $context->{need_refresh} ) {
-    #     $self->_clear_line;
-    #     for my $test ( @{ $context->{active} } ) {
-    #         $formatter->_output( $test->_pretty_name, "\n" );
-    #     }
-    #     $formatter->_output("\n");
-    # }
 }
 
 sub _clear_line {
@@ -112,7 +92,6 @@ sub _output_ruler {
 
     my $context = $shared{$formatter};
 
-    # Too much boilerplate!
     my $ruler = sprintf( "===( %7d )", $context->{tests} );
     $ruler .= ( '=' x ( WIDTH - length $ruler ) );
     $formatter->_output("\r$ruler");
@@ -143,11 +122,6 @@ sub result {
               . "\n" );
     }
 
-    # $self->_plan( '/' . ( $planned || 0 ) . ' ' ) unless $self->_plan;
-
-    # $self->_output_method( my $output
-    #       = $formatter->_get_output_method($parser) );
-
     if ( $result->is_test ) {
         $context->{tests}++;
 
@@ -159,37 +133,6 @@ sub result {
             $self->_output_ruler;
         }
     }
-
-    # if ( $show_count and not $really_quiet and $result->is_test ) {
-    #     my $number = $result->number;
-    #
-    #     my $test_print_modulus = 1;
-    #     my $ceiling            = $number / 5;
-    #     $test_print_modulus *= 2 while $test_print_modulus < $ceiling;
-    #
-    #     unless ( $number % $test_print_modulus ) {
-    #         my $output = $self->_output_method;
-    #         $formatter->$output(
-    #             "\r" . $self->_pretty_name . $number . $self->_plan );
-    #     }
-    # }
-    #
-    # return if $really_quiet;
-    #
-    # if ( $self->_should_display($result) ) {
-    #     unless ( $self->_newline_printed ) {
-    #         $formatter->_output("\n") unless $formatter->quiet;
-    #         $self->_newline_printed(1);
-    #     }
-    #
-    #     # TODO: quiet gets tested here /and/ in _should_display
-    #     unless ( $formatter->quiet ) {
-    #         $self->_output_result($result);
-    #         $formatter->_output("\n");
-    #     }
-    # }
-
-    # print ".";
 }
 
 =head3 C<close_test>
