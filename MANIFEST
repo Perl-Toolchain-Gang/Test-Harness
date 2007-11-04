@@ -121,6 +121,7 @@ t/sample-tests/skip_nomsg
 t/sample-tests/skipall
 t/sample-tests/skipall_nomsg
 t/sample-tests/skipall_v13
+t/sample-tests/space_after_plan
 t/sample-tests/stdout_stderr
 t/sample-tests/switches
 t/sample-tests/taint

@@ -300,7 +300,7 @@ my %samples = (
         wait          => 0,
         version       => 12,
     },
-    'space-after-plan' => {
+    space_after_plan => {
         results => [
             {   is_plan       => TRUE,
                 raw           => '1..5 ',
