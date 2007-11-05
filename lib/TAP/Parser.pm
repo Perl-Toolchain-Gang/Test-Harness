@@ -19,11 +19,11 @@ TAP::Parser - Parse L<TAP|Test::Harness::TAP> output
 
 =head1 VERSION
 
-Version 2.99_08
+Version 2.99_09
 
 =cut
 
-$VERSION = '2.99_08';
+$VERSION = '2.99_09';
 
 my $DEFAULT_TAP_VERSION = 12;
 my $MAX_TAP_VERSION     = 13;
@@ -950,6 +950,7 @@ sub _add_error {
 sub _make_state_table {
     my $self = shift;
     my %states;
+    my %planned_todo = ();
 
     # These transitions are defaults for all states
     my %state_globals = (
@@ -976,16 +977,23 @@ sub _make_state_table {
                     $self->skip_all( $plan->explanation
                           || '(no reason given)' );
                 }
+
+                $planned_todo{$_}++ for @{ $plan->todo_list };
             },
         },
         test => {
             act => sub {
                 my ($test) = @_;
 
-                my ( $has_todo, $number, $tests_run ) = (
-                    $test->has_todo, $test->number,
-                    ++$self->{tests_run}
-                );
+                my ( $number, $tests_run )
+                  = ( $test->number, ++$self->{tests_run} );
+
+                # Fake TODO state
+                if ( defined $number && delete $planned_todo{$number} ) {
+                    $test->set_directive('TODO');
+                }
+
+                my $has_todo = $test->has_todo;
 
                 $self->in_todo($has_todo);
                 if ( defined( my $tests_planned = $self->tests_planned ) ) {
@@ -1021,7 +1029,6 @@ sub _make_state_table {
                         : 'actual_failed'
                       }
                   } => $number;
-
             },
         },
         yaml => {
@@ -1090,7 +1097,6 @@ sub _make_state_table {
                         "Plan ($line) must be at the beginning or end of the TAP output"
                     );
                     $self->is_good_plan(0);
-
                 },
                 continue => 'PLANNED'
             },
@@ -1168,6 +1174,7 @@ sub _iter {
                 }
             }
         }
+        return $token;
     };
 
     if ( $self->_has_callbacks ) {
@@ -1176,7 +1183,7 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
-                $next_state->($result);
+                $result = $next_state->($result);
 
                 if ( my $code = $self->_callback_for( $result->type ) ) {
                     $_->($result) for @{$code};
@@ -1207,7 +1214,7 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
-                $next_state->($result);
+                $result = $next_state->($result);
 
                 # Echo TAP to spool file
                 print {$spool} $result->raw, "\n" if $spool;

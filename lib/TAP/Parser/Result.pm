@@ -27,11 +27,11 @@ TAP::Parser::Result - TAP::Parser output
 
 =head1 VERSION
 
-Version 2.99_08
+Version 2.99_09
 
 =cut
 
-$VERSION = '2.99_08';
+$VERSION = '2.99_09';
 
 =head2 DESCRIPTION
 
@@ -236,5 +236,17 @@ Indicates whether or not the given result has a SKIP directive.
 =cut
 
 sub has_skip { 'SKIP' eq ( shift->{directive} || '' ) }
+
+=head3 C<set_directive>
+
+Set the directive associated with this token. Used internally to fake
+TODO tests.
+
+=cut
+
+sub set_directive {
+    my ( $self, $dir ) = @_;
+    $self->{directive} = $dir;
+}
 
 1;

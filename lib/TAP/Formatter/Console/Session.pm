@@ -36,11 +36,11 @@ TAP::Formatter::Console::Session - Harness output delegate for default console o
 
 =head1 VERSION
 
-Version 2.99_08
+Version 2.99_09
 
 =cut
 
-$VERSION = '2.99_08';
+$VERSION = '2.99_09';
 
 =head1 DESCRIPTION
 
@@ -121,7 +121,7 @@ sub _get_output_result {
             ],
         },
         {   test => sub { $_->is_test && $_->has_todo },
-            colors => ['white'],
+            colors => ['yellow'],
         },
     );
 

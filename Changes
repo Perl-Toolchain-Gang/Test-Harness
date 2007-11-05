@@ -1,5 +1,11 @@
 Revision history for Test-Harness
 
+2.99_09 2007-11-05
+        - Implemented TODO-in-PLAN syntax for TAP version 12 and earlier.
+
+2.99_08 2007-11-04
+        - Tiny changes. New version pushed to get some smoke coverage.
+
 2.99_07 2007-11-01
         - Fix for #21938: Unable to handle circular links
         - Fix for #24926: prove -b and -l should use absolute paths

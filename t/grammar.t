@@ -84,7 +84,8 @@ my $expected = {
     'directive'     => '',
     'type'          => 'plan',
     'tests_planned' => 1,
-    'raw'           => '1..1'
+    'raw'           => '1..1',
+    'todo_list'     => [],
 };
 is_deeply $plan_token, $expected,
   '... and it should contain the correct data';
@@ -110,7 +111,8 @@ $expected = {
     'directive'     => 'SKIP',
     'type'          => 'plan',
     'tests_planned' => 0,
-    'raw'           => '1..0 # SKIP why not?'
+    'raw'           => '1..0 # SKIP why not?',
+    'todo_list'     => [],
 };
 is_deeply $plan_token, $expected,
   '... and it should contain the correct data';
@@ -136,7 +138,8 @@ $expected = {
     'directive'     => 'SKIP',
     'type'          => 'plan',
     'tests_planned' => 0,
-    'raw'           => '1..0'
+    'raw'           => '1..0',
+    'todo_list'     => [],
 };
 is_deeply $plan_token, $expected,
   '... and it should contain the correct data';

@@ -12,11 +12,11 @@ TAP::Parser::Grammar - A grammar for the Test Anything Protocol.
 
 =head1 VERSION
 
-Version 2.99_08
+Version 2.99_09
 
 =cut
 
-$VERSION = '2.99_08';
+$VERSION = '2.99_09';
 
 =head1 DESCRIPTION
 
@@ -55,21 +55,8 @@ my %language_for;
 {
 
     # XXX the 'not' and 'ok' might be on separate lines in VMS ...
-    my $ok           = qr/(?:not )?ok\b/;
-    my $num          = qr/\d+/;
-    my $plan_handler = sub {
-        my ( $self, $line ) = @_;
-        my $tests_planned = $1;
-        my $explanation   = $2;
-        my $skip
-          = ( 0 == $tests_planned || defined $explanation )
-          ? 'SKIP'
-          : '';
-        $explanation = '' unless defined $explanation;
-        return $self->_make_plan_token(
-            $line, $tests_planned, $skip, $explanation,
-        );
-    };
+    my $ok  = qr/(?:not )?ok\b/;
+    my $num = qr/\d+/;
 
     my %v12 = (
         version => {
@@ -81,8 +68,38 @@ my %language_for;
             },
         },
         plan => {
-            syntax  => qr/^1\.\.(\d+)\s*(?:#\s*SKIP\S*\s*(.*))?\z/i,
-            handler => $plan_handler,
+            syntax  => qr/^1\.\.(\d+)\s*(.*)\z/,
+            handler => sub {
+                my ( $self, $line ) = @_;
+                my ( $tests_planned, $tail ) = ( $1, $2 );
+                my $explanation = undef;
+
+                if ( $tail =~ /^todo((?:\s+\d+)+)/ ) {
+                    my @todo = split /\s+/, _trim($1);
+                    return $self->_make_plan_token(
+                        $line, $tests_planned, 'TODO',
+                        '',    \@todo
+                    );
+                }
+                elsif ( $tail =~ /^#\s*SKIP\S*\s*(.*)\z/i ) {
+                    $explanation = $1;
+                }
+                elsif ( $tail !~ /^\s*$/ ) {
+                    return $self->_make_unknown_token($line);
+                }
+
+                my $skip
+                  = ( 0 == $tests_planned || defined $explanation )
+                  ? 'SKIP'
+                  : '';
+
+                $explanation = '' unless defined $explanation;
+                return $self->_make_plan_token(
+                    $line, $tests_planned, $skip,
+                    $explanation, []
+                );
+
+            },
         },
 
         # An optimization to handle the most common test lines without
@@ -142,7 +159,19 @@ my %language_for;
         %v12,
         plan => {
             syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\b(.*))?\z/i,
-            handler => $plan_handler,
+            handler => sub {
+                my ( $self, $line ) = @_;
+                my ( $tests_planned, $explanation ) = ( $1, $2 );
+                my $skip
+                  = ( 0 == $tests_planned || defined $explanation )
+                  ? 'SKIP'
+                  : '';
+                $explanation = '' unless defined $explanation;
+                return $self->_make_plan_token(
+                    $line, $tests_planned, $skip,
+                    $explanation, []
+                );
+            },
         },
         yaml => {
             syntax  => qr/^ (\s+) (---.*) $/x,
@@ -319,9 +348,9 @@ sub _make_version_token {
 }
 
 sub _make_plan_token {
-    my ( $self, $line, $tests_planned, $skip, $explanation ) = @_;
+    my ( $self, $line, $tests_planned, $directive, $explanation, $todo ) = @_;
 
-    if ( $skip && 0 != $tests_planned ) {
+    if ( $directive eq 'SKIP' && 0 != $tests_planned ) {
         warn
           "Specified SKIP directive in plan but more than 0 tests ($line)\n";
     }
@@ -329,8 +358,9 @@ sub _make_plan_token {
         type          => 'plan',
         raw           => $line,
         tests_planned => $tests_planned,
-        directive     => $skip,
+        directive     => $directive,
         explanation   => _trim($explanation),
+        todo_list     => $todo,
     };
 }
 

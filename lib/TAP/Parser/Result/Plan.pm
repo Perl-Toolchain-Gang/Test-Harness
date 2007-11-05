@@ -12,11 +12,11 @@ TAP::Parser::Result::Plan - Plan result token.
 
 =head1 VERSION
 
-Version 2.99_08
+Version 2.99_09
 
 =cut
 
-$VERSION = '2.99_08';
+$VERSION = '2.99_09';
 
 =head1 DESCRIPTION
 
@@ -105,5 +105,16 @@ explanation, if any.
 =cut
 
 sub explanation { shift->{explanation} }
+
+=head3 C<todo_list>
+
+  my $todo = $result->todo_list;
+  for ( @$todo ) {
+      ...
+  }
+
+=cut
+
+sub todo_list { shift->{todo_list} }
 
 1;
