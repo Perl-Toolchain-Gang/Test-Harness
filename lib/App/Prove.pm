@@ -15,11 +15,11 @@ App::Prove - Implements the C<prove> command.
 
 =head1 VERSION
 
-Version 2.99_09
+Version 2.99_10
 
 =cut
 
-$VERSION = '2.99_09';
+$VERSION = '2.99_10';
 
 =head1 DESCRIPTION
 
