@@ -106,4 +106,15 @@ explanation, if any.
 
 sub explanation { shift->{explanation} }
 
+=head3 C<todo_list>
+
+  my $todo = $result->todo_list;
+  for ( @$todo ) {
+      ...
+  }
+
+=cut
+
+sub todo_list { shift->{todo_list} }
+
 1;

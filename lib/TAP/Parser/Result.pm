@@ -237,4 +237,16 @@ Indicates whether or not the given result has a SKIP directive.
 
 sub has_skip { 'SKIP' eq ( shift->{directive} || '' ) }
 
+=head3 C<set_directive>
+
+Set the directive associated with this token. Used internally to fake
+TODO tests.
+
+=cut
+
+sub set_directive {
+    my ( $self, $dir ) = @_;
+    $self->{directive} = $dir;
+}
+
 1;

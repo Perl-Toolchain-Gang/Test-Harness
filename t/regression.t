@@ -720,6 +720,88 @@ my %samples = (
         wait          => 0,
         version       => 12,
     },
+    todo => {
+        results => [
+            {   is_plan       => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                raw           => '1..5 todo 3 2;',
+                tests_planned => 5,
+                todo_list     => [ 3, 2 ],
+            },
+            {   actual_passed => TRUE,
+                is_actual_ok  => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => FALSE,
+                number        => 1,
+                description   => "",
+                explanation   => '',
+            },
+            {   actual_passed => TRUE,
+                is_actual_ok  => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => TRUE,
+                number        => 2,
+                description   => "",
+                explanation   => '',
+            },
+            {   actual_passed => FALSE,
+                is_actual_ok  => FALSE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => TRUE,
+                number        => 3,
+                description   => "",
+                explanation   => '',
+            },
+            {   actual_passed => TRUE,
+                is_actual_ok  => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => FALSE,
+                number        => 4,
+                description   => "",
+                explanation   => '',
+            },
+            {   actual_passed => TRUE,
+                is_actual_ok  => TRUE,
+                passed        => TRUE,
+                is_ok         => TRUE,
+                is_test       => TRUE,
+                has_skip      => FALSE,
+                has_todo      => FALSE,
+                number        => 5,
+                description   => "",
+                explanation   => '',
+            },
+        ],
+        plan   => '1..5',
+        passed => [ 1, 2, 3, 4, 5 ],
+        actual_passed => [ 1, 2, 4, 5 ],
+        failed        => [],
+        actual_failed => [3],
+        todo          => [ 2, 3 ],
+        todo_passed   => [2],
+        skipped       => [],
+        good_plan     => TRUE,
+        is_good_plan  => TRUE,
+        tests_planned => 5,
+        tests_run     => 5,
+        parse_errors  => [],
+        'exit'        => 0,
+        wait          => 0,
+        version       => 12,
+    },
     duplicates => {
         results => [
             {   is_plan       => TRUE,
@@ -2976,7 +3058,7 @@ for my $hide_fork ( 0 .. $can_open3 ) {
                     is scalar $parser->$method(), scalar @$answer,
                       "... and $method should be the correct amount ($test)";
                     is_deeply [ $parser->$method() ], $answer,
-                      "...... and the correct values ($test)";
+                      "... and $method should be the correct values ($test)";
                 }
             }
         }
@@ -3017,23 +3099,23 @@ sub analyze_test {
         $desc =~ s/#/<hash>/g;
         $desc =~ s/\s+/ /g;      # Drop newlines
         ok defined $expected,
-          "$test $count We should have a result for $desc";
-        $count++;
+          "$test/$count We should have a result for $desc";
         while ( my ( $method, $answer ) = each %$expected ) {
 
             if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
                 ok $handler->( $result->$method() ),
-                  "... and $method should return a reasonable value ($test)";
+                  "... and $method should return a reasonable value ($test/$count)";
             }
             elsif ( ref $answer ) {
                 is_deeply $result->$method(), $answer,
-                  "... and $method should return the correct answer ($test)";
+                  "... and $method should return the correct structure ($test/$count)";
             }
             else {
                 is $result->$method(), $answer,
-                  "... and $method should return the correct answer ($test)";
+                  "... and $method should return the correct answer ($test/$count)";
             }
         }
+        $count++;
     }
     is @$results, 0,
       "... and we should have the correct number of results ($test)";

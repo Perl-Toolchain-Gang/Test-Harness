@@ -121,7 +121,7 @@ sub _get_output_result {
             ],
         },
         {   test => sub { $_->is_test && $_->has_todo },
-            colors => ['white'],
+            colors => ['yellow'],
         },
     );
 
