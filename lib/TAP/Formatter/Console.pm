@@ -213,6 +213,8 @@ sub prepare {
     $self->_longest($longest);
 }
 
+sub _format_now { strftime "[%H:%M:%S]", localtime }
+
 sub _format_name {
     my ( $self, $test ) = @_;
     my $name  = $test;
@@ -224,7 +226,7 @@ sub _format_name {
     my $periods = '.' x ( $self->_longest + $extra + 4 - length $test );
 
     if ( $self->timer ) {
-        my $stamp = strftime "[%H:%M:%S]", localtime;
+        my $stamp = $self->_format_now();
         return "$stamp $name$periods";
     }
     else {
@@ -280,9 +282,9 @@ an aggregate.
 
 sub summary {
     my ( $self, $aggregate ) = @_;
-    
+
     return if $self->silent;
-    
+
     my @t     = $aggregate->descriptions;
     my $tests = \@t;
 
@@ -290,6 +292,10 @@ sub summary {
 
     my $total  = $aggregate->total;
     my $passed = $aggregate->passed;
+
+    if ( $self->timer ) {
+        $self->_output( $self->_format_now(), "\n" );
+    }
 
     # TODO: Check this condition still works when all subtests pass but
     # the exit status is nonzero
