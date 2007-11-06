@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.00    2007-11-06
+        - Non-dev release. No changes since 2.99_09.
+
 2.99_09 2007-11-05
         - Implemented TODO-in-PLAN syntax for TAP version 12 and earlier.
 
