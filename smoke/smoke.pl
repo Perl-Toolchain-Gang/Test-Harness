@@ -15,7 +15,7 @@ use Getopt::Long;
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
-my $VERSION = 0.004;
+my $VERSION = 0.005;
 
 # Reopen STDIN.
 use IO::Pty;
@@ -197,8 +197,12 @@ sub test_and_report {
 }
 
 sub work_dir {
-    my ( $task, $version ) = @_;
+    my ( $task, $version, $desc ) = @_;
     my $name = $task->{name};
+    if ( defined $desc ) {
+        $desc =~ s/\W+/_/g;
+        $version = join( '_', $version, $desc );
+    }
     return File::Spec->catdir(
         $Config->{global}->{work}, $version,
         split /::/,                $name
@@ -225,7 +229,7 @@ sub expand {
 
 sub test_against_perl {
     my ( $version, $interp, $task, $rev, $desc ) = @_;
-    my $work = work_dir( $task, $version );
+    my $work = work_dir( $task, $version, $desc );
 
     rmtree($work) if -d $work;
     mkpath($work);
