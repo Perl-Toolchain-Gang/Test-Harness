@@ -117,7 +117,8 @@ The C<$parser> is a L<TAP::Parser|TAP::Parser> object.
 sub add {
     my ( $self, $description, $parser ) = @_;
     if ( exists $self->{parser_for}{$description} ) {
-        $self->_croak("You already have a parser for ($description)");
+        $self->_croak( "You already have a parser for ($description)."
+              . " Perhaps you have run the same test twice." );
     }
     push @{ $self->{parse_order} } => $description;
     $self->{parser_for}{$description} = $parser;
