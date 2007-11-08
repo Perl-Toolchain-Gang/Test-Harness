@@ -114,7 +114,7 @@ my %language_for;
                     $line, $ok, $num,
                     $desc
                 );
-              }
+              },
         },
         test => {
             syntax  => qr/^($ok) \s* ($num)? \s* (.*) \z/x,
