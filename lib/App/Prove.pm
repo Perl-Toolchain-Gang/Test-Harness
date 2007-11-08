@@ -373,7 +373,7 @@ sub _get_lib {
         push @libs, 'lib';
     }
     if ( $self->blib ) {
-        push @libs, 'blib/lib';
+        push @libs, 'blib/lib', 'blib/arch';
     }
     if ( @{ $self->includes } ) {
         push @libs, @{ $self->includes };
