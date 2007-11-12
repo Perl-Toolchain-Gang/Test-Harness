@@ -9,11 +9,11 @@ TAP::Base - Base class that provides common functionality to L<TAP::Parser> and 
 
 =head1 VERSION
 
-Version 3.01
+Version 3.02
 
 =cut
 
-$VERSION = '3.01';
+$VERSION = '3.02';
 
 my $GOT_TIME_HIRES;
 

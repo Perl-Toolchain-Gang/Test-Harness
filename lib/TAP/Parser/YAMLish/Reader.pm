@@ -4,7 +4,7 @@ use strict;
 
 use vars qw{$VERSION};
 
-$VERSION = '3.01';
+$VERSION = '3.02';
 
 # TODO:
 #   Handle blessed object syntax
@@ -277,7 +277,7 @@ TAP::Parser::YAMLish::Reader - Read YAMLish data from iterator
 
 =head1 VERSION
 
-Version 3.01
+Version 3.02
 
 =head1 SYNOPSIS
 
