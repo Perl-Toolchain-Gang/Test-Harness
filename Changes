@@ -4,6 +4,7 @@ Revision history for Test-Harness
         - Fix for RHEL incpush.patch related failure.
         - Output real time of test completion with --timer
         - prove -b adds blib/auto to @INC
+        - made SKIP plan parsing even more liberal for pre-v13 TAP
 
 3.00    2007-11-06
         - Non-dev release. No changes since 2.99_09.
