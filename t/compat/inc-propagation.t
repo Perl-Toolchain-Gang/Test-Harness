@@ -6,7 +6,21 @@
 use strict;
 use lib 't/lib';
 
-use Test::More ( $^O eq 'VMS' ? ( skip_all => 'VMS' ) : ( tests => 2 ) );
+sub has_crazy_patch {
+    my $sentinel = 'blirpzoffle';
+    local $ENV{PERL5LIB} = $sentinel;
+    my $command = join ' ',
+      map {qq{"$_"}} ( $^X, '-e', 'print join q(:), @INC' );
+    my $path = `$command`;
+    my @got = ( $path =~ /($sentinel)/g );
+    return @got > 1;
+}
+
+use Test::More (
+      $^O eq 'VMS' ? ( skip_all => 'VMS' )
+    : has_crazy_patch() ? ( skip_all => 'Incompatible @INC patch' )
+    : ( tests => 2 )
+);
 
 use Data::Dumper;
 use Test::Harness;

@@ -208,7 +208,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    {   lib => mabs( ['blib/lib'] ),
+                    {   lib => mabs( [ 'blib/lib', 'blib/arch' ] ),
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -669,7 +669,7 @@ BEGIN {    # START PLAN
             expect   => { blib  => 1 },
             runlog   => [
                 [   '_runtests',
-                    {   lib => mabs( ['blib/lib'] ),
+                    {   lib => mabs( [ 'blib/lib', 'blib/arch' ] ),
                         verbosity => 0
                     },
                     'TAP::Harness',
@@ -686,7 +686,7 @@ BEGIN {    # START PLAN
             expect   => { blib      => 1 },
             runlog   => [
                 [   '_runtests',
-                    {   lib => mabs( ['blib/lib'] ),
+                    {   lib => mabs( [ 'blib/lib', 'blib/arch' ] ),
                         verbosity => 0
                     },
                     'TAP::Harness',

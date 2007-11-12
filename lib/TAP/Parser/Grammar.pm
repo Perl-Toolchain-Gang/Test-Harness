@@ -12,11 +12,11 @@ TAP::Parser::Grammar - A grammar for the Test Anything Protocol.
 
 =head1 VERSION
 
-Version 2.99_10
+Version 3.01
 
 =cut
 
-$VERSION = '2.99_10';
+$VERSION = '3.01';
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,7 @@ my %language_for;
                 my ( $self, $line ) = @_;
                 my ( $tests_planned, $tail ) = ( $1, $2 );
                 my $explanation = undef;
+                my $skip        = '';
 
                 if ( $tail =~ /^todo((?:\s+\d+)+)/ ) {
                     my @todo = split /\s+/, _trim($1);
@@ -81,19 +82,20 @@ my %language_for;
                         '',    \@todo
                     );
                 }
-                elsif ( $tail =~ /^#\s*SKIP\S*\s*(.*)\z/i ) {
-                    $explanation = $1;
+                elsif ( 0 == $tests_planned ) {
+                    $skip        = 'SKIP';
+                    $explanation = $tail;
+                    # Trim valid SKIP directive without being strict
+                    # about its presence.
+                    $explanation =~ s/^#\s*//;
+                    $explanation =~ s/^skip\S*\s+//i;
                 }
                 elsif ( $tail !~ /^\s*$/ ) {
                     return $self->_make_unknown_token($line);
                 }
 
-                my $skip
-                  = ( 0 == $tests_planned || defined $explanation )
-                  ? 'SKIP'
-                  : '';
-
                 $explanation = '' unless defined $explanation;
+
                 return $self->_make_plan_token(
                     $line, $tests_planned, $skip,
                     $explanation, []
@@ -114,7 +116,7 @@ my %language_for;
                     $line, $ok, $num,
                     $desc
                 );
-              }
+            },
         },
         test => {
             syntax  => qr/^($ok) \s* ($num)? \s* (.*) \z/x,

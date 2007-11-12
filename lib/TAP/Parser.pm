@@ -19,11 +19,11 @@ TAP::Parser - Parse L<TAP|Test::Harness::TAP> output
 
 =head1 VERSION
 
-Version 2.99_10
+Version 3.01
 
 =cut
 
-$VERSION = '2.99_10';
+$VERSION = '3.01';
 
 my $DEFAULT_TAP_VERSION = 12;
 my $MAX_TAP_VERSION     = 13;

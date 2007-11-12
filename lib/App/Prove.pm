@@ -15,11 +15,11 @@ App::Prove - Implements the C<prove> command.
 
 =head1 VERSION
 
-Version 2.99_10
+Version 3.01
 
 =cut
 
-$VERSION = '2.99_10';
+$VERSION = '3.01';
 
 =head1 DESCRIPTION
 
@@ -373,7 +373,7 @@ sub _get_lib {
         push @libs, 'lib';
     }
     if ( $self->blib ) {
-        push @libs, 'blib/lib';
+        push @libs, 'blib/lib', 'blib/arch';
     }
     if ( @{ $self->includes } ) {
         push @libs, @{ $self->includes };
