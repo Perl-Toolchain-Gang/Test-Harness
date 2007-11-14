@@ -281,7 +281,9 @@ is_deeply $token, $expected,
         $grammar->set_version('no_such_version');
     };
 
-    is @die, 1, 'set_version with bad version';
+    unless (is @die, 1, 'set_version with bad version') {
+        diag " >>> $_ <<<\n" for @die;
+    }
 
     like pop @die, qr/^Unsupported syntax version: no_such_version at /,
       '... and got expected message';

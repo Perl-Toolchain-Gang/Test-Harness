@@ -441,7 +441,9 @@ is scalar $parser->passed, 2,
         TAP::Parser::_stream $foreigner, qw(a b c);
     };
 
-    is @die, 1, 'coverage testing for TAP::Parser accessors';
+    unless ( is @die, 1, 'coverage testing for TAP::Parser accessors' ) {
+        diag " >>> $_ <<<\n" for @die;
+    }
 
     like pop @die, qr/_stream[(][)] may not be set externally/,
       '... and we died with expected message';

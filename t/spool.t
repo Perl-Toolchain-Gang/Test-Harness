@@ -127,7 +127,9 @@ END_TAP
         $useOrigClose = 1;
     };
 
-    is @die, 1, 'close failed, die as expected';
+    unless ( is @die, 1, 'close failed, die as expected' ) {
+        diag " >>> $_ <<<\n" for @die;
+    }
 
     like pop @die, qr/ Error closing TAP spool file[(] /,
       '...with expected message';
