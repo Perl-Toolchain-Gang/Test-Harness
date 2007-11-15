@@ -111,26 +111,29 @@ one of the messages in the DIAGNOSTICS section.
 sub _aggregate {
     my ( $harness, $aggregate, @tests ) = @_;
 
-    my $path_sep  = $Config{path_sep};
-    my $path_pat  = qr{$path_sep};
-    my @extra_inc = _filtered_inc();
+    if (IS_VMS) {
 
-    my $previous = $ENV{PERL5LIB};
-    if ($previous) {
-        push @extra_inc, split( $path_pat, $previous );
-    }
-
-    if (@extra_inc) {
-        $ENV{PERL5LIB} = join( $path_sep, @extra_inc );
-    }
-
-    $harness->aggregate_tests( $aggregate, @tests );
-
-    if ($previous) {
-        $ENV{PERL5LIB} = $previous;
+        # Jiggery pokery doesn't appear to work on VMS - so disable it
+        # pending investigation.
+        $harness->aggregate_tests( $aggregate, @tests );
     }
     else {
-        delete $ENV{PERL5LIB};
+        my $path_sep  = $Config{path_sep};
+        my $path_pat  = qr{$path_sep};
+        my @extra_inc = _filtered_inc();
+
+        my $previous = $ENV{PERL5LIB};
+        local $ENV{PERL5LIB};
+
+        if ($previous) {
+            push @extra_inc, split( $path_pat, $previous );
+        }
+
+        if (@extra_inc) {
+            $ENV{PERL5LIB} = join( $path_sep, @extra_inc );
+        }
+
+        $harness->aggregate_tests( $aggregate, @tests );
     }
 }
 
@@ -203,7 +206,8 @@ sub _new_harness {
         }
     }
 
-    # push @lib, _filtered_inc();
+    # Do things the old way on VMS...
+    push @lib, _filtered_inc() if IS_VMS;
 
     my $args = {
         timer      => $Timer,
