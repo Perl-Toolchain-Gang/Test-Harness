@@ -9,8 +9,9 @@ BEGIN {
     $hires = eval 'use Time::HiRes qw(sleep); 1';
 }
 
-use Test::More (
-    $hires ? ( tests => 9 * 3 ) : ( skip_all => 'Need Time::HiRes' ) );
+use Test::More ( $^O eq 'VMS' ? ( skip_all => 'VMS' )
+    : $hires ? ( tests    => 9 * 3 )
+    :          ( skip_all => 'Need Time::HiRes' ) );
 
 use File::Spec;
 use TAP::Parser::Iterator::Process;

@@ -212,8 +212,6 @@ sub handle_unicode {
 sub wait { shift->{wait} }
 sub exit { shift->{exit} }
 
-use Encode qw(decode_utf8);
-
 sub _next {
     my $self = shift;
 
