@@ -84,12 +84,26 @@ sub _use_open3 {
     return 1;
 }
 
+{
+    my $got_unicode;
+
+    sub _get_unicode {
+        return $got_unicode if defined $got_unicode;
+        eval 'use Encode qw(decode_utf8);';
+        $got_unicode = $@ ? 0 : 1;
+
+    }
+}
+
 sub new {
     my $class = shift;
     my $args  = shift;
 
     my @command = @{ delete $args->{command} || [] }
       or die "Must supply a command to execute";
+
+    # Private. Used to frig with chunk size during testing.
+    my $chunk_size = delete $args->{_chunk_size} || 65536;
 
     my $merge = delete $args->{merge};
     my ( $pid, $err, $sel );
@@ -145,11 +159,12 @@ sub new {
     }
 
     my $self = bless {
-        out  => $out,
-        err  => $err,
-        sel  => $sel,
-        pid  => $pid,
-        exit => undef,
+        out        => $out,
+        err        => $err,
+        sel        => $sel,
+        pid        => $pid,
+        exit       => undef,
+        chunk_size => $chunk_size,
     }, $class;
 
     if ( my $teardown = delete $args->{teardown} ) {
@@ -169,11 +184,27 @@ Upgrade the input stream to handle UTF8.
 
 sub handle_unicode {
     my $self = shift;
-    if ( $] >= 5.008 ) {
-        my ( $out, $err ) = ( $self->{out}, $self->{err} );
-        eval 'binmode($out, ":utf8")';
-        eval 'binmode($err, ":utf8")' if ref $err;
+
+    if ( $self->{sel} ) {
+        if (_get_unicode()) {
+
+            # Make sure our iterator has been constructed and...
+            my $next = $self->{_next} ||= $self->_next;
+
+            # ...wrap it to do UTF8 casting
+            $self->{_next} = sub {
+                my $line = $next->();
+                return decode_utf8($line) if defined $line;
+                return;
+            };
+        }
     }
+    else {
+        if ( $] >= 5.008 ) {
+            eval 'binmode($self->{out}, ":utf8")';
+        }
+    }
+
 }
 
 ##############################################################################
@@ -181,53 +212,136 @@ sub handle_unicode {
 sub wait { shift->{wait} }
 sub exit { shift->{exit} }
 
-sub next_raw {
+use Encode qw(decode_utf8);
+
+sub _next {
     my $self = shift;
 
     if ( my $out = $self->{out} ) {
-
-        # If we have an IO::Select we need to poll it.
         if ( my $sel = $self->{sel} ) {
-            my $err  = $self->{err};
-            my $flip = 0;
+            my $err        = $self->{err};
+            my @buf        = ();
+            my $partial    = '';                    # Partial line
+            my $chunk_size = $self->{chunk_size};
+            return sub {
+                return shift @buf if @buf;
 
-            # Loops forever while we're reading from STDERR
-            while ( my @ready = $sel->can_read ) {
+                READ:
+                while ( my @ready = $sel->can_read ) {
+                    for my $fh (@ready) {
+                        my $got = sysread $fh, my ($chunk), $chunk_size;
 
-                # Load balancing :)
-                @ready = reverse @ready if $flip;
-                $flip = !$flip;
-
-                for my $fh (@ready) {
-                    if ( defined( my $line = <$fh> ) ) {
-                        if ( $fh == $err ) {
-                            warn $line;
+                        if ( $got == 0 ) {
+                            $sel->remove($fh);
+                        }
+                        elsif ( $fh == $err ) {
+                            print STDERR $chunk;    # echo STDERR
                         }
                         else {
-                            chomp $line;
-                            return $line;
+                            $chunk   = $partial . $chunk;
+                            $partial = '';
+
+                            # Make sure we have a complete line
+                            unless ( substr( $chunk, -1, 1 ) eq "\n" ) {
+                                my $nl = rindex $chunk, "\n";
+                                if ( $nl == -1 ) {
+                                    $partial = $chunk;
+                                    redo READ;
+                                }
+                                else {
+                                    $partial = substr( $chunk, $nl + 1 );
+                                    $chunk = substr( $chunk, 0, $nl );
+                                }
+                            }
+
+                            push @buf, split /\n/, $chunk;
+                            return shift @buf if @buf;
                         }
                     }
-                    else {
-                        $sel->remove($fh);
+                }
+
+                # Return partial last line
+                if ($partial) {
+                    my $last = $partial;
+                    $partial = '';
+                    return $last;
+                }
+
+                $self->_finish;
+                return;
+            };
+        }
+        else {
+            return sub {
+                if ( defined( my $line = <$out> ) ) {
+                    chomp $line;
+                    return $line;
+                }
+                $self->_finish;
+                return;
+            };
+        }
+    }
+    else {
+        return sub {
+            $self->_finish;
+            return;
+        };
+    }
+}
+
+sub next_raw {
+    my $self = shift;
+
+    if (0) {
+        if ( my $out = $self->{out} ) {
+
+            # If we have an IO::Select we need to poll it.
+            if ( my $sel = $self->{sel} ) {
+                my $err  = $self->{err};
+                my $flip = 0;
+
+                # Loops forever while we're reading from STDERR
+                while ( my @ready = $sel->can_read ) {
+
+                    # Load balancing :)
+                    @ready = reverse @ready if $flip;
+                    $flip = !$flip;
+
+                    for my $fh (@ready) {
+                        if ( defined( my $line = <$fh> ) ) {
+                            if ( $fh == $err ) {
+                                warn $line;
+                            }
+                            else {
+                                chomp $line;
+                                return $line;
+                            }
+                        }
+                        else {
+                            $sel->remove($fh);
+                        }
                     }
                 }
             }
-        }
-        else {
+            else {
 
-            # Only one handle: just a simple read
-            if ( defined( my $line = <$out> ) ) {
-                chomp $line;
-                return $line;
+                # Only one handle: just a simple read
+                if ( defined( my $line = <$out> ) ) {
+                    chomp $line;
+                    return $line;
+                }
             }
         }
+
+        # We only get here when the stream(s) is/are exhausted
+        $self->_finish;
+
+        return;
     }
-
-    # We only get here when the stream(s) is/are exhausted
-    $self->_finish;
-
-    return;
+    else {
+        return ( $self->{_next} ||= $self->_next )->();
+    }
 }
 
 sub _finish {

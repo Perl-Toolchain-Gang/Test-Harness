@@ -9,6 +9,7 @@ examples/harness-hook/hook.pl
 examples/harness-hook/lib/Harness/Hook.pm
 examples/my_exec
 examples/README
+examples/silent-harness.pl
 examples/t/10-stuff.t
 examples/t/ruby.t
 examples/test_urls.txt
@@ -80,6 +81,7 @@ t/nofork-mux.t
 t/nofork.t
 t/parse.t
 t/premature-bailout.t
+t/process.t
 t/prove.t
 t/proverun.t
 t/regression.t
@@ -89,6 +91,7 @@ t/sample-tests/bignum
 t/sample-tests/bignum_many
 t/sample-tests/combined
 t/sample-tests/combined_compat
+t/sample-tests/delayed
 t/sample-tests/descriptive
 t/sample-tests/descriptive_trailing
 t/sample-tests/die
