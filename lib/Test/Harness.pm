@@ -111,6 +111,9 @@ one of the messages in the DIAGNOSTICS section.
 sub _aggregate {
     my ( $harness, $aggregate, @tests ) = @_;
 
+    # Don't propagate to our children
+    local $ENV{HARNESS_OPTIONS};
+
     if (IS_VMS) {
 
         # Jiggery pokery doesn't appear to work on VMS - so disable it
@@ -216,6 +219,20 @@ sub _new_harness {
         switches   => \@switches,
         verbosity  => $Verbose,
     };
+
+    if ( defined( my $env_opt = $ENV{HARNESS_OPTIONS} ) ) {
+        for my $opt ( split /:/, $env_opt ) {
+            if ( $opt =~ /^j(\d*)$/ ) {
+                $args->{jobs} = $1 || 9;
+            }
+            elsif ( $opt eq 'f' ) {
+                $args->{fork} = 1;
+            }
+            else {
+                die "Unknown HARNESS_OPTIONS item: $opt\n";
+            }
+        }
+    }
 
     return TAP::Harness->new($args);
 }
@@ -484,6 +501,26 @@ or you can use the C<-v> switch in the F<prove> utility.
 If true, C<Test::Harness> will output the verbose results of running
 its tests.  Setting C<$Test::Harness::verbose> will override this,
 or you can use the C<-v> switch in the F<prove> utility.
+
+=item C<HARNESS_OPTIONS>
+
+Provide additional options to the harness. Currently supported options are:
+
+=over
+
+=item C<< j<n> >>
+
+Run <n> (default 9) parallel jobs.
+
+=item C<< f >>
+
+Use forked parallelism.
+
+=back
+
+Multiple options may be separated by colons:
+
+    HARNESS_OPTIONS=j9:f make test
 
 =back
 
