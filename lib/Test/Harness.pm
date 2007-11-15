@@ -10,6 +10,7 @@ use constant IS_VMS => ( $^O eq 'VMS' );
 use TAP::Harness            ();
 use TAP::Parser::Aggregator ();
 
+use Config;
 use Exporter;
 
 # TODO: Emulate at least some of these
@@ -107,6 +108,32 @@ one of the messages in the DIAGNOSTICS section.
 
 =cut
 
+sub _aggregate {
+    my ( $harness, $aggregate, @tests ) = @_;
+
+    my $path_sep  = $Config{path_sep};
+    my $path_pat  = qr{$path_sep};
+    my @extra_inc = _filtered_inc();
+
+    my $previous = $ENV{PERL5LIB};
+    if ($previous) {
+        push @extra_inc, split( $path_pat, $previous );
+    }
+
+    if (@extra_inc) {
+        $ENV{PERL5LIB} = join( $path_sep, @extra_inc );
+    }
+
+    $harness->aggregate_tests( $aggregate, @tests );
+
+    if ($previous) {
+        $ENV{PERL5LIB} = $previous;
+    }
+    else {
+        delete $ENV{PERL5LIB};
+    }
+}
+
 sub runtests {
     my @tests = @_;
 
@@ -116,7 +143,7 @@ sub runtests {
     my $harness   = _new_harness();
     my $aggregate = TAP::Parser::Aggregator->new();
 
-    $harness->aggregate_tests( $aggregate, @tests );
+    _aggregate( $harness, $aggregate, @tests );
 
     $harness->formatter->summary($aggregate);
 
@@ -176,7 +203,7 @@ sub _new_harness {
         }
     }
 
-    push @lib, _filtered_inc();
+    # push @lib, _filtered_inc();
 
     my $args = {
         timer      => $Timer,
@@ -192,7 +219,7 @@ sub _new_harness {
 # Get the parts of @INC which are changed from the stock list AND
 # preserve reordering of stock directories.
 sub _filtered_inc {
-    my @inc = grep { !ref } @INC; #28567
+    my @inc = grep { !ref } @INC;    #28567
 
     if (IS_VMS) {
 
@@ -289,7 +316,7 @@ sub execute_tests {
         }
     );
 
-    $harness->aggregate_tests( $aggregate, @{ $args{tests} } );
+    _aggregate( $harness, $aggregate, @{ $args{tests} } );
 
     $tot{bench} = $aggregate->elapsed;
     my @tests = $aggregate->descriptions;
