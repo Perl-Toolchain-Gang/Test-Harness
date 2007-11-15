@@ -103,7 +103,7 @@ sub new {
       or die "Must supply a command to execute";
 
     # Private. Used to frig with chunk size during testing.
-    my $chunk_size = delete $args->{_chunk_size} || 1024;
+    my $chunk_size = delete $args->{_chunk_size} || 65536;
 
     my $merge = delete $args->{merge};
     my ( $pid, $err, $sel );
