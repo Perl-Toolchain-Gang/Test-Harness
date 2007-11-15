@@ -186,7 +186,7 @@ sub handle_unicode {
     my $self = shift;
 
     if ( $self->{sel} ) {
-        if (_get_unicode()) {
+        if ( _get_unicode() ) {
 
             # Make sure our iterator has been constructed and...
             my $next = $self->{_next} ||= $self->_next;
@@ -292,56 +292,7 @@ sub _next {
 
 sub next_raw {
     my $self = shift;
-
-    if (0) {
-        if ( my $out = $self->{out} ) {
-
-            # If we have an IO::Select we need to poll it.
-            if ( my $sel = $self->{sel} ) {
-                my $err  = $self->{err};
-                my $flip = 0;
-
-                # Loops forever while we're reading from STDERR
-                while ( my @ready = $sel->can_read ) {
-
-                    # Load balancing :)
-                    @ready = reverse @ready if $flip;
-                    $flip = !$flip;
-
-                    for my $fh (@ready) {
-                        if ( defined( my $line = <$fh> ) ) {
-                            if ( $fh == $err ) {
-                                warn $line;
-                            }
-                            else {
-                                chomp $line;
-                                return $line;
-                            }
-                        }
-                        else {
-                            $sel->remove($fh);
-                        }
-                    }
-                }
-            }
-            else {
-
-                # Only one handle: just a simple read
-                if ( defined( my $line = <$out> ) ) {
-                    chomp $line;
-                    return $line;
-                }
-            }
-        }
-
-        # We only get here when the stream(s) is/are exhausted
-        $self->_finish;
-
-        return;
-    }
-    else {
-        return ( $self->{_next} ||= $self->_next )->();
-    }
+    return ( $self->{_next} ||= $self->_next )->();
 }
 
 sub _finish {
