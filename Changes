@@ -5,6 +5,7 @@ Revision history for Test-Harness
           select. Fixes #30740.
         - Made Test::Harness @INC propagation more compatible with 2.64.
           Was breaking Parrot's test suite.
+        - Added HARNESS_OPTIONS (#30676)
 
 3.01    2007-11-12
         - Fix for RHEL incpush.patch related failure.
