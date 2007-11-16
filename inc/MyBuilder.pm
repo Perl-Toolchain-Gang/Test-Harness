@@ -83,9 +83,22 @@ sub ACTION_tidy {
     }
 }
 
-sub ACTION_profile {
-    system( $^X, qw( -d:DProf -Mblib bin/prove t/ ) );
+my @profiling_target = qw( -Mblib bin/prove t/regression.t );
+
+sub ACTION_dprof {
+    system( $^X, '-d:DProf', @profiling_target );
     exec( qw( dprofpp -R ) );
+}
+
+sub ACTION_smallprof {
+    system( $^X, '-d:SmallProf', @profiling_target );
+    open( my $fh, '<', 'smallprof.out' ) or die "Can't open smallprof.out: $!";
+    @rows = grep { /\d+:/ } <$fh>;
+    close $fh;
+
+    @rows = sort { (split(/\s+/,$b))[2] <=> (split(/\s+/,$a))[2] } @rows;
+    @rows = @rows[0..30];
+    print join( '', @rows );
 }
 
 1;
