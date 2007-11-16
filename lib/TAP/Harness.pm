@@ -178,7 +178,7 @@ Typically, Perl tests are run through this.  However, anything which spits out
 TAP is fine.  You can use this argument to specify the name of the program
 (and optional switches) to run your tests with:
 
-  exec => '/usr/bin/ruby -w'
+  exec => ['/usr/bin/ruby', '-w']
   
 =item * C<merge>
 
