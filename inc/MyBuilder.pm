@@ -83,7 +83,7 @@ sub ACTION_tidy {
     }
 }
 
-my @profiling_target = qw( -Mblib bin/prove t/ );
+my @profiling_target = qw( -Mblib bin/prove --timer t/ );
 
 sub ACTION_dprof {
     system( $^X, '-d:DProf', @profiling_target );
