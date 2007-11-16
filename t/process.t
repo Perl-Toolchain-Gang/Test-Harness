@@ -18,11 +18,11 @@ use TAP::Parser::Iterator::Process;
 
 my @expect = (
     '1..5',
-    'ok 1',
+    'ok 1 00000',
     'ok 2',
     'not ok 3',
     'ok 4',
-    'ok 5',
+    'ok 5 00000',
 );
 
 my $source = File::Spec->catfile( 't', 'sample-tests', 'delayed' );

@@ -259,7 +259,7 @@ sub _next {
                 }
 
                 # Return partial last line
-                if ($partial) {
+                if (length $partial) {
                     my $last = $partial;
                     $partial = '';
                     return $last;
