@@ -440,7 +440,10 @@ sub _make_yaml_token {
 }
 
 sub _trim {
-    my $data = shift || '';
+    my $data = shift;
+
+    return '' unless defined $data;
+
     $data =~ s/^\s+//;
     $data =~ s/\s+$//;
     return $data;

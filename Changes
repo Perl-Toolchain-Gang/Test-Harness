@@ -1,5 +1,9 @@
 Revision history for Test-Harness
 
+NEXT
+        - Fixed some little bugs-waiting-to-happen inside
+          TAP::Parser::Grammar.
+
 3.02    2007-11-15
         - Process I/O now unbuffered, uses sysread, plays better with
           select. Fixes #30740.
