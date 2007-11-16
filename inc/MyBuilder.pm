@@ -83,4 +83,9 @@ sub ACTION_tidy {
     }
 }
 
+sub ACTION_profile {
+    system( $^X, qw( -d:DProf -Mblib bin/prove t/ ) );
+    exec( qw( dprofpp -R ) );
+}
+
 1;
