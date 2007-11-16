@@ -393,7 +393,7 @@ sub _make_comment_token {
     return {
         type    => 'comment',
         raw     => $line,
-        comment => _trim($1)
+        comment => _trim($comment)
     };
 }
 
