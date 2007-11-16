@@ -257,8 +257,7 @@ current line of TAP.
 sub tokenize {
     my $self = shift;
 
-    my $stream = $self->{stream};
-    my $line   = $stream->next;
+    my $line = $self->{stream}->next;
     return unless defined $line;
 
     my $token;
