@@ -206,7 +206,7 @@ Indicates whether or not the given result has a TODO or SKIP directive.
 
 sub has_directive {
     my $self = shift;
-    return ( $self->has_todo || $self->has_skip ) || '';
+    return ( $self->has_todo || $self->has_skip );
 }
 
 ##############################################################################
