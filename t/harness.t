@@ -299,7 +299,7 @@ foreach my $test_args ( get_arg_sets() ) {
 
     my @callback_log = ();
 
-    for my $evt (qw(made_parser before_runtests after_runtests)) {
+    for my $evt (qw(parser_args made_parser before_runtests after_runtests)) {
         $harness->callback(
             $evt => sub {
                 push @callback_log, $evt;
@@ -363,7 +363,7 @@ foreach my $test_args ( get_arg_sets() ) {
     cmp_ok( $callback_count, '==', 1, 'callback called once' );
     is_deeply(
         \@callback_log,
-        [ 'before_runtests', 'made_parser', 'after_runtests' ],
+        [ 'before_runtests', 'parser_args', 'made_parser', 'after_runtests' ],
         'callback log matches'
     );
     isa_ok $parser, 'TAP::Parser';
