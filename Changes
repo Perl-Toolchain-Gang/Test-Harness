@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+3.04
+
 3.03    2007-11-17
         - Fixed some little bugs-waiting-to-happen inside
           TAP::Parser::Grammar.
