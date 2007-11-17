@@ -7,8 +7,9 @@ use strict;
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS => ( $^O eq 'VMS' );
 
-use TAP::Harness            ();
-use TAP::Parser::Aggregator ();
+use TAP::Harness              ();
+use TAP::Parser::Aggregator   ();
+use TAP::Parser::Source::Perl ();
 
 use Config;
 use Exporter;
@@ -108,6 +109,12 @@ one of the messages in the DIAGNOSTICS section.
 
 =cut
 
+sub _has_taint {
+    my $test = shift;
+    return TAP::Parser::Source::Perl->get_taint(
+        TAP::Parser::Source::Perl->shebang($test) );
+}
+
 sub _aggregate {
     my ( $harness, $aggregate, @tests ) = @_;
 
@@ -125,11 +132,13 @@ sub _aggregate {
         my $path_pat  = qr{$path_sep};
         my @extra_inc = _filtered_inc();
 
+        # Supply -I switches in taint mode
         $harness->callback(
             parser_args => sub {
                 my ( $test, $args ) = @_;
-                # use Data::Dumper;
-                # warn "# ", Dumper( { test => $test, args => $args } );
+                if ( _has_taint($test) ) {
+                    push @{ $args->{switches} }, map {"-I$_"} _filtered_inc();
+                }
             }
         );
 
