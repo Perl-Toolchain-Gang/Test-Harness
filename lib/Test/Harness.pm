@@ -125,6 +125,14 @@ sub _aggregate {
         my $path_pat  = qr{$path_sep};
         my @extra_inc = _filtered_inc();
 
+        $harness->callback(
+            parser_args => sub {
+                my ( $test, $args ) = @_;
+                # use Data::Dumper;
+                # warn "# ", Dumper( { test => $test, args => $args } );
+            }
+        );
+
         my $previous = $ENV{PERL5LIB};
         local $ENV{PERL5LIB};
 

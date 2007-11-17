@@ -189,6 +189,61 @@ sub _libs2switches {
     return map {"-I$_"} grep {$_} @_;
 }
 
+=head3 C<shebang>
+
+Get the shebang line for a script file.
+
+    my $shebang = TAP::Parser::Source::Perl->shebang( $some_script );
+
+May be called as a class method
+
+=cut
+
+{
+    # Global shebang cache.
+    my %shebang_for;
+
+    sub _read_shebang {
+        my $file = shift;
+        local *TEST;
+        my $shebang;
+        if ( open( TEST, $file ) ) {
+            $shebang = <TEST>;
+            close(TEST) or print "Can't close $file. $!\n";
+        }
+        else {
+            print "Can't open $file. $!\n";
+        }
+        return $shebang;
+    }
+
+    sub shebang {
+        my ( $class, $file ) = @_;
+        unless ( exists $shebang_for{$file} ) {
+            $shebang_for{$file} = _read_shebang($file);
+        }
+        return $shebang_for{$file};
+    }
+}
+
+=head3 C<get_taint>
+
+Decode any taint switches from a Perl shebang line.
+
+    # $taint will be 't'
+    my $taint = TAP::Parser::Source::Perl->get_taint( '#!/usr/bin/perl -t' );
+
+    # $untaint will be undefined
+    my $untaint = TAP::Parser::Source::Perl->get_taint( '#!/usr/bin/perl' );    
+
+=cut
+
+sub get_taint {
+    my ( $class, $shebang ) = @_;
+    return unless $shebang =~ /^#!.*\bperl.*\s-\w*([Tt]+)/;
+    return $1;
+}
+
 sub _switches {
     my $self     = shift;
     my $file     = $self->source_file;
@@ -196,15 +251,11 @@ sub _switches {
         $self->switches,
     );
 
-    local *TEST;
-    open( TEST, $file ) or print "can't open $file. $!\n";
-    my $shebang = <TEST>;
-    close(TEST) or print "can't close $file. $!\n";
-
+    my $shebang = $self->shebang($file);
     return unless defined $shebang;
 
-    my $taint = ( $shebang =~ /^#!.*\bperl.*\s-\w*([Tt]+)/ );
-    push @switches, "-$1" if $taint;
+    my $taint = $self->get_taint($shebang);
+    push @switches, "-$taint" if defined $taint;
 
     # Quote the argument if there's any whitespace in it, or if
     # we're VMS, since VMS requires all parms quoted.  Also, don't quote
