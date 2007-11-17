@@ -200,6 +200,7 @@ May be called as a class method
 =cut
 
 {
+
     # Global shebang cache.
     my %shebang_for;
 
@@ -240,7 +241,9 @@ Decode any taint switches from a Perl shebang line.
 
 sub get_taint {
     my ( $class, $shebang ) = @_;
-    return unless $shebang =~ /^#!.*\bperl.*\s-\w*([Tt]+)/;
+    return
+      unless defined $shebang
+          && $shebang =~ /^#!.*\bperl.*\s-\w*([Tt]+)/;
     return $1;
 }
 
