@@ -1207,7 +1207,7 @@ sub _iter {
 
             return $result;
         };
-    } # _has_callbacks
+    }    # _has_callbacks
     else {
         return sub {
             my $result = eval { $grammar->tokenize };
@@ -1227,7 +1227,7 @@ sub _iter {
 
             return $result;
         };
-    } # no callbacks
+    }    # no callbacks
 }
 
 sub _finish {

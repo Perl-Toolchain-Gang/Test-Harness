@@ -85,6 +85,7 @@ my %language_for;
                 elsif ( 0 == $tests_planned ) {
                     $skip        = 'SKIP';
                     $explanation = $tail;
+
                     # Trim valid SKIP directive without being strict
                     # about its presence.
                     $explanation =~ s/^#\s*//;
