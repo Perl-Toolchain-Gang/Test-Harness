@@ -519,7 +519,7 @@ END_TAP
 
     is @die, 1, 'coverage testing for _initialize';
 
-    like pop @die, qr/PANIC:  could not determine stream at/,
+    like pop @die, qr/PANIC:\s+could not determine stream at/,
       '...and it failed as expected';
 
     @die = ();

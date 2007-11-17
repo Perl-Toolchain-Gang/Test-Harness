@@ -1,8 +1,11 @@
 Revision history for Test-Harness
 
-NEXT
+3.03    2007-11-17
         - Fixed some little bugs-waiting-to-happen inside
           TAP::Parser::Grammar.
+        - Added parser_args callback to TAP::Harness.
+        - Made @INC propagation even more compatible with 2.64 so that
+          parrot still works *and* #30796 is fixed.
 
 3.02    2007-11-15
         - Process I/O now unbuffered, uses sysread, plays better with
