@@ -351,7 +351,7 @@ sub run {
         }
 
         unless ($stream) {
-            $self->_croak("PANIC:  could not determine stream");
+            $self->_croak( 'PANIC: could not determine stream' );
         }
 
         while ( my ( $k, $v ) = each %initialize ) {
@@ -1079,7 +1079,7 @@ sub _make_state_table {
                 act => sub {
                     my ($version) = @_;
                     $self->_add_error(
-                        "More than one plan found in TAP output");
+                        'More than one plan found in TAP output');
                 },
             },
         },
@@ -1516,7 +1516,7 @@ against bleed by via anonymous checkout of the latest version:
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Curtis "Ovid" Poe, all rights reserved.
+Copyright 2006-2007 Curtis "Ovid" Poe, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
