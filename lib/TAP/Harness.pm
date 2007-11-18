@@ -537,10 +537,10 @@ sub make_parser {
     my ( $self, $test ) = @_;
 
     my $args = $self->_get_parser_args($test);
-    $self->_make_callback( 'parser_args', $test, $args );
+    $self->_make_callback( 'parser_args', $args, $test );
     my $parser = TAP::Parser->new($args);
 
-    $self->_make_callback( 'made_parser', $parser );
+    $self->_make_callback( 'made_parser', $parser, $test );
     my $session = $self->formatter->open_test( $test, $parser );
 
     return ( $parser, $session );

@@ -135,7 +135,7 @@ sub _aggregate {
         # Supply -I switches in taint mode
         $harness->callback(
             parser_args => sub {
-                my ( $test, $args ) = @_;
+                my ( $args, $test ) = @_;
                 if ( _has_taint($test) ) {
                     push @{ $args->{switches} }, map {"-I$_"} _filtered_inc();
                 }
