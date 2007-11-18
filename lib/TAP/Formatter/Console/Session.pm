@@ -193,7 +193,7 @@ sub _closures {
             # relationship changes.
 
             if ( !$plan ) {
-                my $planned = $parser->tests_planned || '0';
+                my $planned = $parser->tests_planned || '?';
                 $plan = "/$planned ";
             }
             $output = $formatter->_get_output_method($parser);

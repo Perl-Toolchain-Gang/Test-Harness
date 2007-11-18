@@ -392,7 +392,7 @@ sub _get_tests {
     my ( @tests, %tests );
 
     unless (@argv) {
-        croak "No tests named and 't' directory not found"
+        croak q{No tests named and 't' directory not found}
           unless -d 't';
         @argv = 't';
     }
