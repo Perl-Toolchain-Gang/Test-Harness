@@ -227,7 +227,9 @@ sub _closures {
         },
 
         close_test => sub {
-            if ( $show_count && !$really_quiet ) {
+            return if $really_quiet;
+
+            if ($show_count) {
                 my $spaces = ' ' x
                   length( '.' . $pretty . $plan . $parser->tests_run );
                 $formatter->$output("\r$spaces\r$pretty");
@@ -240,22 +242,20 @@ sub _closures {
                 $self->_output_test_failure($parser);
             }
             else {
-                unless ($really_quiet) {
-                    my $time_report = '';
-                    if ( $formatter->timer ) {
-                        my $start_time = $parser->start_time;
-                        my $end_time   = $parser->end_time;
-                        if ( defined $start_time and defined $end_time ) {
-                            my $elapsed = $end_time - $start_time;
-                            $time_report
-                              = $self->time_is_hires
-                              ? sprintf( ' %8d ms', $elapsed * 1000 )
-                              : sprintf( ' %8s s', $elapsed || '<1' );
-                        }
+                my $time_report = '';
+                if ( $formatter->timer ) {
+                    my $start_time = $parser->start_time;
+                    my $end_time   = $parser->end_time;
+                    if ( defined $start_time and defined $end_time ) {
+                        my $elapsed = $end_time - $start_time;
+                        $time_report
+                          = $self->time_is_hires
+                          ? sprintf( ' %8d ms', $elapsed * 1000 )
+                          : sprintf( ' %8s s', $elapsed || '<1' );
                     }
-
-                    $formatter->_output("ok$time_report\n");
                 }
+
+                $formatter->_output("ok$time_report\n");
             }
         },
     };

@@ -1,6 +1,7 @@
 Revision history for Test-Harness
 
 3.04
+        - Fixed output leakage with really_quiet set.
 
 3.03    2007-11-17
         - Fixed some little bugs-waiting-to-happen inside
