@@ -10,7 +10,7 @@ use TAP::Harness;
 
 my $HARNESS = 'TAP::Harness';
 
-plan tests => 96;
+plan tests => 106;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -111,6 +111,75 @@ foreach my $test_args ( get_arg_sets() ) {
     my $expected_status  = qr{^Result: PASS$};
     my $summary          = pop @output;
     my $expected_summary = qr{^Files=1, Tests=1,  \d+ wallclock secs};
+
+    is_deeply \@output, \@expected, '... and the output should be correct';
+    like $status, $expected_status,
+      '... and the status line should be correct';
+    like $summary, $expected_summary,
+      '... and the report summary should look correct';
+
+    # use an alias for test name
+
+    @output = ();
+    ok $aggregate
+      = _runtests( $harness, [ 't/source_tests/harness', 'My Nice Test' ] ),
+      '... runtests returns the aggregate';
+
+    isa_ok $aggregate, 'TAP::Parser::Aggregator';
+
+    chomp(@output);
+
+    @expected = (
+        'My Nice Test....',
+        '1..1',
+        '[[reset]]',
+        'ok 1 - this is a test',
+        '[[reset]]',
+        'ok',
+        'All tests successful.',
+    );
+    $status           = pop @output;
+    $expected_status  = qr{^Result: PASS$};
+    $summary          = pop @output;
+    $expected_summary = qr{^Files=1, Tests=1,  \d+ wallclock secs};
+
+    is_deeply \@output, \@expected, '... and the output should be correct';
+    like $status, $expected_status,
+      '... and the status line should be correct';
+    like $summary, $expected_summary,
+      '... and the report summary should look correct';
+
+    # run same test twice
+
+    @output = ();
+    ok $aggregate
+      = _runtests( $harness, [ 't/source_tests/harness', 'My Nice Test' ],
+        [ 't/source_tests/harness', 'My Nice Test Again' ] ),
+      '... runtests returns the aggregate';
+
+    isa_ok $aggregate, 'TAP::Parser::Aggregator';
+
+    chomp(@output);
+
+    @expected = (
+        'My Nice Test..........',
+        '1..1',
+        '[[reset]]',
+        'ok 1 - this is a test',
+        '[[reset]]',
+        'ok',
+        'My Nice Test Again....',
+        '1..1',
+        '[[reset]]',
+        'ok 1 - this is a test',
+        '[[reset]]',
+        'ok',
+        'All tests successful.',
+    );
+    $status           = pop @output;
+    $expected_status  = qr{^Result: PASS$};
+    $summary          = pop @output;
+    $expected_summary = qr{^Files=2, Tests=2,  \d+ wallclock secs};
 
     is_deeply \@output, \@expected, '... and the output should be correct';
     like $status, $expected_status,

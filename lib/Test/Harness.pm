@@ -112,7 +112,7 @@ one of the messages in the DIAGNOSTICS section.
 sub _has_taint {
     my $test = shift;
     return TAP::Parser::Source::Perl->get_taint(
-        TAP::Parser::Source::Perl->shebang($test) );
+        TAP::Parser::Source::Perl->shebang( $test ) );
 }
 
 sub _aggregate {
@@ -136,7 +136,7 @@ sub _aggregate {
         $harness->callback(
             parser_args => sub {
                 my ( $args, $test ) = @_;
-                if ( _has_taint($test) ) {
+                if ( _has_taint($test->[0]) ) {
                     push @{ $args->{switches} }, map {"-I$_"} _filtered_inc();
                 }
             }

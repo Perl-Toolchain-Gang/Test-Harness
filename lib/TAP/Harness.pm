@@ -288,12 +288,23 @@ Any keys for which the value is C<undef> will be ignored.
 
 =head3 C<runtests>
 
-  $harness->runtests(@tests);
+    $harness->runtests(@tests);
 
 Accepts and array of C<@tests> to be run.  This should generally be the names
 of test files, but this is not required.  Each element in C<@tests> will be
 passed to C<TAP::Parser::new()> as a C<source>.  See L<TAP::Parser> for more
 information.
+
+It is possible to provide aliases that will be displayed in place of the
+test name by supplying the test as a reference to an array containing
+C<< [ $test, $alias ] >>:
+
+    $harness->runtests( [ 't/foo.t', 'Foo Once' ],
+                        [ 't/foo.t', 'Foo Twice' ] );
+
+Normally it is an error to attempt to run the same test twice. Aliases
+allow you to overcome this limitation by giving each run of the test a
+unique name.
 
 Tests will be run in the order found.
 
@@ -358,7 +369,7 @@ sub _aggregate_forked {
     );
 
     while ( my ( $id, $parser ) = $iter->() ) {
-        $aggregate->add( $tests[$id], $parser );
+        $aggregate->add( $tests[$id]->[1], $parser );
     }
 
     return;
@@ -389,7 +400,7 @@ sub _aggregate_parallel {
 
                 # End of parser. Automatically removed from the mux.
                 $self->finish_parser( $parser, $session );
-                $aggregate->add( $test, $parser );
+                $aggregate->add( $test->[1], $parser );
             }
             redo RESULT;
         }
@@ -410,7 +421,7 @@ sub _aggregate_single {
         }
 
         $self->finish_parser( $parser, $session );
-        $aggregate->add( $test, $parser );
+        $aggregate->add( $test->[1], $parser );
     }
 
     return;
@@ -421,19 +432,22 @@ sub aggregate_tests {
 
     my $jobs = $self->jobs;
 
-    $self->formatter->prepare(@tests);
+    my @expanded = map { 'ARRAY' eq ref $_ ? $_ : [ $_, $_ ] } @tests;
+
+    # Formatter gets only names
+    $self->formatter->prepare( map { $_->[1] } @expanded );
     $aggregate->start;
 
     if ( $self->jobs > 1 ) {
         if ( $self->fork ) {
-            $self->_aggregate_forked( $aggregate, @tests );
+            $self->_aggregate_forked( $aggregate, @expanded );
         }
         else {
-            $self->_aggregate_parallel( $aggregate, @tests );
+            $self->_aggregate_parallel( $aggregate, @expanded );
         }
     }
     else {
-        $self->_aggregate_single( $aggregate, @tests );
+        $self->_aggregate_single( $aggregate, @expanded );
     }
 
     $aggregate->stop;
@@ -506,19 +520,20 @@ This is a bit clunky and will be cleaned up in a later release.
 
 sub _get_parser_args {
     my ( $self, $test ) = @_;
-    my %args = ();
+    my $test_prog = $test->[0];
+    my %args      = ();
     my @switches;
     @switches = $self->lib if $self->lib;
     push @switches => $self->switches if $self->switches;
     $args{switches} = \@switches;
-    $args{spool}    = $self->_open_spool($test);
+    $args{spool}    = $self->_open_spool($test_prog);
     $args{merge}    = $self->merge;
     $args{exec}     = $self->exec;
     if ( my $exec = $self->exec ) {
-        $args{exec} = [ @$exec, $test ];
+        $args{exec} = [ @$exec, $test_prog ];
     }
     else {
-        $args{source} = $test;
+        $args{source} = $test_prog;
     }
     return \%args;
 }
@@ -541,7 +556,7 @@ sub make_parser {
     my $parser = TAP::Parser->new($args);
 
     $self->_make_callback( 'made_parser', $parser, $test );
-    my $session = $self->formatter->open_test( $test, $parser );
+    my $session = $self->formatter->open_test( $test->[1], $parser );
 
     return ( $parser, $session );
 }
