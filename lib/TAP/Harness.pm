@@ -128,7 +128,7 @@ BEGIN {
 =head3 C<new>
 
  my %args = (
-    verbose => 1,
+    verbosity => 1,
     lib     => [ 'lib', 'blib/lib' ],
  )
  my $harness = TAP::Harness->new( \%args );
