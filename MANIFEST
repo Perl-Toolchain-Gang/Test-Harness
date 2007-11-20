@@ -32,6 +32,7 @@ lib/TAP/Parser/Iterator/Stream.pm
 lib/TAP/Parser/Multiplexer.pm
 lib/TAP/Parser/Result.pm
 lib/TAP/Parser/Result/Bailout.pm
+lib/TAP/Parser/Result/Begin.pm
 lib/TAP/Parser/Result/Comment.pm
 lib/TAP/Parser/Result/Plan.pm
 lib/TAP/Parser/Result/Test.pm

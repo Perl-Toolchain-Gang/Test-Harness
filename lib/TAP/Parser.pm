@@ -26,7 +26,7 @@ Version 3.04
 $VERSION = '3.04';
 
 my $DEFAULT_TAP_VERSION = 12;
-my $MAX_TAP_VERSION     = 13;
+my $MAX_TAP_VERSION     = 14;
 
 $ENV{TAP_VERSION} = $MAX_TAP_VERSION;
 
@@ -1161,7 +1161,7 @@ sub _iter {
     my $next_state = sub {
         my $token = shift;
         my $type  = $token->type;
-        my $count = 1;
+
         TRANS: {
             my $state_spec = $state_table->{$state}
               or die "Illegal state: $state";
