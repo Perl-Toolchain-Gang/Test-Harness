@@ -1,5 +1,7 @@
 TODO:
 
+    - Add test counts via --count switch.
+    - pre and post test callback to match the pre and post suite callbacks.
     - Add --start and --end switches to runtests.
     - Clear all known T::H bugs, if possible.
     - T:H to separate distro when we're ready to have do the switch.
