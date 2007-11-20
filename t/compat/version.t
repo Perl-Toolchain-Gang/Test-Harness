@@ -3,11 +3,8 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 3;
-
-BEGIN {
-    use_ok('Test::Harness');
-}
+use Test::More tests => 2;
+use Test::Harness;
 
 my $ver = $ENV{HARNESS_VERSION} or die "HARNESS_VERSION not set";
 ok( $ver =~ /^[23].\d\d(_\d\d)?$/, "Version is proper format" );
