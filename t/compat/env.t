@@ -14,7 +14,7 @@ my $test_template = <<'END';
 
 use Test::More tests => 1;
 
-is $ENV{HARNESS_PERL_SWITCHES}, '-f';
+is $ENV{HARNESS_PERL_SWITCHES}, '-w';
 END
 
 open TEST, ">env_check.t.tmp";
@@ -24,7 +24,7 @@ close TEST;
 END { unlink 'env_check.t.tmp'; }
 
 {
-    local $ENV{HARNESS_PERL_SWITCHES} = '-f';
+    local $ENV{HARNESS_PERL_SWITCHES} = '-w';
     my ( $tot, $failed )
       = Test::Harness::execute_tests( tests => ['env_check.t.tmp'] );
     is $tot->{bad}, 0;
