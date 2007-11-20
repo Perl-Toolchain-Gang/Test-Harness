@@ -53,6 +53,7 @@ t/aggregator.t
 t/bailout.t
 t/base.t
 t/callbacks.t
+t/compat/env.t
 t/compat/failure.t
 t/compat/inc-propagation.t
 t/compat/inc_taint.t
