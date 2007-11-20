@@ -33,6 +33,7 @@ my $revs = <<REVISIONS;
     547 More minor speed-ups
     548 Banish accessor bloat
     554 More accessor shaving
+    837 Before nested TAP
 REVISIONS
 
 # parse it out into a map and list
