@@ -3,11 +3,8 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 2;
-
-BEGIN {
-    use_ok('Test::Harness');
-}
+use Test::More tests => 1;
+use Test::Harness;
 
 {
     #28567

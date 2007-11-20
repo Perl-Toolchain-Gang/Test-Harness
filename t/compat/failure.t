@@ -3,13 +3,10 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 use File::Spec;
-
-BEGIN {
-    use_ok('Test::Harness');
-}
+use Test::Harness;
 
 {
 
