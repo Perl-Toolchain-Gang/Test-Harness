@@ -237,15 +237,6 @@ sub _new_harness {
         verbosity  => $Verbose,
     };
 
-    # Incomplete support for HARNESS_PERL. Because we use the exec
-    # option we're bypassing the Perl-specific processing in
-    # TAP::Parser::Source::Perl which means we don't do taint flag magic
-    # properly among other things.
-    
-    if ( defined( my $env_ep = $ENV{HARNESS_PERL} ) ) {
-        $args->{exec} = [ split /\s+/, $env_ep ];
-    }
-
     if ( defined( my $env_opt = $ENV{HARNESS_OPTIONS} ) ) {
         for my $opt ( split /:/, $env_opt ) {
             if ( $opt =~ /^j(\d*)$/ ) {

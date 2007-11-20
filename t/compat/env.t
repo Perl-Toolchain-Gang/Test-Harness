@@ -1,13 +1,19 @@
 #!/usr/bin/perl -w
 
-# Test that @INC is propogated from the harness process to the test
-# process.
+# Test that env vars are honoured.
 
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 1;
+use Test::More (
+    $^O eq 'VMS'
+    ? ( skip_all => 'VMS' )
+    : ( tests => 1 )
+);
+
 use Test::Harness;
+
+# HARNESS_PERL_SWITCHES
 
 my $test_template = <<'END';
 #!/usr/bin/perl
