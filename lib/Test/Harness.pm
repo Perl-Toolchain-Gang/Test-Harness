@@ -112,7 +112,7 @@ one of the messages in the DIAGNOSTICS section.
 sub _has_taint {
     my $test = shift;
     return TAP::Parser::Source::Perl->get_taint(
-        TAP::Parser::Source::Perl->shebang( $test ) );
+        TAP::Parser::Source::Perl->shebang($test) );
 }
 
 sub _aggregate {
@@ -136,7 +136,7 @@ sub _aggregate {
         $harness->callback(
             parser_args => sub {
                 my ( $args, $test ) = @_;
-                if ( _has_taint($test->[0]) ) {
+                if ( _has_taint( $test->[0] ) ) {
                     push @{ $args->{switches} }, map {"-I$_"} _filtered_inc();
                 }
             }
@@ -236,6 +236,15 @@ sub _new_harness {
         switches   => \@switches,
         verbosity  => $Verbose,
     };
+
+    # Incomplete support for HARNESS_PERL. Because we use the exec
+    # option we're bypassing the Perl-specific processing in
+    # TAP::Parser::Source::Perl which means we don't do taint flag magic
+    # properly among other things.
+    
+    if ( defined( my $env_ep = $ENV{HARNESS_PERL} ) ) {
+        $args->{exec} = [ split /\s+/, $env_ep ];
+    }
 
     if ( defined( my $env_opt = $ENV{HARNESS_OPTIONS} ) ) {
         for my $opt ( split /:/, $env_opt ) {

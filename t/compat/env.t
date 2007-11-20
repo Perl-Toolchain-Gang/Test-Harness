@@ -17,16 +17,16 @@ use Test::More tests => 1;
 is $ENV{HARNESS_PERL_SWITCHES}, '-w';
 END
 
-open TEST, ">env_check.t.tmp";
+open TEST, ">env_check_t.tmp";
 print TEST $test_template;
 close TEST;
 
-END { unlink 'env_check.t.tmp'; }
+END { unlink 'env_check_t.tmp'; }
 
 {
     local $ENV{HARNESS_PERL_SWITCHES} = '-w';
     my ( $tot, $failed )
-      = Test::Harness::execute_tests( tests => ['env_check.t.tmp'] );
+      = Test::Harness::execute_tests( tests => ['env_check_t.tmp'] );
     is $tot->{bad}, 0;
 }
 
