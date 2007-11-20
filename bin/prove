@@ -122,10 +122,6 @@ the test suite, sometimes running faster than C<prove>.
 C<prove>, which comes with L<Test::Harness> and whose code I've nicked in a
 few places (thanks Andy!).
 
-=head1 CAVEATS
-
-This is alpha code.  You've been warned.
-
 =cut
 
 # vim:ts=4:sw=4:et:sta
