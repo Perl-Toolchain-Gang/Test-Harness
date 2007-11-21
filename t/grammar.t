@@ -397,24 +397,8 @@ is_deeply $token, $expected,
     # but we dont care as this is coverage testing, so
     # if thats what we have to do to exercise that code,
     # so be it.
-    my $yaml = [ '  ...  ', '- 2', '  ---  ', ];
 
-    sub iter {
-        my $ar = shift;
-        return sub {
-            return shift @$ar;
-        };
-    }
-
-    my $iter = iter($yaml);
-
-    while ( my $line = $iter->() ) {
-        $stream->put($line);
-    }
-
-    # pad == '   ', marker == '--- '
-    # length $pad == 3
-    # strip == pad
+    $stream->put($_) for '  ...  ', '- 2', '  ---  ';
 
     my @die;
 
