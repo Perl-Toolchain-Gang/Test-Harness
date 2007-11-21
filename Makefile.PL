@@ -19,8 +19,11 @@ my %mm_args = (
     'EXE_FILES'   => ['bin/prove'],
 );
 
-if ( $ExtUtils::MakeMaker::VERSION >= 6.31 ) {
-    $mm_args{LICENSE} = 'perl';
+{
+    local $^W = 0; # Silence warning about non-numeric version    
+    if ( $ExtUtils::MakeMaker::VERSION >= '6.31' ) {
+        $mm_args{LICENSE} = 'perl';
+    }
 }
 
 WriteMakefile(%mm_args);
