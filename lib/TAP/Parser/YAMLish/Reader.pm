@@ -48,10 +48,7 @@ sub read {
     # restriction we'll have to implement look-ahead in the iterators.
     # Which might not be a bad idea.
     my $dots = $self->_peek;
-    # if ( defined $dots && $dots =~ $IS_END_YAML ) {
-    #     $self->_next;
-    # }
-    
+
     die "Missing '...' at end of YAMLish"
       unless defined $dots
           and $dots =~ $IS_END_YAML;

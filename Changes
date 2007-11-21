@@ -5,6 +5,7 @@ Revision history for Test-Harness
         - Progress reports for tests without plans now show
           "143/?" instead of "143/0".
         - Made TAP::Harness::runtests support aliases for test names.
+        - Implemented "TAP blocks" - structured TAP syntax.
 
 3.03    2007-11-17
         - Fixed some little bugs-waiting-to-happen inside

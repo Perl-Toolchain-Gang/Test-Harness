@@ -951,7 +951,7 @@ sub _add_error {
 }
 
 sub _make_state_table {
-    my $self = shift;
+    my ( $self, $begin_handler ) = @_;
     my %states;
     my %planned_todo = ();
 
@@ -1033,10 +1033,24 @@ sub _make_state_table {
                   } => $number;
             },
         },
+        begin => {
+            act => sub {
+                my ($begin) = @_;
+                $begin_handler->($begin);
+            },
+        },
         yaml => {
             act => sub { },
         },
     );
+
+    my $bad_plan = sub {
+        my ($test) = @_;
+        my $line = $self->plan;
+        $self->_add_error( "Plan ($line) must be at the beginning "
+              . "or end of the TAP output" );
+        $self->is_good_plan(0);
+    };
 
     # Each state contains a hash the keys of which match a token type. For
     # each token
@@ -1071,16 +1085,19 @@ sub _make_state_table {
                 },
                 goto => 'PLAN'
             },
-            plan => { goto => 'PLANNED' },
-            test => { goto => 'UNPLANNED' },
+            plan  => { goto => 'PLANNED' },
+            test  => { goto => 'UNPLANNED' },
+            begin => { goto => 'UNPLANNED' },
         },
         PLAN => {
-            plan => { goto => 'PLANNED' },
-            test => { goto => 'UNPLANNED' },
+            plan  => { goto => 'PLANNED' },
+            test  => { goto => 'UNPLANNED' },
+            begin => { goto => 'UNPLANNED' },
         },
         PLANNED => {
-            test => { goto => 'PLANNED_AFTER_TEST' },
-            plan => {
+            test  => { goto => 'PLANNED_AFTER_TEST' },
+            begin => { goto => 'PLANNED_AFTER_TEST' },
+            plan  => {
                 act => sub {
                     my ($version) = @_;
                     $self->_add_error(
@@ -1089,32 +1106,32 @@ sub _make_state_table {
             },
         },
         PLANNED_AFTER_TEST => {
-            test => { goto => 'PLANNED_AFTER_TEST' },
-            plan => { act  => sub { }, continue => 'PLANNED' },
-            yaml => { goto => 'PLANNED' },
+            test  => { goto => 'PLANNED_AFTER_TEST' },
+            begin => { goto => 'PLANNED_AFTER_TEST' },
+            plan  => { act  => sub { }, continue => 'PLANNED' },
+            yaml  => { goto => 'PLANNED' },
         },
         GOT_PLAN => {
             test => {
-                act => sub {
-                    my ($plan) = @_;
-                    my $line = $self->plan;
-                    $self->_add_error(
-                            "Plan ($line) must be at the beginning "
-                          . "or end of the TAP output" );
-                    $self->is_good_plan(0);
-                },
+                act      => $bad_plan,
+                continue => 'PLANNED'
+            },
+            begin => {
+                act      => $bad_plan,
                 continue => 'PLANNED'
             },
             plan => { continue => 'PLANNED' },
         },
         UNPLANNED => {
-            test => { goto => 'UNPLANNED_AFTER_TEST' },
-            plan => { goto => 'GOT_PLAN' },
+            test  => { goto => 'UNPLANNED_AFTER_TEST' },
+            begin => { goto => 'UNPLANNED_AFTER_TEST' },
+            plan  => { goto => 'GOT_PLAN' },
         },
         UNPLANNED_AFTER_TEST => {
-            test => { act  => sub { }, continue => 'UNPLANNED' },
-            plan => { act  => sub { }, continue => 'UNPLANNED' },
-            yaml => { goto => 'PLANNED' },
+            test  => { act  => sub { }, continue => 'UNPLANNED' },
+            begin => { act  => sub { }, continue => 'UNPLANNED' },
+            plan  => { act  => sub { }, continue => 'UNPLANNED' },
+            yaml  => { goto => 'PLANNED' },
         },
     );
 
@@ -1150,12 +1167,48 @@ determine the readiness of this parser.
 sub get_select_handles { shift->_stream->get_select_handles }
 
 sub _iter {
-    my $self        = shift;
-    my $stream      = $self->_stream;
-    my $spool       = $self->_spool;
-    my $grammar     = $self->_grammar;
-    my $state       = 'INIT';
-    my $state_table = $self->_make_state_table;
+    my $self    = shift;
+    my $stream  = $self->_stream;
+    my $spool   = $self->_spool;
+    my $grammar = $self->_grammar;
+    my $state   = 'INIT';
+    my @stack   = ();
+    my @context = ();
+
+    # Handle begin directive
+    my $begin_handler = sub {
+        my $begin = shift;
+        push @stack,   $state;
+        push @context, $begin->number;
+        $state = 'INIT';
+        my $next_line = $grammar->peek;
+        if ( defined $next_line && $next_line =~ /^(\s+)/ ) {
+            $grammar->push_indented_reader($1);
+        }
+        else {
+            $self->_add_error('Empty begin block');
+        }
+    };
+
+    # Handle end of stream - which means either pop a block or finish
+    my $end_handler = sub {
+        if (@stack) {
+            $state = pop @stack;
+            pop @context;
+            $grammar->pop_reader;
+
+            # Recurse to get another token
+            return $self->next;
+        }
+        else {
+            $self->exit( $stream->exit );
+            $self->wait( $stream->wait );
+            $self->_finish;
+            return;
+        }
+    };
+
+    my $state_table = $self->_make_state_table($begin_handler);
 
     # Make next_state closure
     my $next_state = sub {
@@ -1188,6 +1241,7 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
+                $result->context(@context) if @context;
                 $result = $next_state->($result);
 
                 if ( my $code = $self->_callback_for( $result->type ) ) {
@@ -1203,11 +1257,9 @@ sub _iter {
                 print {$spool} $result->raw, "\n" if $spool;
             }
             else {
-                $self->exit( $stream->exit );
-                $self->wait( $stream->wait );
-                $self->_finish;
-
-                $self->_make_callback( 'EOF', $result );
+                $result = $end_handler->();
+                $self->_make_callback( 'EOF', $result )
+                  unless defined $result;
             }
 
             return $result;
@@ -1219,15 +1271,14 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
+                $result->context(@context) if @context;
                 $result = $next_state->($result);
 
                 # Echo TAP to spool file
                 print {$spool} $result->raw, "\n" if $spool;
             }
             else {
-                $self->exit( $stream->exit );
-                $self->wait( $stream->wait );
-                $self->_finish;
+                $result = $end_handler->();
             }
 
             return $result;

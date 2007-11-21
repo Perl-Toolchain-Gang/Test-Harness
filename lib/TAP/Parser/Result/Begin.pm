@@ -52,16 +52,6 @@ sub _number {
     $self->{test_num} = $number;
 }
 
-=head3 C<indent>
-
-  my $indent = $result->indent
-
-Get the indent: a string containing a number of spaces.
-
-=cut
-
-sub indent { shift->{indent} }
-
 ##############################################################################
 
 =head3 C<description>

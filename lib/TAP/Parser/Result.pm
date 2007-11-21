@@ -251,4 +251,17 @@ sub set_directive {
     $self->{directive} = $dir;
 }
 
+=head3 C<context>
+
+Set or get the context of this result. For nested TAP blocks the context
+is a list of test numbers corresponding to any containing tests.
+
+=cut
+
+sub context {
+    my ( $self, @context ) = @_;
+    $self->{context} = \@context if @context;
+    return @{ $self->{context} };
+}
+
 1;

@@ -213,7 +213,7 @@ is_deeply $token, $expected,
 
 # begin directive
 
-my $begin = '  begin 12 Start something';
+my $begin = 'begin 12 Start something';
 like $begin, $syntax_for{'begin'},
   'Begin blocks should match the begin syntax';
 
@@ -225,15 +225,14 @@ $expected = {
     'type'        => 'begin',
     'description' => 'Start something',
     'test_num'    => 12,
-    'indent'      => '  ',
-    'raw'         => '  begin 12 Start something',
+    'raw'         => 'begin 12 Start something',
 };
 is_deeply $token, $expected,
   '... and the token should contain the correct data';
 
 # begin directive, no description
 
-$begin = ' begin 12';
+$begin = 'begin 12';
 like $begin, $syntax_for{'begin'},
   'Begin blocks should match the begin syntax';
 
@@ -245,8 +244,7 @@ $expected = {
     'type'        => 'begin',
     'description' => '',
     'test_num'    => 12,
-    'indent'      => ' ',
-    'raw'         => ' begin 12',
+    'raw'         => 'begin 12',
 };
 is_deeply $token, $expected,
   '... and the token should contain the correct data';

@@ -53,6 +53,7 @@ t/000-load.t
 t/aggregator.t
 t/bailout.t
 t/base.t
+t/blocks.t
 t/callbacks.t
 t/compat/env.t
 t/compat/failure.t
@@ -91,6 +92,7 @@ t/results.t
 t/sample-tests/bailout
 t/sample-tests/bignum
 t/sample-tests/bignum_many
+t/sample-tests/blocks
 t/sample-tests/combined
 t/sample-tests/combined_compat
 t/sample-tests/delayed
