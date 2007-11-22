@@ -59,9 +59,9 @@ This provides console orientated output formatting for TAP::Harness.
  my %args = (
     formatter => $self,
  )
- my $harness = TAP::Formatter::Console->new( \%args );
+ my $harness = TAP::Formatter::Console::Session->new( \%args );
 
-The constructor returns a new C<TAP::Formatter::Console> object. The following options are allowed:
+The constructor returns a new C<TAP::Formatter::Console::Session> object.
 
 =over 4
 
