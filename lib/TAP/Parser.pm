@@ -50,7 +50,6 @@ BEGIN {    # making accessors
         tests_run
         wait
         version
-        in_todo
         start_time
         end_time
         skip_all
@@ -645,14 +644,6 @@ directive.
 Note that TODO tests I<always> pass.  If you need to know whether or not
 they really passed, check the C<is_actual_ok> method.
 
-=head3 C<in_todo>
-
-  if ( $parser->in_todo ) { ... }
-
-True while the most recent result was a TODO. Becomes true before the
-TODO result is returned and stays true until just before the next non-
-TODO test is returned.
-
 =head1 TOTAL RESULTS
 
 After parsing the TAP, there are many methods available to let you dig through
@@ -998,7 +989,6 @@ sub _make_state_table {
 
                 my $has_todo = $test->has_todo;
 
-                $self->in_todo($has_todo);
                 if ( defined( my $tests_planned = $self->tests_planned ) ) {
                     if ( $tests_run > $tests_planned ) {
                         $test->is_unplanned(1);

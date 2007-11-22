@@ -6,6 +6,7 @@ Revision history for Test-Harness
           "143/?" instead of "143/0".
         - Made TAP::Harness::runtests support aliases for test names.
         - Implemented "TAP blocks" - structured TAP syntax.
+        - Removed internally unused, untested TAP::Parser::in_todo.
 
 3.03    2007-11-17
         - Fixed some little bugs-waiting-to-happen inside
