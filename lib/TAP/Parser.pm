@@ -941,10 +941,34 @@ sub _add_error {
     return $self;
 }
 
-sub _make_state_table {
-    my ( $self, $begin_handler ) = @_;
-    my %states;
+=head3 C<get_select_handles>
+
+Get an a list of file handles which can be passed to C<select> to
+determine the readiness of this parser.
+
+=cut
+
+sub get_select_handles { shift->_stream->get_select_handles }
+
+# This is a very long function. Sorry about that. Lots of closures need
+# to share the same scope.
+sub _iter {
+    my $self         = shift;
+    my $stream       = $self->_stream;
+    my $spool        = $self->_spool;
+    my $grammar      = $self->_grammar;
+    my $state        = 'INIT';
+    my @stack        = ();
+    my @context      = ();
     my %planned_todo = ();
+
+    my $bad_plan = sub {
+        my ($test) = @_;
+        my $line = $self->plan;
+        $self->_add_error( "Plan ($line) must be at the beginning "
+              . "or end of the TAP output" );
+        $self->is_good_plan(0);
+    };
 
     # These transitions are defaults for all states
     my %state_globals = (
@@ -1025,22 +1049,23 @@ sub _make_state_table {
         },
         begin => {
             act => sub {
-                my ($begin) = @_;
-                $begin_handler->($begin);
+                my $begin = shift;
+                push @stack,   $state;
+                push @context, $begin->number;
+                $state = 'INIT';
+                my $next_line = $grammar->peek;
+                if ( defined $next_line && $next_line =~ /^(\s+)/ ) {
+                    $grammar->push_indented_reader($1);
+                }
+                else {
+                    $self->_add_error('Empty begin block');
+                }
             },
         },
         yaml => {
             act => sub { },
         },
     );
-
-    my $bad_plan = sub {
-        my ($test) = @_;
-        my $line = $self->plan;
-        $self->_add_error( "Plan ($line) must be at the beginning "
-              . "or end of the TAP output" );
-        $self->is_good_plan(0);
-    };
 
     # Each state contains a hash the keys of which match a token type. For
     # each token
@@ -1050,7 +1075,7 @@ sub _make_state_table {
     #            missing
     #   continue Goto the new state and run the new state for the
     #            current token
-    %states = (
+    my %state_table = (
         INIT => {
             version => {
                 act => sub {
@@ -1126,10 +1151,10 @@ sub _make_state_table {
     );
 
     # Apply globals and defaults to state table
-    for my $name ( sort keys %states ) {
+    for my $name ( sort keys %state_table ) {
 
         # Merge with globals
-        my $st = { %state_globals, %{ $states{$name} } };
+        my $st = { %state_globals, %{ $state_table{$name} } };
 
         # Add defaults
         for my $next ( sort keys %{$st} ) {
@@ -1141,43 +1166,32 @@ sub _make_state_table {
         }
 
         # Stuff back in table
-        $states{$name} = $st;
+        $state_table{$name} = $st;
     }
 
-    return \%states;
-}
+    # Make next_state closure
+    my $next_state = sub {
+        my $token = shift;
+        my $type  = $token->type;
 
-=head3 C<get_select_handles>
+        TRANS: {
+            my $state_spec = $state_table{$state}
+              or die "Illegal state: $state";
 
-Get an a list of file handles which can be passed to C<select> to
-determine the readiness of this parser.
-
-=cut
-
-sub get_select_handles { shift->_stream->get_select_handles }
-
-sub _iter {
-    my $self    = shift;
-    my $stream  = $self->_stream;
-    my $spool   = $self->_spool;
-    my $grammar = $self->_grammar;
-    my $state   = 'INIT';
-    my @stack   = ();
-    my @context = ();
-
-    # Handle begin directive
-    my $begin_handler = sub {
-        my $begin = shift;
-        push @stack,   $state;
-        push @context, $begin->number;
-        $state = 'INIT';
-        my $next_line = $grammar->peek;
-        if ( defined $next_line && $next_line =~ /^(\s+)/ ) {
-            $grammar->push_indented_reader($1);
+            if ( my $next = $state_spec->{$type} ) {
+                if ( my $act = $next->{act} ) {
+                    $act->($token);
+                }
+                if ( my $cont = $next->{continue} ) {
+                    $state = $cont;
+                    redo TRANS;
+                }
+                elsif ( my $goto = $next->{goto} ) {
+                    $state = $goto;
+                }
+            }
         }
-        else {
-            $self->_add_error('Empty begin block');
-        }
+        return $token;
     };
 
     # Handle end of stream - which means either pop a block or finish
@@ -1198,33 +1212,9 @@ sub _iter {
         }
     };
 
-    my $state_table = $self->_make_state_table($begin_handler);
-
-    # Make next_state closure
-    my $next_state = sub {
-        my $token = shift;
-        my $type  = $token->type;
-
-        TRANS: {
-            my $state_spec = $state_table->{$state}
-              or die "Illegal state: $state";
-
-            if ( my $next = $state_spec->{$type} ) {
-                if ( my $act = $next->{act} ) {
-                    $act->($token);
-                }
-                if ( my $cont = $next->{continue} ) {
-                    $state = $cont;
-                    redo TRANS;
-                }
-                elsif ( my $goto = $next->{goto} ) {
-                    $state = $goto;
-                }
-            }
-        }
-        return $token;
-    };
-
+    # Finally make the closure that we return. For performance reasons
+    # there are two versions of the returned function: one that handles
+    # callbacks and one that does not.
     if ( $self->_has_callbacks ) {
         return sub {
             my $result = eval { $grammar->tokenize };
