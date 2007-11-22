@@ -47,7 +47,12 @@ sub new {
     my ( $class, $stream ) = @_;
     my $self;
     $self = bless {
-        reader => sub {
+        reader => 'CODE' eq ref $stream
+        ? sub {
+            my $pb = $self->{pushback};
+            return ( @$pb ? shift @$pb : $stream->(), '' );
+          }
+        : sub {
             my $pb = $self->{pushback};
             return ( @$pb ? shift @$pb : $stream->next, '' );
         },
