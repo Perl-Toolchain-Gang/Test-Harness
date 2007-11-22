@@ -303,26 +303,30 @@ sub run {
 
         # everything here is basically designed to convert any TAP source to a
         # stream.
-        $arg_for ||= {};
 
-        $self->SUPER::_initialize( $arg_for, \@legal_callback );
+        # Shallow copy
+        my %args = %{ $arg_for || {} };
 
-        # XXX why delete() ?
-        my $stream = delete $arg_for->{stream};
-        my $tap    = delete $arg_for->{tap};
-        my $source = delete $arg_for->{source};
-        my $exec   = delete $arg_for->{exec};
-        my $merge  = delete $arg_for->{merge};
-        my $spool  = delete $arg_for->{spool};
+        $self->SUPER::_initialize( \%args, \@legal_callback );
 
-        if ( 1 < grep {defined} $stream, $tap, $source ) {
+        my $stream   = delete $args{stream};
+        my $tap      = delete $args{tap};
+        my $source   = delete $args{source};
+        my $exec     = delete $args{exec};
+        my $merge    = delete $args{merge};
+        my $spool    = delete $args{spool};
+        my $switches = delete $args{switches};
+
+        if ( 1 < grep {defined} $stream, $tap, $source, $exec ) {
             $self->_croak(
-                "You may only choose one of 'stream', 'tap', or 'source'");
+                "You may only choose one of 'exec', 'stream', 'tap' or 'source'"
+            );
         }
-        if ( $source && $exec ) {
-            $self->_croak(
-                '"source" and "exec" are mutually exclusive options');
+
+        if ( my @excess = sort keys %args ) {
+            $self->_croak("Unknown options: @excess");
         }
+
         if ($tap) {
             $stream = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
         }
@@ -340,8 +344,8 @@ sub run {
 
                 my $perl = TAP::Parser::Source::Perl->new;
 
-                $perl->switches( $arg_for->{switches} )
-                  if $arg_for->{switches};
+                $perl->switches($switches)
+                  if $switches;
 
                 $perl->merge($merge);    # XXX args to new()?
 
@@ -1011,8 +1015,6 @@ sub _iter {
                     $test->set_directive('TODO');
                 }
 
-                my $has_todo = $test->has_todo;
-
                 if ( defined( my $tests_planned = $self->tests_planned ) ) {
                     if ( $tests_run > $tests_planned ) {
                         $test->is_unplanned(1);
@@ -1030,12 +1032,12 @@ sub _iter {
                     $test->_number( $number = $tests_run );
                 }
 
-                push @{ $self->{todo} } => $number if $has_todo;
+                push @{ $self->{todo} } => $number
+                  if $test->has_todo;
                 push @{ $self->{todo_passed} } => $number
                   if $test->todo_passed;
                 push @{ $self->{skipped} } => $number
                   if $test->has_skip;
-
                 push @{ $self->{ $test->is_ok ? 'passed' : 'failed' } } =>
                   $number;
                 push @{

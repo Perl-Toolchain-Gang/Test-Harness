@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 260;
+use Test::More tests => 258;
 use IO::c55Capture;
 
 use File::Spec;
@@ -540,24 +540,7 @@ END_TAP
     is @die, 1, 'coverage testing for _initialize';
 
     like pop @die,
-      qr/You may only choose one of 'stream', 'tap', or 'source'/,
-      '...and it failed as expected';
-
-    @die = ();
-
-    eval {
-        local $SIG{__DIE__} = sub { push @die, @_ };
-
-        $PARSER->new(
-            {   source => 'source',    # only one of these is allowed
-                exec   => 'exec'
-            }
-        );
-    };
-
-    is @die, 1, 'coverage testing for _initialize';
-
-    like pop @die, qr/"source" and "exec" are mutually exclusive options/,
+      qr/You may only choose one of 'exec', 'stream', 'tap' or 'source'/,
       '...and it failed as expected';
 }
 
