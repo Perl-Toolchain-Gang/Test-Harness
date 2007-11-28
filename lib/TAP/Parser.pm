@@ -26,7 +26,7 @@ Version 3.04
 $VERSION = '3.04';
 
 my $DEFAULT_TAP_VERSION = 12;
-my $MAX_TAP_VERSION     = 14;
+my $MAX_TAP_VERSION     = 13;
 
 $ENV{TAP_VERSION} = $MAX_TAP_VERSION;
 
@@ -50,6 +50,7 @@ BEGIN {    # making accessors
         tests_run
         wait
         version
+        in_todo
         start_time
         end_time
         skip_all
@@ -648,6 +649,14 @@ directive.
 Note that TODO tests I<always> pass.  If you need to know whether or not
 they really passed, check the C<is_actual_ok> method.
 
+=head3 C<in_todo>
+
+  if ( $parser->in_todo ) { ... }
+
+True while the most recent result was a TODO. Becomes true before the
+TODO result is returned and stays true until just before the next non-
+TODO test is returned.
+
 =head1 TOTAL RESULTS
 
 After parsing the TAP, there are many methods available to let you dig through
@@ -945,34 +954,10 @@ sub _add_error {
     return $self;
 }
 
-=head3 C<get_select_handles>
-
-Get an a list of file handles which can be passed to C<select> to
-determine the readiness of this parser.
-
-=cut
-
-sub get_select_handles { shift->_stream->get_select_handles }
-
-# This is a very long function. Sorry about that. Lots of closures need
-# to share the same scope.
-sub _iter {
-    my $self         = shift;
-    my $stream       = $self->_stream;
-    my $spool        = $self->_spool;
-    my $grammar      = $self->_grammar;
-    my $state        = 'INIT';
-    my @stack        = ();
-    my @context      = ();
+sub _make_state_table {
+    my $self = shift;
+    my %states;
     my %planned_todo = ();
-
-    my $bad_plan = sub {
-        my ($test) = @_;
-        my $line = $self->plan;
-        $self->_add_error( "Plan ($line) must be at the beginning "
-              . "or end of the TAP output" );
-        $self->is_good_plan(0);
-    };
 
     # These transitions are defaults for all states
     my %state_globals = (
@@ -1015,6 +1000,9 @@ sub _iter {
                     $test->set_directive('TODO');
                 }
 
+                my $has_todo = $test->has_todo;
+
+                $self->in_todo($has_todo);
                 if ( defined( my $tests_planned = $self->tests_planned ) ) {
                     if ( $tests_run > $tests_planned ) {
                         $test->is_unplanned(1);
@@ -1032,12 +1020,12 @@ sub _iter {
                     $test->_number( $number = $tests_run );
                 }
 
-                push @{ $self->{todo} } => $number
-                  if $test->has_todo;
+                push @{ $self->{todo} } => $number if $has_todo;
                 push @{ $self->{todo_passed} } => $number
                   if $test->todo_passed;
                 push @{ $self->{skipped} } => $number
                   if $test->has_skip;
+
                 push @{ $self->{ $test->is_ok ? 'passed' : 'failed' } } =>
                   $number;
                 push @{
@@ -1047,21 +1035,6 @@ sub _iter {
                         : 'actual_failed'
                       }
                   } => $number;
-            },
-        },
-        begin => {
-            act => sub {
-                my $begin = shift;
-                push @stack,   $state;
-                push @context, $begin->number;
-                $state = 'INIT';
-                my $next_line = $grammar->peek;
-                if ( defined $next_line && $next_line =~ /^(\s+)/ ) {
-                    $grammar->push_indented_reader($1);
-                }
-                else {
-                    $self->_add_error('Empty begin block');
-                }
             },
         },
         yaml => {
@@ -1077,7 +1050,7 @@ sub _iter {
     #            missing
     #   continue Goto the new state and run the new state for the
     #            current token
-    my %state_table = (
+    %states = (
         INIT => {
             version => {
                 act => sub {
@@ -1102,19 +1075,16 @@ sub _iter {
                 },
                 goto => 'PLAN'
             },
-            plan  => { goto => 'PLANNED' },
-            test  => { goto => 'UNPLANNED' },
-            begin => { goto => 'UNPLANNED' },
+            plan => { goto => 'PLANNED' },
+            test => { goto => 'UNPLANNED' },
         },
         PLAN => {
-            plan  => { goto => 'PLANNED' },
-            test  => { goto => 'UNPLANNED' },
-            begin => { goto => 'UNPLANNED' },
+            plan => { goto => 'PLANNED' },
+            test => { goto => 'UNPLANNED' },
         },
         PLANNED => {
-            test  => { goto => 'PLANNED_AFTER_TEST' },
-            begin => { goto => 'PLANNED_AFTER_TEST' },
-            plan  => {
+            test => { goto => 'PLANNED_AFTER_TEST' },
+            plan => {
                 act => sub {
                     my ($version) = @_;
                     $self->_add_error(
@@ -1123,40 +1093,40 @@ sub _iter {
             },
         },
         PLANNED_AFTER_TEST => {
-            test  => { goto => 'PLANNED_AFTER_TEST' },
-            begin => { goto => 'PLANNED_AFTER_TEST' },
-            plan  => { act  => sub { }, continue => 'PLANNED' },
-            yaml  => { goto => 'PLANNED' },
+            test => { goto => 'PLANNED_AFTER_TEST' },
+            plan => { act  => sub { }, continue => 'PLANNED' },
+            yaml => { goto => 'PLANNED' },
         },
         GOT_PLAN => {
             test => {
-                act      => $bad_plan,
-                continue => 'PLANNED'
-            },
-            begin => {
-                act      => $bad_plan,
+                act => sub {
+                    my ($plan) = @_;
+                    my $line = $self->plan;
+                    $self->_add_error(
+                            "Plan ($line) must be at the beginning "
+                          . "or end of the TAP output" );
+                    $self->is_good_plan(0);
+                },
                 continue => 'PLANNED'
             },
             plan => { continue => 'PLANNED' },
         },
         UNPLANNED => {
-            test  => { goto => 'UNPLANNED_AFTER_TEST' },
-            begin => { goto => 'UNPLANNED_AFTER_TEST' },
-            plan  => { goto => 'GOT_PLAN' },
+            test => { goto => 'UNPLANNED_AFTER_TEST' },
+            plan => { goto => 'GOT_PLAN' },
         },
         UNPLANNED_AFTER_TEST => {
-            test  => { act  => sub { }, continue => 'UNPLANNED' },
-            begin => { act  => sub { }, continue => 'UNPLANNED' },
-            plan  => { act  => sub { }, continue => 'UNPLANNED' },
-            yaml  => { goto => 'PLANNED' },
+            test => { act  => sub { }, continue => 'UNPLANNED' },
+            plan => { act  => sub { }, continue => 'UNPLANNED' },
+            yaml => { goto => 'PLANNED' },
         },
     );
 
     # Apply globals and defaults to state table
-    for my $name ( sort keys %state_table ) {
+    for my $name ( sort keys %states ) {
 
         # Merge with globals
-        my $st = { %state_globals, %{ $state_table{$name} } };
+        my $st = { %state_globals, %{ $states{$name} } };
 
         # Add defaults
         for my $next ( sort keys %{$st} ) {
@@ -1168,16 +1138,36 @@ sub _iter {
         }
 
         # Stuff back in table
-        $state_table{$name} = $st;
+        $states{$name} = $st;
     }
+
+    return \%states;
+}
+
+=head3 C<get_select_handles>
+
+Get an a list of file handles which can be passed to C<select> to
+determine the readiness of this parser.
+
+=cut
+
+sub get_select_handles { shift->_stream->get_select_handles }
+
+sub _iter {
+    my $self        = shift;
+    my $stream      = $self->_stream;
+    my $spool       = $self->_spool;
+    my $grammar     = $self->_grammar;
+    my $state       = 'INIT';
+    my $state_table = $self->_make_state_table;
 
     # Make next_state closure
     my $next_state = sub {
         my $token = shift;
         my $type  = $token->type;
-
+        my $count = 1;
         TRANS: {
-            my $state_spec = $state_table{$state}
+            my $state_spec = $state_table->{$state}
               or die "Illegal state: $state";
 
             if ( my $next = $state_spec->{$type} ) {
@@ -1198,20 +1188,10 @@ sub _iter {
 
     # Handle end of stream - which means either pop a block or finish
     my $end_handler = sub {
-        if (@stack) {
-            $state = pop @stack;
-            pop @context;
-            $grammar->pop_reader;
-
-            # Recurse to get another token
-            return $self->next;
-        }
-        else {
-            $self->exit( $stream->exit );
-            $self->wait( $stream->wait );
-            $self->_finish;
-            return;
-        }
+        $self->exit( $stream->exit );
+        $self->wait( $stream->wait );
+        $self->_finish;
+        return;
     };
 
     # Finally make the closure that we return. For performance reasons
@@ -1223,7 +1203,6 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
-                $result->context(@context) if @context;
                 $result = $next_state->($result);
 
                 if ( my $code = $self->_callback_for( $result->type ) ) {
@@ -1253,7 +1232,6 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
-                $result->context(@context) if @context;
                 $result = $next_state->($result);
 
                 # Echo TAP to spool file

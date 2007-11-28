@@ -45,21 +45,7 @@ Returns TAP grammar object that will parse the specified stream.
 
 sub new {
     my ( $class, $stream ) = @_;
-    my $self;
-    $self = bless {
-        reader => 'CODE' eq ref $stream
-        ? sub {
-            my $pb = $self->{pushback};
-            return ( @$pb ? shift @$pb : $stream->(), '' );
-          }
-        : sub {
-            my $pb = $self->{pushback};
-            return ( @$pb ? shift @$pb : $stream->next, '' );
-        },
-        stream       => $stream,
-        reader_stack => [],
-        pushback     => [],
-    }, $class;
+    my $self = bless { stream => $stream }, $class;
     $self->set_version(12);
     return $self;
 }
@@ -200,35 +186,15 @@ my %language_for;
         },
     );
 
-    my %v14 = (
-        %v13,
-        begin => {
-            syntax  => qr/^ begin \s+ (\d+) \s* (.*) $/x,
-            handler => sub {
-                my ( $self, $line ) = @_;
-                my ( $number, $desc ) = ( $1, $2 );
-                return $self->_make_begin_token( $line, $number, $desc );
-              }
-        },
-    );
-
-    my %setup_unicode = (
-        setup => sub {
-            shift->{stream}->handle_unicode;
-        }
-    );
-
     %language_for = (
         '12' => {
             tokens => \%v12,
         },
         '13' => {
             tokens => \%v13,
-            %setup_unicode,
-        },
-        '14' => {
-            tokens => \%v14,
-            %setup_unicode,
+            setup  => sub {
+                shift->{stream}->handle_unicode;
+            },
         },
     );
 }
@@ -292,7 +258,7 @@ current line of TAP.
 sub tokenize {
     my $self = shift;
 
-    my ( $line, $pad ) = $self->{reader}->();
+    my $line = $self->{stream}->next;
     return unless defined $line;
 
     my $token;
@@ -374,78 +340,6 @@ sub handler_for {
     return $self->{tokens}->{$type}->{handler};
 }
 
-=head3 C<unread>
-
-Push a line of text back onto the input stream.
-
-=cut
-
-sub unread {
-    my ( $self, $line ) = @_;
-    push @{ $self->{pushback} }, $line;
-}
-
-=head3 C<peek>
-
-Peek non-destructively at the next line of input.
-
-=cut
-
-sub peek {
-    my $self = shift;
-    my ( $line, $pad ) = $self->{reader}->();
-    $self->unread( $pad . $line );
-    return $line;
-}
-
-=head3 C<push_indented_reader>
-
-Push onto the reader stack a reader that will read lines as long as they
-are indented by C<$pad> spaces.
-
-=cut
-
-sub push_indented_reader {
-    my ( $self, $pad ) = @_;
-
-    my $top_reader = $self->{reader};
-
-    push @{ $self->{reader_stack} }, $top_reader;
-
-    my $leader = length($pad);
-    my $strip  = qr{ ^ (?: \s{$leader} ) (.*) $ }x;
-
-    # TODO: This doesn't work. It's impossible to make sense of how much
-    # stripping will have been done on the pushback.
-
-    return $self->{reader} = sub {
-        my ( $line, $opad ) = $top_reader->();
-
-        return unless defined $line;
-        return ( $1, $opad . $pad ) if $line =~ $strip;
-        $self->unread( $opad . $line );
-        return;
-    };
-
-}
-
-=head3 C<pop_reader>
-
-Pop a reader from the stack.
-
-=cut
-
-sub pop_reader {
-    my $self = shift;
-    unless ( @{ $self->{reader_stack} } ) {
-        require Carp;
-        Carp::croak("Reader stack empty");
-    }
-
-    $self->{reader} = pop @{ $self->{reader_stack} };
-    return;
-}
-
 sub _make_version_token {
     my ( $self, $line, $version ) = @_;
     return {
@@ -472,19 +366,9 @@ sub _make_plan_token {
     };
 }
 
-sub _make_begin_token {
-    my ( $self, $line, $num, $desc ) = @_;
-    return {
-        test_num    => $num,
-        description => _trim($desc),
-        raw         => $line,
-        type        => 'begin',
-    };
-}
-
 sub _make_test_token {
     my ( $self, $line, $ok, $num, $desc, $dir, $explanation ) = @_;
-    return {
+    my %test = (
         ok          => $ok,
         test_num    => $num,
         description => _trim($desc),
@@ -492,7 +376,8 @@ sub _make_test_token {
         explanation => _trim($explanation),
         raw         => $line,
         type        => 'test',
-    };
+    );
+    return \%test;
 }
 
 sub _make_unknown_token {
@@ -526,15 +411,21 @@ sub _make_yaml_token {
 
     my $yaml = TAP::Parser::YAMLish::Reader->new;
 
-    $self->unread( $pad . $marker );
-    my $rdr  = $self->push_indented_reader($pad);
-    my $data = $yaml->read(
-        sub {
-            my ( $line, $pad ) = $rdr->();
-            return $line;
-        }
-    );
-    $self->pop_reader;
+    my $stream = $self->{stream};
+
+    # Construct a reader that reads from our input stripping leading
+    # spaces from each line.
+    my $leader = length($pad);
+    my $strip  = qr{ ^ (\s{$leader}) (.*) $ }x;
+    my @extra  = ($marker);
+    my $reader = sub {
+        return shift @extra if @extra;
+        my $line = $stream->next;
+        return $2 if $line =~ $strip;
+        return;
+    };
+
+    my $data = $yaml->read($reader);
 
     # Reconstitute input. This is convoluted. Maybe we should just
     # record it on the way in...

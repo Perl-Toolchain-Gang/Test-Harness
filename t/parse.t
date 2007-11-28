@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 258;
+use Test::More tests => 260;
 use IO::c55Capture;
 
 use File::Spec;
@@ -20,8 +20,7 @@ sub _get_results {
     return @results;
 }
 
-my ($PARSER, $PLAN, $TEST, $COMMENT, $BAILOUT,
-    $UNKNOWN, $YAML, $VERSION, $BEGIN ) = qw(
+my ( $PARSER, $PLAN, $TEST, $COMMENT, $BAILOUT, $UNKNOWN, $YAML, $VERSION ) = qw(
   TAP::Parser
   TAP::Parser::Result::Plan
   TAP::Parser::Result::Test
@@ -30,7 +29,6 @@ my ($PARSER, $PLAN, $TEST, $COMMENT, $BAILOUT,
   TAP::Parser::Result::Unknown
   TAP::Parser::Result::YAML
   TAP::Parser::Result::Version
-  TAP::Parser::Result::Begin
 );
 
 my $tap = <<'END_TAP';
@@ -738,7 +736,7 @@ END_TAP
 
     # now too high a version
     $tap = <<'END_TAP';
-TAP version 15
+TAP version 14
 1..2
 ok 1 - input file opened
 ok 2 - Gandalf wins
@@ -753,7 +751,7 @@ END_TAP
     is @errors, 1, 'test too high version number';
 
     like pop @errors,
-      qr/TAP specified version 15 but we don't know about versions later than 14/,
+      qr/TAP specified version 14 but we don't know about versions later than 13/,
       '... and trapped expected version error';
 }
 
@@ -877,6 +875,44 @@ END_TAP
         like shift @errors, qr/this is the dying iterator/,
           '...and it was what we expected';
     }
+}
+
+{
+
+    # coverage testing of TAP::Parser::_next_state
+
+    package TAP::Parser::WithBrokenState;
+    use vars qw(@ISA);
+
+    @ISA = qw( TAP::Parser );
+
+    sub _make_state_table {
+        return { INIT => { plan => { goto => 'FOO' } } };
+    }
+
+    package main;
+
+    my $tap = <<'END_TAP';
+1..2
+ok 1 - input file opened
+ok 2 - Gandalf wins
+END_TAP
+
+    my $parser = TAP::Parser::WithBrokenState->new( { tap => $tap } );
+
+    my @die;
+
+    eval {
+        local $SIG{__DIE__} = sub { push @die, @_ };
+
+        $parser->next;
+        $parser->next;
+    };
+
+    is @die, 1, 'detect broken state machine';
+
+    like pop @die, qr/Illegal state: FOO/,
+      '...and the message is as we expect';
 }
 
 {

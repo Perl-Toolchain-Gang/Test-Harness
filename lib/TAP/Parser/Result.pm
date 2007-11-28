@@ -4,7 +4,6 @@ use strict;
 use vars qw($VERSION);
 
 use TAP::Parser::Result::Bailout ();
-use TAP::Parser::Result::Begin   ();
 use TAP::Parser::Result::Comment ();
 use TAP::Parser::Result::Plan    ();
 use TAP::Parser::Result::Test    ();
@@ -45,13 +44,12 @@ only and should not be relied upon.
 # note that this is bad.  Makes it very difficult to subclass, but then, it
 # would be a lot of work to subclass this system.
 my %class_for = (
-    bailout => 'TAP::Parser::Result::Bailout',
-    begin   => 'TAP::Parser::Result::Begin',
-    comment => 'TAP::Parser::Result::Comment',
     plan    => 'TAP::Parser::Result::Plan',
     test    => 'TAP::Parser::Result::Test',
-    unknown => 'TAP::Parser::Result::Unknown',
+    comment => 'TAP::Parser::Result::Comment',
+    bailout => 'TAP::Parser::Result::Bailout',
     version => 'TAP::Parser::Result::Version',
+    unknown => 'TAP::Parser::Result::Unknown',
     yaml    => 'TAP::Parser::Result::YAML',
 );
 
@@ -249,19 +247,6 @@ TODO tests.
 sub set_directive {
     my ( $self, $dir ) = @_;
     $self->{directive} = $dir;
-}
-
-=head3 C<context>
-
-Set or get the context of this result. For nested TAP blocks the context
-is a list of test numbers corresponding to any containing tests.
-
-=cut
-
-sub context {
-    my ( $self, @context ) = @_;
-    $self->{context} = \@context if @context;
-    return @{ $self->{context} };
 }
 
 1;

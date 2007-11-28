@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 93;
+use Test::More tests => 81;
 
 use TAP::Parser::Grammar;
 use TAP::Parser::Iterator::Array;
@@ -41,9 +41,8 @@ isa_ok $grammar, $GRAMMAR, '... and the object it returns';
 # why.  We'll still use the instance because that should be forward
 # compatible.
 
-my @V12 = sort qw(bailout comment plan simple_test test version);
-my @V13 = sort ( @V12, 'yaml' );
-my @V14 = sort ( @V13, 'begin' );
+my @V12 = qw(bailout comment plan simple_test test version);
+my @V13 = ( @V12, 'yaml' );
 
 can_ok $grammar, 'token_types';
 ok my @types = sort( $grammar->token_types ),
@@ -54,11 +53,6 @@ $grammar->set_version(13);
 ok @types = sort( $grammar->token_types ),
   '... and calling it should succeed (v13)';
 is_deeply \@types, \@V13, '... and return the correct token types (v13)';
-
-$grammar->set_version(14);
-ok @types = sort( $grammar->token_types ),
-  '... and calling it should succeed (v14)';
-is_deeply \@types, \@V14, '... and return the correct token types (v14)';
 
 can_ok $grammar, 'syntax_for';
 can_ok $grammar, 'handler_for';
@@ -211,44 +205,6 @@ $expected = {
 is_deeply $token, $expected,
   '... and the token should contain the correct data';
 
-# begin directive
-
-my $begin = 'begin 12 Start something';
-like $begin, $syntax_for{'begin'},
-  'Begin blocks should match the begin syntax';
-
-$stream->put($begin);
-ok $token = $grammar->tokenize,
-  '... and calling it with data should return a token';
-
-$expected = {
-    'type'        => 'begin',
-    'description' => 'Start something',
-    'test_num'    => 12,
-    'raw'         => 'begin 12 Start something',
-};
-is_deeply $token, $expected,
-  '... and the token should contain the correct data';
-
-# begin directive, no description
-
-$begin = 'begin 12';
-like $begin, $syntax_for{'begin'},
-  'Begin blocks should match the begin syntax';
-
-$stream->put($begin);
-ok $token = $grammar->tokenize,
-  '... and calling it with data should return a token';
-
-$expected = {
-    'type'        => 'begin',
-    'description' => '',
-    'test_num'    => 12,
-    'raw'         => 'begin 12',
-};
-is_deeply $token, $expected,
-  '... and the token should contain the correct data';
-
 # test tests :/
 
 my $test = 'ok 1 this is a test';
@@ -325,7 +281,7 @@ is_deeply $token, $expected,
         $grammar->set_version('no_such_version');
     };
 
-    unless ( is @die, 1, 'set_version with bad version' ) {
+    unless (is @die, 1, 'set_version with bad version') {
         diag " >>> $_ <<<\n" for @die;
     }
 
@@ -395,8 +351,24 @@ is_deeply $token, $expected,
     # but we dont care as this is coverage testing, so
     # if thats what we have to do to exercise that code,
     # so be it.
+    my $yaml = [ '  ...  ', '- 2', '  ---  ', ];
 
-    $stream->put($_) for '  ...  ', '- 2', '  ---  ';
+    sub iter {
+        my $ar = shift;
+        return sub {
+            return shift @$ar;
+        };
+    }
+
+    my $iter = iter($yaml);
+
+    while ( my $line = $iter->() ) {
+        $stream->put($line);
+    }
+
+    # pad == '   ', marker == '--- '
+    # length $pad == 3
+    # strip == pad
 
     my @die;
 
