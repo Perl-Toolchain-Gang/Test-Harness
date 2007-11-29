@@ -128,7 +128,10 @@ sub apply_switch {
             );
         },
         failed => sub {
-            $self->_select( where => sub { $_->{last_result} != 0 } );
+            $self->_select(
+                where => sub { $_->{last_result} != 0 },
+                order => sub { -$_->{last_result} }
+            );
         },
         passed => sub {
             $self->_select( where => sub { $_->{last_result} == 0 } );
@@ -137,7 +140,10 @@ sub apply_switch {
             $self->_select();
         },
         todo => sub {
-            $self->_select( order => sub { -$_->{last_todo} } );
+            $self->_select(
+                where => sub { $_->{last_todo} != 0 },
+                order => sub { -$_->{last_todo}; }
+            );
         },
         hot => sub {
             $self->_select(

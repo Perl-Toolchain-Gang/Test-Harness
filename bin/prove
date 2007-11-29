@@ -178,7 +178,7 @@ failure order.
 
 =item C<todo>
 
-Run the tests with the most todos first.
+Run any tests with todos.
 
 =item C<save>
 
