@@ -7,7 +7,8 @@ use Carp;
 use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
 
-use vars qw($VERSION);
+use vars qw($VERSION @ISA);
+@ISA = qw( TAP::Base );
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant NEED_GLOB => IS_WIN32;
@@ -118,7 +119,7 @@ sub apply_switch {
     my $switch = shift;
 
     my $last_gen = $self->{_}->{generation} - 1;
-    my $now      = time();
+    my $now      = $self->get_time;
 
     my %handler = (
         last => sub {
@@ -290,7 +291,7 @@ sub observe_test {
     my ( $self, $test, $parser ) = @_;
     $self->_record_test(
         $test,                   scalar( $parser->failed ),
-        scalar( $parser->todo ), time()
+        scalar( $parser->todo ), $self->get_time
     );
 }
 
