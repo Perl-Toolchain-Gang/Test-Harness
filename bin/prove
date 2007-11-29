@@ -135,26 +135,26 @@ Run the same tests as the last time the state was saved. This makes it
 possible to recreate the ordering of a shuffled test.
 
     # Run all tests in random order
-    $ prove --state=save --shuffle
+    $ prove -b --state=save --shuffle
 
     # Run them again in the same order
-    $ prove --state=last
+    $ prove -b --state=last
 
 =item C<failed>
 
 Run only the tests that failed on the last run.
 
     # Run all tests
-    $ prove --state=save
+    $ prove -b --state=save
     
     # Run failures
-    $ prove --state=failed
+    $ prove -b --state=failed
 
 If you also specify the C<save> option newly passing tests will be
 excluded from subsequent runs.
 
     # Repeat until no more failures
-    $ prove --state=failed,save
+    $ prove -b --state=failed,save
 
 =item C<passed>
 
@@ -166,7 +166,7 @@ new problems have been introduced.
 Run all tests in normal order. Multple options may be specified, so to
 run all tests with the failures from last time first:
 
-    $ prove --state=failed,all,save
+    $ prove -b --state=failed,all,save
 
 =item C<hot>
 
@@ -174,7 +174,7 @@ Run the tests that most recently failed first. The last failure time of
 each test is stored. The C<hot> switch causes tests to be run in most-recent-
 failure order.
 
-    $ prove --state=hot,save
+    $ prove -b --state=hot,save
 
 =item C<save>
 
