@@ -118,6 +118,77 @@ that appears on STDERR looks like a test result the test harness will
 get confused. Use this option only if you understand the consequences
 and can live with the risk.
 
+=head2 C<--state>
+
+You can ask C<prove> to remember the state of previous test runs and
+select and/or order the tests to be run this time based on that
+saved state.
+
+The C<--state> switch requires an argument which must be a comma
+separated list of one or more of the following options.
+
+=over
+
+=item C<last>
+
+Run in the same order as last time. This makes it possible to recreate
+the ordering of a shuffled test.
+
+    # Run all tests in random order
+    $ prove --state=save --shuffle
+
+    # Run them again in the same order
+    $ prove --state=last
+
+=item C<failed>
+
+Run only the tests that failed on the last run.
+
+    # Run all tests
+    $ prove --state=save
+    
+    # Run failures
+    $ prove --state=failed
+
+If you also specify the C<save> option newly passing tests will be
+excluded from subsequent runs.
+
+    # Repeat until no more failures
+    $ prove --state=failed,save
+
+=item C<passed>
+
+Run only the passed tests from last time. Useful to make sure that no
+new problems have been introduced.
+
+=item C<all>
+
+Run all tests in normal order. Multple options may be specified, so to
+run all tests with the failures from last time first:
+
+    $ prove --state=failed,all,save
+
+=item C<hot>
+
+Run the tests that most recently failed first. The last failure time of
+each test is stored. The C<hot> switch causes tests to be run in most-recent-
+failure order.
+
+    $ prove --state=hot,save
+
+=item C<save>
+
+Save the state on exit. The state is stored in a file called F<.prove>
+(F<_prove> on Windows and VMS) in the current directory.
+
+=back
+
+=head3 Other Recipes
+
+Run all the tests that passed last time on order of how recently they failed:
+
+    $ prove --state=hot,passed,save
+
 =head1 PERFORMANCE
 
 Because of its design, C<TAP::Parser> collects more information than

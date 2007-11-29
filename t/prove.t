@@ -157,8 +157,8 @@ BEGIN {    # START PLAN
                     { verbosity => 0 },
                     'TAP::Harness',
                     'one',
+                    'three',
                     'two',
-                    'three'
                 ]
             ],
         },
@@ -193,8 +193,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     { verbosity => 0 },
                     'TAP::Harness',
-                    'one', 'two',
-                    'three'
+                    'one', 'three', 'two',
                 ]
             ],
         },
@@ -212,7 +211,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -231,7 +230,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -250,7 +249,7 @@ BEGIN {    # START PLAN
                         verbosity  => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -268,7 +267,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -286,7 +285,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -305,7 +304,7 @@ BEGIN {    # START PLAN
                         verbosity       => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -324,7 +323,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -342,7 +341,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -360,7 +359,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -378,7 +377,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -395,7 +394,7 @@ BEGIN {    # START PLAN
                     { verbosity => -1
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -412,7 +411,7 @@ BEGIN {    # START PLAN
                     { verbosity => -2
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -428,7 +427,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     { verbosity => 0 },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -444,7 +443,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     { verbosity => 0 },
                     'TAP::Harness',
-                    'three', 'two', 'one'
+                    'two', 'three', 'one'
                 ]
             ],
         },
@@ -461,8 +460,9 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     { verbosity => 0 },
                     'TAP::Harness',
-                    'xxxone', 'xxxtwo',
-                    'xxxthree'
+                    'xxxone',
+                    'xxxthree',
+                     'xxxtwo',
                 ]
             ],
         },
@@ -480,7 +480,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -498,7 +498,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -515,7 +515,7 @@ BEGIN {    # START PLAN
                     { verbosity => 1
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -533,7 +533,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },
@@ -551,7 +551,7 @@ BEGIN {    # START PLAN
                         verbosity => 0
                     },
                     'TAP::Harness',
-                    'one', 'two', 'three'
+                    'one', 'three', 'two'
                 ]
             ],
         },

@@ -50,9 +50,10 @@ sub new {
     my %args = %{ shift || {} };
 
     my $self = bless {
-        tests => {},
-        seq   => 1,
-        store => delete $args{store},
+        tests  => {},
+        select => [],
+        seq    => 1,
+        store  => delete $args{store},
     }, $class;
 
     my $store = $self->{store};
@@ -93,7 +94,7 @@ Run only the passed tests from last time
 
 Run all tests in normal order
 
-=item C<flakey>
+=item C<hot>
 
 Run the tests that most recently failed first
 
@@ -120,9 +121,9 @@ sub apply_switch {
             $self->_select( where => sub { $_->{last_result} == 0 } );
         },
         all => sub {
-            $self->_select( where => sub {1} );
+            $self->_select();
         },
-        flakey => sub {
+        hot => sub {
             $self->_select(
                 order => sub {
                     return -$_->{last_fail_time}
@@ -149,6 +150,7 @@ sub apply_switch {
 
 sub _select {
     my ( $self, %spec ) = @_;
+    push @{ $self->{select} }, \%spec;
 }
 
 =head3 C<get_tests>
@@ -161,21 +163,58 @@ sub get_tests {
     my $self    = shift;
     my $recurse = shift;
     my @argv    = @_;
+    my %seen;
 
-    unless (@argv) {
+    my @selected = $self->_query;
+
+    unless ( @argv || @{ $self->{select} } ) {
         croak q{No tests named and 't' directory not found}
           unless -d 't';
         @argv = 't';
     }
 
-    return $self->_get_raw_tests( $recurse, @argv );
+    push @selected, $self->_get_raw_tests( $recurse, @argv ) if @argv;
+    return grep { !$seen{$_}++ } @selected;
+}
+
+sub _query {
+    my $self = shift;
+    return map { $self->_query_clause($_) } @{ $self->{select} };
+}
+
+sub _query_clause {
+    my ( $self, $clause ) = @_;
+    my @got;
+    my $tests = $self->{tests};
+    my $where = $clause->{where} || sub {1};
+
+    # Select
+    for my $test ( sort keys %$tests ) {
+        local $_ = $tests->{$test};
+        push @got, $test if $where->();
+    }
+
+    # Sort
+    if ( my $order = $clause->{order} ) {
+        @got = map { $_->[0] }
+          sort {
+                 ( defined $b->[1] <=> defined $a->[1] )
+              || ( ( $a->[1] || 0 ) <=> ( $b->[1] || 0 ) )
+          } map {
+            [   $_,
+                do { local $_ = $tests->{$_}; $order->() }
+            ]
+          } @got;
+    }
+
+    return @got;
 }
 
 sub _get_raw_tests {
     my $self    = shift;
     my $recurse = shift;
     my @argv    = @_;
-    my ( @tests, %seen );
+    my @tests;
 
     # Do globbing on Win32.
     @argv = map { glob "$_" } @argv if NEED_GLOB;
@@ -187,15 +226,13 @@ sub _get_raw_tests {
             next;
         }
 
-        push @tests, sort grep { !$seen{$_}++ } (
-              -d $arg
-            ? $recurse
-                  ? $self->_expand_dir_recursive($arg)
-                  : glob( File::Spec->catfile( $arg, '*.t' ) )
-            : $arg
-        );
+        push @tests, -d $arg
+          ? $recurse
+              ? $self->_expand_dir_recursive($arg)
+              : glob( File::Spec->catfile( $arg, '*.t' ) )
+          : $arg;
     }
-    return @tests;
+    return sort @tests;
 }
 
 sub _expand_dir_recursive {
