@@ -2,9 +2,9 @@ package App::Prove;
 
 use strict;
 use TAP::Harness;
-use File::Find;
 use File::Spec;
 use Getopt::Long;
+use App::Prove::State;
 use Carp;
 
 use vars qw($VERSION);
@@ -37,8 +37,9 @@ wrapper around an instance of this module.
 
 =cut
 
-my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
-my $NEED_GLOB = $IS_WIN32;
+use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
+use constant IS_VMS => $^O eq 'VMS';
+use constant STATE_FILE => ( IS_WIN32 || IS_VMS ) ? '_prove' : '.prove';
 
 use constant PLUGINS => 'App::Prove::Plugin';
 
@@ -47,9 +48,10 @@ my @ATTR;
 BEGIN {
     @ATTR = qw(
       archive argv blib color directives exec failures fork formatter
-      harness includes modules plugins jobs lib merge parse quiet really_quiet recurse
-      backwards shuffle taint_fail taint_warn timer verbose
-      warnings_fail warnings_warn show_help show_man show_version test_args
+      harness includes modules plugins jobs lib merge parse quiet
+      really_quiet recurse backwards shuffle taint_fail taint_warn timer
+      verbose warnings_fail warnings_warn show_help show_man
+      show_version test_args state
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -81,7 +83,8 @@ sub new {
         includes      => [],
         modules       => [],
         plugins       => [],
-        harness_class => 'TAP::Harness'
+        harness_class => 'TAP::Harness',
+        _state        => App::Prove::State->new( { store => STATE_FILE } ),
     }, $class;
 
     for my $attr (@ATTR) {
@@ -155,6 +158,7 @@ sub process_args {
             'a|archive=s' => \$self->{archive},
             'j|jobs=i'    => \$self->{jobs},
             'timer'       => \$self->{timer},
+            'state=s'     => \$self->{state},
             'T'           => \$self->{taint_fail},
             't'           => \$self->{taint_warn},
             'W'           => \$self->{warnings_fail},
@@ -196,7 +200,7 @@ sub _help {
 sub _color_default {
     my $self = shift;
 
-    return -t STDOUT && !$IS_WIN32;
+    return -t STDOUT && !IS_WIN32;
 }
 
 sub _get_args {
@@ -341,7 +345,8 @@ sub run {
         $self->_load_extensions( $self->modules );
         $self->_load_extensions( $self->plugins, PLUGINS );
 
-        my @tests = $self->_get_tests( @{ $self->argv } );
+        my @tests
+          = $self->{_state}->get_tests( $self->recurse, @{ $self->argv } );
 
         $self->_shuffle(@tests) if $self->shuffle;
         @tests = reverse @tests if $self->backwards;
@@ -354,7 +359,14 @@ sub run {
 
 sub _runtests {
     my ( $self, $args, $harness_class, @tests ) = @_;
-    my $harness    = $harness_class->new($args);
+    my $harness = $harness_class->new($args);
+
+    $harness->callback(
+        after_test => sub {
+            $self->{_state}->observe_test(@_);
+        }
+    );
+
     my $aggregator = $harness->runtests(@tests);
 
     $self->_exit( $aggregator->has_problems ? 1 : 0 );
@@ -401,63 +413,6 @@ sub _get_lib {
 
     # Huh?
     return @libs ? \@libs : ();
-}
-
-sub _get_tests {
-    my $self = shift;
-    my @argv = @_;
-    my ( @tests, %tests );
-
-    unless (@argv) {
-        croak q{No tests named and 't' directory not found}
-          unless -d 't';
-        @argv = 't';
-    }
-
-    # Do globbing on Win32.
-    if ($NEED_GLOB) {
-        @argv = map { glob "$_" } @argv;
-    }
-
-    foreach my $arg (@argv) {
-        if ( '-' eq $arg ) {
-            push @argv => <STDIN>;
-            chomp(@argv);
-            next;
-        }
-
-        if ( -d $arg ) {
-            my @files = $self->_expand_dir($arg);
-            foreach my $file (@files) {
-                push @tests => $file unless exists $tests{$file};
-            }
-            @tests{@files} = (1) x @files;
-        }
-        else {
-            push @tests => $arg unless exists $tests{$arg};
-            $tests{$arg} = 1;
-        }
-    }
-    return @tests;
-}
-
-sub _expand_dir {
-    my $self = shift;
-    my $dir  = shift;
-    my @tests;
-    if ( $self->recurse ) {
-        find(
-            {   follow => 1,    #21938
-                wanted =>
-                  sub { -f && /\.t$/ && push @tests => $File::Find::name }
-            },
-            $dir
-        );
-    }
-    else {
-        @tests = glob( File::Spec->catfile( $dir, '*.t' ) );
-    }
-    return sort @tests;
 }
 
 sub _shuffle {
@@ -571,6 +526,8 @@ calling C<run>.
 =item C<show_version>
 
 =item C<shuffle>
+
+=item C<state>
 
 =item C<taint_fail>
 

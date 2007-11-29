@@ -16,6 +16,7 @@ examples/test_urls.txt
 HACKING.pod
 inc/MyBuilder.pm
 lib/App/Prove.pm
+lib/App/Prove/State.pm
 lib/TAP/Base.pm
 lib/TAP/Formatter/Color.pm
 lib/TAP/Formatter/Console.pm
