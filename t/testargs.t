@@ -32,8 +32,8 @@ for my $args ( [qw( yes no maybe )], [qw( 1 2 3 )] ) {
 }
 
 {
-    my $harness
-      = TAP::Harness->new( { test_args => [qw( magic hat brigade )] } );
+    my $harness = TAP::Harness->new(
+        { verbosity => -9, test_args => [qw( magic hat brigade )] } );
     my $aggregate = $harness->runtests($test);
 
     is $aggregate->total,  3, "ran the right number of tests";
