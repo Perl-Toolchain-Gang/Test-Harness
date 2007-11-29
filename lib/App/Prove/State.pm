@@ -226,13 +226,14 @@ sub _get_raw_tests {
             next;
         }
 
-        push @tests, -d $arg
+        push @tests,
+          sort -d $arg
           ? $recurse
               ? $self->_expand_dir_recursive($arg)
               : glob( File::Spec->catfile( $arg, '*.t' ) )
           : $arg;
     }
-    return sort @tests;
+    return @tests;
 }
 
 sub _expand_dir_recursive {
