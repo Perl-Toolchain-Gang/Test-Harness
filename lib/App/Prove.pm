@@ -345,8 +345,12 @@ sub run {
         $self->_load_extensions( $self->modules );
         $self->_load_extensions( $self->plugins, PLUGINS );
 
-        my @tests
-          = $self->{_state}->get_tests( $self->recurse, @{ $self->argv } );
+        my $state = $self->{_state};
+        if ( defined( my $state_switch = $self->state ) ) {
+            $state->apply_switch($state_switch);
+        }
+
+        my @tests = $state->get_tests( $self->recurse, @{ $self->argv } );
 
         $self->_shuffle(@tests) if $self->shuffle;
         @tests = reverse @tests if $self->backwards;

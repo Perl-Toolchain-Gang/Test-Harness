@@ -64,7 +64,7 @@ sub new {
 
 sub DESTROY {
     my $self = shift;
-    if ( defined( my $store = $self->{store} ) ) {
+    if ( $self->{should_save} && defined( my $store = $self->{store} ) ) {
         $self->save($store);
     }
 }
@@ -79,6 +79,7 @@ Apply a list of switch options to the state.
 
 sub apply_switch {
     my $self = shift;
+    $self->{should_save}++;
 }
 
 =head3 C<get_tests>
