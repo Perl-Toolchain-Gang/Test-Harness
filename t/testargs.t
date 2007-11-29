@@ -3,25 +3,29 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 8;
+use Test::More tests => 16;
 use File::Spec;
 use TAP::Parser;
 
 my $test = File::Spec->catfile( 't', 'sample-tests', 'echo' );
 
 sub echo_ok {
-    my @args   = @_;
-    my $parser = TAP::Parser->new( { source => $test, test_args => \@args } );
-    my @got    = ();
+    my $options = shift;
+    my @args    = @_;
+    my $parser  = TAP::Parser->new( { %$options, test_args => \@args } );
+    my @got     = ();
     while ( my $result = $parser->next ) {
         push @got, $result;
     }
     my $plan = shift @got;
     ok $plan->is_plan;
     for (@got) {
-        is $_->description, shift(@args), "option passed OK";
+        is $_->description, shift(@args),
+          join( ', ', keys %$options ) . ": option passed OK";
     }
 }
 
-echo_ok(qw( yes no maybe ));
-echo_ok(qw( 1 2 3 ));
+for my $args ( [qw( yes no maybe )], [qw( 1 2 3 )] ) {
+    echo_ok( { source => $test }, @$args );
+    echo_ok( { exec => [ $^X, $test ] }, @$args );
+}

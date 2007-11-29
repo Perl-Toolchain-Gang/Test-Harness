@@ -322,7 +322,7 @@ sub run {
         my $merge     = delete $args{merge};
         my $spool     = delete $args{spool};
         my $switches  = delete $args{switches};
-        my $test_args = delete $args{test_args};
+        my @test_args = @{ delete $args{test_args} || [] };
 
         if ( 1 < grep {defined} $stream, $tap, $source, $exec ) {
             $self->_croak(
@@ -339,7 +339,7 @@ sub run {
         }
         elsif ($exec) {
             my $source = TAP::Parser::Source->new;
-            $source->source($exec);
+            $source->source( [ @$exec, @test_args ] );
             $source->merge($merge);    # XXX should just be arguments?
             $stream = $source->get_stream;
         }
@@ -356,11 +356,7 @@ sub run {
 
                 $perl->merge($merge);    # XXX args to new()?
 
-                $perl->source(
-                    [   $source,
-                        @{ $test_args || [] }
-                    ]
-                );
+                $perl->source( [ $source, @test_args ] );
 
                 $stream = $perl->get_stream;
             }
