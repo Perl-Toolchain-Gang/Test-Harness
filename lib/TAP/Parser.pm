@@ -350,7 +350,7 @@ sub run {
 
                 $perl->merge($merge);    # XXX args to new()?
 
-                $stream = $perl->source_file($source)->get_stream;
+                $stream = $perl->source( [$source] )->get_stream;
             }
             else {
                 $self->_croak("Cannot determine source for $source");

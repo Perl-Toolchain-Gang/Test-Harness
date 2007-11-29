@@ -29,7 +29,8 @@ ok $source->source( [ $perl, '-It/lib', '-T', $test ] ),
 can_ok $source, 'get_stream';
 my $stream = $source->get_stream;
 
-isa_ok $stream, 'TAP::Parser::Iterator::Process', 'get_stream returns the right object';
+isa_ok $stream, 'TAP::Parser::Iterator::Process',
+  'get_stream returns the right object';
 can_ok $stream, 'next';
 is $stream->next, '1..1', '... and the first line should be correct';
 is $stream->next, 'ok 1', '... as should the second';
@@ -39,8 +40,8 @@ can_ok 'TAP::Parser::Source::Perl', 'new';
 $source = TAP::Parser::Source::Perl->new;
 isa_ok $source, 'TAP::Parser::Source::Perl', '... and the object it returns';
 
-can_ok $source, 'source_file';
-ok $source->source_file($test),
+can_ok $source, 'source';
+ok $source->source( [$test] ),
   '... and calling it with valid args should succeed';
 
 can_ok $source, 'get_stream';
