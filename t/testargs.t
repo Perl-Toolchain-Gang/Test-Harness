@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 25;
+use Test::More tests => 19;
 use File::Spec;
 use TAP::Parser;
 use TAP::Harness;
@@ -29,7 +29,7 @@ sub echo_ok {
     }
 }
 
-for my $args ( [qw( --switch yes no maybe --another-switch -- )], [qw( 1 2 3 )] ) {
+for my $args ( [qw( yes no maybe )], [qw( 1 2 3 )] ) {
     echo_ok( { source => $test }, @$args );
     echo_ok( { exec => [ $^X, $test ] }, @$args );
 }
