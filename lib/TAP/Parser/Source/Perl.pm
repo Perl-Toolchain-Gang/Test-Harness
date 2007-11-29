@@ -48,6 +48,22 @@ Returns a new C<TAP::Parser::Source::Perl> object.
 
 =head2 Instance Methods
 
+=head3 C<source>
+
+Getter/setter the name of the test program and any arguments it requires.
+
+  my ($filename, @args) = @{ $perl->source };
+  $perl->source( [ $filename, @args ] );
+
+=cut
+
+sub source {
+    my $self = shift;
+    $self->_croak("Cannot find ($_[0][0])")
+      if @_ && !-f $_[0][0];
+    return $self->SUPER::source(@_);
+}
+
 =head3 C<switches>
 
   my $switches = $perl->switches;
