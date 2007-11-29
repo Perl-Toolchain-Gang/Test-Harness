@@ -91,6 +91,17 @@ my @schedule = (
             't/yamlish-writer.t',
         ],
     },
+    {   options        => [ 'failed', 'passed' ],
+        get_tests_args => [],
+        expect         => [
+            't/compat/inc_taint.t',
+            't/compat/version.t',
+            't/compat/env.t',
+            't/compat/failure.t',
+            't/source.t',
+            't/yamlish-writer.t',
+        ],
+    },
 );
 
 plan tests => @schedule * 2;
@@ -103,8 +114,9 @@ for my $test (@schedule) {
 
     # Naughty
     $state->{_} = get_state();
-
-    $state->apply_switch( $test->{options} );
+    my $options = $test->{options};
+    $options = [$options] unless 'ARRAY' eq ref $options;
+    $state->apply_switch(@$options);
 
     my @got = $state->get_tests( @{ $test->{get_tests_args} } );
 

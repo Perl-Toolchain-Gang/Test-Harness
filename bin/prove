@@ -196,6 +196,10 @@ Save the state on exit. The state is stored in a file called F<.prove>
 
 =back
 
+The C<--state> switch may be used more than once.
+
+    $ prove -b --state=hot --state=all,save
+
 =head3 Other Recipes
 
 Run all the tests that passed last time on order of how recently they failed:

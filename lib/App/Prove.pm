@@ -82,6 +82,7 @@ sub new {
         argv          => [],
         includes      => [],
         modules       => [],
+        state         => [],
         plugins       => [],
         harness_class => 'TAP::Harness',
         _state        => App::Prove::State->new( { store => STATE_FILE } ),
@@ -158,7 +159,7 @@ sub process_args {
             'a|archive=s' => \$self->{archive},
             'j|jobs=i'    => \$self->{jobs},
             'timer'       => \$self->{timer},
-            'state=s'     => \$self->{state},
+            'state=s@'    => \$self->{state},
             'T'           => \$self->{taint_fail},
             't'           => \$self->{taint_warn},
             'W'           => \$self->{warnings_fail},
@@ -347,7 +348,7 @@ sub run {
 
         my $state = $self->{_state};
         if ( defined( my $state_switch = $self->state ) ) {
-            $state->apply_switch($state_switch);
+            $state->apply_switch(@$state_switch);
         }
 
         my @tests = $state->get_tests( $self->recurse, @{ $self->argv } );

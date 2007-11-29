@@ -116,13 +116,13 @@ Save the state on exit.
 =cut
 
 sub apply_switch {
-    my $self   = shift;
-    my $switch = shift;
+    my $self = shift;
+    my @opts = @_;
 
     my $last_gen = $self->{_}->{generation} - 1;
     my $now      = $self->get_time;
 
-    my @switches = split /,/, $switch;
+    my @switches = map { split /,/ } @opts;
 
     my %handler = (
         last => sub {
