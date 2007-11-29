@@ -132,7 +132,7 @@ separated list of one or more of the following options.
 =item C<last>
 
 Run the same tests as the last time the state was saved. This makes it
-possible to recreate the ordering of a shuffled test.
+possible, for example, to recreate the ordering of a shuffled test.
 
     # Run all tests in random order
     $ prove -b --state=save --shuffle
@@ -171,7 +171,7 @@ run all tests with the failures from last time first:
 =item C<hot>
 
 Run the tests that most recently failed first. The last failure time of
-each test is stored. The C<hot> switch causes tests to be run in most-recent-
+each test is stored. The C<hot> option causes tests to be run in most-recent-
 failure order.
 
     $ prove -b --state=hot,save

@@ -114,6 +114,7 @@ sub apply_switch {
     my $switch = shift;
 
     my $last_gen = $self->{_}->{generation} - 1;
+    my $now      = time();
 
     my %handler = (
         last => sub {
@@ -134,7 +135,7 @@ sub apply_switch {
         hot => sub {
             $self->_select(
                 order => sub {
-                    return -$_->{last_fail_time}
+                    return $now - $_->{last_fail_time}
                       if defined $_->{last_fail_time};
                     return;
                 }
@@ -187,7 +188,12 @@ sub get_tests {
 
 sub _query {
     my $self = shift;
-    return map { $self->_query_clause($_) } @{ $self->{select} };
+    if ( my @sel = @{ $self->{select} } ) {
+        warn "No saved state, selection will be empty\n"
+          unless keys %{ $self->{_}->{tests} };
+        return map { $self->_query_clause($_) } @sel;
+    }
+    return;
 }
 
 sub _query_clause {
