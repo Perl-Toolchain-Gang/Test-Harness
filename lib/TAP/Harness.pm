@@ -80,6 +80,7 @@ BEGIN {
         formatter       => sub { shift; shift },
         jobs            => sub { shift; shift },
         fork            => sub { shift; shift },
+        test_args       => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -167,6 +168,11 @@ this only makes sense in the context of tests written in Perl.
 Accepts a scalar value or array ref of scalar values indicating which switches
 should be included if Perl tests are executed.  Naturally, this only makes
 sense in the context of tests written in Perl.
+
+=item * C<test_args>
+
+A reference to an C<@INC> style array of arguments to be passed to each
+test program.
 
 =item * C<color>
 
@@ -529,12 +535,18 @@ sub _get_parser_args {
     $args{spool}    = $self->_open_spool($test_prog);
     $args{merge}    = $self->merge;
     $args{exec}     = $self->exec;
+
     if ( my $exec = $self->exec ) {
         $args{exec} = [ @$exec, $test_prog ];
     }
     else {
         $args{source} = $test_prog;
     }
+
+    if ( defined( my $test_args = $self->test_args ) ) {
+        $args{test_args} = $test_args;
+    }
+
     return \%args;
 }
 
