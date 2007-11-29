@@ -75,11 +75,59 @@ sub DESTROY {
 
 Apply a list of switch options to the state.
 
+=over
+
+=item C<last>
+
+Run in the same order as last time
+
+=item C<failed>
+
+Run only the failed tests from last time
+
+=item C<passed>
+
+Run only the passed tests from last time
+
+=item C<all>
+
+Run all tests in normal order
+
+=item C<flakey>
+
+Run the tests that most recently failed first
+
+=item C<save>
+
+Save the state on exit.
+
+=back
+
 =cut
 
 sub apply_switch {
-    my $self = shift;
-    $self->{should_save}++;
+    my $self   = shift;
+    my $switch = shift;
+
+    my %handler = (
+        last   => sub { },
+        failed => sub { },
+        passed => sub { },
+        all    => sub { },
+        flakey => sub { },
+        save   => sub {
+            $self->{should_save}++;
+        },
+    );
+
+    for my $ele ( split /,/, $switch ) {
+        my ( $opt, $arg )
+          = ( $ele =~ /^([^:]+):(.*)/ )
+          ? ( $1, $2 )
+          : ( $ele, undef );
+        my $code = $handler{$opt} || croak "Illegal state option: $opt";
+        $code->($arg);
+    }
 }
 
 =head3 C<get_tests>
@@ -92,13 +140,21 @@ sub get_tests {
     my $self    = shift;
     my $recurse = shift;
     my @argv    = @_;
-    my ( @tests, %seen );
 
     unless (@argv) {
         croak q{No tests named and 't' directory not found}
           unless -d 't';
         @argv = 't';
     }
+
+    return $self->_get_raw_tests( $recurse, @argv );
+}
+
+sub _get_raw_tests {
+    my $self    = shift;
+    my $recurse = shift;
+    my @argv    = @_;
+    my ( @tests, %seen );
 
     # Do globbing on Win32.
     @argv = map { glob "$_" } @argv if NEED_GLOB;
@@ -182,14 +238,14 @@ Write the state to a file.
 
 =cut
 
-sub save {
-    my ( $self, $name ) = @_;
-    my $writer = TAP::Parser::YAMLish::Writer->new;
-    local *FH;
-    open FH, ">$name" or croak "Can't write $name ($!)";
-    $writer->write( $self->{tests} || {}, \*FH );
-    close FH;
-}
+# sub save {
+#     my ( $self, $name ) = @_;
+#     my $writer = TAP::Parser::YAMLish::Writer->new;
+#     local *FH;
+#     open FH, ">$name" or croak "Can't write $name ($!)";
+#     $writer->write( $self->{tests} || {}, \*FH );
+#     close FH;
+# }
 
 =head3 C<load>
 
