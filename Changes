@@ -7,6 +7,7 @@ Revision history for Test-Harness
         - Made TAP::Harness::runtests support aliases for test names.
         - Made it possible to pass command line args to test programs
           from prove, TAP::Harness, TAP::Parser.
+        - Added --state switch to prove.
 
 3.03    2007-11-17
         - Fixed some little bugs-waiting-to-happen inside
