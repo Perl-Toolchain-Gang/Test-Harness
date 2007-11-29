@@ -6,6 +6,7 @@ use File::Spec;
 use Carp;
 use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
+use TAP::Base;
 
 use vars qw($VERSION @ISA);
 @ISA = qw( TAP::Base );
@@ -292,7 +293,7 @@ Store the results of a test.
 sub observe_test {
     my ( $self, $test, $parser ) = @_;
     $self->_record_test(
-        $test,                   scalar( $parser->failed ),
+        $test, scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
         scalar( $parser->todo ), $self->get_time
     );
 }
