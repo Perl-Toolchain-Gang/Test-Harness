@@ -181,6 +181,10 @@ the most recently failed first use
 
     $ prove -b --state=hot,all,save
 
+This combination of options may also be specified thus
+
+    $ prove -b --state=adrian
+
 =item C<todo>
 
 Run any tests with todos.

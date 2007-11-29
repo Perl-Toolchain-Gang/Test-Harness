@@ -121,6 +121,8 @@ sub apply_switch {
     my $last_gen = $self->{_}->{generation} - 1;
     my $now      = $self->get_time;
 
+    my @switches = split /,/, $switch;
+
     my %handler = (
         last => sub {
             $self->_select(
@@ -155,9 +157,12 @@ sub apply_switch {
         save => sub {
             $self->{should_save}++;
         },
+        adrian => sub {
+            unshift @switches, qw( hot all save );
+        },
     );
 
-    for my $ele ( split /,/, $switch ) {
+    while ( defined( my $ele = shift @switches ) ) {
         my ( $opt, $arg )
           = ( $ele =~ /^([^:]+):(.*)/ )
           ? ( $1, $2 )
