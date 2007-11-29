@@ -198,6 +198,11 @@ be used when invoking the perl executable.
      switches => '-Ilib',
  } );
 
+=item * C<test_args>
+
+Used in conjunction with the C<source> option to supply a reference to
+an C<@ARGV> style array of arguments to pass to the test program.
+
 =item * C<spool>
 
 If passed a filehandle will write a copy of all parsed TAP to that handle.
@@ -310,13 +315,14 @@ sub run {
 
         $self->SUPER::_initialize( \%args, \@legal_callback );
 
-        my $stream   = delete $args{stream};
-        my $tap      = delete $args{tap};
-        my $source   = delete $args{source};
-        my $exec     = delete $args{exec};
-        my $merge    = delete $args{merge};
-        my $spool    = delete $args{spool};
-        my $switches = delete $args{switches};
+        my $stream    = delete $args{stream};
+        my $tap       = delete $args{tap};
+        my $source    = delete $args{source};
+        my $exec      = delete $args{exec};
+        my $merge     = delete $args{merge};
+        my $spool     = delete $args{spool};
+        my $switches  = delete $args{switches};
+        my $test_args = delete $args{test_args};
 
         if ( 1 < grep {defined} $stream, $tap, $source, $exec ) {
             $self->_croak(
@@ -350,7 +356,13 @@ sub run {
 
                 $perl->merge($merge);    # XXX args to new()?
 
-                $stream = $perl->source( [$source] )->get_stream;
+                $perl->source(
+                    [   $source,
+                        @{ $test_args || [] }
+                    ]
+                );
+
+                $stream = $perl->get_stream;
             }
             else {
                 $self->_croak("Cannot determine source for $source");
