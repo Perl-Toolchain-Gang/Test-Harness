@@ -176,6 +176,11 @@ failure order.
 
     $ prove -b --state=hot,save
 
+Tests that have never failed will not be selected. To run all tests with
+the most recently failed first use
+
+    $ prove -b --state=hot,all,save
+
 =item C<todo>
 
 Run any tests with todos.

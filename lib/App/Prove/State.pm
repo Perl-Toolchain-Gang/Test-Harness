@@ -148,11 +148,8 @@ sub apply_switch {
         },
         hot => sub {
             $self->_select(
-                order => sub {
-                    return $now - $_->{last_fail_time}
-                      if defined $_->{last_fail_time};
-                    return;
-                }
+                where => sub { defined $_->{last_fail_time} },
+                order => sub { $now - $_->{last_fail_time} }
             );
         },
         save => sub {
