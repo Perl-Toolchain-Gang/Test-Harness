@@ -131,8 +131,8 @@ separated list of one or more of the following options.
 
 =item C<last>
 
-Run in the same order as last time. This makes it possible to recreate
-the ordering of a shuffled test.
+Run the same tests as the last time the state was saved. This makes it
+possible to recreate the ordering of a shuffled test.
 
     # Run all tests in random order
     $ prove --state=save --shuffle

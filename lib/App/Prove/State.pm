@@ -50,7 +50,10 @@ sub new {
     my %args = %{ shift || {} };
 
     my $self = bless {
-        tests  => {},
+        _ => {
+            tests      => {},
+            generation => 1
+        },
         select => [],
         seq    => 1,
         store  => delete $args{store},
@@ -110,9 +113,14 @@ sub apply_switch {
     my $self   = shift;
     my $switch = shift;
 
+    my $last_gen = $self->{_}->{generation} - 1;
+
     my %handler = (
         last => sub {
-            $self->_select( order => sub { $_->{seq} } );
+            $self->_select(
+                where => sub { $_->{gen} >= $last_gen },
+                order => sub { $_->{seq} }
+            );
         },
         failed => sub {
             $self->_select( where => sub { $_->{last_result} != 0 } );
@@ -185,7 +193,7 @@ sub _query {
 sub _query_clause {
     my ( $self, $clause ) = @_;
     my @got;
-    my $tests = $self->{tests};
+    my $tests = $self->{_}->{tests};
     my $where = $clause->{where} || sub {1};
 
     # Select
@@ -271,12 +279,14 @@ sub observe_test {
 #     most recent result
 #     total failures
 #     total passes
+#     state generation
 
 sub _record_test {
     my ( $self, $test, $fail, $when ) = @_;
-    my $rec = $self->{tests}->{ $test->[0] } ||= {};
+    my $rec = $self->{_}->{tests}->{ $test->[0] } ||= {};
 
     $rec->{seq} = $self->{seq}++;
+    $rec->{gen} = $self->{_}->{generation};
 
     $rec->{last_run_time} = $when;
     $rec->{last_result}   = $fail;
@@ -302,7 +312,7 @@ sub save {
     my $writer = TAP::Parser::YAMLish::Writer->new;
     local *FH;
     open FH, ">$name" or croak "Can't write $name ($!)";
-    $writer->write( $self->{tests} || {}, \*FH );
+    $writer->write( $self->{_} || {}, \*FH );
     close FH;
 }
 
@@ -317,7 +327,7 @@ sub load {
     my $reader = TAP::Parser::YAMLish::Reader->new;
     local *FH;
     open FH, "<$name" or croak "Can't read $name ($!)";
-    $self->{tests} = $reader->read(
+    $self->{_} = $reader->read(
         sub {
             my $line = <FH>;
             defined $line && chomp $line;
@@ -328,11 +338,12 @@ sub load {
     # $writer->write( $self->{tests} || {}, \*FH );
     close FH;
     $self->_regen_seq;
+    $self->{_}->{generation}++;
 }
 
 sub _regen_seq {
     my $self = shift;
-    for my $rec ( values %{ $self->{tests} || {} } ) {
+    for my $rec ( values %{ $self->{_}->{tests} || {} } ) {
         $self->{seq} = $rec->{seq} + 1
           if defined $rec->{seq} && $rec->{seq} >= $self->{seq};
     }
