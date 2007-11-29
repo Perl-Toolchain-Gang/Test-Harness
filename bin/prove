@@ -176,6 +176,10 @@ failure order.
 
     $ prove -b --state=hot,save
 
+=item C<todo>
+
+Run the tests with the most todos first.
+
 =item C<save>
 
 Save the state on exit. The state is stored in a file called F<.prove>

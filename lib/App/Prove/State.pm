@@ -101,6 +101,10 @@ Run all tests in normal order
 
 Run the tests that most recently failed first
 
+=item C<todo>
+
+Run the tests ordered by number of todos.
+
 =item C<save>
 
 Save the state on exit.
@@ -131,6 +135,9 @@ sub apply_switch {
         },
         all => sub {
             $self->_select();
+        },
+        todo => sub {
+            $self->_select( order => sub { -$_->{last_todo} } );
         },
         hot => sub {
             $self->_select(
@@ -275,7 +282,10 @@ Store the results of a test.
 
 sub observe_test {
     my ( $self, $test, $parser ) = @_;
-    $self->_record_test( $test, scalar( $parser->failed ), time() );
+    $self->_record_test(
+        $test,                   scalar( $parser->failed ),
+        scalar( $parser->todo ), time()
+    );
 }
 
 # Store:
@@ -283,12 +293,13 @@ sub observe_test {
 #     last pass time
 #     last run time
 #     most recent result
+#     most recent todos
 #     total failures
 #     total passes
 #     state generation
 
 sub _record_test {
-    my ( $self, $test, $fail, $when ) = @_;
+    my ( $self, $test, $fail, $todo, $when ) = @_;
     my $rec = $self->{_}->{tests}->{ $test->[0] } ||= {};
 
     $rec->{seq} = $self->{seq}++;
@@ -296,6 +307,7 @@ sub _record_test {
 
     $rec->{last_run_time} = $when;
     $rec->{last_result}   = $fail;
+    $rec->{last_todo}     = $todo;
 
     if ($fail) {
         $rec->{total_failures}++;
