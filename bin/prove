@@ -82,6 +82,16 @@ Color support requires L<Term::ANSIColor> on Unix-like platforms and
 L<Win32::Console> windows. If the necessary module is not installed
 colored output will not be available.
 
+=head2 Arguments to Tests
+
+It is possible to supply arguments to tests. To do so separate them from
+prove's own arguments with '--'. For example
+
+ prove -v t/mytest.t -- --url http://example.com
+ 
+would run F<t/mytest.t> with the options '--url http://example.com'.
+When running multiple tests they will each receive the same arguments.
+
 =head2 C<--exec>
 
 Normally you can just pass a list of Perl tests and the harness will know how

@@ -49,7 +49,7 @@ BEGIN {
       archive argv blib color directives exec failures fork formatter
       harness includes modules plugins jobs lib merge parse quiet really_quiet recurse
       backwards shuffle taint_fail taint_warn timer verbose
-      warnings_fail warnings_warn show_help show_man show_version
+      warnings_fail warnings_warn show_help show_man show_version test_args
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -77,10 +77,11 @@ sub new {
     my $args = shift || {};
 
     my $self = bless {
-        argv     => [],
-        includes => [],
-        modules  => [],
-        plugins  => [],
+        argv          => [],
+        includes      => [],
+        modules       => [],
+        plugins       => [],
+        harness_class => 'TAP::Harness'
     }, $class;
 
     for my $attr (@ATTR) {
@@ -106,6 +107,12 @@ Dies on invalid arguments.
 
 sub process_args {
     my ( $self, @args ) = @_;
+
+    if ( defined( my $stop_at = _first_pos( '--', @args ) ) ) {
+        my @test_args = splice @args, $stop_at;
+        shift @test_args;
+        $self->{test_args} = \@test_args;
+    }
 
     if ( my @bad = map {"-$_"} grep {/^-(man|help)$/} @args ) {
         die "Long options should be written with two dashes: ",
@@ -161,6 +168,14 @@ sub process_args {
     return;
 }
 
+sub _first_pos {
+    my $want = shift;
+    for ( 0 .. $#_ ) {
+        return $_ if $_[$_] eq $want;
+    }
+    return;
+}
+
 sub _exit { exit( $_[1] || 0 ) }
 
 sub _help {
@@ -186,8 +201,6 @@ sub _color_default {
 
 sub _get_args {
     my $self = shift;
-
-    $self->{harness_class} = 'TAP::Harness';
 
     my %args;
 
@@ -250,6 +263,10 @@ sub _get_args {
     # defined but zero-length exec runs test files as binaries
     $args{exec} = [ split( /\s+/, $self->exec ) ]
       if ( defined( $self->exec ) );
+
+    if ( defined( my $test_args = $self->test_args ) ) {
+        $args{test_args} = $test_args;
+    }
 
     return ( \%args, $self->{harness_class} );
 }
@@ -558,6 +575,8 @@ calling C<run>.
 =item C<taint_fail>
 
 =item C<taint_warn>
+
+=item C<test_args>
 
 =item C<timer>
 
