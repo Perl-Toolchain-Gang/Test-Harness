@@ -55,9 +55,9 @@ sub new {
         store => delete $args{store},
     }, $class;
 
-    if ( defined( my $store = $self->{store} ) ) {
-        $self->load($store);
-    }
+    my $store = $self->{store};
+    $self->load($store)
+      if defined $store && -f $store;
 
     return $self;
 }
@@ -110,12 +110,28 @@ sub apply_switch {
     my $switch = shift;
 
     my %handler = (
-        last   => sub { },
-        failed => sub { },
-        passed => sub { },
-        all    => sub { },
-        flakey => sub { },
-        save   => sub {
+        last => sub {
+            $self->_select( order => sub { $_->{seq} } );
+        },
+        failed => sub {
+            $self->_select( where => sub { $_->{last_result} != 0 } );
+        },
+        passed => sub {
+            $self->_select( where => sub { $_->{last_result} == 0 } );
+        },
+        all => sub {
+            $self->_select( where => sub {1} );
+        },
+        flakey => sub {
+            $self->_select(
+                order => sub {
+                    return -$_->{last_fail_time}
+                      if defined $_->{last_fail_time};
+                    return;
+                }
+            );
+        },
+        save => sub {
             $self->{should_save}++;
         },
     );
@@ -125,9 +141,14 @@ sub apply_switch {
           = ( $ele =~ /^([^:]+):(.*)/ )
           ? ( $1, $2 )
           : ( $ele, undef );
-        my $code = $handler{$opt} || croak "Illegal state option: $opt";
+        my $code = $handler{$opt}
+          || croak "Illegal state option: $opt";
         $code->($arg);
     }
+}
+
+sub _select {
+    my ( $self, %spec ) = @_;
 }
 
 =head3 C<get_tests>
@@ -238,14 +259,14 @@ Write the state to a file.
 
 =cut
 
-# sub save {
-#     my ( $self, $name ) = @_;
-#     my $writer = TAP::Parser::YAMLish::Writer->new;
-#     local *FH;
-#     open FH, ">$name" or croak "Can't write $name ($!)";
-#     $writer->write( $self->{tests} || {}, \*FH );
-#     close FH;
-# }
+sub save {
+    my ( $self, $name ) = @_;
+    my $writer = TAP::Parser::YAMLish::Writer->new;
+    local *FH;
+    open FH, ">$name" or croak "Can't write $name ($!)";
+    $writer->write( $self->{tests} || {}, \*FH );
+    close FH;
+}
 
 =head3 C<load>
 
@@ -257,7 +278,7 @@ sub load {
     my ( $self, $name ) = @_;
     my $reader = TAP::Parser::YAMLish::Reader->new;
     local *FH;
-    open FH, "<$name" or croak "Can't write $name ($!)";
+    open FH, "<$name" or croak "Can't read $name ($!)";
     $self->{tests} = $reader->read(
         sub {
             my $line = <FH>;
