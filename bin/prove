@@ -55,6 +55,7 @@ Options that take arguments:
       --formatter   Result formatter to use. See TAP::Harness.
  -a,  --archive     Store the resulting TAP in an archive file.
  -j,  --jobs N      Run N test jobs in parallel (try 9.)
+      --state=opts  Control prove's persistent state.
 
 =head2 Reading from C<STDIN>
 
@@ -191,7 +192,11 @@ Run any tests with todos.
 
 =item C<slow>
 
-Run the tests in slowest to fastest order.
+Run the tests in slowest to fastest order. This is useful in conjunction
+with the C<-j> parallel testing switch to ensure that your slowest tests
+start running first.
+
+    $ prove -b --state=slow -j9 
 
 =item C<fast>
 
