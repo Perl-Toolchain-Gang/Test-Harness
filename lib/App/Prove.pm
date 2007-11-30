@@ -112,7 +112,7 @@ Dies on invalid arguments.
 sub process_args {
     my ( $self, @args ) = @_;
 
-    if ( defined( my $stop_at = _first_pos( '--', @args ) ) ) {
+    if ( defined( my $stop_at = _first_pos( '::', @args ) ) ) {
         my @test_args = splice @args, $stop_at;
         shift @test_args;
         $self->{test_args} = \@test_args;
