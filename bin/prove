@@ -189,6 +189,14 @@ This combination of options may also be specified thus
 
 Run any tests with todos.
 
+=item C<slow>
+
+Run the tests in slowest to fastest order.
+
+=item C<fast>
+
+Run test tests in fastest to slowest order.
+
 =item C<save>
 
 Save the state on exit. The state is stored in a file called F<.prove>

@@ -102,6 +102,28 @@ my @schedule = (
             't/yamlish-writer.t',
         ],
     },
+    {   options        => 'slow',
+        get_tests_args => [],
+        expect         => [
+            't/yamlish-writer.t',
+            't/compat/env.t',
+            't/compat/inc_taint.t',
+            't/compat/version.t',
+            't/compat/failure.t',
+            't/source.t',
+        ],
+    },
+    {   options        => 'fast',
+        get_tests_args => [],
+        expect         => [
+            't/source.t',
+            't/compat/failure.t',
+            't/compat/version.t',
+            't/compat/inc_taint.t',
+            't/compat/env.t',
+            't/yamlish-writer.t',
+        ],
+    },
 );
 
 plan tests => @schedule * 2;
@@ -137,6 +159,7 @@ sub get_state {
                 'total_passes'   => '48',
                 'seq'            => '1549',
                 'gen'            => '51',
+                'elapsed'        => 0.1230,
                 'last_todo'      => '1'
             },
             't/yamlish-writer.t' => {
@@ -147,6 +170,7 @@ sub get_state {
                 'total_passes'   => '41',
                 'seq'            => '1578',
                 'gen'            => '49',
+                'elapsed'        => 12.2983,
                 'last_todo'      => '0'
             },
             't/compat/env.t' => {
@@ -157,6 +181,7 @@ sub get_state {
                 'total_passes'   => '48',
                 'seq'            => '1548',
                 'gen'            => '52',
+                'elapsed'        => 3.1290,
                 'last_todo'      => '0'
             },
             't/compat/version.t' => {
@@ -167,6 +192,7 @@ sub get_state {
                 'total_passes'   => '47',
                 'seq'            => '1555',
                 'gen'            => '51',
+                'elapsed'        => 0.2363,
                 'last_todo'      => '4'
             },
             't/compat/inc_taint.t' => {
@@ -176,6 +202,7 @@ sub get_state {
                 'total_passes'   => '47',
                 'seq'            => '1551',
                 'gen'            => '51',
+                'elapsed'        => 1.6938,
                 'last_todo'      => '0'
             },
             't/source.t' => {
@@ -185,6 +212,7 @@ sub get_state {
                 'total_passes'   => '41',
                 'seq'            => '1570',
                 'gen'            => '51',
+                'elapsed'        => 0.0143,
                 'last_todo'      => '0'
             },
         }

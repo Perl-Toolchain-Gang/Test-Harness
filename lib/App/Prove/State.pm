@@ -107,6 +107,14 @@ Run the tests that most recently failed first
 
 Run the tests ordered by number of todos.
 
+=item C<slow>
+
+Run the tests in slowest to fastest order.
+
+=item C<fast>
+
+Run test tests in fastest to slowest order.
+
 =item C<save>
 
 Save the state on exit.
@@ -154,6 +162,12 @@ sub apply_switch {
                 where => sub { defined $_->{last_fail_time} },
                 order => sub { $now - $_->{last_fail_time} }
             );
+        },
+        slow => sub {
+            $self->_select( order => sub { -$_->{elapsed} } );
+        },
+        fast => sub {
+            $self->_select( order => sub { $_->{elapsed} } );
         },
         save => sub {
             $self->{should_save}++;
@@ -294,7 +308,7 @@ sub observe_test {
     my ( $self, $test, $parser ) = @_;
     $self->_record_test(
         $test, scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
-        scalar( $parser->todo ), $self->get_time
+        scalar( $parser->todo ), $parser->start_time, $parser->end_time
     );
 }
 
@@ -309,23 +323,24 @@ sub observe_test {
 #     state generation
 
 sub _record_test {
-    my ( $self, $test, $fail, $todo, $when ) = @_;
+    my ( $self, $test, $fail, $todo, $start_time, $end_time ) = @_;
     my $rec = $self->{_}->{tests}->{ $test->[0] } ||= {};
 
     $rec->{seq} = $self->{seq}++;
     $rec->{gen} = $self->{_}->{generation};
 
-    $rec->{last_run_time} = $when;
+    $rec->{last_run_time} = $end_time;
     $rec->{last_result}   = $fail;
     $rec->{last_todo}     = $todo;
+    $rec->{elapsed}       = $end_time - $start_time;
 
     if ($fail) {
         $rec->{total_failures}++;
-        $rec->{last_fail_time} = $when;
+        $rec->{last_fail_time} = $end_time;
     }
     else {
         $rec->{total_passes}++;
-        $rec->{last_pass_time} = $when;
+        $rec->{last_pass_time} = $end_time;
     }
 }
 
