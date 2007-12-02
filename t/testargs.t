@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 25;
+use Test::More tests => 19;
 use File::Spec;
 use TAP::Parser;
 use TAP::Harness;
@@ -29,7 +29,7 @@ sub echo_ok {
     }
 }
 
-for my $args ( [qw( --switch yes no maybe --another-switch -- )], [qw( 1 2 3 )] ) {
+for my $args ( [qw( yes no maybe )], [qw( 1 2 3 )] ) {
     echo_ok( { source => $test }, @$args );
     echo_ok( { exec => [ $^X, $test ] }, @$args );
 }
@@ -64,7 +64,7 @@ package main;
 {
     my $app = Test::Prove->new;
 
-    $app->process_args( $test, '--', 'one', 'two', 'huh' );
+    $app->process_args( $test, '::', 'one', 'two', 'huh' );
     $app->run();
     my $log = $app->get_run_log;
     is_deeply $log->[0]->[0]->{test_args}, [ 'one', 'two', 'huh' ],

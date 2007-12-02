@@ -232,6 +232,7 @@ Any keys for which the value is C<undef> will be ignored.
       made_parser
       before_runtests
       after_runtests
+      after_test
     );
 
     sub _initialize {
@@ -344,6 +345,13 @@ Tests will be run in the order found.
 
 =cut
 
+sub _after_test {
+    my ( $self, $aggregate, $test, $parser ) = @_;
+
+    $self->_make_callback( 'after_test', $test, $parser );
+    $aggregate->add( $test->[1], $parser );
+}
+
 sub _aggregate_forked {
     my ( $self, $aggregate, @tests ) = @_;
 
@@ -375,7 +383,7 @@ sub _aggregate_forked {
     );
 
     while ( my ( $id, $parser ) = $iter->() ) {
-        $aggregate->add( $tests[$id]->[1], $parser );
+        $self->_after_test( $aggregate, $tests[$id], $parser );
     }
 
     return;
@@ -406,7 +414,7 @@ sub _aggregate_parallel {
 
                 # End of parser. Automatically removed from the mux.
                 $self->finish_parser( $parser, $session );
-                $aggregate->add( $test->[1], $parser );
+                $self->_after_test( $aggregate, $test, $parser );
             }
             redo RESULT;
         }
@@ -427,7 +435,7 @@ sub _aggregate_single {
         }
 
         $self->finish_parser( $parser, $session );
-        $aggregate->add( $test->[1], $parser );
+        $self->_after_test( $aggregate, $test, $parser );
     }
 
     return;

@@ -5,6 +5,7 @@
 \..*\.swp
 \..*\.swo
 ^_build/
+^\.prove$
 
 # Makemaker generated files and dirs.
 ^MANIFEST\.

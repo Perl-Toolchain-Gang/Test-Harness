@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 56;
+use Test::More tests => 58;
 
 BEGIN {
 
@@ -11,6 +11,7 @@ BEGIN {
     my @classes = qw(
       TAP::Parser
       App::Prove
+      App::Prove::State
       TAP::Base
       TAP::Formatter::Color
       TAP::Formatter::Console::ParallelSession
