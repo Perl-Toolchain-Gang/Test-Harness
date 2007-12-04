@@ -202,6 +202,14 @@ start running first.
 
 Run test tests in fastest to slowest order.
 
+=item C<new>
+
+Run the tests in newest to oldest order.
+
+=item C<old>
+
+Run the tests in oldest to newest order.
+
 =item C<save>
 
 Save the state on exit. The state is stored in a file called F<.prove>

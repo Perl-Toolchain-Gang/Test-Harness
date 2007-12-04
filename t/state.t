@@ -124,6 +124,28 @@ my @schedule = (
             't/yamlish-writer.t',
         ],
     },
+    {   options        => 'old',
+        get_tests_args => [],
+        expect         => [
+            't/compat/env.t',
+            't/compat/failure.t',
+            't/compat/inc_taint.t',
+            't/compat/version.t',
+            't/source.t',
+            't/yamlish-writer.t',
+        ],
+    },
+    {   options        => 'new',
+        get_tests_args => [],
+        expect         => [
+            't/source.t',
+            't/yamlish-writer.t',
+            't/compat/inc_taint.t',
+            't/compat/version.t',
+            't/compat/env.t',
+            't/compat/failure.t',
+        ],
+    },
 );
 
 plan tests => @schedule * 2;

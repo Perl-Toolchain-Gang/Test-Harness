@@ -115,6 +115,14 @@ Run the tests in slowest to fastest order.
 
 Run test tests in fastest to slowest order.
 
+=item C<new>
+
+Run the tests in newest to oldest order.
+
+=item C<old>
+
+Run the tests in oldest to newest order.
+
 =item C<save>
 
 Save the state on exit.
@@ -168,6 +176,22 @@ sub apply_switch {
         },
         fast => sub {
             $self->_select( order => sub { $_->{elapsed} } );
+        },
+        new => sub {
+            $self->_select(
+                order => sub {
+                        ( $_->{total_failures} || 0 )
+                      + ( $_->{total_passes} || 0 );
+                }
+            );
+        },
+        old => sub {
+            $self->_select(
+                order => sub {
+                    -(    ( $_->{total_failures} || 0 )
+                        + ( $_->{total_passes} || 0 ) );
+                }
+            );
         },
         save => sub {
             $self->{should_save}++;
