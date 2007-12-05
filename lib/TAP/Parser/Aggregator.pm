@@ -265,13 +265,13 @@ Depending on the outcome of the tests returns 'PASS', 'FAIL' or
 sub get_status {
     my $self = shift;
 
-    if ( my $total = $self->total ) {
-        return $total == $self->passed
-          && !$self->has_errors ? 'PASS' : 'FAIL';
-    }
-    else {
-        return 'NOTESTS';
-    }
+    my $total  = $self->total;
+    my $passed = $self->passed;
+
+    return
+        ( $self->has_errors || $total != $passed ) ? 'FAIL'
+      : $total ? 'PASS'
+      :          'NOTESTS';
 }
 
 ##############################################################################

@@ -483,7 +483,7 @@ foreach my $test_args ( get_arg_sets() ) {
     $status  = pop @output;
     $summary = pop @output;
 
-    like $status, qr{^Result: NOTESTS$},
+    like $status, qr{^Result: FAIL$},
       '... and the status line should be correct';
     $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';
