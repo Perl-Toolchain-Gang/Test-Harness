@@ -515,10 +515,6 @@ If true, C<Test::Harness> will output the verbose results of running
 its tests.  Setting C<$Test::Harness::verbose> will override this,
 or you can use the C<-v> switch in the F<prove> utility.
 
-If true, C<Test::Harness> will output the verbose results of running
-its tests.  Setting C<$Test::Harness::verbose> will override this,
-or you can use the C<-v> switch in the F<prove> utility.
-
 =item C<HARNESS_OPTIONS>
 
 Provide additional options to the harness. Currently supported options are:
