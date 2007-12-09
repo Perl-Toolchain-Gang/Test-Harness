@@ -125,9 +125,6 @@ sub process_args {
           join( ', ', @bad ), "\n";
     }
 
-    # Allow cuddling the paths with the -I
-    @args = map { /^(-I)(.+)/ ? ( $1, $2 ) : $_ } @args;
-
     {
         local @ARGV = @args;
         Getopt::Long::Configure( 'no_ignore_case', 'bundling' );

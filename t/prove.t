@@ -1200,20 +1200,22 @@ BEGIN {    # START PLAN
         #     ],
         # },
         #
-        # {   name => 'Switch -I=s@',
-        #     args => {
-        #         argv => [qw( one two three )],
-        #     },
-        #     switches => [ '-I=s@', $dummy_test ],
-        #     expect   => {},
-        #     runlog   => [
-        #         [   {},
-        #             'TAP::Harness',
-        #             $dummy_test
-        #         ]
-        #     ],
-        # },
-        #
+        {   name => 'Switch -I=s@',
+            args => {
+                argv => [qw( one two three )],
+            },
+            switches => [ '-Ilib', $dummy_test ],
+            expect   => {
+                includes => sub {
+                    my ( $val, $attr ) = @_;
+                    return
+                         'ARRAY' eq ref $val
+                      && 1 == @$val
+                      && $val->[0] =~ /lib$/;
+                },
+            },
+        },
+
         # {   name => 'Switch -a',
         #     args => {
         #         argv => [qw( one two three )],
