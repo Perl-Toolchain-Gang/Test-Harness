@@ -1,6 +1,11 @@
 Revision history for Test-Harness
 
-3.04
+3.05    2007-12-09
+        - Skip unicode.t if Encode unavailable
+        - Support for .proverc files.
+        - Clarified prove documentation.
+
+3.04    2007-12-02
         - Fixed output leakage with really_quiet set.
         - Progress reports for tests without plans now show
           "143/?" instead of "143/0".

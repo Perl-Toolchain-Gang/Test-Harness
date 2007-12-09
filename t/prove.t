@@ -1314,7 +1314,7 @@ for my $test (@SCHEDULE) {
 
     # Optionally parse command args
     if ( my $switches = $test->{switches} ) {
-        eval { $app->process_args(@$switches) };
+        eval { $app->process_args( '--norc', @$switches ) };
         if ( my $err_pattern = $test->{parse_error} ) {
             like $@, $err_pattern, "$name: expected parse error";
         }
