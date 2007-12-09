@@ -597,9 +597,9 @@ BEGIN {    # START PLAN
             args => {
                 argv => [qw( one two three )],
             },
-            switches => [ '-f',    $dummy_test ],
-            expect   => { failures => 1 },
-            runlog   => [
+            switches => [ '-f', $dummy_test ],
+            expect => { failures => 1 },
+            runlog => [
                 [   '_runtests',
                     {   failures  => 1,
                         verbosity => 0
@@ -615,8 +615,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--failures', $dummy_test ],
-            expect   => { failures      => 1 },
-            runlog   => [
+            expect => { failures => 1 },
+            runlog => [
                 [   '_runtests',
                     {   failures  => 1,
                         verbosity => 0
@@ -632,8 +632,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '-l', $dummy_test ],
-            expect   => { lib   => 1 },
-            runlog   => [
+            expect => { lib => 1 },
+            runlog => [
                 [   '_runtests',
                     {   lib => mabs( ['lib'] ),
                         verbosity => 0
@@ -649,8 +649,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--lib', $dummy_test ],
-            expect   => { lib      => 1 },
-            runlog   => [
+            expect => { lib => 1 },
+            runlog => [
                 [   '_runtests',
                     {   lib => mabs( ['lib'] ),
                         verbosity => 0
@@ -666,8 +666,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '-b', $dummy_test ],
-            expect   => { blib  => 1 },
-            runlog   => [
+            expect => { blib => 1 },
+            runlog => [
                 [   '_runtests',
                     {   lib => mabs( [ 'blib/lib', 'blib/arch' ] ),
                         verbosity => 0
@@ -683,8 +683,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--blib', $dummy_test ],
-            expect   => { blib      => 1 },
-            runlog   => [
+            expect => { blib => 1 },
+            runlog => [
                 [   '_runtests',
                     {   lib => mabs( [ 'blib/lib', 'blib/arch' ] ),
                         verbosity => 0
@@ -699,9 +699,9 @@ BEGIN {    # START PLAN
             args => {
                 argv => [qw( one two three )],
             },
-            switches => [ '-s',   $dummy_test ],
-            expect   => { shuffle => 1 },
-            runlog   => [
+            switches => [ '-s', $dummy_test ],
+            expect => { shuffle => 1 },
+            runlog => [
                 [   '_runtests',
                     { verbosity => 0 },
                     'TAP::Harness',
@@ -715,8 +715,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--shuffle', $dummy_test ],
-            expect   => { shuffle      => 1 },
-            runlog   => [
+            expect => { shuffle => 1 },
+            runlog => [
                 [   '_runtests',
                     { verbosity => 0 },
                     'TAP::Harness',
@@ -730,8 +730,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '-c', $dummy_test ],
-            expect   => { color => 1 },
-            runlog   => [
+            expect => { color => 1 },
+            runlog => [
                 [   '_runtests',
                     {   color     => 1,
                         verbosity => 0
@@ -746,9 +746,9 @@ BEGIN {    # START PLAN
             args => {
                 argv => [qw( one two three )],
             },
-            switches => [ '-r',   $dummy_test ],
-            expect   => { recurse => 1 },
-            runlog   => [
+            switches => [ '-r', $dummy_test ],
+            expect => { recurse => 1 },
+            runlog => [
                 [   '_runtests',
                     { verbosity => 0 },
                     'TAP::Harness',
@@ -762,8 +762,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--recurse', $dummy_test ],
-            expect   => { recurse      => 1 },
-            runlog   => [
+            expect => { recurse => 1 },
+            runlog => [
                 [   '_runtests',
                     { verbosity => 0 },
                     'TAP::Harness',
@@ -777,8 +777,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--reverse', @dummy_tests ],
-            expect   => { backwards    => 1 },
-            runlog   => [
+            expect => { backwards => 1 },
+            runlog => [
                 [   '_runtests',
                     { verbosity => 0 },
                     'TAP::Harness',
@@ -830,8 +830,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '-q', $dummy_test ],
-            expect   => { quiet => 1 },
-            runlog   => [
+            expect => { quiet => 1 },
+            runlog => [
                 [   '_runtests',
                     { verbosity => -1
                     },
@@ -846,8 +846,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--quiet', $dummy_test ],
-            expect   => { quiet      => 1 },
-            runlog   => [
+            expect => { quiet => 1 },
+            runlog => [
                 [   '_runtests',
                     { verbosity => -1
                     },
@@ -861,9 +861,9 @@ BEGIN {    # START PLAN
             args => {
                 argv => [qw( one two three )],
             },
-            switches => [ '-Q',        $dummy_test ],
-            expect   => { really_quiet => 1 },
-            runlog   => [
+            switches => [ '-Q', $dummy_test ],
+            expect => { really_quiet => 1 },
+            runlog => [
                 [   '_runtests',
                     { verbosity => -2
                     },
@@ -877,9 +877,9 @@ BEGIN {    # START PLAN
             args => {
                 argv => [qw( one two three )],
             },
-            switches => [ '--QUIET',   $dummy_test ],
-            expect   => { really_quiet => 1 },
-            runlog   => [
+            switches => [ '--QUIET', $dummy_test ],
+            expect => { really_quiet => 1 },
+            runlog => [
                 [   '_runtests',
                     { verbosity => -2
                     },
@@ -894,8 +894,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '-m', $dummy_test ],
-            expect   => { merge => 1 },
-            runlog   => [
+            expect => { merge => 1 },
+            runlog => [
                 [   '_runtests',
                     {   merge     => 1,
                         verbosity => 0
@@ -911,8 +911,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--merge', $dummy_test ],
-            expect   => { merge      => 1 },
-            runlog   => [
+            expect => { merge => 1 },
+            runlog => [
                 [   '_runtests',
                     {   merge     => 1,
                         verbosity => 0
@@ -928,8 +928,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--directives', $dummy_test ],
-            expect   => { directives      => 1 },
-            runlog   => [
+            expect => { directives => 1 },
+            runlog => [
                 [   '_runtests',
                     {   directives => 1,
                         verbosity  => 0
@@ -946,8 +946,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--exec', '-s', $dummy_test ],
-            expect   => { exec      => '-s' },
-            runlog   => [
+            expect => { exec => '-s' },
+            runlog => [
                 [   '_runtests', { exec => ['-s'], verbosity => 0 },
                     'TAP::Harness',
                     $dummy_test
@@ -961,8 +961,8 @@ BEGIN {    # START PLAN
                 argv => [qw( one two three )],
             },
             switches => [ '--exec', '/foo/bar/perl -Ilib', $dummy_test ],
-            expect   => { exec      => '/foo/bar/perl -Ilib' },
-            runlog   => [
+            expect => { exec => '/foo/bar/perl -Ilib' },
+            runlog => [
                 [   '_runtests',
                     {   exec      => [qw(/foo/bar/perl -Ilib)],
                         verbosity => 0
