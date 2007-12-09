@@ -130,7 +130,7 @@ for my $test (@SCHEDULE) {
     my $name = $test->{name};
 
     my $app = FakeProve->new;
-    $app->process_args( @{ $test->{args} } );
+    $app->process_args( '--norc', @{ $test->{args} } );
 
     # Why does this make the output from the test spew out of
     # our STDOUT?
