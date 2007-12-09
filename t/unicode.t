@@ -16,6 +16,10 @@ BEGIN {
     plan skip_all => "File::Temp unavailable"
       if $@;
 
+    eval "use Encode";
+    plan skip_all => "Encode unavailable"
+      if $@;
+
     # Subs that take the supplied TAP and turn it into a set of args to
     # supply to TAP::Harness->new. The returned hash includes the
     # temporary file so that its reference count doesn't go to zero
