@@ -259,6 +259,7 @@ sub _query_clause {
 
     # Select
     for my $test ( sort keys %$tests ) {
+        next unless -f $test;
         local $_ = $tests->{$test};
         push @got, $test if $where->();
     }
