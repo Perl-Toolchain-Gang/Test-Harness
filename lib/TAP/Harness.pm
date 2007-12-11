@@ -431,7 +431,13 @@ sub _aggregate_single {
 
         while ( defined( my $result = $parser->next ) ) {
             $session->result($result);
-            exit 1 if $result->is_bailout;
+            if ( $result->is_bailout ) {
+
+                # Keep reading until input is exhausted in the hope
+                # of allowing any pending diagnostics to show up.
+                1 while $parser->next;
+                exit 1;
+            }
         }
 
         $self->finish_parser( $parser, $session );
