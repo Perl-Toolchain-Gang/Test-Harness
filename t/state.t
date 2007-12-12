@@ -127,23 +127,23 @@ my @schedule = (
     {   options        => 'old',
         get_tests_args => [],
         expect         => [
-            't/compat/env.t',
-            't/compat/failure.t',
+            't/source.t',
             't/compat/inc_taint.t',
             't/compat/version.t',
-            't/source.t',
             't/yamlish-writer.t',
+            't/compat/failure.t',
+            't/compat/env.t',
         ],
     },
     {   options        => 'new',
         get_tests_args => [],
         expect         => [
-            't/source.t',
-            't/yamlish-writer.t',
-            't/compat/inc_taint.t',
-            't/compat/version.t',
             't/compat/env.t',
             't/compat/failure.t',
+            't/yamlish-writer.t',
+            't/compat/version.t',
+            't/compat/inc_taint.t',
+            't/source.t',
         ],
     },
 );
@@ -182,7 +182,8 @@ sub get_state {
                 'seq'            => '1549',
                 'gen'            => '51',
                 'elapsed'        => 0.1230,
-                'last_todo'      => '1'
+                'last_todo'      => '1',
+                'mtime'          => 1196285623,
             },
             't/yamlish-writer.t' => {
                 'last_result'    => '0',
@@ -193,7 +194,8 @@ sub get_state {
                 'seq'            => '1578',
                 'gen'            => '49',
                 'elapsed'        => 12.2983,
-                'last_todo'      => '0'
+                'last_todo'      => '0',
+                'mtime'          => 1196285400,
             },
             't/compat/env.t' => {
                 'last_result'    => '0',
@@ -204,7 +206,8 @@ sub get_state {
                 'seq'            => '1548',
                 'gen'            => '52',
                 'elapsed'        => 3.1290,
-                'last_todo'      => '0'
+                'last_todo'      => '0',
+                'mtime'          => 1196285739,
             },
             't/compat/version.t' => {
                 'last_result'    => '2',
@@ -215,7 +218,8 @@ sub get_state {
                 'seq'            => '1555',
                 'gen'            => '51',
                 'elapsed'        => 0.2363,
-                'last_todo'      => '4'
+                'last_todo'      => '4',
+                'mtime'          => 1196285239,
             },
             't/compat/inc_taint.t' => {
                 'last_result'    => '3',
@@ -225,7 +229,8 @@ sub get_state {
                 'seq'            => '1551',
                 'gen'            => '51',
                 'elapsed'        => 1.6938,
-                'last_todo'      => '0'
+                'last_todo'      => '0',
+                'mtime'          => 1196185639,
             },
             't/source.t' => {
                 'last_result'    => '0',
@@ -235,7 +240,8 @@ sub get_state {
                 'seq'            => '1570',
                 'gen'            => '51',
                 'elapsed'        => 0.0143,
-                'last_todo'      => '0'
+                'last_todo'      => '0',
+                'mtime'          => 1186285639,
             },
         }
     };
