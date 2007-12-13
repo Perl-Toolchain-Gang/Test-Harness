@@ -269,7 +269,7 @@ foreach my $test_args ( get_arg_sets() ) {
         't/source_tests/harness_failure (Wstat: 0 Tests: 2 Failed: 1)',
         '[[reset]]',
         '[[red]]',
-        'Failed test number(s):',
+        'Failed test:',
         '[[reset]]',
         '[[red]]',
         '2',
@@ -292,7 +292,7 @@ foreach my $test_args ( get_arg_sets() ) {
         'Test Summary Report',
         '-------------------',
         't/source_tests/harness_failure (Wstat: 0 Tests: 2 Failed: 1)',
-        'Failed test number(s):',
+        'Failed test:',
         '2',
     );
 
@@ -313,7 +313,7 @@ foreach my $test_args ( get_arg_sets() ) {
         'Test Summary Report',
         '-------------------',
         't/source_tests/harness_failure (Wstat: 0 Tests: 2 Failed: 1)',
-        'Failed test number(s):',
+        'Failed test:',
         '2',
     );
 
@@ -417,7 +417,7 @@ foreach my $test_args ( get_arg_sets() ) {
         't/source_tests/harness_badtap (Wstat: 0 Tests: 2 Failed: 1)',
         '[[reset]]',
         '[[red]]',
-        'Failed test number(s):',
+        'Failed test:',
         '[[reset]]',
         '[[red]]',
         '2',
@@ -452,7 +452,7 @@ foreach my $test_args ( get_arg_sets() ) {
         'Test Summary Report',
         '-------------------',
         't/source_tests/harness_failure (Wstat: 0 Tests: 2 Failed: 1)',
-        'Failed test number(s):',
+        'Failed test:',
         '2',
     );
 
