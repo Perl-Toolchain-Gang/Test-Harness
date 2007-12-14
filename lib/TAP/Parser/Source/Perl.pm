@@ -272,7 +272,7 @@ sub _switches {
 
 sub _get_perl {
     my $proto = shift;
-    return $ENV{HARNESS_PERL}           if defined $ENV{HARNESS_PERL};
+    return $ENV{HARNESS_PERL} if defined $ENV{HARNESS_PERL};
     return Win32::GetShortPathName($^X) if IS_WIN32;
     return $^X;
 }
