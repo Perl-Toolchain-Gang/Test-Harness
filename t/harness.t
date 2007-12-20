@@ -1,7 +1,24 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+    if( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ('../lib', 'lib');
+    }
+    else {
+	use lib 't/lib';
+    }
+}
+
+BEGIN {
+    if ($ENV{PERL_CORE}) {
+	# FIXME
+	print "1..0 # Skip pending resolution of a clean way to record the change in location of the sample tests\n";
+	exit 0;
+    }
+}
+
 use strict;
-use lib 't/lib';
 
 use Test::More;
 use IO::c55Capture;

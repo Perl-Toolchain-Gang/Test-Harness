@@ -1,5 +1,13 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+    if ($ENV{PERL_CORE}) {
+	# FIXME
+	print "1..0 # Skip pending resolution of how to set the library with -I\n";
+	exit 0;
+    }
+}
+
 # Test that options in PERL5LIB and PERL5OPT are propogated to tainted
 # tests
 

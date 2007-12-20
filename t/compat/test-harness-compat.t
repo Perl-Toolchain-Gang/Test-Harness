@@ -1,5 +1,13 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+    if ($ENV{PERL_CORE}) {
+	# FIXME
+	print "1..0 # Skip until we figure out why it exists with no output just after the plan\n";
+	exit 0;
+    }
+}
+
 use strict;
 use lib 't/lib';
 

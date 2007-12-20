@@ -3,8 +3,25 @@
 # check nofork logic on systems which *can* fork()
 # NOTE maybe a good candidate for xt/author or something.
 
+BEGIN {
+    if( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ('../lib', 'lib');
+    }
+    else {
+	use lib 't/lib';
+    }
+}
+
+BEGIN {
+    if ($ENV{PERL_CORE}) {
+	# FIXME
+	print "1..0 # Skip pending resolution of how to set the library with -I\n";
+	exit 0;
+    }
+}
+
 use strict;
-use lib 't/lib';
 
 use Config;
 use Test::More (
@@ -47,7 +64,7 @@ my $mod = 'TAP::Parser::Iterator::Process';
             stdout    => $capture,
         }
     );
-    $harness->runtests('t/sample-tests/simple');
+    $harness->runtests(($ENV{PERL_CORE} ? 'lib' : 't') . '/sample-tests/simple');
     my @output = tied($$capture)->dump;
     is pop @output, "Result: PASS\n", 'status OK';
     pop @output;                 # get rid of summary line
