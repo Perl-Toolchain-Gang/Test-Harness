@@ -13,4 +13,5 @@ BEGIN {
 use strict;
 
 use NoFork;
-require( $ENV{PERL_CORE} ? '../lib/Test/Harness/' : '' ) . 't/multiplexer.t';
+require(
+    ( $ENV{PERL_CORE} ? '../lib/Test/Harness/' : '' ) . 't/multiplexer.t' );
