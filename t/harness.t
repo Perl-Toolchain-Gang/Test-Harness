@@ -521,8 +521,10 @@ SKIP: {
     );
 
     eval {
-        _runtests( $harness,
-            $ENV{PERL_CORE} ? 'lib/data/catme.1' : 't/data/catme.1' );
+        _runtests(
+            $harness,
+            $ENV{PERL_CORE} ? 'lib/data/catme.1' : 't/data/catme.1'
+        );
     };
 
     my @output = tied($$capture)->dump;
@@ -787,7 +789,8 @@ sub _runtests {
 
     # coverage tests for the basically untested T::H::_open_spool
 
-    $ENV{PERL_TEST_HARNESS_DUMP_TAP} = File::Spec->catfile(qw(t spool));
+    my @spool = ( $ENV{PERL_CORE} ? ('spool') : ( 't', 'spool' ) );
+    $ENV{PERL_TEST_HARNESS_DUMP_TAP} = File::Spec->catfile(@spool);
 
 # now given that we're going to be writing stuff to the file system, make sure we have
 # a cleanup hook
@@ -806,8 +809,8 @@ sub _runtests {
 
     # normal tests in verbose mode
 
-    my $parser = $harness->runtests(
-        File::Spec->catfile(qw (t source_tests harness )) );
+    my $parser
+      = $harness->runtests( File::Spec->catfile( $source_tests, 'harness' ) );
 
     isa_ok $parser, 'TAP::Parser::Aggregator',
       '... runtests returns the aggregate';
