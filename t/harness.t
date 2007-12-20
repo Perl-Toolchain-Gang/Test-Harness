@@ -817,6 +817,6 @@ sub _runtests {
 
     ok -e File::Spec->catfile(
         $ENV{PERL_TEST_HARNESS_DUMP_TAP},
-        qw( t source_tests harness )
+        $source_tests, 'harness'
     );
 }
