@@ -1,10 +1,12 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
-	# FIXME
-	print "1..0 # Skip pending resolution of how to avoid creating a directory t in the core\n";
-	exit 0;
+    if ( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ( '../lib', 'lib' );
+    }
+    else {
+        unshift @INC, 't/lib';
     }
 }
 
@@ -13,8 +15,6 @@ BEGIN {
 # nearly everything
 
 use strict;
-use lib 't/lib';
-
 use Test::More;
 
 my $useOrigOpen;
