@@ -1,21 +1,25 @@
 #!/usr/bin/perl -w
 
-use strict;
-use lib 't/lib';
+BEGIN {
+    if ( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = '../lib';
+    }
+    else {
+        unshift @INC, 't/lib';
+    }
+}
 
+use strict;
 use Test::More;
 use App::Prove::State;
 
-my @schedule = (
+sub mn {
+    my $pfx = $ENV{PERL_CORE} ? '../lib/Test/Harness/' : '';
+    return map {"$pfx$_"} @_;
+}
 
-    # last => sub {
-    # failed => sub {
-    # passed => sub {
-    # all => sub {
-    # todo => sub {
-    # hot => sub {
-    # save => sub {
-    # adrian => sub {
+my @schedule = (
     {   options        => 'all',
         get_tests_args => [],
         expect         => [
@@ -162,11 +166,11 @@ for my $test (@schedule) {
     $options = [$options] unless 'ARRAY' eq ref $options;
     $state->apply_switch(@$options);
 
-    my @got = $state->get_tests( @{ $test->{get_tests_args} } );
-
-    unless ( is_deeply \@got, $test->{expect}, "$desc: order OK" ) {
+    my @got    = $state->get_tests( @{ $test->{get_tests_args} } );
+    my @expect = mn( @{ $test->{expect} } );
+    unless ( is_deeply \@got, \@expect, "$desc: order OK" ) {
         use Data::Dumper;
-        diag( Dumper( { got => \@got, want => $test->{expect} } ) );
+        diag( Dumper( { got => \@got, want => \@expect } ) );
     }
 }
 
@@ -174,7 +178,7 @@ sub get_state {
     return {
         'generation' => '51',
         'tests'      => {
-            't/compat/failure.t' => {
+            mn('t/compat/failure.t') => {
                 'last_result'    => '0',
                 'last_run_time'  => '1196371471.57738',
                 'last_pass_time' => '1196371471.57738',
@@ -185,7 +189,7 @@ sub get_state {
                 'last_todo'      => '1',
                 'mtime'          => 1196285623,
             },
-            't/yamlish-writer.t' => {
+            mn('t/yamlish-writer.t') => {
                 'last_result'    => '0',
                 'last_run_time'  => '1196371480.5761',
                 'last_pass_time' => '1196371480.5761',
@@ -197,7 +201,7 @@ sub get_state {
                 'last_todo'      => '0',
                 'mtime'          => 1196285400,
             },
-            't/compat/env.t' => {
+            mn('t/compat/env.t') => {
                 'last_result'    => '0',
                 'last_run_time'  => '1196371471.42967',
                 'last_pass_time' => '1196371471.42967',
@@ -209,7 +213,7 @@ sub get_state {
                 'last_todo'      => '0',
                 'mtime'          => 1196285739,
             },
-            't/compat/version.t' => {
+            mn('t/compat/version.t') => {
                 'last_result'    => '2',
                 'last_run_time'  => '1196371472.96476',
                 'last_pass_time' => '1196371472.96476',
@@ -221,7 +225,7 @@ sub get_state {
                 'last_todo'      => '4',
                 'mtime'          => 1196285239,
             },
-            't/compat/inc_taint.t' => {
+            mn('t/compat/inc_taint.t') => {
                 'last_result'    => '3',
                 'last_run_time'  => '1196371471.89682',
                 'last_pass_time' => '1196371471.89682',
@@ -232,7 +236,7 @@ sub get_state {
                 'last_todo'      => '0',
                 'mtime'          => 1196185639,
             },
-            't/source.t' => {
+            mn('t/source.t') => {
                 'last_result'    => '0',
                 'last_run_time'  => '1196371479.72508',
                 'last_pass_time' => '1196371479.72508',
