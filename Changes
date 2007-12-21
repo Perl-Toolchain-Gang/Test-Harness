@@ -7,6 +7,7 @@ Revision history for Test-Harness
           are deleted.
         - --state=new and --state=old now consider the modification time
           of test scripts.
+        - Made test suite core-compatible.
 
 3.05    2007-12-09
         - Skip unicode.t if Encode unavailable

@@ -8,8 +8,6 @@ use File::Copy;
 use Getopt::Long;
 use File::chdir;
 
-# use File::Find::Parallel;
-
 $| = 1;
 
 my @to_core = (
@@ -30,7 +28,8 @@ my @to_core = (
     't/sample-tests'                  => 't/lib/sample-tests',
     't/source_tests'                  => 't/lib/source_tests',
 
-    # Files that we don't include that would match the above rules
+    # Files that we don't include that would match the above rules. All
+    # of these would match the 't' rule.
     't/lib/Test/Builder.pm'        => undef,
     't/lib/Test/Builder/Module.pm' => undef,
     't/lib/Test/More.pm'           => undef,
