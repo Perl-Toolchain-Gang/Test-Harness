@@ -125,7 +125,7 @@ sub _aggregate {
 
         # Jiggery pokery doesn't appear to work on VMS - so disable it
         # pending investigation.
-        $harness->aggregate_tests( $aggregate, @tests );
+        _aggregate_tests( $harness, $aggregate, @tests );
     }
     else {
         my $path_sep  = $Config{path_sep};
@@ -153,8 +153,16 @@ sub _aggregate {
             $ENV{PERL5LIB} = join( $path_sep, @extra_inc );
         }
 
-        $harness->aggregate_tests( $aggregate, @tests );
+        _aggregate_tests( $harness, $aggregate, @tests );
     }
+}
+
+sub _aggregate_tests {
+    my ( $harness, $aggregate, @tests ) = @_;
+    $aggregate->start();
+    $harness->aggregate_tests( $aggregate, @tests );
+    $aggregate->stop();
+
 }
 
 sub runtests {

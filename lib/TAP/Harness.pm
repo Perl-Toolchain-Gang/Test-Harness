@@ -330,7 +330,9 @@ sub runtests {
     my $aggregate = TAP::Parser::Aggregator->new;
 
     $self->_make_callback( 'before_runtests', $aggregate );
+    $aggregate->start;
     $self->aggregate_tests( $aggregate, @tests );
+    $aggregate->stop;
     $self->formatter->summary($aggregate);
     $self->_make_callback( 'after_runtests', $aggregate );
 
@@ -446,7 +448,30 @@ sub _aggregate_single {
 Run the named tests and display a summary of result. Tests will be run
 in the order found. 
 
-Each test is either
+Test results will be added to the supplied L<TAP::Parser::Aggregator>.
+C<aggregate_tests> may be called multiple times to run several sets of
+tests. Multiple C<Test::Harness> instances may be used to pass results
+to a single aggregator so that different parts of a complex test suite
+may be run using different C<TAP::Harness> settings. This is useful, for
+example, in the case where some tests should run in parallel but others
+are unsuitable for parallel execution.
+
+    my $formatter = TAP::Formatter::Console->new;
+    my $ser_harness = TAP::Harness->new( { formatter => $formatter } );
+    my $par_harness = TAP::Harness->new( { formatter => $formatter,
+                                           jobs => 9 } );
+    my $aggregator = TAP::Parser::Aggregator->new;
+    
+    $aggregator->start();
+    $ser_harness->aggregate_tests( $aggregator, @ser_tests );
+    $par_harness->aggregate_tests( $aggregator, @par_tests );
+    $aggregator->stop();
+    $formatter->summary( $aggregator );
+
+Note that for simpler testing requirements it will often be possible to
+replace the above code with a single call to C<runtests>.
+
+Each elements of the @tests array is either
 
 =over
 
@@ -455,6 +480,12 @@ Each test is either
 =item * a reference to a [ file name, display name ]
 
 =back
+
+When you supply a separate display name it becomes possible to run a
+test more than once; the display name is effectively the alias by which
+the test is known inside the harness. The harness doesn't care if it
+runs the same script more than once along as each invocation uses a
+different name.
 
 =cut
 
@@ -467,7 +498,6 @@ sub aggregate_tests {
 
     # Formatter gets only names
     $self->formatter->prepare( map { $_->[1] } @expanded );
-    $aggregate->start;
 
     if ( $self->jobs > 1 ) {
         if ( $self->fork ) {
@@ -480,8 +510,6 @@ sub aggregate_tests {
     else {
         $self->_aggregate_single( $aggregate, @expanded );
     }
-
-    $aggregate->stop;
 
     return;
 }
