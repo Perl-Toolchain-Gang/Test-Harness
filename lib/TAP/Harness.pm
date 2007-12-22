@@ -337,14 +337,6 @@ sub runtests {
     return $aggregate;
 }
 
-=head3 C<aggregate_tests>
-
-  $harness->aggregate_tests( $aggregate, @tests );
-
-Tests will be run in the order found.
-
-=cut
-
 sub _after_test {
     my ( $self, $aggregate, $test, $parser ) = @_;
 
@@ -446,6 +438,25 @@ sub _aggregate_single {
 
     return;
 }
+
+=head3 C<aggregate_tests>
+
+  $harness->aggregate_tests( $aggregate, @tests );
+
+Run the named tests and display a summary of result. Tests will be run
+in the order found. 
+
+Each test is either
+
+=over
+
+=item * the file name of a test script to run
+
+=item * a reference to a [ file name, display name ]
+
+=back
+
+=cut
 
 sub aggregate_tests {
     my ( $self, $aggregate, @tests ) = @_;
