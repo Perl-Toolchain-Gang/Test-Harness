@@ -40,11 +40,11 @@ Test::Harness - Run Perl standard test scripts with statistics
 
 =head1 VERSION
 
-Version 3.05
+Version 3.06
 
 =cut
 
-$VERSION = '3.05';
+$VERSION = '3.06';
 
 # Backwards compatibility for exportable variable names.
 *verbose  = *Verbose;
@@ -125,7 +125,7 @@ sub _aggregate {
 
         # Jiggery pokery doesn't appear to work on VMS - so disable it
         # pending investigation.
-        $harness->aggregate_tests( $aggregate, @tests );
+        _aggregate_tests( $harness, $aggregate, @tests );
     }
     else {
         my $path_sep  = $Config{path_sep};
@@ -153,8 +153,16 @@ sub _aggregate {
             $ENV{PERL5LIB} = join( $path_sep, @extra_inc );
         }
 
-        $harness->aggregate_tests( $aggregate, @tests );
+        _aggregate_tests( $harness, $aggregate, @tests );
     }
+}
+
+sub _aggregate_tests {
+    my ( $harness, $aggregate, @tests ) = @_;
+    $aggregate->start();
+    $harness->aggregate_tests( $aggregate, @tests );
+    $aggregate->stop();
+
 }
 
 sub runtests {
@@ -563,7 +571,7 @@ L<Test::Harness> (on which this module is based) has this attribution:
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2007, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
+Copyright (c) 2007-2008, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

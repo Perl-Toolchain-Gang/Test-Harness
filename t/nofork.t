@@ -3,8 +3,17 @@
 # check nofork logic on systems which *can* fork()
 # NOTE maybe a good candidate for xt/author or something.
 
+BEGIN {
+    if ( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ( '../lib', 'lib' );
+    }
+    else {
+        use lib 't/lib';
+    }
+}
+
 use strict;
-use lib 't/lib';
 
 use Config;
 use Test::More (
@@ -22,7 +31,8 @@ sub backticks {
     util::stdout_of( sub { system(@args) and die "error $?" } );
 }
 
-my @perl = ( $^X, '-Ilib', '-It/lib' );
+my @libs = map "-I$_", @INC;
+my @perl = ( $^X, @libs );
 my $mod = 'TAP::Parser::Iterator::Process';
 
 {    # just check the introspective method to start...
@@ -43,14 +53,15 @@ my $mod = 'TAP::Parser::Iterator::Process';
     local *STDERR;
     my $harness = TAP::Harness->new(
         {   verbosity => -2,
-            switches  => [ '-It/lib', "-MNoFork" ],
+            switches  => [ @libs, "-MNoFork" ],
             stdout    => $capture,
         }
     );
-    $harness->runtests('t/sample-tests/simple');
+    $harness->runtests(
+        ( $ENV{PERL_CORE} ? 'lib' : 't' ) . '/sample-tests/simple' );
     my @output = tied($$capture)->dump;
     is pop @output, "Result: PASS\n", 'status OK';
-    pop @output;                 # get rid of summary line
+    pop @output;    # get rid of summary line
     is( $output[-1], "All tests successful.\n", 'ran with no fork' );
 }
 
