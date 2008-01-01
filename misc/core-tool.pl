@@ -116,12 +116,20 @@ sub lookup {
 }
 
 sub diff_files {
-    my ( $from_dir, $to_dir, @file_map ) = @_;
+    with_pairs(
+        sub {
+            system( qw( diff -uNr ), @_ );
+        },
+        @_
+    );
+}
+
+sub with_pairs {
+    my ( $act, $from_dir, $to_dir, @file_map ) = @_;
     $to_dir = File::Spec->rel2abs($to_dir);
     local $CWD = $from_dir;
     while ( my ( $from_file, $to_file ) = splice @file_map, 0, 2 ) {
-        my $to_abs = File::Spec->catfile( $to_dir, $to_file );
-        system( qw( diff -uNr ), $from_file, $to_abs );
+        $act->( $from_file, File::Spec->catfile( $to_dir, $to_file ) );
     }
 }
 
