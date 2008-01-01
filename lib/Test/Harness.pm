@@ -571,7 +571,7 @@ L<Test::Harness> (on which this module is based) has this attribution:
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2007, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
+Copyright (c) 2007-2008, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

@@ -326,9 +326,9 @@ L<http://use.perl.org/~Alias/journal/29427>
 
 =head1 COPYRIGHT
 
-Copyright 2007 Andy Armstrong.
+Copyright 2007-2008 Andy Armstrong.
 
-Portions copyright 2006-2007 Adam Kennedy.
+Portions copyright 2006-2008 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
