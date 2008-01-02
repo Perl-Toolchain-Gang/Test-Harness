@@ -10,8 +10,7 @@ global:
     - /home/andy/Works/Perl/versions/5.8.6/bin/perl
     - /home/andy/Works/Perl/versions/5.8.7/bin/perl
     - /usr/bin/perl
-    - /home/andy/Works/Perl/versions/5.9.5/bin/perl5.9.5
-    - /home/andy/Works/Perl/versions/blead/bin/perl5.*
+    - /alt/local/bin/perl
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
   shell: /bin/bash
