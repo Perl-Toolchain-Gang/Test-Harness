@@ -15,7 +15,7 @@ global:
   svn: /usr/bin/svn
   shell: /bin/bash
   work: /home/andy/.smoke-work
-  description: Ubuntu Fiesty box with Test::Harness 2.64
+  description: Ubuntu Fiesty box with Test::Harness 3.06
 tasks:
   - mailto:
       - email: tapx-commit@hexten.net
