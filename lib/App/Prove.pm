@@ -449,6 +449,10 @@ sub _get_switches {
         push @switches, '-w';
     }
 
+    if ( defined( my $hps = $ENV{HARNESS_PERL_SWITCHES} ) ) {
+        push @switches, $hps;
+    }
+
     return @switches ? \@switches : ();
 }
 
