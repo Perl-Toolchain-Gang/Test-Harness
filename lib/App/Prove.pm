@@ -407,6 +407,7 @@ sub run {
 
         $self->_shuffle(@tests) if $self->shuffle;
         @tests = reverse @tests if $self->backwards;
+        local $ENV{TEST_VERBOSE} = 1 if $self->verbose;
 
         $self->_runtests( $self->_get_args, @tests );
     }
