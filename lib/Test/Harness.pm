@@ -21,6 +21,7 @@ use vars qw(
   $Verbose $Switches $Debug
   $verbose $switches $debug
   $Columns
+  $Color
   $Directives
   $Timer
   $Strap
@@ -71,6 +72,7 @@ $Switches = '-w';
 $Columns = $ENV{HARNESS_COLUMNS} || $ENV{COLUMNS} || 80;
 $Columns--;    # Some shells have trouble with a full line of text.
 $Timer = $ENV{HARNESS_TIMER} || 0;
+$Color = $ENV{HARNESS_COLOR} || 0;
 
 =head1 SYNOPSIS
 
@@ -237,14 +239,16 @@ sub _new_harness {
     # Do things the old way on VMS...
     push @lib, _filtered_inc() if IS_VMS;
 
+    # If $Verbose isn't numeric default to 1. This helps core.
+    my $verbosity = ( $Verbose ? ( $Verbose !~ /\d/ ) ? 1 : $Verbose : 0 );
+
     my $args = {
         timer      => $Timer,
         directives => $Directives,
         lib        => \@lib,
         switches   => \@switches,
-
-        # If $Verbose isn't numeric default to 1. This helps core.
-        verbosity => ( $Verbose ? ( $Verbose !~ /\d/ ) ? 1 : $Verbose : 0 ),
+        color      => $Color,
+        verbosity  => $verbosity,
     };
 
     if ( defined( my $env_opt = $ENV{HARNESS_OPTIONS} ) ) {
