@@ -190,6 +190,7 @@ sub process_args {
             'b|blib'      => \$self->{blib},
             's|shuffle'   => \$self->{shuffle},
             'color!'      => \$self->{color},
+            'colour!'     => \$self->{color},
             'c'           => \$self->{color},
             'harness=s'   => \$self->{harness},
             'formatter=s' => \$self->{formatter},
