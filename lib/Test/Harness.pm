@@ -242,7 +242,9 @@ sub _new_harness {
         directives => $Directives,
         lib        => \@lib,
         switches   => \@switches,
-        verbosity  => $Verbose,
+
+        # If $Verbose isn't numeric default to 1. This helps core.
+        verbosity => ( $Verbose ? ( $Verbose !~ /\d/ ) ? 1 : $Verbose : 0 ),
     };
 
     if ( defined( my $env_opt = $ENV{HARNESS_OPTIONS} ) ) {
