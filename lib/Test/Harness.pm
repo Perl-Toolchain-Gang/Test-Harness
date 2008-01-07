@@ -259,6 +259,9 @@ sub _new_harness {
             elsif ( $opt eq 'f' ) {
                 $args->{fork} = 1;
             }
+            elsif ( $opt eq 'c' ) {
+                $args->{color} = 1;
+            }
             else {
                 die "Unknown HARNESS_OPTIONS item: $opt\n";
             }
