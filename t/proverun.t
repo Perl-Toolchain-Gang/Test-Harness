@@ -1,9 +1,16 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+    if ( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ( '../lib', 'lib' );
+    }
+    else {
+        unshift @INC, 't/lib';
+    }
+}
+
 use strict;
-
-use lib 't/lib';
-
 use Test::More;
 use File::Spec;
 use App::Prove;
@@ -12,8 +19,10 @@ my @SCHEDULE;
 
 BEGIN {
 
-    my $sample_test
-      = File::Spec->catfile( split /\//, 't/sample-tests/simple' );
+    my $sample_test = File::Spec->catfile(
+        split /\//,
+        ( $ENV{PERL_CORE} ? 'lib' : 't' ) . '/sample-tests/simple'
+    );
 
     @SCHEDULE = (
         {   name   => 'Create empty',
@@ -130,7 +139,7 @@ for my $test (@SCHEDULE) {
     my $name = $test->{name};
 
     my $app = FakeProve->new;
-    $app->process_args( @{ $test->{args} } );
+    $app->process_args( '--norc', @{ $test->{args} } );
 
     # Why does this make the output from the test spew out of
     # our STDOUT?

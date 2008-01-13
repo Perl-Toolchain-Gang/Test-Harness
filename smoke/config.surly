@@ -10,13 +10,12 @@ global:
     - /home/andy/Works/Perl/versions/5.8.6/bin/perl
     - /home/andy/Works/Perl/versions/5.8.7/bin/perl
     - /usr/bin/perl
-    - /home/andy/Works/Perl/versions/5.9.5/bin/perl5.9.5
-    - /home/andy/Works/Perl/versions/blead/bin/perl5.*
+    - /alt/local/bin/perl
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
   shell: /bin/bash
   work: /home/andy/.smoke-work
-  description: Ubuntu Fiesty box with Test::Harness 2.64
+  description: Ubuntu Fiesty box with Test::Harness 3.06
 tasks:
   - mailto:
       - email: tapx-commit@hexten.net

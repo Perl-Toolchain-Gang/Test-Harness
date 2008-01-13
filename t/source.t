@@ -1,7 +1,16 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+    if ( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ( '../lib', 'lib' );
+    }
+    else {
+        unshift @INC, 't/lib';
+    }
+}
+
 use strict;
-use lib 't/lib';
 
 use Test::More tests => 30;
 
@@ -10,7 +19,10 @@ use File::Spec;
 use TAP::Parser::Source;
 use TAP::Parser::Source::Perl;
 
-my $test = File::Spec->catfile( 't', 'source_tests', 'source' );
+my $test = File::Spec->catfile(
+    ( $ENV{PERL_CORE} ? 'lib' : 't' ), 'source_tests',
+    'source'
+);
 
 my $perl = $^X;
 

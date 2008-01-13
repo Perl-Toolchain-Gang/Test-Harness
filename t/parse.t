@@ -1,7 +1,16 @@
 #!/usr/bin/perl -w
 
 use strict;
-use lib 't/lib';
+
+BEGIN {
+    if( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ('../lib', 'lib');
+    }
+    else {
+	use lib 't/lib';
+    }
+}
 
 use Test::More tests => 260;
 use IO::c55Capture;
@@ -615,7 +624,8 @@ END_TAP
     # coverage test of perl source with switches
 
     my $parser = TAP::Parser->new(
-        {   source => File::Spec->catfile( 't', 'sample-tests', 'simple' ),
+        {   source => File::Spec->catfile( ($ENV{PERL_CORE} ? 'lib' : 't'),
+					   'sample-tests', 'simple' ),
         }
     );
 

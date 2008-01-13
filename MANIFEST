@@ -64,6 +64,7 @@ t/compat/test-harness-compat.t
 t/compat/version.t
 t/console.t
 t/data/catme.1
+t/data/proverc
 t/data/sample.yml
 t/errors.t
 t/grammar.t
@@ -85,6 +86,7 @@ t/parse.t
 t/premature-bailout.t
 t/process.t
 t/prove.t
+t/proverc.t
 t/proverun.t
 t/regression.t
 t/results.t

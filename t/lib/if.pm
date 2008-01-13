@@ -1,14 +1,18 @@
 package if;
 
-use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.05';
 
 sub work {
-    my $method = shift() ? 'import' : 'unimport';
-    return unless shift;    # CONDITION
-    my $p = shift;          # PACKAGE
-    eval "require $p" or die;    # Adds .pm etc if needed
-    $p->$method(@_) if $p->can($method);
+  my $method = shift() ? 'import' : 'unimport';
+  die "Too few arguments to `use if' (some code returning an empty list in list context?)"
+    unless @_ >= 2;
+  return unless shift;		# CONDITION
+
+  my $p = $_[0];		# PACKAGE
+  (my $file = "$p.pm") =~ s!::!/!g;
+  require $file;		# Works even if $_[0] is a keyword (like open)
+  my $m = $p->can($method);
+  goto &$m if $m;
 }
 
 sub import   { shift; unshift @_, 1; goto &work }
@@ -35,6 +39,9 @@ has no effect unless C<CONDITION> is true.  In this case the effect is
 the same as of
 
   use MODULE ARGUMENTS;
+
+Above C<< => >> provides necessary quoting of C<MODULE>.  If not used (e.g.,
+no ARGUMENTS to give), you'd better quote C<MODULE> yourselves.
 
 =head1 BUGS
 
