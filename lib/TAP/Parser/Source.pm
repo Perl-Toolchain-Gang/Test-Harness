@@ -14,11 +14,11 @@ TAP::Parser::Source - Stream output from some source
 
 =head1 VERSION
 
-Version 3.05
+Version 3.08
 
 =cut
 
-$VERSION = '3.05';
+$VERSION = '3.08';
 
 =head1 DESCRIPTION
 

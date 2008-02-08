@@ -4,9 +4,10 @@ use strict;
 
 use vars qw{$VERSION};
 
-$VERSION = '3.05';
+$VERSION = '3.08';
 
 my $ESCAPE_CHAR = qr{ [ \x00-\x1f \" ] }x;
+my $ESCAPE_KEY  = qr{ (?: ^\W ) | $ESCAPE_CHAR }x;
 
 my @UNPRINTABLE = qw(
   z    x01  x02  x03  x04  x05  x06  a
@@ -71,10 +72,11 @@ sub _put {
 sub _enc_scalar {
     my $self = shift;
     my $val  = shift;
+    my $rule = shift;
 
     return '~' unless defined $val;
 
-    if ( $val =~ /$ESCAPE_CHAR/ ) {
+    if ( $val =~ /$rule/ ) {
         $val =~ s/\\/\\\\/g;
         $val =~ s/"/\\"/g;
         $val =~ s/ ( [\x00-\x1f] ) / '\\' . $UNPRINTABLE[ ord($1) ] /gex;
@@ -103,7 +105,7 @@ sub _write_obj {
                 for my $key ( sort keys %$obj ) {
                     my $value = $obj->{$key};
                     $self->_write_obj(
-                        $pad . $self->_enc_scalar($key) . ':',
+                        $pad . $self->_enc_scalar( $key, $ESCAPE_KEY ) . ':',
                         $value, $indent + 1
                     );
                 }
@@ -131,7 +133,7 @@ sub _write_obj {
         }
     }
     else {
-        $self->_put( $prefix, ' ', $self->_enc_scalar($obj) );
+        $self->_put( $prefix, ' ', $self->_enc_scalar( $obj, $ESCAPE_CHAR ) );
     }
 }
 
@@ -147,7 +149,7 @@ TAP::Parser::YAMLish::Writer - Write YAMLish data
 
 =head1 VERSION
 
-Version 3.05
+Version 3.08
 
 =head1 SYNOPSIS
 
@@ -243,7 +245,7 @@ L<http://use.perl.org/~Alias/journal/29427>
 
 =head1 COPYRIGHT
 
-Copyright 2007 Andy Armstrong.
+Copyright 2007-2008 Andy Armstrong.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

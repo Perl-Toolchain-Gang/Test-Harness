@@ -3,7 +3,6 @@
 # Test that env vars are honoured.
 
 use strict;
-use lib 't/lib';
 
 use Test::More (
     $^O eq 'VMS'

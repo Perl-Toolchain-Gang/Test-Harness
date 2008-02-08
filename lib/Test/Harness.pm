@@ -21,6 +21,7 @@ use vars qw(
   $Verbose $Switches $Debug
   $verbose $switches $debug
   $Columns
+  $Color
   $Directives
   $Timer
   $Strap
@@ -40,11 +41,11 @@ Test::Harness - Run Perl standard test scripts with statistics
 
 =head1 VERSION
 
-Version 3.05
+Version 3.08
 
 =cut
 
-$VERSION = '3.05';
+$VERSION = '3.08';
 
 # Backwards compatibility for exportable variable names.
 *verbose  = *Verbose;
@@ -71,6 +72,7 @@ $Switches = '-w';
 $Columns = $ENV{HARNESS_COLUMNS} || $ENV{COLUMNS} || 80;
 $Columns--;    # Some shells have trouble with a full line of text.
 $Timer = $ENV{HARNESS_TIMER} || 0;
+$Color = $ENV{HARNESS_COLOR} || 0;
 
 =head1 SYNOPSIS
 
@@ -125,7 +127,7 @@ sub _aggregate {
 
         # Jiggery pokery doesn't appear to work on VMS - so disable it
         # pending investigation.
-        $harness->aggregate_tests( $aggregate, @tests );
+        _aggregate_tests( $harness, $aggregate, @tests );
     }
     else {
         my $path_sep  = $Config{path_sep};
@@ -153,8 +155,16 @@ sub _aggregate {
             $ENV{PERL5LIB} = join( $path_sep, @extra_inc );
         }
 
-        $harness->aggregate_tests( $aggregate, @tests );
+        _aggregate_tests( $harness, $aggregate, @tests );
     }
+}
+
+sub _aggregate_tests {
+    my ( $harness, $aggregate, @tests ) = @_;
+    $aggregate->start();
+    $harness->aggregate_tests( $aggregate, @tests );
+    $aggregate->stop();
+
 }
 
 sub runtests {
@@ -209,6 +219,7 @@ sub _canon {
 }
 
 sub _new_harness {
+    my $sub_args = shift || {};
 
     if ( defined( my $env_sw = $ENV{HARNESS_PERL_SWITCHES} ) ) {
         $Switches .= ' ' . $env_sw if ( length($env_sw) );
@@ -229,13 +240,20 @@ sub _new_harness {
     # Do things the old way on VMS...
     push @lib, _filtered_inc() if IS_VMS;
 
+    # If $Verbose isn't numeric default to 1. This helps core.
+    my $verbosity = ( $Verbose ? ( $Verbose !~ /\d/ ) ? 1 : $Verbose : 0 );
+
     my $args = {
         timer      => $Timer,
         directives => $Directives,
         lib        => \@lib,
         switches   => \@switches,
-        verbosity  => $Verbose,
+        color      => $Color,
+        verbosity  => $verbosity,
     };
+
+    $args->{stdout} = $sub_args->{out}
+      if exists $sub_args->{out};
 
     if ( defined( my $env_opt = $ENV{HARNESS_OPTIONS} ) ) {
         for my $opt ( split /:/, $env_opt ) {
@@ -244,6 +262,9 @@ sub _new_harness {
             }
             elsif ( $opt eq 'f' ) {
                 $args->{fork} = 1;
+            }
+            elsif ( $opt eq 'c' ) {
+                $args->{color} = 1;
             }
             else {
                 die "Unknown HARNESS_OPTIONS item: $opt\n";
@@ -319,9 +340,7 @@ sub _check_sequence {
 sub execute_tests {
     my %args = @_;
 
-    # TODO: Handle out option
-
-    my $harness   = _new_harness();
+    my $harness   = _new_harness( \%args );
     my $aggregate = TAP::Parser::Aggregator->new();
 
     my %tot = (
@@ -563,7 +582,7 @@ L<Test::Harness> (on which this module is based) has this attribution:
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2007, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
+Copyright (c) 2007-2008, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

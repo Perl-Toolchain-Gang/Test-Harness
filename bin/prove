@@ -27,6 +27,7 @@ Boolean options:
  -s,  --shuffle     Run the tests in random order.
  -c,  --color       Colored test output (default).
       --nocolor     Do not color test output.
+ -D   --dry         Dry run. Show test that would have run.
  -f,  --failures    Only show failed tests.
       --fork        Fork to run harness in multiple processes
  -m,  --merge       Merge test scripts' STDERR with their STDOUT.
@@ -44,6 +45,7 @@ Boolean options:
  -h,  --help        Display this help
  -?,                Display this help
  -H,  --man         Longer manpage for prove
+      --norc        Don't process default .proverc
 
 Options that take arguments:
 
@@ -56,6 +58,25 @@ Options that take arguments:
  -a,  --archive     Store the resulting TAP in an archive file.
  -j,  --jobs N      Run N test jobs in parallel (try 9.)
       --state=opts  Control prove's persistent state.
+      --rc=rcfile   Process options from rcfile
+
+=head1 NOTES
+
+=head2 .proverc
+
+If F<~/.proverc> or F<./.proverc> exist they will be read and any
+options they contain processed before the command line options. Options
+in F<.proverc> are specified in the same way as command line options:
+
+    # .proverc
+    --state=hot,fast,save
+    -j9 --fork
+
+Additional option files may be specified with the C<--rc> option.
+Default option file processing is disabled by the C<--norc> option.
+
+Under Windows and VMS the option file is named F<_proverc> rather than
+F<.proverc> and is sought only in the current directory.
 
 =head2 Reading from C<STDIN>
 
@@ -65,8 +86,6 @@ file, you can add them to your tests by using a '-':
  prove - < my_list_of_things_to_test.txt
 
 See the C<README> in the C<examples> directory of this distribution.
-
-=head1 NOTES
 
 =head2 Default Test Directory
 
@@ -146,7 +165,7 @@ possible, for example, to recreate the ordering of a shuffled test.
 Run only the tests that failed on the last run.
 
     # Run all tests
-e    $ prove -b --state=save
+    $ prove -b --state=save
     
     # Run failures
     $ prove -b --state=failed
@@ -220,20 +239,6 @@ Save the state on exit. The state is stored in a file called F<.prove>
 The C<--state> switch may be used more than once.
 
     $ prove -b --state=hot --state=all,save
-
-=head1 PERFORMANCE
-
-Because of its design, C<TAP::Parser> collects more information than
-C<Test::Harness>.  However, the trade-off is sometimes slightly slower
-performance than when using the C<prove> utility which is bundled with
-L<Test::Harness>.  For small tests suites, this is usually not a problem.
-However, enabling the C<--quiet> or C<--QUIET> options can sometimes speed up
-the test suite, sometimes running faster than C<prove>.
-
-=head1 SEE ALSO
-
-C<prove>, which comes with L<Test::Harness> and whose code I've nicked in a
-few places (thanks Andy!).
 
 =cut
 

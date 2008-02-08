@@ -1,7 +1,7 @@
 ---
 global:
   perls:
-    - /usr/bin/perl
+    - /alt/local/bin/perl
   status: /home/andy/.smoke-tapx-vms
   svn: /usr/bin/svn
   work: /home/andy/.smoke-work-vms

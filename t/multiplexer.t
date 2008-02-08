@@ -56,7 +56,8 @@ my @schedule = (
             return [
                 TAP::Parser->new(
                     {   source => File::Spec->catfile(
-                            't', 'sample-tests', 'simple'
+                            ($ENV{PERL_CORE} ? 'lib' : 't'), 'sample-tests',
+			    'simple'
                         ),
                     }
                 ),
@@ -75,7 +76,8 @@ my @schedule = (
             return map {
                 [   TAP::Parser->new(
                         {   source => File::Spec->catfile(
-                                't', 'sample-tests', 'simple'
+                                ($ENV{PERL_CORE} ? 'lib' : 't'),
+				'sample-tests', 'simple'
                             ),
                         }
                     ),
@@ -114,7 +116,8 @@ my @schedule = (
               ( map {
                     [   TAP::Parser->new(
                             {   source => File::Spec->catfile(
-                                    't', 'sample-tests', 'simple'
+                                    ($ENV{PERL_CORE} ? 'lib' : 't'),
+				    'sample-tests', 'simple'
                                 ),
                             }
                         ),

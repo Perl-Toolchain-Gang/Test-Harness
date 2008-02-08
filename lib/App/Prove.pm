@@ -15,11 +15,11 @@ App::Prove - Implements the C<prove> command.
 
 =head1 VERSION
 
-Version 3.05
+Version 3.08
 
 =cut
 
-$VERSION = '3.05';
+$VERSION = '3.08';
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,10 @@ wrapper around an instance of this module.
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS => $^O eq 'VMS';
-use constant STATE_FILE => ( IS_WIN32 || IS_VMS ) ? '_prove' : '.prove';
+use constant IS_UNIXY => !( IS_VMS || IS_WIN32 );
+
+use constant STATE_FILE => IS_UNIXY ? '.prove'   : '_prove';
+use constant RC_FILE    => IS_UNIXY ? '.proverc' : '_proverc';
 
 use constant PLUGINS => 'App::Prove::Plugin';
 
@@ -51,7 +54,7 @@ BEGIN {
       harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man
-      show_version test_args state
+      show_version test_args state dry
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -80,6 +83,7 @@ sub new {
 
     my $self = bless {
         argv          => [],
+        rc_opts       => [],
         includes      => [],
         modules       => [],
         state         => [],
@@ -98,9 +102,30 @@ sub new {
     return $self;
 }
 
+=head3 C<add_rc_file>
+
+    $prove->add_rc_file('myproj/.proverc');
+
+Called before C<process_args> to prepend the contents of an rc file to
+the options.
+
+=cut
+
+sub add_rc_file {
+    my ( $self, $rc_file ) = @_;
+
+    local *RC;
+    open RC, "<$rc_file" or croak "Can't read $rc_file ($!)";
+    while ( defined( my $line = <RC> ) ) {
+        push @{ $self->{rc_opts} }, grep $_ && $_ !~ /^#/,
+          $line =~ m{ ' ([^']*) ' | " ([^"]*) " | (\#.*) | (\S*) }xg;
+    }
+    close RC;
+}
+
 =head3 C<process_args>
 
-  $prove->process_args(@args);
+    $prove->process_args(@args);
 
 Processes the command-line arguments. Attributes will be set
 appropriately. Any filenames may be found in the C<argv> attribute.
@@ -110,7 +135,29 @@ Dies on invalid arguments.
 =cut
 
 sub process_args {
-    my ( $self, @args ) = @_;
+    my $self = shift;
+
+    my @rc = RC_FILE;
+    unshift @rc, glob '~/' . RC_FILE if IS_UNIXY;
+
+    # Preprocess meta-args.
+    my @args;
+    while ( defined( my $arg = shift ) ) {
+        if ( $arg eq '--norc' ) {
+            @rc = ();
+        }
+        elsif ( $arg eq '--rc' ) {
+            defined( my $rc = shift )
+              or croak "Missing argument to --rc";
+            push @rc, $rc;
+        }
+        elsif ( $arg =~ m{^--rc=(.+)$} ) {
+            push @rc, $1;
+        }
+        else {
+            push @args, $arg;
+        }
+    }
 
     # Everything after the arisdottle '::' gets passed as args to
     # test programs.
@@ -120,10 +167,16 @@ sub process_args {
         $self->{test_args} = \@test_args;
     }
 
+    # Grab options from RC files
+    $self->add_rc_file($_) for grep -f, @rc;
+    unshift @args, @{ $self->{rc_opts} };
+
     if ( my @bad = map {"-$_"} grep {/^-(man|help)$/} @args ) {
         die "Long options should be written with two dashes: ",
           join( ', ', @bad ), "\n";
     }
+
+    # And finally...
 
     {
         local @ARGV = @args;
@@ -137,7 +190,9 @@ sub process_args {
             'b|blib'      => \$self->{blib},
             's|shuffle'   => \$self->{shuffle},
             'color!'      => \$self->{color},
+            'colour!'     => \$self->{color},
             'c'           => \$self->{color},
+            'D|dry'       => \$self->{dry},
             'harness=s'   => \$self->{harness},
             'formatter=s' => \$self->{formatter},
             'r|recurse'   => \$self->{recurse},
@@ -340,25 +395,36 @@ sub run {
     elsif ( $self->show_version ) {
         $self->print_version;
     }
+    elsif ( $self->dry ) {
+        print "$_\n" for $self->_get_tests;
+    }
     else {
 
         $self->_load_extensions( $self->modules );
         $self->_load_extensions( $self->plugins, PLUGINS );
 
-        my $state = $self->{_state};
-        if ( defined( my $state_switch = $self->state ) ) {
-            $state->apply_switch(@$state_switch);
-        }
+        local $ENV{TEST_VERBOSE} = 1 if $self->verbose;
 
-        my @tests = $state->get_tests( $self->recurse, @{ $self->argv } );
-
-        $self->_shuffle(@tests) if $self->shuffle;
-        @tests = reverse @tests if $self->backwards;
-
-        $self->_runtests( $self->_get_args, @tests );
+        $self->_runtests( $self->_get_args, $self->_get_tests );
     }
 
     return;
+}
+
+sub _get_tests {
+    my $self = shift;
+
+    my $state = $self->{_state};
+    if ( defined( my $state_switch = $self->state ) ) {
+        $state->apply_switch(@$state_switch);
+    }
+
+    my @tests = $state->get_tests( $self->recurse, @{ $self->argv } );
+
+    $self->_shuffle(@tests) if $self->shuffle;
+    @tests = reverse @tests if $self->backwards;
+
+    return @tests;
 }
 
 sub _runtests {
@@ -394,6 +460,10 @@ sub _get_switches {
     }
     elsif ( $self->warnings_warn ) {
         push @switches, '-w';
+    }
+
+    if ( defined( my $hps = $ENV{HARNESS_PERL_SWITCHES} ) ) {
+        push @switches, $hps;
     }
 
     return @switches ? \@switches : ();
@@ -492,6 +562,8 @@ calling C<run>.
 =item C<color>
 
 =item C<directives>
+
+=item C<dry>
 
 =item C<exec>
 

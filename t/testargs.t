@@ -1,5 +1,9 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+    chdir 't' and @INC = '../lib' if $ENV{PERL_CORE};
+}
+
 use strict;
 use lib 't/lib';
 
@@ -9,7 +13,8 @@ use TAP::Parser;
 use TAP::Harness;
 use App::Prove;
 
-my $test = File::Spec->catfile( 't', 'sample-tests', 'echo' );
+my $test = File::Spec->catfile( ($ENV{PERL_CORE} ? 'lib' : 't'),
+				'sample-tests', 'echo' );
 
 diag( "\n\n", bigness( join ' ', @ARGV ), "\n\n" ) if @ARGV;
 
@@ -64,7 +69,7 @@ package main;
 {
     my $app = Test::Prove->new;
 
-    $app->process_args( $test, '::', 'one', 'two', 'huh' );
+    $app->process_args( '--norc', $test, '::', 'one', 'two', 'huh' );
     $app->run();
     my $log = $app->get_run_log;
     is_deeply $log->[0]->[0]->{test_args}, [ 'one', 'two', 'huh' ],

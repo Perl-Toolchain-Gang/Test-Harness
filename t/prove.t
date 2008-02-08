@@ -1,7 +1,16 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+    if ( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ( '../lib', 'lib' );
+    }
+    else {
+        unshift @INC, 't/lib';
+    }
+}
+
 use strict;
-use lib 't/lib';
 
 use Test::More;
 use File::Spec;
@@ -1314,7 +1323,7 @@ for my $test (@SCHEDULE) {
 
     # Optionally parse command args
     if ( my $switches = $test->{switches} ) {
-        eval { $app->process_args(@$switches) };
+        eval { $app->process_args( '--norc', @$switches ) };
         if ( my $err_pattern = $test->{parse_error} ) {
             like $@, $err_pattern, "$name: expected parse error";
         }

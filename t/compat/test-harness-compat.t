@@ -1,16 +1,26 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+    if ( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = '../lib';
+    }
+    else {
+        unshift @INC, 't/lib';
+    }
+}
+
 use strict;
-use lib 't/lib';
+# use lib 't/lib';
 
 use Test::More;
-
 use File::Spec;
-
 use Test::Harness qw(execute_tests);
 
 # unset this global when self-testing ('testcover' and etc issue)
 local $ENV{HARNESS_PERL_SWITCHES};
+
+my $TEST_DIR = $ENV{PERL_CORE} ? 'lib/sample-tests' : 't/sample-tests';
 
 {
 
@@ -18,7 +28,6 @@ local $ENV{HARNESS_PERL_SWITCHES};
     # do it for our internal calls
     local $ENV{PERL_TEST_HARNESS_DUMP_TAP} = 0;
 
-    my $TEST_DIR = 't/sample-tests';
     my $PER_LOOP = 4;
 
     my $results = {
@@ -49,118 +58,118 @@ local $ENV{HARNESS_PERL_SWITCHES};
               )
           ) => {
             'failed' => {
-                't/sample-tests/die' => {
+                "$TEST_DIR/die" => {
                     'canon'  => '??',
                     'estat'  => 1,
                     'failed' => '??',
                     'max'    => '??',
-                    'name'   => 't/sample-tests/die',
+                    'name'   => "$TEST_DIR/die",
                     'wstat'  => '256'
                 },
-                't/sample-tests/die_head_end' => {
+                "$TEST_DIR/die_head_end" => {
                     'canon'  => '??',
                     'estat'  => 1,
                     'failed' => '??',
                     'max'    => '??',
-                    'name'   => 't/sample-tests/die_head_end',
+                    'name'   => "$TEST_DIR/die_head_end",
                     'wstat'  => '256'
                 },
-                't/sample-tests/die_last_minute' => {
+                "$TEST_DIR/die_last_minute" => {
                     'canon'  => '??',
                     'estat'  => 1,
                     'failed' => 0,
                     'max'    => 4,
-                    'name'   => 't/sample-tests/die_last_minute',
+                    'name'   => "$TEST_DIR/die_last_minute",
                     'wstat'  => '256'
                 },
-                't/sample-tests/duplicates' => {
+                "$TEST_DIR/duplicates" => {
                     'canon'  => '??',
                     'estat'  => '',
                     'failed' => '??',
                     'max'    => 10,
-                    'name'   => 't/sample-tests/duplicates',
+                    'name'   => "$TEST_DIR/duplicates",
                     'wstat'  => ''
                 },
-                't/sample-tests/head_fail' => {
+                "$TEST_DIR/head_fail" => {
                     'canon'  => 2,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 4,
-                    'name'   => 't/sample-tests/head_fail',
+                    'name'   => "$TEST_DIR/head_fail",
                     'wstat'  => ''
                 },
-                't/sample-tests/inc_taint' => {
+                "$TEST_DIR/inc_taint" => {
                     'canon'  => 1,
                     'estat'  => 1,
                     'failed' => 1,
                     'max'    => 1,
-                    'name'   => 't/sample-tests/inc_taint',
+                    'name'   => "$TEST_DIR/inc_taint",
                     'wstat'  => '256'
                 },
-                't/sample-tests/no_nums' => {
+                "$TEST_DIR/no_nums" => {
                     'canon'  => 3,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 5,
-                    'name'   => 't/sample-tests/no_nums',
+                    'name'   => "$TEST_DIR/no_nums",
                     'wstat'  => ''
                 },
-                't/sample-tests/no_output' => {
+                "$TEST_DIR/no_output" => {
                     'canon'  => '??',
                     'estat'  => '',
                     'failed' => '??',
                     'max'    => '??',
-                    'name'   => 't/sample-tests/no_output',
+                    'name'   => "$TEST_DIR/no_output",
                     'wstat'  => ''
                 },
-                't/sample-tests/simple_fail' => {
+                "$TEST_DIR/simple_fail" => {
                     'canon'  => '2 5',
                     'estat'  => '',
                     'failed' => 2,
                     'max'    => 5,
-                    'name'   => 't/sample-tests/simple_fail',
+                    'name'   => "$TEST_DIR/simple_fail",
                     'wstat'  => ''
                 },
-                't/sample-tests/switches' => {
+                "$TEST_DIR/switches" => {
                     'canon'  => 1,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 1,
-                    'name'   => 't/sample-tests/switches',
+                    'name'   => "$TEST_DIR/switches",
                     'wstat'  => ''
                 },
-                't/sample-tests/todo_misparse' => {
+                "$TEST_DIR/todo_misparse" => {
                     'canon'  => 1,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 1,
-                    'name'   => 't/sample-tests/todo_misparse',
+                    'name'   => "$TEST_DIR/todo_misparse",
                     'wstat'  => ''
                 },
-                't/sample-tests/too_many' => {
+                "$TEST_DIR/too_many" => {
                     'canon'  => '4-7',
                     'estat'  => 4,
                     'failed' => 4,
                     'max'    => 3,
-                    'name'   => 't/sample-tests/too_many',
+                    'name'   => "$TEST_DIR/too_many",
                     'wstat'  => '1024'
                 },
-                't/sample-tests/vms_nit' => {
+                "$TEST_DIR/vms_nit" => {
                     'canon'  => 1,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 2,
-                    'name'   => 't/sample-tests/vms_nit',
+                    'name'   => "$TEST_DIR/vms_nit",
                     'wstat'  => ''
                 }
             },
             'todo' => {
-                't/sample-tests/todo_inline' => {
+                "$TEST_DIR/todo_inline" => {
                     'canon'  => 2,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 2,
-                    'name'   => 't/sample-tests/todo_inline',
+                    'name'   => "$TEST_DIR/todo_inline",
                     'wstat'  => ''
                 }
             },
@@ -179,12 +188,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
           },
         'die' => {
             'failed' => {
-                't/sample-tests/die' => {
+                "$TEST_DIR/die" => {
                     'canon'  => '??',
                     'estat'  => 1,
                     'failed' => '??',
                     'max'    => '??',
-                    'name'   => 't/sample-tests/die',
+                    'name'   => "$TEST_DIR/die",
                     'wstat'  => '256'
                 }
             },
@@ -204,12 +213,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'die_head_end' => {
             'failed' => {
-                't/sample-tests/die_head_end' => {
+                "$TEST_DIR/die_head_end" => {
                     'canon'  => '??',
                     'estat'  => 1,
                     'failed' => '??',
                     'max'    => '??',
-                    'name'   => 't/sample-tests/die_head_end',
+                    'name'   => "$TEST_DIR/die_head_end",
                     'wstat'  => '256'
                 }
             },
@@ -229,12 +238,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'die_last_minute' => {
             'failed' => {
-                't/sample-tests/die_last_minute' => {
+                "$TEST_DIR/die_last_minute" => {
                     'canon'  => '??',
                     'estat'  => 1,
                     'failed' => 0,
                     'max'    => 4,
-                    'name'   => 't/sample-tests/die_last_minute',
+                    'name'   => "$TEST_DIR/die_last_minute",
                     'wstat'  => '256'
                 }
             },
@@ -254,12 +263,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'duplicates' => {
             'failed' => {
-                't/sample-tests/duplicates' => {
+                "$TEST_DIR/duplicates" => {
                     'canon'  => '??',
                     'estat'  => '',
                     'failed' => '??',
                     'max'    => 10,
-                    'name'   => 't/sample-tests/duplicates',
+                    'name'   => "$TEST_DIR/duplicates",
                     'wstat'  => ''
                 }
             },
@@ -295,12 +304,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'head_fail' => {
             'failed' => {
-                't/sample-tests/head_fail' => {
+                "$TEST_DIR/head_fail" => {
                     'canon'  => 2,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 4,
-                    'name'   => 't/sample-tests/head_fail',
+                    'name'   => "$TEST_DIR/head_fail",
                     'wstat'  => ''
                 }
             },
@@ -320,12 +329,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'inc_taint' => {
             'failed' => {
-                't/sample-tests/inc_taint' => {
+                "$TEST_DIR/inc_taint" => {
                     'canon'  => 1,
                     'estat'  => 1,
                     'failed' => 1,
                     'max'    => 1,
-                    'name'   => 't/sample-tests/inc_taint',
+                    'name'   => "$TEST_DIR/inc_taint",
                     'wstat'  => '256'
                 }
             },
@@ -377,12 +386,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'no_nums' => {
             'failed' => {
-                't/sample-tests/no_nums' => {
+                "$TEST_DIR/no_nums" => {
                     'canon'  => 3,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 5,
-                    'name'   => 't/sample-tests/no_nums',
+                    'name'   => "$TEST_DIR/no_nums",
                     'wstat'  => ''
                 }
             },
@@ -402,12 +411,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'no_output' => {
             'failed' => {
-                't/sample-tests/no_output' => {
+                "$TEST_DIR/no_output" => {
                     'canon'  => '??',
                     'estat'  => '',
                     'failed' => '??',
                     'max'    => '??',
-                    'name'   => 't/sample-tests/no_output',
+                    'name'   => "$TEST_DIR/no_output",
                     'wstat'  => ''
                 }
             },
@@ -491,12 +500,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'simple_fail' => {
             'failed' => {
-                't/sample-tests/simple_fail' => {
+                "$TEST_DIR/simple_fail" => {
                     'canon'  => '2 5',
                     'estat'  => '',
                     'failed' => 2,
                     'max'    => 5,
-                    'name'   => 't/sample-tests/simple_fail',
+                    'name'   => "$TEST_DIR/simple_fail",
                     'wstat'  => ''
                 }
             },
@@ -596,12 +605,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'switches' => {
             'failed' => {
-                't/sample-tests/switches' => {
+                "$TEST_DIR/switches" => {
                     'canon'  => 1,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 1,
-                    'name'   => 't/sample-tests/switches',
+                    'name'   => "$TEST_DIR/switches",
                     'wstat'  => ''
                 }
             },
@@ -655,12 +664,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         'todo_inline' => {
             'failed' => {},
             'todo'   => {
-                't/sample-tests/todo_inline' => {
+                "$TEST_DIR/todo_inline" => {
                     'canon'  => 2,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 2,
-                    'name'   => 't/sample-tests/todo_inline',
+                    'name'   => "$TEST_DIR/todo_inline",
                     'wstat'  => ''
                 }
             },
@@ -679,12 +688,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'todo_misparse' => {
             'failed' => {
-                't/sample-tests/todo_misparse' => {
+                "$TEST_DIR/todo_misparse" => {
                     'canon'  => 1,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 1,
-                    'name'   => 't/sample-tests/todo_misparse',
+                    'name'   => "$TEST_DIR/todo_misparse",
                     'wstat'  => ''
                 }
             },
@@ -704,12 +713,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'too_many' => {
             'failed' => {
-                't/sample-tests/too_many' => {
+                "$TEST_DIR/too_many" => {
                     'canon'  => '4-7',
                     'estat'  => 4,
                     'failed' => 4,
                     'max'    => 3,
-                    'name'   => 't/sample-tests/too_many',
+                    'name'   => "$TEST_DIR/too_many",
                     'wstat'  => '1024'
                 }
             },
@@ -729,12 +738,12 @@ local $ENV{HARNESS_PERL_SWITCHES};
         },
         'vms_nit' => {
             'failed' => {
-                't/sample-tests/vms_nit' => {
+                "$TEST_DIR/vms_nit" => {
                     'canon'  => 1,
                     'estat'  => '',
                     'failed' => 1,
                     'max'    => 2,
-                    'name'   => 't/sample-tests/vms_nit',
+                    'name'   => "$TEST_DIR/vms_nit",
                     'wstat'  => ''
                 }
             },
@@ -781,13 +790,13 @@ local $ENV{HARNESS_PERL_SWITCHES};
         return $hash unless $^O eq 'VMS';
 
         while ( my ( $file, $want ) = each %$hash ) {
-            for ( qw( estat wstat ) ) {
+            for (qw( estat wstat )) {
                 if ( exists $want->{$_} ) {
                     $want->{$_} = $want->{$_} ? 1 : 0;
                 }
             }
         }
-        return $hash
+        return $hash;
     }
 
     {
