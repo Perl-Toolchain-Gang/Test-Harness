@@ -221,6 +221,7 @@ sub _canon {
 sub _new_harness {
     my $sub_args = shift || {};
 
+    # TODO: $Switches is supposed to /override/ HARNESS_PERL_SWITCHES
     if ( defined( my $env_sw = $ENV{HARNESS_PERL_SWITCHES} ) ) {
         $Switches .= ' ' . $env_sw if ( length($env_sw) );
     }
