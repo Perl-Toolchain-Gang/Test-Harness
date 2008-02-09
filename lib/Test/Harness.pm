@@ -10,6 +10,7 @@ use constant IS_VMS => ( $^O eq 'VMS' );
 use TAP::Harness              ();
 use TAP::Parser::Aggregator   ();
 use TAP::Parser::Source::Perl ();
+use TAP::Parser::Utils        ();
 
 use Config;
 use Exporter;
@@ -221,15 +222,13 @@ sub _canon {
 sub _new_harness {
     my $sub_args = shift || {};
 
-    # TODO: $Switches is supposed to /override/ HARNESS_PERL_SWITCHES
-    if ( defined( my $env_sw = $ENV{HARNESS_PERL_SWITCHES} ) ) {
-        $Switches .= ' ' . $env_sw if ( length($env_sw) );
-    }
-
-    # This is a bit crufty. The switches have all been joined into a
-    # single string so we have to try and recover them.
     my ( @lib, @switches );
-    for my $opt ( split( /\s+(?=-)/, $Switches ) ) {
+    for my $opt (
+        TAP::Parser::Utils::split_shell_switches(
+            $Switches, $ENV{HARNESS_PERL_SWITCHES}
+        )
+      )
+    {
         if ( $opt =~ /^ -I (.*) $ /x ) {
             push @lib, $1;
         }
