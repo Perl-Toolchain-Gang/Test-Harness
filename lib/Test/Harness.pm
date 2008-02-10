@@ -10,7 +10,8 @@ use constant IS_VMS => ( $^O eq 'VMS' );
 use TAP::Harness              ();
 use TAP::Parser::Aggregator   ();
 use TAP::Parser::Source::Perl ();
-use TAP::Parser::Utils        ();
+
+use TAP::Parser::Utils qw( split_shell );
 
 use Config;
 use Exporter;
@@ -223,12 +224,7 @@ sub _new_harness {
     my $sub_args = shift || {};
 
     my ( @lib, @switches );
-    for my $opt (
-        TAP::Parser::Utils::split_shell_switches(
-            $Switches, $ENV{HARNESS_PERL_SWITCHES}
-        )
-      )
-    {
+    for my $opt ( split_shell( $Switches, $ENV{HARNESS_PERL_SWITCHES} ) ) {
         if ( $opt =~ /^ -I (.*) $ /x ) {
             push @lib, $1;
         }

@@ -2,7 +2,7 @@ package App::Prove;
 
 use strict;
 use TAP::Harness;
-use TAP::Parser::Utils;
+use TAP::Parser::Utils qw( split_shell );
 use File::Spec;
 use Getopt::Long;
 use App::Prove::State;
@@ -463,8 +463,7 @@ sub _get_switches {
         push @switches, '-w';
     }
 
-    push @switches,
-      TAP::Parser::Utils::split_shell_switches( $ENV{HARNESS_PERL_SWITCHES} );
+    push @switches, split_shell( $ENV{HARNESS_PERL_SWITCHES} );
 
     return @switches ? \@switches : ();
 }
