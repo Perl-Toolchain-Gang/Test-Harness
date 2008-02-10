@@ -13,7 +13,8 @@ This is the guide for TAP::Harness internals contributors (developers,
 testers, documenters.)
 
 If you are looking for more information on how to I<use> TAP::Harness,
-you probably want the L<TAP::Harness::Cookbook> instead.
+you probably want
+L<http://testanything.org/wiki/index.php/TAP::Parser_Cookbook> instead.
 
 =head1 Getting Started
 

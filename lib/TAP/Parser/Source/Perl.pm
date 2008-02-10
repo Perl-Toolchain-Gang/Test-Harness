@@ -255,13 +255,14 @@ sub _switches {
     my $taint = $self->get_taint($shebang);
     push @switches, "-$taint" if defined $taint;
 
-    # Hacky bodge. We split any switches that contain a double quote
-    # followed by w/s so that, e.g., '-e "print"' turns into '- e',
-    # 'print', then quote each switch if there's any whitespace in it,
-    # or if we're VMS, since VMS requires all parms quoted. Also, don't
-    # quote it if it's already quoted.
-    return map { ( ( /\s/ || IS_VMS ) && !/^".*"$/ ) ? qq["$_"] : $_ }
-      map { /^(-\S+)\s+"(.*?)"$/ ? ( $1, $2 ) : ($_) } @switches;
+    # Quote the argument if there's any whitespace in it, or if
+    # we're VMS, since VMS requires all parms quoted.  Also, don't quote
+    # it if it's already quoted.
+    for (@switches) {
+        $_ = qq["$_"] if ( ( /\s/ || IS_VMS ) && !/^".*"$/ );
+    }
+
+    return @switches;
 }
 
 sub _get_perl {

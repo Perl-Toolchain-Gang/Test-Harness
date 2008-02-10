@@ -41,6 +41,7 @@ lib/TAP/Parser/Result/Version.pm
 lib/TAP/Parser/Result/YAML.pm
 lib/TAP/Parser/Source.pm
 lib/TAP/Parser/Source/Perl.pm
+lib/TAP/Parser/Utils.pm
 lib/TAP/Parser/YAMLish/Reader.pm
 lib/TAP/Parser/YAMLish/Writer.pm
 lib/Test/Harness.pm
@@ -156,6 +157,7 @@ t/streams.t
 t/taint.t
 t/testargs.t
 t/unicode.t
+t/utils.t
 t/yamlish-output.t
 t/yamlish-writer.t
 t/yamlish.t
