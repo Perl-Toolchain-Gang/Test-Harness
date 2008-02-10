@@ -62,13 +62,11 @@ sub split_shell {
         ) /xg;
     }
 
-    my @out = ();
-
-    for ( grep length, @parts ) {
+    for (@parts) {
         s/ \\(.) | ['"] /defined $1 ? $1 : ''/exg;
-        push @out, $_;
     }
-    return @out;
+
+    return @parts;
 }
 
 1;
