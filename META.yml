@@ -1,6 +1,7 @@
 ---
 name: Test-Harness
-version: 3.09
+version: 3.10
+
 
 
 
@@ -24,7 +25,8 @@ recommends:
 provides:
   App::Prove:
     file: lib/App/Prove.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -33,7 +35,8 @@ provides:
 
   TAP::Base:
     file: lib/TAP/Base.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -42,7 +45,8 @@ provides:
 
   TAP::Formatter::Color:
     file: lib/TAP/Formatter/Color.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -51,7 +55,8 @@ provides:
 
   TAP::Formatter::Console:
     file: lib/TAP/Formatter/Console.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -60,7 +65,8 @@ provides:
 
   TAP::Formatter::Console::ParallelSession:
     file: lib/TAP/Formatter/Console/ParallelSession.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -69,7 +75,8 @@ provides:
 
   TAP::Formatter::Console::Session:
     file: lib/TAP/Formatter/Console/Session.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -78,7 +85,8 @@ provides:
 
   TAP::Harness:
     file: lib/TAP/Harness.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -87,7 +95,8 @@ provides:
 
   TAP::Parser:
     file: lib/TAP/Parser.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -96,7 +105,8 @@ provides:
 
   TAP::Parser::Aggregator:
     file: lib/TAP/Parser/Aggregator.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -105,7 +115,8 @@ provides:
 
   TAP::Parser::Grammar:
     file: lib/TAP/Parser/Grammar.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -114,7 +125,8 @@ provides:
 
   TAP::Parser::Iterator:
     file: lib/TAP/Parser/Iterator.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -123,7 +135,8 @@ provides:
 
   TAP::Parser::Iterator::Array:
     file: lib/TAP/Parser/Iterator/Array.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -132,7 +145,8 @@ provides:
 
   TAP::Parser::Iterator::Process:
     file: lib/TAP/Parser/Iterator/Process.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -141,7 +155,8 @@ provides:
 
   TAP::Parser::Iterator::Stream:
     file: lib/TAP/Parser/Iterator/Stream.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -150,7 +165,8 @@ provides:
 
   TAP::Parser::Multiplexer:
     file: lib/TAP/Parser/Multiplexer.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -159,7 +175,8 @@ provides:
 
   TAP::Parser::Result:
     file: lib/TAP/Parser/Result.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -168,7 +185,8 @@ provides:
 
   TAP::Parser::Result::Bailout:
     file: lib/TAP/Parser/Result/Bailout.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -177,7 +195,8 @@ provides:
 
   TAP::Parser::Result::Comment:
     file: lib/TAP/Parser/Result/Comment.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -186,7 +205,8 @@ provides:
 
   TAP::Parser::Result::Plan:
     file: lib/TAP/Parser/Result/Plan.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -195,7 +215,8 @@ provides:
 
   TAP::Parser::Result::Test:
     file: lib/TAP/Parser/Result/Test.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -204,7 +225,8 @@ provides:
 
   TAP::Parser::Result::Unknown:
     file: lib/TAP/Parser/Result/Unknown.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -213,7 +235,8 @@ provides:
 
   TAP::Parser::Result::Version:
     file: lib/TAP/Parser/Result/Version.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -222,7 +245,8 @@ provides:
 
   TAP::Parser::Result::YAML:
     file: lib/TAP/Parser/Result/YAML.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -231,7 +255,8 @@ provides:
 
   TAP::Parser::Source:
     file: lib/TAP/Parser/Source.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -240,7 +265,8 @@ provides:
 
   TAP::Parser::Source::Perl:
     file: lib/TAP/Parser/Source/Perl.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -249,7 +275,8 @@ provides:
 
   TAP::Parser::YAMLish::Reader:
     file: lib/TAP/Parser/YAMLish/Reader.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -258,7 +285,8 @@ provides:
 
   TAP::Parser::YAMLish::Writer:
     file: lib/TAP/Parser/YAMLish/Writer.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
@@ -267,7 +295,8 @@ provides:
 
   Test::Harness:
     file: lib/Test/Harness.pm
-    version: 3.09
+    version: 3.10
+
 
 
 
