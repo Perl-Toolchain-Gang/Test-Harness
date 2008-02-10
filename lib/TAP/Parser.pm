@@ -506,13 +506,6 @@ C<$result> object.
 
 This is merely a synonym for C<as_string>.
 
-=head3 C<tests_planned>
-
-  my $planned = $result->tests_planned;
-
-Returns the number of tests planned.  For example, a plan of C<1..17> will
-cause this method to return '17'.
-
 =head3 C<directive>
 
  my $directive = $result->directive;
