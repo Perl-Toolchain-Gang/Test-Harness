@@ -372,7 +372,7 @@ sub _make_test_token {
         ok          => $ok,
         test_num    => $num,
         description => _trim($desc),
-        directive   => uc($dir),
+        directive   => uc( defined $dir ? $dir : '' ),
         explanation => _trim($explanation),
         raw         => $line,
         type        => 'test',
