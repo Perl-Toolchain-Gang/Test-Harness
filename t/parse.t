@@ -3,16 +3,16 @@
 use strict;
 
 BEGIN {
-    if( $ENV{PERL_CORE} ) {
+    if ( $ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ('../lib', 'lib');
+        @INC = ( '../lib', 'lib' );
     }
     else {
-	use lib 't/lib';
+        use lib 't/lib';
     }
 }
 
-use Test::More tests => 260;
+use Test::More tests => 268;
 use IO::c55Capture;
 
 use File::Spec;
@@ -624,8 +624,10 @@ END_TAP
     # coverage test of perl source with switches
 
     my $parser = TAP::Parser->new(
-        {   source => File::Spec->catfile( ($ENV{PERL_CORE} ? 'lib' : 't'),
-					   'sample-tests', 'simple' ),
+        {   source => File::Spec->catfile(
+                ( $ENV{PERL_CORE} ? 'lib' : 't' ),
+                'sample-tests', 'simple'
+            ),
         }
     );
 
@@ -987,4 +989,31 @@ END_TAP
     like pop @die,
       qr/Panic: planned test count [(]1001[)] did not equal sum of passed [(]0[)] and failed [(]2[)] tests!/,
       '...and the message is as we expect';
+}
+
+{
+
+    # Sanity check on state table
+
+    my $parser      = TAP::Parser->new( { tap => "1..1\nok 1\n" } );
+    my $state_table = $parser->_make_state_table;
+    my @states      = sort keys %$state_table;
+    my @expect      = sort qw(
+      bailout comment plan test unknown version yaml
+    );
+
+    my %reachable = ( INIT => 1 );
+
+    for my $name (@states) {
+        my $state      = $state_table->{$name};
+        my @can_handle = sort keys %$state;
+        is_deeply \@can_handle, \@expect, "token types handled in $name";
+        for my $type (@can_handle) {
+            $reachable{$_}++
+              for grep {defined}
+              map      { $state->{$type}->{$_} } qw(goto continue);
+        }
+    }
+
+    is_deeply [ sort keys %reachable ], [@states], "all states reachable";
 }

@@ -976,6 +976,7 @@ sub _make_state_table {
     my %state_globals = (
         comment => {},
         bailout => {},
+        yaml    => {},
         version => {
             act => sub {
                 $self->_add_error(
