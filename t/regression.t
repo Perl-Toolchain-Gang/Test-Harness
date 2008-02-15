@@ -2240,10 +2240,13 @@ my %samples = (
         is_good_plan  => FALSE,
         tests_planned => FALSE,
         tests_run     => 0,
-        parse_errors  => ['No plan found in TAP output'],
-        'exit'        => 0,
-        wait          => 0,
-        version       => 13,
+        parse_errors  => [
+            'Unknown TAP token: "1..0 # skipping: rope"',
+            'No plan found in TAP output'
+        ],
+        'exit'  => 0,
+        wait    => 0,
+        version => 13,
     },
     skipall_nomsg => {
         results => [
@@ -2803,7 +2806,7 @@ my %samples = (
         tests_planned => 5,
         tests_run     => 5,
         parse_errors =>
-          [ 'Explicit TAP version must be at least 13. Got version 12' ],
+          ['Explicit TAP version must be at least 13. Got version 12'],
         'exit'  => 0,
         wait    => 0,
         version => 12,
@@ -2883,7 +2886,7 @@ my %samples = (
         tests_planned => 5,
         tests_run     => 5,
         parse_errors =>
-          [ 'If TAP version is present it must be the first line of output' ],
+          ['If TAP version is present it must be the first line of output'],
         'exit'  => 0,
         wait    => 0,
         version => 12,

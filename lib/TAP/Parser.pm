@@ -9,7 +9,8 @@ use TAP::Parser::Result       ();
 use TAP::Parser::Source       ();
 use TAP::Parser::Source::Perl ();
 use TAP::Parser::Iterator     ();
-use Carp                      ();
+
+use Carp qw( confess );
 
 @ISA = qw(TAP::Base);
 
@@ -873,6 +874,16 @@ Once the parser is done, this will return the version number for the
 parsed TAP. Version numbers were introduced with TAP version 13 so if no
 version number is found version 12 is assumed.
 
+=head3 C<strict_mode>
+
+Returns true if the parser is operating in strict mode. Strict parsing
+is enabled when a TAP version number > 12 is seen. In strict mode the
+parser will flag parse errors for any unknown TAP tokens.
+
+=cut
+
+sub strict_mode { shift->version > 12 }
+
 =head3 C<exit>
 
   $parser->exit;
@@ -967,10 +978,18 @@ sub _make_state_table {
         bailout => {},
         version => {
             act => sub {
-                my ($version) = @_;
                 $self->_add_error(
                     'If TAP version is present it must be the first line of output'
                 );
+            },
+        },
+        unknown => {
+            act => sub {
+                my $unk = shift;
+                if ( $self->strict_mode ) {
+                    $self->_add_error(
+                        'Unknown TAP token: "' . $unk->raw . '"' );
+                }
             },
         },
     );
@@ -1125,7 +1144,7 @@ sub _make_state_table {
     );
 
     # Apply globals and defaults to state table
-    for my $name ( sort keys %states ) {
+    for my $name ( keys %states ) {
 
         # Merge with globals
         my $st = { %state_globals, %{ $states{$name} } };
@@ -1167,7 +1186,6 @@ sub _iter {
     my $next_state = sub {
         my $token = shift;
         my $type  = $token->type;
-        my $count = 1;
         TRANS: {
             my $state_spec = $state_table->{$state}
               or die "Illegal state: $state";
@@ -1183,6 +1201,9 @@ sub _iter {
                 elsif ( my $goto = $next->{goto} ) {
                     $state = $goto;
                 }
+            }
+            else {
+                confess("Unhandled token type: $type\n");
             }
         }
         return $token;
