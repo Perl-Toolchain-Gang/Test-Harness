@@ -412,6 +412,10 @@ examples of each, are as follows:
 
  1..42
 
+=item * Pragma
+
+ pragma +strict
+
 =item * Test
 
  ok 3 - We should start with some foobar!
@@ -522,6 +526,18 @@ If a SKIP directive is included with the plan, this method will return it.
 If a SKIP directive was included with the plan, this method will return the
 explanation, if any.
 
+=head2 C<pragma> methods
+
+ if ( $result->is_pragma ) { ... }
+
+If the above evaluates as true, the following methods will be available on the
+C<$result> object.
+
+=head3 C<pragmas>
+
+Returns a list of pragmas each of which is a + or - followed by the
+pragma name.
+ 
 =head2 C<commment> methods
 
  if ( $result->is_comment ) { ... }
@@ -783,6 +799,47 @@ This method lets you know which (or how many) tests had SKIP directives.
 
 sub skipped { @{ shift->{skipped} } }
 
+=head2 Pragmas
+
+=head3 C<pragma>
+
+Get or set a pragma. To get the state of a pragma:
+
+  if ( $p->pragma('strict') ) {
+      # be strict
+  }
+
+To set the state of a pragma:
+
+  $p->pragma('strict', 1); # enable strict mode
+
+=cut
+
+sub pragma {
+    my ( $self, $pragma ) = splice @_, 0, 2;
+
+    return $self->{pragma}->{$pragma} unless @_;
+
+    if ( my $state = shift ) {
+        $self->{pragma}->{$pragma} = 1;
+    }
+    else {
+        delete $self->{pragma}->{$pragma};
+    }
+
+    return;
+}
+
+=head3 C<pragmas>
+
+Get a list of all the currently enabled pragmas:
+
+  my @pragmas_enabled = $p->pragmas;
+
+=cut
+
+sub pragmas { sort keys %{ shift->{pragma} || {} } }
+
 =head2 Summary Results
 
 These results are "meta" information about the total results of an individual
@@ -873,16 +930,6 @@ sub has_problems {
 Once the parser is done, this will return the version number for the
 parsed TAP. Version numbers were introduced with TAP version 13 so if no
 version number is found version 12 is assumed.
-
-=head3 C<strict_mode>
-
-Returns true if the parser is operating in strict mode. Strict parsing
-is enabled when a TAP version number > 12 is seen. In strict mode the
-parser will flag parse errors for any unknown TAP tokens.
-
-=cut
-
-sub strict_mode { shift->version > 12 }
 
 =head3 C<exit>
 
@@ -987,9 +1034,19 @@ sub _make_state_table {
         unknown => {
             act => sub {
                 my $unk = shift;
-                if ( $self->strict_mode ) {
+                if ( $self->pragma('strict') ) {
                     $self->_add_error(
                         'Unknown TAP token: "' . $unk->raw . '"' );
+                }
+            },
+        },
+        pragma => {
+            act => sub {
+                my ($pragma) = @_;
+                for my $pr ( $pragma->pragmas ) {
+                    if ( $pr =~ /^ ([-+])(\w+) $/x ) {
+                        $self->pragma( $2, $1 eq '+' );
+                    }
                 }
             },
         },
@@ -1059,9 +1116,7 @@ sub _make_state_table {
                   } => $number;
             },
         },
-        yaml => {
-            act => sub { },
-        },
+        yaml => { act => sub { }, },
     );
 
     # Each state contains a hash the keys of which match a token type. For

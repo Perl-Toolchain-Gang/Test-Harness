@@ -1,8 +1,9 @@
 Revision history for Test-Harness
 
 3.10    ---
-        - fault unknown TAP tokens in TAP v13 or later.
         - fix undefined value warnings with bleadperl.
+        - added pragma support.
+        - fault unknown TAP tokens under strict pragma.
 
 3.09    2008-02-10
         - support for HARNESS_PERL_SWITCHES containing things like 

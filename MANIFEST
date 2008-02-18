@@ -35,6 +35,7 @@ lib/TAP/Parser/Result.pm
 lib/TAP/Parser/Result/Bailout.pm
 lib/TAP/Parser/Result/Comment.pm
 lib/TAP/Parser/Result/Plan.pm
+lib/TAP/Parser/Result/Pragma.pm
 lib/TAP/Parser/Result/Test.pm
 lib/TAP/Parser/Result/Unknown.pm
 lib/TAP/Parser/Result/Version.pm
@@ -132,6 +133,7 @@ t/sample-tests/skipall_nomsg
 t/sample-tests/skipall_v13
 t/sample-tests/space_after_plan
 t/sample-tests/stdout_stderr
+t/sample-tests/strict
 t/sample-tests/switches
 t/sample-tests/taint
 t/sample-tests/taint_warn

@@ -29,9 +29,10 @@ sub _get_results {
     return @results;
 }
 
-my ( $PARSER, $PLAN, $TEST, $COMMENT, $BAILOUT, $UNKNOWN, $YAML, $VERSION ) = qw(
+my ( $PARSER, $PLAN, $PRAGMA, $TEST, $COMMENT, $BAILOUT, $UNKNOWN, $YAML, $VERSION ) = qw(
   TAP::Parser
   TAP::Parser::Result::Plan
+  TAP::Parser::Result::Pragma
   TAP::Parser::Result::Test
   TAP::Parser::Result::Comment
   TAP::Parser::Result::Bailout
@@ -999,7 +1000,7 @@ END_TAP
     my $state_table = $parser->_make_state_table;
     my @states      = sort keys %$state_table;
     my @expect      = sort qw(
-      bailout comment plan test unknown version yaml
+      bailout comment plan pragma test unknown version yaml
     );
 
     my %reachable = ( INIT => 1 );

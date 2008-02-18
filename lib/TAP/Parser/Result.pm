@@ -6,14 +6,30 @@ use vars qw($VERSION);
 use TAP::Parser::Result::Bailout ();
 use TAP::Parser::Result::Comment ();
 use TAP::Parser::Result::Plan    ();
+use TAP::Parser::Result::Pragma  ();
 use TAP::Parser::Result::Test    ();
 use TAP::Parser::Result::Unknown ();
 use TAP::Parser::Result::Version ();
 use TAP::Parser::Result::YAML    ();
 
+# note that this is bad.  Makes it very difficult to subclass, but then, it
+# would be a lot of work to subclass this system.
+my %class_for;
+
 BEGIN {
+    %class_for = (
+        plan    => 'TAP::Parser::Result::Plan',
+        pragma  => 'TAP::Parser::Result::Pragma',
+        test    => 'TAP::Parser::Result::Test',
+        comment => 'TAP::Parser::Result::Comment',
+        bailout => 'TAP::Parser::Result::Bailout',
+        version => 'TAP::Parser::Result::Version',
+        unknown => 'TAP::Parser::Result::Unknown',
+        yaml    => 'TAP::Parser::Result::YAML',
+    );
+
     no strict 'refs';
-    foreach my $token (qw( plan comment test bailout version unknown yaml )) {
+    for my $token ( keys %class_for ) {
         my $method = "is_$token";
         *$method = sub { return $token eq shift->type };
     }
@@ -40,18 +56,6 @@ current bit of test data from TAP (usually a line).  It's for internal use
 only and should not be relied upon.
 
 =cut
-
-# note that this is bad.  Makes it very difficult to subclass, but then, it
-# would be a lot of work to subclass this system.
-my %class_for = (
-    plan    => 'TAP::Parser::Result::Plan',
-    test    => 'TAP::Parser::Result::Test',
-    comment => 'TAP::Parser::Result::Comment',
-    bailout => 'TAP::Parser::Result::Bailout',
-    version => 'TAP::Parser::Result::Version',
-    unknown => 'TAP::Parser::Result::Unknown',
-    yaml    => 'TAP::Parser::Result::YAML',
-);
 
 ##############################################################################
 
