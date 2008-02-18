@@ -8,7 +8,7 @@ use TAP::Parser::Result;
 
 =head1 NAME
 
-TAP::Parser::Result::Version - TAP version result token.
+TAP::Parser::Result::Version - TAP syntax version token.
 
 =head1 VERSION
 
@@ -23,11 +23,11 @@ $VERSION = '3.10';
 This is a subclass of L<TAP::Parser::Result>.  A token of this class will be
 returned if a version line is encountered.
 
- TAP version 4
+ TAP version 13
  ok 1
  not ok 2
 
-The first version of TAP to include an explicit version number is 4.
+The first version of TAP to include an explicit version number is 13.
 
 =head1 OVERRIDDEN METHODS
 
