@@ -93,11 +93,17 @@ Indicates whether or not this is the test plan line.
 
  1..3
 
+=item * C<is_pragma>
+
+Indicates whether or not this is a pragma line.
+
+ pragma +strict
+
 =item * C<is_test>
 
 Indicates whether or not this is a test line.
 
- is $foo, $bar, $description;
+ ok 1 Is OK!
 
 =item * C<is_comment>
 
