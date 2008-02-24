@@ -11,7 +11,7 @@ global:
   svn: /usr/local/bin/svn
   shell: /usr/local/bin/bash
   work: /home/andy/.smoke-work
-  description: FreeBSD 6.2 box with Test::Harness 2.64
+  description: FreeBSD 6.2
 tasks:
   - mailto:
       - email: tapx-commit@hexten.net
