@@ -5,7 +5,7 @@ use App::Prove;
 
 my $app = App::Prove->new;
 $app->process_args(@ARGV);
-$app->run;
+exit $app->run ? 0 : 1;
 
 __END__
 

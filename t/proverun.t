@@ -44,7 +44,7 @@ BEGIN {
         },
     );
 
-    plan tests => @SCHEDULE * 2;
+    plan tests => @SCHEDULE * 3;
 }
 
 # Waaaaay too much boilerplate
@@ -59,12 +59,6 @@ sub new {
     my $self  = $class->SUPER::new(@_);
     $self->{_log} = [];
     return $self;
-}
-
-sub _exit {
-    my $self = shift;
-    push @{ $self->{_log} }, [ '_exit', @_ ];
-    die "Exited";
 }
 
 sub get_log {
@@ -143,8 +137,8 @@ for my $test (@SCHEDULE) {
 
     # Why does this make the output from the test spew out of
     # our STDOUT?
-    eval { $app->run };
-    like $@, qr{Exited}, "$name: exited via _exit()";
+    ok eval { $app->run }, 'run returned true';
+    ok !$@, 'no errors';
 
     my @log = get_log();
 

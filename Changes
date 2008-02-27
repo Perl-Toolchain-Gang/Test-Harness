@@ -1,5 +1,9 @@
 Revision history for Test-Harness
 
+3.11    2008-02-27
+        - applied Jim Keenan's patch that makes App::Prove::run return a
+          rather than exit (#33609)
+
 3.10    2008-02-26
         - fix undefined value warnings with bleadperl.
         - added pragma support.

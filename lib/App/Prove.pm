@@ -236,8 +236,6 @@ sub _first_pos {
     return;
 }
 
-sub _exit { exit( $_[1] || 0 ) }
-
 sub _help {
     my ( $self, $verbosity ) = @_;
 
@@ -406,9 +404,9 @@ sub run {
 
         local $ENV{TEST_VERBOSE} = 1 if $self->verbose;
 
-        $self->_runtests( $self->_get_args, $self->_get_tests );
+        return $self->_runtests( $self->_get_args, $self->_get_tests );
     }
-
+    
     return;
 }
 
@@ -440,9 +438,7 @@ sub _runtests {
 
     my $aggregator = $harness->runtests(@tests);
 
-    $self->_exit( $aggregator->has_problems ? 1 : 0 );
-
-    return;
+    return $aggregator->has_problems ? 0 : 1;
 }
 
 sub _get_switches {
