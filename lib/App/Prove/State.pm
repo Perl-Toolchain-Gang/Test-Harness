@@ -222,9 +222,9 @@ sub get_tests {
     my @selected = $self->_query;
 
     unless ( @argv || @{ $self->{select} } ) {
-        croak q{No tests named and 't' directory not found}
-          unless -d 't';
-        @argv = 't';
+        @argv = $recurse ? '.' : 't';
+        croak qq{No tests named and '@argv' directory not found}
+          unless -d $argv[0];
     }
 
     push @selected, $self->_get_raw_tests( $recurse, @argv ) if @argv;

@@ -407,7 +407,7 @@ sub run {
         return $self->_runtests( $self->_get_args, $self->_get_tests );
     }
     
-    return;
+    return 1;
 }
 
 sub _get_tests {
