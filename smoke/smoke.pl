@@ -19,11 +19,11 @@ my $VERSION = 0.005;
 
 # Reopen STDIN.
 use IO::Pty;
-unless ( $^O =~ /netbsd/ ) {
+# unless ( $^O =~ /netbsd/ ) {
     my $pty = IO::Pty->new;
     open( STDIN, "<&" . $pty->slave->fileno() )
       || die "Couldn't reopen STDIN for reading, $!\n";
-}
+# }
 
 GetOptions(
     'v|verbose' => \my $VERBOSE,
