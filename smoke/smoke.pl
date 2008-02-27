@@ -18,8 +18,8 @@ use YAML qw( DumpFile LoadFile );
 my $VERSION = 0.005;
 
 # Reopen STDIN.
+use IO::Pty;
 unless ( $^O =~ /netbsd/ ) {
-    require IO::Pty;
     my $pty = IO::Pty->new;
     open( STDIN, "<&" . $pty->slave->fileno() )
       || die "Couldn't reopen STDIN for reading, $!\n";
