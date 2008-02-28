@@ -3,6 +3,7 @@ global:
   perls:
     - /usr/pkg/bin/perl
     - /alt/local/bin/perl
+    - /home/andy/Works/Perl/versions/blead/bin/perl
   status: /home/andy/.smoke-tapx
   svn: /usr/pkg/bin/svn
   shell: /usr/pkg/bin/bash
