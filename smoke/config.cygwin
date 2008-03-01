@@ -7,6 +7,10 @@ global:
   shell: /usr/bin/bash
   work: /home/Administrator/.smoke-work
   description: CygWin on Windows XP
+  mailargs:
+    - smtp
+    - Server
+    - post.hexten.net
 tasks:
   - mailto:
       - email: tapx-commit@hexten.net
