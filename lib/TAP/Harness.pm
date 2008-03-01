@@ -477,7 +477,7 @@ Each elements of the @tests array is either
 
 =item * the file name of a test script to run
 
-=item * a reference to a [ file name, display name ]
+=item * a reference to a [ file name, display name ] array
 
 =back
 

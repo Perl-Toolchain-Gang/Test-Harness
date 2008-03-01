@@ -192,6 +192,9 @@ Any keys for which the value is C<undef> will be ignored.
 
 Called by Test::Harness before any test output is generated. 
 
+This is an advisory and may not be called in the case where tests are
+being supplied to Test::Harness by an iterator.
+
 =cut
 
 sub prepare {
@@ -203,8 +206,6 @@ sub prepare {
     foreach my $test (@tests) {
         $longest = length $test if length $test > $longest;
         if ( $test !~ /\.\w+$/ ) {
-
-            # TODO: Coverage?
             $tests_without_extensions = 1;
         }
     }
