@@ -160,7 +160,7 @@ sub test_and_report {
               . hostname
               . ")" );
 
-        my $fh = $msg->open('smtp');
+        my $fh = $msg->open('smtp', Server => 'post.hexten.net');
 
         print $fh "To obtain this release use the following command:\n\n";
         print $fh "  svn checkout -r$cur_rev $task->{svn}\n\n";
