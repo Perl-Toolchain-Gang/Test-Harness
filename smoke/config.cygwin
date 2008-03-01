@@ -2,23 +2,19 @@
 global:
   perls:
     - /usr/bin/perl
-    - /alt/local/bin/perl
-  status: /Users/andy/.smoke-tapx
+  status: /home/Administrator/.smoke-tapx
   svn: /usr/bin/svn
-  shell: /bin/bash
-  work: /Users/andy/.smoke-work
-  description: MacBook Pro
+  shell: /usr/bin/bash
+  work: /home/Administrator/.smoke-work
+  description: CygWin on Windows XP
 tasks:
   - mailto:
-      - email: andy@hexten.net
+      - email: tapx-commit@hexten.net
         filter: all
         verbose: 1
-      - email: andy@singletrackworld.com
-        filter: passed
-        verbose: 0
-      - email: andy@edfax.co.uk
+      - email: tapx-dev@hexten.net
         filter: failed
-        verbose: 0
+        verbose: 1
     name: TAP::Parser
     script:
       - yes n | %PERL% Makefile.PL
@@ -27,7 +23,7 @@ tasks:
       - make distclean
       - yes n | %PERL% Build.PL
       - ./Build
-      - ./Build test
+      - ./Build testauthor
       - ./Build testprove
       - ./Build distclean
     subdir: trunk

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Path;
-use File::TinyLock;
+use Fcntl ':flock';
 
 # use IO::Handle;
 use IPC::Run qw( run );
@@ -35,8 +35,9 @@ die "smoke.pl [-v] [--force] config\n" unless @ARGV == 1;
 my $config = shift;
 die "No file $config\n" unless -f $config;
 
-# TIMEOUT doesn't seem to work. Ho hum...
-exit if File::TinyLock::lock( $config, TIMEOUT => 1 );
+my $lock = "$config.lck";
+open my $lh, '>', $lock or die "Can't write $lock ($!)\n";
+flock( $lh, LOCK_EX | LOCK_NB ) or exit;
 
 my $Config = load_config($config);
 my $Status = load_config( $Config->{global}->{status} );
@@ -46,6 +47,8 @@ my $SHELL = $Config->{global}->{shell} || 'bash';
 for my $task ( @{ $Config->{tasks} } ) {
     test_and_report($task);
 }
+
+unlink $lock;
 
 sub load_config {
     my ($name) = @_;
@@ -359,5 +362,4 @@ END {
     if ( defined $Status ) {
         save_config( $Config->{global}->{status}, $Status );
     }
-    File::TinyLock::unlock($config);
 }
