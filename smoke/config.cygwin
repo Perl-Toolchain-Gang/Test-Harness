@@ -11,6 +11,8 @@ global:
     - smtp
     - Server
     - post.hexten.net
+    - Sender
+    - andy@hexten.net
 tasks:
   - mailto:
       - email: tapx-commit@hexten.net
