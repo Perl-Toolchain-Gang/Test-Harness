@@ -20,7 +20,7 @@ my $rc = shell_run( [ $perl, 'Makefile.PL' ],
   or shell_run(
     [ $perl, 'Build.PL' ],
     'Build',
-    'Build testauthor',
+    'Build test',
     'Build testprove',
     'Build distclean'
   );
