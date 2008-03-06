@@ -4,6 +4,7 @@ Revision history for Test-Harness
         - applied Jim Keenan's patch that makes App::Prove::run return a
           rather than exit (#33609)
         - prove -r now recurses cwd rather than 't' by default (#33007)
+        - restored --ext switch to prove (#33848)
 
 3.10    2008-02-26
         - fix undefined value warnings with bleadperl.

@@ -55,7 +55,7 @@ BEGIN {
       harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man
-      show_version test_args state dry
+      show_version test_args state dry extension
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -194,6 +194,7 @@ sub process_args {
             'colour!'     => \$self->{color},
             'c'           => \$self->{color},
             'D|dry'       => \$self->{dry},
+            'ext=s'       => \$self->{extension},
             'harness=s'   => \$self->{harness},
             'formatter=s' => \$self->{formatter},
             'r|recurse'   => \$self->{recurse},
@@ -406,7 +407,7 @@ sub run {
 
         return $self->_runtests( $self->_get_args, $self->_get_tests );
     }
-    
+
     return 1;
 }
 
@@ -414,6 +415,8 @@ sub _get_tests {
     my $self = shift;
 
     my $state = $self->{_state};
+    my $ext   = $self->extension;
+    $state->extension($ext) if defined $ext;
     if ( defined( my $state_switch = $self->state ) ) {
         $state->apply_switch(@$state_switch);
     }
@@ -561,6 +564,8 @@ calling C<run>.
 =item C<dry>
 
 =item C<exec>
+
+=item C<extension>
 
 =item C<failures>
 
