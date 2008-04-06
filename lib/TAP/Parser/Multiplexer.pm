@@ -128,8 +128,6 @@ sub _iter {
 
         unless (@ready) {
             return unless $sel->count;
-
-            # TODO: Win32 doesn't do select properly on handles...
             @ready = $sel->can_read;
         }
 
