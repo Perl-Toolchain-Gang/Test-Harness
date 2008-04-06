@@ -40,6 +40,7 @@ sub read {
 
     # Prime the reader
     $self->_next;
+    return unless $self->{next};
 
     my $doc = $self->_read;
 
@@ -58,15 +59,7 @@ sub read {
     return $doc;
 }
 
-sub get_raw {
-    my $self = shift;
-
-    if ( defined( my $capture = $self->{capture} ) ) {
-        return join( "\n", @$capture ) . "\n";
-    }
-
-    return '';
-}
+sub get_raw { join( "\n", grep defined, @{ shift->{capture} || [] } ) . "\n" }
 
 sub _peek {
     my $self = shift;

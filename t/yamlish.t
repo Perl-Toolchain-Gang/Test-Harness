@@ -474,6 +474,10 @@ BEGIN {
                 "\n\t" => 'newline, tab',
             },
         },
+        {   name => 'Empty',
+            in   => [],
+            out  => undef,
+        },
     );
 
     plan tests => @SCHEDULE * 5;
