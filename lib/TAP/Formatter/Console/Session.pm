@@ -288,9 +288,6 @@ sub _output_test_failure {
     my $failed = $parser->failed + $total - $tests_run;
     my $exit   = $parser->exit;
 
-    # TODO: $flist isn't used anywhere
-    # my $flist  = join ", " => $formatter->range( $parser->failed );
-
     if ( my $exit = $parser->exit ) {
         my $wstat = $parser->wait;
         my $status = sprintf( "%d (wstat %d, 0x%x)", $exit, $wstat, $wstat );
