@@ -128,7 +128,10 @@ BEGIN {
                 six => '6'
             },
         },
-
+        {   name => 'Space after colon',
+            in   => [ '---', 'spog: ', ' - 1', ' - 2', '...' ],
+            out => { spog => [ 1, 2 ] },
+        },
         {   name => 'Original YAML::Tiny test',
             in   => [
                 '---',

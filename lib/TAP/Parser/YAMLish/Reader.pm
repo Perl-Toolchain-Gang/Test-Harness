@@ -17,7 +17,7 @@ my %UNESCAPES = (
 );
 
 my $QQ_STRING    = qr{ " (?:\\. | [^"])* " }x;
-my $HASH_LINE    = qr{ ^ ($QQ_STRING|\S+) \s* : (?: \s+ (.+?) \s* )? $ }x;
+my $HASH_LINE    = qr{ ^ ($QQ_STRING|\S+) \s* : \s* (?: (.+?) \s* )? $ }x;
 my $IS_HASH_KEY  = qr{ ^ [\w\'\"] }x;
 my $IS_END_YAML  = qr{ ^ \.\.\. \s* $ }x;
 my $IS_QQ_STRING = qr{ ^ $QQ_STRING $ }x;
