@@ -1,33 +1,8 @@
 TODO:
 
-    - Add test counts via --count switch.
-    - pre and post test callback to match the pre and post suite callbacks.
-    - Add --start and --end switches to runtests.
-    - Clear all known T::H bugs, if possible.
-    - T:H to separate distro when we're ready to have do the switch.
-    - Make Harness capable of running multiple tests in parallel.
-    - Investigate compatibility with Test::TAP::Model (which uses Test::Harness::Straps)
-    - Make sure we play nicely with Test::Warn
-    - Work out how to test PERL_TEST_HARNESS_DUMP_YAML without jumping on someone who's
-      already using it. Maybe if PERL_TAPX_PREFIX is defined prepend the value of that
-      to the env variables it reads.
-    - YAML dump of test results to file. PERL_TEST_HARNESS_DUMP_YAML=/home/me/somefile.yaml.
-    - Implement TAP stream capture to a file. PERL_TEST_HARNESS_DUMP_TAP=/home/me/somedir.
-    - Try it with Test::Smoke and see what's needed to run tests in parallel.
-      This is a key feature that p5p needs.
-    - Question:  what to do if tests hang?  Jan Dubois and Steven Hay are
-      looking into this for another project.  They're looking at Win32::Job to
-      manage test sessions on Windows.
-    - Make TAP::Parser thread-safe!
-    - Convert tprove_gtk into TAP::Harness::GTK.
-    - Have the aggregator return an iterator.
-    - Make sure we get the right harness output with no tests run.
-    - Make the 'colored' test output easier to override.
-    - More tests, particularly IPC::Open3
-    - Run it against Perl's test suite (first prove, then tprove).
-    - The 'result' objects are currently blessing hashrefs.  This is bad.
-      Instead, they should have proper getter/setters to provide future
-      support for subclassing.
-    - Horrible idea:  have Mac's voice synthesis tell you when tests fail :)
-    - Or better yet use Growl :)
-    - YAML test summary output for Test::Reporter et al.
+    - Associate YAML diagnostic with the preceding test. Currently it's
+      necessary to look ahead past a test to discover whether it has a
+      diagnostic document.
+      
+    - Parallel testing scheduler rules.
+    
