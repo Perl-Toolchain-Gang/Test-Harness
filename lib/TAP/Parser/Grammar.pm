@@ -224,7 +224,8 @@ sub set_version {
     my $version = shift;
 
     if ( my $language = $language_for{$version} ) {
-        $self->{tokens} = $language->{tokens};
+        $self->{version} = $version;
+        $self->{tokens}  = $language->{tokens};
 
         if ( my $setup = $language->{setup} ) {
             $self->$setup();
@@ -358,10 +359,14 @@ sub _make_version_token {
 sub _make_plan_token {
     my ( $self, $line, $tests_planned, $directive, $explanation, $todo ) = @_;
 
-    if ( $directive eq 'SKIP' && 0 != $tests_planned ) {
+    if (   $directive eq 'SKIP'
+        && 0 != $tests_planned
+        && $self->{version} < 13 )
+    {
         warn
           "Specified SKIP directive in plan but more than 0 tests ($line)\n";
     }
+    
     return {
         type          => 'plan',
         raw           => $line,
