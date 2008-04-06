@@ -220,7 +220,7 @@ ok $test->is_actual_ok,
   '... and the correct boolean version of is_actual_ok()';
 is $test->number, 5, '... and have the correct test number';
 ok !$test->description, '... and skipped tests have no description';
-is $test->directive, 'SKIP', '... and teh correct directive';
+is $test->directive, 'SKIP', '... and the correct directive';
 is $test->explanation, 'we have no description',
   '... but we should have an explanation';
 ok $test->has_skip, '... and it is a SKIPped test';

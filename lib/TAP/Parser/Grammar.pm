@@ -83,13 +83,10 @@ my %language_for;
                     );
                 }
                 elsif ( 0 == $tests_planned ) {
-                    $skip        = 'SKIP';
-                    $explanation = $tail;
+                    $skip = 'SKIP';
 
-                    # Trim valid SKIP directive without being strict
-                    # about its presence.
-                    $explanation =~ s/^#\s*//;
-                    $explanation =~ s/^skip\S*\s+//i;
+                    # If we can't match # SKIP the directive should be undef.
+                    ($explanation) = $tail =~ /^#\s*SKIP\s+(.*)/i;
                 }
                 elsif ( $tail !~ /^\s*$/ ) {
                     return $self->_make_unknown_token($line);
