@@ -144,7 +144,9 @@ sub _read_scalar {
             $self->_next;
             my ( $next, $ind ) = $self->_peek;
             last if $ind < $indent;
-            push @multiline, $next;
+
+            my $pad = $string eq '|' ? ( ' ' x ( $ind - $indent ) ) : '';
+            push @multiline, $pad . $next;
         }
 
         return join( ( $string eq '>' ? ' ' : "\n" ), @multiline ) . "\n";
