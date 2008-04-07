@@ -48,6 +48,15 @@ BEGIN {
             ],
             out => "Hello, World\n",
         },
+        {   name => 'Hello World Block',
+            in   => [
+                '--- |',
+                '   Hello,',
+                '      World',
+                '...',
+            ],
+            out => "Hello,\n   World\n",
+        },
         {   name => 'Hello World 5',
             in   => [
                 '--- >',
