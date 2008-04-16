@@ -55,6 +55,7 @@ BEGIN {    # making accessors
         start_time
         end_time
         skip_all
+        ignore_exit
         )
       )
     {
@@ -316,14 +317,15 @@ sub run {
 
         $self->SUPER::_initialize( \%args, \@legal_callback );
 
-        my $stream    = delete $args{stream};
-        my $tap       = delete $args{tap};
-        my $source    = delete $args{source};
-        my $exec      = delete $args{exec};
-        my $merge     = delete $args{merge};
-        my $spool     = delete $args{spool};
-        my $switches  = delete $args{switches};
-        my @test_args = @{ delete $args{test_args} || [] };
+        my $stream      = delete $args{stream};
+        my $tap         = delete $args{tap};
+        my $source      = delete $args{source};
+        my $exec        = delete $args{exec};
+        my $merge       = delete $args{merge};
+        my $spool       = delete $args{spool};
+        my $switches    = delete $args{switches};
+        my $ignore_exit = delete $args{ignore_exit};
+        my @test_args   = @{ delete $args{test_args} || [] };
 
         if ( 1 < grep {defined} $stream, $tap, $source, $exec ) {
             $self->_croak(
@@ -379,6 +381,7 @@ sub run {
         $grammar->set_version( $self->version );
         $self->_grammar($grammar);
         $self->_spool($spool);
+        $self->ignore_exit($ignore_exit);
 
         $self->start_time( $self->get_time );
 
@@ -919,8 +922,7 @@ sub has_problems {
     return
          $self->failed
       || $self->parse_errors
-      || $self->wait
-      || $self->exit;
+      || ( !$self->ignore_exit && ( $self->wait || $self->exit ) );
 }
 
 =head3 C<version>
@@ -945,6 +947,16 @@ an executable, it returns the exit status of the executable.
 Once the parser is done, this will return the wait status.  If the parser ran
 an executable, it returns the wait status of the executable.  Otherwise, this
 mererely returns the C<exit> status.
+
+=head2 C<ignore_exit>
+
+  $parser->ignore_exit(1);
+
+Tell the parser to ignore the exit status from the test when determining
+whether the test passed. Normally tests with non-zero exit status are
+considered to have failed even if all individual tests passed. In cases
+where it is not possible to control the exit value of the test script
+use this option to ignore it.
 
 =head3 C<parse_errors>
 

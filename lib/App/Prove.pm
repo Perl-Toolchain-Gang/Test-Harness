@@ -55,7 +55,7 @@ BEGIN {
       harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man
-      show_version test_args state dry extension
+      show_version test_args state dry extension ignore_exit
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -196,6 +196,7 @@ sub process_args {
             'D|dry'       => \$self->{dry},
             'ext=s'       => \$self->{extension},
             'harness=s'   => \$self->{harness},
+            'ignore-exit' => \$self->{ignore_exit},
             'formatter=s' => \$self->{formatter},
             'r|recurse'   => \$self->{recurse},
             'reverse'     => \$self->{backwards},
@@ -286,6 +287,10 @@ sub _get_args {
 
     if ( my $formatter = $self->formatter ) {
         $args{formatter_class} = $formatter;
+    }
+
+    if ( $self->ignore_exit ) {
+        $args{ignore_exit} = 1;
     }
 
     if ( $self->taint_fail && $self->taint_warn ) {

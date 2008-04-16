@@ -124,6 +124,13 @@ sub add {
     $self->{parser_for}{$description} = $parser;
 
     while ( my ( $summary, $method ) = each %SUMMARY_METHOD_FOR ) {
+
+        # Slightly nasty. Instead we should maybe have 'cooked' accessors
+        # for results that may be masked by the parser.
+        next
+          if ( $method eq 'exit' || $method eq 'wait' )
+          && $parser->ignore_exit;
+
         if ( my $count = $parser->$method() ) {
             $self->{$summary} += $count;
             push @{ $self->{"descriptions_for_$summary"} } => $description;

@@ -12,7 +12,7 @@ BEGIN {
     }
 }
 
-use Test::More tests => 268;
+use Test::More tests => 284;
 use IO::c55Capture;
 
 use File::Spec;
@@ -1017,4 +1017,41 @@ END_TAP
     }
 
     is_deeply [ sort keys %reachable ], [@states], "all states reachable";
+}
+
+{
+
+    # exit, wait, ignore_exit interactions
+
+    my @truth = (
+        [ 0, 0, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 1, 0, 0, 1 ],
+        [ 1, 0, 1, 0 ],
+        [ 1, 1, 0, 1 ],
+        [ 1, 1, 1, 0 ],
+        [ 0, 1, 0, 1 ],
+        [ 0, 1, 1, 0 ],
+    );
+
+    for my $t (@truth) {
+        my ( $wait, $exit, $ignore_exit, $has_problems ) = @$t;
+        my $test_parser = sub {
+            my $parser = shift;
+            $parser->wait($wait);
+            $parser->exit($exit);
+            ok $has_problems ? $parser->has_problems : !$parser->has_problems,
+              "exit=$exit, wait=$wait, ignore=$ignore_exit";
+        };
+
+        my $parser = TAP::Parser->new( { tap => "1..1\nok 1\n" } );
+        $parser->ignore_exit($ignore_exit);
+        $test_parser->($parser);
+
+        $test_parser->(
+            TAP::Parser->new(
+                { tap => "1..1\nok 1\n", ignore_exit => $ignore_exit }
+            )
+        );
+    }
 }

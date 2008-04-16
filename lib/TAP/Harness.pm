@@ -81,6 +81,7 @@ BEGIN {
         jobs            => sub { shift; shift },
         fork            => sub { shift; shift },
         test_args       => sub { shift; shift },
+        ignore_exit     => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -213,6 +214,11 @@ true:
 
 If set to a true value, only test results with directives will be displayed.
 This overrides other settings such as C<verbose> or C<failures>.
+
+=item * C<ignore_exit>
+
+If set to a true value instruct C<TAP::Parser> to ignore exit and wait
+status from test scripts.
 
 =item * C<stdout>
 
@@ -588,10 +594,11 @@ sub _get_parser_args {
     my @switches;
     @switches = $self->lib if $self->lib;
     push @switches => $self->switches if $self->switches;
-    $args{switches} = \@switches;
-    $args{spool}    = $self->_open_spool($test_prog);
-    $args{merge}    = $self->merge;
-    $args{exec}     = $self->exec;
+    $args{switches}    = \@switches;
+    $args{spool}       = $self->_open_spool($test_prog);
+    $args{merge}       = $self->merge;
+    $args{exec}        = $self->exec;
+    $args{ignore_exit} = $self->ignore_exit;
 
     if ( my $exec = $self->exec ) {
         $args{exec} = [ @$exec, $test_prog ];
