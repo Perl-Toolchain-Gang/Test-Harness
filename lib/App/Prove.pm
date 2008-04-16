@@ -580,6 +580,8 @@ calling C<run>.
 
 =item C<harness>
 
+=item C<ignore_exit>
+
 =item C<includes>
 
 =item C<jobs>
