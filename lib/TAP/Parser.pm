@@ -55,7 +55,6 @@ BEGIN {    # making accessors
         start_time
         end_time
         skip_all
-        ignore_exit
         )
       )
     {
@@ -957,6 +956,10 @@ whether the test passed. Normally tests with non-zero exit status are
 considered to have failed even if all individual tests passed. In cases
 where it is not possible to control the exit value of the test script
 use this option to ignore it.
+
+=cut
+
+sub ignore_exit { shift->pragma( 'ignore_exit', @_ ) }
 
 =head3 C<parse_errors>
 
