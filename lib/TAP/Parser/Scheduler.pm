@@ -207,18 +207,6 @@ sub _find_next_job {
     return;
 }
 
-=head3 C<get_job_iterator>
-
-Get a code reference that will return a stream of
-C<TAP::Parser::Scheduler::Job>s.
-
-=cut
-
-sub get_job_iterator {
-    my $self = shift;
-    return sub { $self->get_job };
-}
-
 =head3 C<as_string>
 
 Return a human readable representation of the scheduling tree.

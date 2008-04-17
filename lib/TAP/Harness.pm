@@ -400,7 +400,7 @@ sub _aggregate_forked {
             delete $parser->{_grammar};
             return $parser;
         },
-        $scheduler->get_job_iterator
+        sub { $scheduler->get_job }
     );
 
     while ( my ( $job, $parser ) = $iter->() ) {
@@ -415,16 +415,15 @@ sub _aggregate_forked {
 sub _aggregate_parallel {
     my ( $self, $aggregate, $scheduler ) = @_;
 
-    my $job_iter = $scheduler->get_job_iterator;
-    my $jobs     = $self->jobs;
-    my $mux      = TAP::Parser::Multiplexer->new;
+    my $jobs = $self->jobs;
+    my $mux  = TAP::Parser::Multiplexer->new;
 
     RESULT: {
 
         # Keep multiplexer topped up
         FILL:
         while ( $mux->parsers < $jobs ) {
-            my $job = $job_iter->();
+            my $job = $scheduler->get_job;
 
             # If we hit a spinner stop filling and start running.
             last FILL if !defined $job || $job->is_spinner;
@@ -455,10 +454,9 @@ sub _aggregate_parallel {
 
 sub _aggregate_single {
     my ( $self, $aggregate, $scheduler ) = @_;
-    my $job_iter = $scheduler->get_job_iterator;
 
     JOB:
-    while ( my $job = $job_iter->() ) {
+    while ( my $job = $scheduler->get_job ) {
         next JOB if $job->is_spinner;
 
         my ( $parser, $session ) = $self->make_parser($job);
@@ -544,7 +542,7 @@ sub aggregate_tests {
     local $ENV{HARNESS_IS_VERBOSE} = 1
       if $self->formatter->verbosity > 0;
 
-    # Formatter gets only names. TODO: Pass jobs instead of array refs
+    # Formatter gets only names.
     $self->formatter->prepare( map { $_->description } $scheduler->get_all );
 
     if ( $self->jobs > 1 ) {
