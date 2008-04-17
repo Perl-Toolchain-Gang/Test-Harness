@@ -3,10 +3,10 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 1;
+use Test::More;
 use TAP::Parser::Scheduler;
 
-my $rules = {
+my $perl_rules = {
     par => [
         { seq => '../ext/DB_File/t/*' },
         { seq => '../ext/IO_Compress_Zlib/t/*' },
@@ -16,7 +16,7 @@ my $rules = {
     ]
 };
 
-my $tests = [
+my $some_tests = [
     '../ext/DB_File/t/A',
     'foo',
     '../ext/DB_File/t/B',
@@ -25,21 +25,74 @@ my $tests = [
     '../lib/CPANPLUS/E',
     'bar',
     '../lib/CPANPLUS/F',
+    '../ext/DB_File/t/D',
+    '../ext/DB_File/t/E',
+    '../ext/DB_File/t/F',
 ];
 
-ok my $scheduler = TAP::Parser::Scheduler->new(
-    tests => $tests,
-    rules => $rules,
-  ),
-  'new';
+my @schedule = (
+    {   name  => 'Sequential, no rules',
+        tests => $some_tests,
+        jobs  => 1,
+    },
+    {   name  => 'Sequential, Perl rules',
+        rules => $perl_rules,
+        tests => $some_tests,
+        jobs  => 1,
+    },
+    {   name  => 'Two in parallel, Perl rules',
+        rules => $perl_rules,
+        tests => $some_tests,
+        jobs  => 2,
+    },
+    {   name  => 'Massively parallel, Perl rules',
+        rules => $perl_rules,
+        tests => $some_tests,
+        jobs  => 1000,
+    },
+    {   name  => 'Massively parallel, no rules',
+        tests => $some_tests,
+        jobs  => 1000,
+    },
+);
 
-# while ( defined( my $job = $scheduler->get_job ) ) {
-#     diag $job->filename;
-# }
+plan tests => @schedule * 2;
 
-# use Data::Dumper;
-# diag( Dumper($scheduler) );
+for my $test (@schedule) {
+    test_scheduler(
+        $test->{name},
+        $test->{tests},
+        $test->{rules},
+        $test->{jobs}
+    );
+}
 
-# diag( $_ ) for map { $_->filename } $scheduler->get_all;
+sub test_scheduler {
+    my ( $name, $tests, $rules, $jobs ) = @_;
 
-# diag( Dumper( [ $scheduler->get_all ] ) );
+    ok my $scheduler = TAP::Parser::Scheduler->new(
+        tests => $tests,
+        defined $rules ? ( rules => $rules ) : (),
+      ),
+      "$name: new";
+
+    my @pipeline = ();
+    my @got      = ();
+
+    while ( defined( my $job = $scheduler->get_job ) ) {
+        if ( $job->is_spinner || @pipeline >= $jobs ) {
+            die "Oops! Spinner!" unless @pipeline;
+            my $done = shift @pipeline;
+
+            # diag "Completed ", $done->filename;
+        }
+        next if $job->is_spinner;
+
+        # diag "      Got ", $job->filename;
+        push @pipeline, $job;
+
+        push @got, $job->filename;
+    }
+
+    is_deeply [ sort @got ], [ sort @$tests ], "$name: got all tests";
+}
