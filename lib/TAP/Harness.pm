@@ -83,6 +83,7 @@ BEGIN {
         fork            => sub { shift; shift },
         test_args       => sub { shift; shift },
         ignore_exit     => sub { shift; shift },
+        rules           => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -220,6 +221,23 @@ This overrides other settings such as C<verbose> or C<failures>.
 
 If set to a true value instruct C<TAP::Parser> to ignore exit and wait
 status from test scripts.
+
+=item * C<rules>
+
+A reference to a hash of rules that control which tests may be
+executed in parallel. This is an experimental feature and the
+interface may change.
+
+    $harness->rules(
+        {   par => [
+                { seq => '../ext/DB_File/t/*' },
+                { seq => '../ext/IO_Compress_Zlib/t/*' },
+                { seq => '../lib/CPANPLUS/*' },
+                { seq => '../lib/ExtUtils/t/*' },
+                '*'
+            ]
+        }
+    );
 
 =item * C<stdout>
 
@@ -517,7 +535,10 @@ sub aggregate_tests {
 
     my $jobs = $self->jobs;
 
-    my $scheduler = TAP::Parser::Scheduler->new( tests => \@tests );
+    my $scheduler = TAP::Parser::Scheduler->new(
+        tests => \@tests,
+        rules => $self->rules
+    );
 
     # #12458
     local $ENV{HARNESS_IS_VERBOSE} = 1
