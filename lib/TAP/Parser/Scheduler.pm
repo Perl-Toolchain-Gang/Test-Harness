@@ -179,7 +179,7 @@ sub _find_next_job {
     for my $seq (@$rule) {
         if ( @$seq && defined $seq->[0] && 'ARRAY' ne ref $seq->[0] ) {
             my $job = splice @$seq, 0, 1, undef;
-            $job->on_destroy( sub { splice @$seq, 0, 1 } );
+            $job->on_finish( sub { splice @$seq, 0, 1 } );
             return $job;
         }
     }

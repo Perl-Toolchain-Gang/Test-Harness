@@ -46,20 +46,26 @@ sub new {
     }, $class;
 }
 
-=head3 C<on_destroy>
+=head3 C<on_finish>
 
 Register a closure to be called when this job is destroyed.
 
 =cut
 
-sub on_destroy {
+sub on_finish {
     my ( $self, $cb ) = @_;
-    $self->{on_destroy} = $cb;
+    $self->{on_finish} = $cb;
 }
 
-sub DESTROY {
+=head3 C<finish>
+
+Called when a job is complete to unlock it.
+
+=cut
+
+sub finish {
     my $self = shift;
-    if ( my $cb = $self->{on_destroy} ) {
+    if ( my $cb = $self->{on_finish} ) {
         $cb->($self);
     }
 }

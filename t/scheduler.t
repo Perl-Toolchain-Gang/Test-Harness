@@ -83,6 +83,7 @@ sub test_scheduler {
         if ( $job->is_spinner || @pipeline >= $jobs ) {
             die "Oops! Spinner!" unless @pipeline;
             my $done = shift @pipeline;
+            $done->finish;
 
             # diag "Completed ", $done->filename;
         }

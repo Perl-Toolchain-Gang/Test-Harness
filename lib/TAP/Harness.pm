@@ -386,8 +386,9 @@ sub _aggregate_forked {
     );
 
     while ( my ( $job, $parser ) = $iter->() ) {
-        $self->_after_test( $aggregate, $job, $parser )
-          unless $job->is_spinner;
+        next if $job->is_spinner;
+        $self->_after_test( $aggregate, $job, $parser );
+        $job->finish;
     }
 
     return;
@@ -425,6 +426,7 @@ sub _aggregate_parallel {
                 # End of parser. Automatically removed from the mux.
                 $self->finish_parser( $parser, $session );
                 $self->_after_test( $aggregate, $job, $parser );
+                $job->finish;
             }
             redo RESULT;
         }
@@ -456,6 +458,7 @@ sub _aggregate_single {
 
         $self->finish_parser( $parser, $session );
         $self->_after_test( $aggregate, $job, $parser );
+        $job->finish;
     }
 
     return;
