@@ -40,6 +40,9 @@ lib/TAP/Parser/Result/Test.pm
 lib/TAP/Parser/Result/Unknown.pm
 lib/TAP/Parser/Result/Version.pm
 lib/TAP/Parser/Result/YAML.pm
+lib/TAP/Parser/Scheduler.pm
+lib/TAP/Parser/Scheduler/Job.pm
+lib/TAP/Parser/Scheduler/Spinner.pm
 lib/TAP/Parser/Source.pm
 lib/TAP/Parser/Source/Perl.pm
 lib/TAP/Parser/Utils.pm
@@ -146,6 +149,7 @@ t/sample-tests/version_late
 t/sample-tests/version_old
 t/sample-tests/vms_nit
 t/sample-tests/with_comments
+t/scheduler.t
 t/source.t
 t/source_tests/harness
 t/source_tests/harness_badtap
