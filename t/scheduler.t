@@ -16,6 +16,8 @@ my $perl_rules = {
     ]
 };
 
+my $incomplete_rules = { par => [ { seq => [ '*A', '*D' ] } ] };
+
 my $some_tests = [
     '../ext/DB_File/t/A',
     'foo',
@@ -54,6 +56,21 @@ my @schedule = (
         tests => $some_tests,
         jobs  => 1000,
     },
+    {   name  => 'Sequential, incomplete rules',
+        rules => $incomplete_rules,
+        tests => $some_tests,
+        jobs  => 1,
+    },
+    {   name  => 'Two in parallel, incomplete rules',
+        rules => $incomplete_rules,
+        tests => $some_tests,
+        jobs  => 2,
+    },
+    {   name  => 'Massively parallel, incomplete rules',
+        rules => $incomplete_rules,
+        tests => $some_tests,
+        jobs  => 1000,
+    },
 );
 
 plan tests => @schedule * 2;
@@ -76,10 +93,14 @@ sub test_scheduler {
       ),
       "$name: new";
 
+    # diag $scheduler->as_string;
+
     my @pipeline = ();
     my @got      = ();
 
     while ( defined( my $job = $scheduler->get_job ) ) {
+
+        # diag $scheduler->as_string;
         if ( $job->is_spinner || @pipeline >= $jobs ) {
             die "Oops! Spinner!" unless @pipeline;
             my $done = shift @pipeline;

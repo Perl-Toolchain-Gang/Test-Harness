@@ -70,15 +70,15 @@ sub new {
 
 sub _set_rules {
     my ( $self, $rules, $tests ) = @_;
-    $self->{schedule} = $self->_rule_clause(
-        $rules,
-        [   map { TAP::Parser::Scheduler::Job->new(@$_) }
-              map { 'ARRAY' eq ref $_ ? $_ : [ $_, $_ ] } @$tests
-        ]
-    );
+    my @tests = map { TAP::Parser::Scheduler::Job->new(@$_) }
+      map { 'ARRAY' eq ref $_ ? $_ : [ $_, $_ ] } @$tests;
+    my $schedule = $self->_rule_clause( $rules, \@tests );
 
-    # TODO: If any tests are left add them as a parallel block at the end of
+    # If any tests are left add them as a sequential block at the end of
     # the run.
+    $schedule = [ [ $schedule, @tests ] ] if @tests;
+
+    $self->{schedule} = $schedule;
 }
 
 sub _rule_clause {
@@ -170,25 +170,37 @@ sub get_job {
     return;
 }
 
+sub _not_empty {
+    my $ar = shift;
+    return 1 unless defined $ar && 'ARRAY' eq ref $ar;
+    return 1 if grep { _not_empty($_) } @$ar;
+    return;
+}
+
+sub _is_empty { !_not_empty(@_) }
+
 sub _find_next_job {
     my ( $self, $rule ) = @_;
 
-    # return unless defined $rule;
-    # return $rule unless 'ARRAY' eq ref $rule;
-
+    my @queue = ();
     for my $seq (@$rule) {
-        if ( @$seq && defined $seq->[0] && 'ARRAY' ne ref $seq->[0] ) {
-            my $job = splice @$seq, 0, 1, undef;
-            $job->on_finish( sub { splice @$seq, 0, 1 } );
-            return $job;
+        # Prune any exhausted items.
+        shift @$seq while @$seq && _is_empty( $seq->[0] );
+        if ( @$seq && defined $seq->[0] ) {
+            if ( 'ARRAY' eq ref $seq->[0] ) {
+                push @queue, $seq;
+            }
+            else {
+                my $job = splice @$seq, 0, 1, undef;
+                $job->on_finish( sub { shift @$seq } );
+                return $job;
+            }
         }
     }
 
-    for my $seq (@$rule) {
-        if ( @$seq && defined $seq->[0] && 'ARRAY' eq ref $seq->[0] ) {
-            if ( my @jobs = $self->_find_next_job( $seq->[0] ) ) {
-                return @jobs;
-            }
+    for my $seq (@queue) {
+        if ( my @jobs = $self->_find_next_job( $seq->[0] ) ) {
+            return @jobs;
         }
     }
 
@@ -202,15 +214,39 @@ C<TAP::Parser::Scheduler::Job>s.
 
 =cut
 
-# sub get_job_iterator {
-#     my $self  = shift;
-#     my @tests = $self->get_all;
-#     return sub { shift @tests };
-# }
-
 sub get_job_iterator {
     my $self = shift;
     return sub { $self->get_job };
+}
+
+=head3 C<as_string>
+
+Return a human readable representation of the scheduling tree.
+
+=cut
+
+sub as_string {
+    my $self = shift;
+    return $self->_as_string( $self->{schedule} );
+}
+
+sub _as_string {
+    my ( $self, $rule, $depth ) = ( shift, shift, shift || 0 );
+    my $pad    = ' ' x 2;
+    my $indent = $pad x $depth;
+    if ( !defined $rule ) {
+        return "$indent(undef)\n";
+    }
+    elsif ( 'ARRAY' eq ref $rule ) {
+        my $type = ( 'par', 'seq' )[ $depth % 2 ];
+        return join(
+            '', "$indent$type:\n",
+            map { $self->_as_string( $_, $depth + 1 ) } @$rule
+        );
+    }
+    else {
+        return "$indent'" . $rule->filename . "'\n";
+    }
 }
 
 1;
