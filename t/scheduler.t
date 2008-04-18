@@ -73,7 +73,7 @@ my @schedule = (
     },
 );
 
-plan tests => @schedule * 2 + 23;
+plan tests => @schedule * 2 + 266;
 
 for my $test (@schedule) {
     test_scheduler(
@@ -147,6 +147,28 @@ for my $test (@schedule) {
     finish( $E1, $E2, $E3, $C5, $C8 );
     my $C9 = ok_job( $scheduler, 'C9' );
     ok_job( $scheduler, undef );
+}
+
+{
+    my @tests = ();
+    for my $t ( 'A' .. 'Z' ) {
+        push @tests, map {"$t$_"} 1 .. 9;
+    }
+    my $rules = { par => [ map { { seq => "$_*" } } 'A' .. 'Z' ] };
+
+    my $scheduler = TAP::Parser::Scheduler->new(
+        tests => \@tests,
+        rules => $rules
+    );
+
+    # diag $scheduler->as_string;
+
+    for my $n ( 1 .. 9 ) {
+        my @got = ();
+        push @got, ok_job( $scheduler, "$_$n" ) for 'A' .. 'Z';
+        ok_job( $scheduler, $n == 9 ? undef : '#' );
+        finish(@got);
+    }
 }
 
 sub finish { $_->finish for @_ }
