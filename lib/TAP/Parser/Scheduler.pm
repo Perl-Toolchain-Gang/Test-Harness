@@ -114,8 +114,8 @@ sub _expand {
     my ( $self, $name, $tests ) = @_;
 
     $name =~ s{(.)}{
-        $1 eq '?' ? '.'
-      : $1 eq '*' ? '.*'
+        $1 eq '?' ? '[^/]'
+      : $1 eq '*' ? '[^/]*'
       :             quotemeta($1);
     }gex;
 
