@@ -13,27 +13,8 @@ my $torture;                      # torture testing?
 
 use TAP::Harness;
 
-# $Test::Harness::switches = "";    # Too much noise otherwise
-
 my $verbosity = 0;
 $verbosity++ while @ARGV && $ARGV[0] eq '-v' && shift;
-
-my $rules = {
-    par => [
-        { seq => '../ext/DB_File/t/*' },
-        { seq => '../ext/IO_Compress_Zlib/t/*' },
-        { seq => '../lib/CPANPLUS/*' },
-        { seq => '../lib/ExtUtils/t/*' },
-        '*'
-    ]
-};
-
-my $harness = TAP::Harness->new(
-    {   verbosity => $verbosity,
-        rules     => $rules,
-        jobs      => 9,
-    }
-);
 
 if ( $ARGV[0] && $ARGV[0] eq '-torture' ) {
     shift;
@@ -47,17 +28,17 @@ $ENV{PERL_CORE} = 1;
 #fudge DATA for now.
 %datahandle = qw(
   lib/bigint.t		1
-  lib/bigintpm.t		1
-  lib/bigfloat.t	 	1
+  lib/bigintpm.t	1
+  lib/bigfloat.t 	1
   lib/bigfloatpm.t	1
   op/gv.t			1
   lib/complex.t		1
-  lib/ph.t		1
+  lib/ph.t		    1
   lib/soundex.t		1
-  op/misc.t		1
+  op/misc.t		    1
   op/runlevel.t		1
-  op/tie.t		1
-  op/lex_assign.t		1
+  op/tie.t		    1
+  op/lex_assign.t	1
 );
 
 foreach ( keys %datahandle ) {
@@ -153,5 +134,40 @@ if ( $^O eq 'MSWin32' ) {
 }
 @tests = grep /$re/, @tests
   if $re;
+
+# Tux's Oslo rules
+# my $rules = {
+#     par => [
+#         { seq => '../ext/DB_File/t/*' },
+#         { seq => '../ext/IO_Compress_Zlib/t/*' },
+#         { seq => '../lib/CPANPLUS/*' },
+#         { seq => '../lib/ExtUtils/t/*' },
+#         '*'
+#     ]
+# };
+
+# Run each directory sequentially
+my $rules = seq_dir_rules(@tests);
+
+my $harness = TAP::Harness->new(
+    {   verbosity => $verbosity,
+        rules     => $rules,
+        jobs      => 9,
+    }
+);
+
 $harness->runtests(@tests);
+
 exit(0);
+
+# Generate T::H schedule rules that run the contents of each directory
+# sequentially.
+sub seq_dir_rules {
+    my @tests = @_;
+    my %dir   = ();
+    for (@tests) {
+        s{[^/]+$}{\*};
+        $dir{$_}++;
+    }
+    return { par => [ map { { seq => $_ } } sort keys %dir ] };
+}
