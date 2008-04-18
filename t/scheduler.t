@@ -87,8 +87,10 @@ for my $test (@schedule) {
 # An ad-hoc test
 
 {
-    my @tests
-      = qw( A1 A2 A3 B1 C1 C8 C5 C7 C4 C6 C3 C2 C9 D1 D2 D3 E3 E2 E1 );
+    my @tests = qw(
+      A1 A2 A3 B1 C1 C8 C5 C7 C4 C6 C3 C2 C9 D1 D2 D3 E3 E2 E1
+    );
+
     my $rules = {
         par => [
             { seq => 'A*' },
@@ -106,8 +108,11 @@ for my $test (@schedule) {
             },
         ]
     };
-    my $scheduler
-      = TAP::Parser::Scheduler->new( tests => \@tests, rules => $rules );
+
+    my $scheduler = TAP::Parser::Scheduler->new(
+        tests => \@tests,
+        rules => $rules
+    );
 
     # diag $scheduler->as_string;
 
