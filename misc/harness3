@@ -5,11 +5,14 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '../lib';              # pick up only this build's lib
-    $ENV{PERL5LIB} = '../lib';    # so children will see it too
+    @INC = '../lib';    # pick up only this build's lib
+    if ( my $th = $ENV{TH_PATH} ) {
+        unshift @INC, "$th/lib";
+    }
+    $ENV{PERL5LIB} = join ':', @INC;    # so children will see it too
 }
 
-my $torture;                      # torture testing?
+my $torture;                            # torture testing?
 
 use TAP::Harness;
 
@@ -149,10 +152,13 @@ if ( $^O eq 'MSWin32' ) {
 # Run each directory sequentially
 my $rules = seq_dir_rules(@tests);
 
+# use Data::Dumper;
+# print Dumper($rules);
+
 my $harness = TAP::Harness->new(
     {   verbosity => $verbosity,
         rules     => $rules,
-        jobs      => 9,
+        jobs      => 4,
     }
 );
 
@@ -169,5 +175,6 @@ sub seq_dir_rules {
         s{[^/]+$}{\*};
         $dir{$_}++;
     }
+
     return { par => [ map { { seq => $_ } } sort keys %dir ] };
 }
