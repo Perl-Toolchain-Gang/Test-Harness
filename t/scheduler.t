@@ -73,7 +73,7 @@ my @schedule = (
     },
 );
 
-plan tests => @schedule * 2;
+plan tests => @schedule * 2 + 23;
 
 for my $test (@schedule) {
     test_scheduler(
@@ -82,6 +82,83 @@ for my $test (@schedule) {
         $test->{rules},
         $test->{jobs}
     );
+}
+
+# An ad-hoc test
+
+{
+    my @tests
+      = qw( A1 A2 A3 B1 C1 C8 C5 C7 C4 C6 C3 C2 C9 D1 D2 D3 E3 E2 E1 );
+    my $rules = {
+        par => [
+            { seq => 'A*' },
+            { par => 'B*' },
+            { seq => [ 'C1', 'C2' ] },
+            {   par => [
+                    { seq => [ 'C3', 'C4', 'C5' ] },
+                    { seq => [ 'C6', 'C7', 'C8' ] }
+                ]
+            },
+            {   seq => [
+                    { par => ['D*'] },
+                    { par => ['E*'] }
+                ]
+            },
+        ]
+    };
+    my $scheduler
+      = TAP::Parser::Scheduler->new( tests => \@tests, rules => $rules );
+
+    # diag $scheduler->as_string;
+
+    my $A1 = ok_job( $scheduler, 'A1' );
+    my $B1 = ok_job( $scheduler, 'B1' );
+    finish($A1);
+    my $A2 = ok_job( $scheduler, 'A2' );
+    my $C1 = ok_job( $scheduler, 'C1' );
+    finish( $A2, $C1 );
+    my $A3 = ok_job( $scheduler, 'A3' );
+    my $C2 = ok_job( $scheduler, 'C2' );
+    finish( $A3, $C2 );
+    my $C3 = ok_job( $scheduler, 'C3' );
+    my $C6 = ok_job( $scheduler, 'C6' );
+    my $D1 = ok_job( $scheduler, 'D1' );
+    my $D2 = ok_job( $scheduler, 'D2' );
+    finish($C6);
+    my $C7 = ok_job( $scheduler, 'C7' );
+    my $D3 = ok_job( $scheduler, 'D3' );
+    ok_job( $scheduler, '#' );
+    ok_job( $scheduler, '#' );
+    finish( $D3, $C3, $D1, $B1 );
+    my $C4 = ok_job( $scheduler, 'C4' );
+    finish( $C4, $C7 );
+    my $C5 = ok_job( $scheduler, 'C5' );
+    my $C8 = ok_job( $scheduler, 'C8' );
+    ok_job( $scheduler, '#' );
+    finish($D2);
+    my $E3 = ok_job( $scheduler, 'E3' );
+    my $E2 = ok_job( $scheduler, 'E2' );
+    my $E1 = ok_job( $scheduler, 'E1' );
+    finish( $E1, $E2, $E3, $C5, $C8 );
+    my $C9 = ok_job( $scheduler, 'C9' );
+    ok_job( $scheduler, undef );
+}
+
+sub finish { $_->finish for @_ }
+
+sub ok_job {
+    my ( $scheduler, $want ) = @_;
+    my $job = $scheduler->get_job;
+    if ( !defined $want ) {
+        ok !defined $job, 'undef';
+    }
+    elsif ( $want eq '#' ) {
+        ok $job->is_spinner, 'spinner';
+    }
+    else {
+        is $job->filename, $want, $want;
+    }
+    return $job;
 }
 
 sub test_scheduler {
@@ -118,3 +195,4 @@ sub test_scheduler {
 
     is_deeply [ sort @got ], [ sort @$tests ], "$name: got all tests";
 }
+
