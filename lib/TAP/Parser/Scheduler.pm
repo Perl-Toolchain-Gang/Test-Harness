@@ -184,6 +184,7 @@ sub _find_next_job {
 
     my @queue = ();
     for my $seq (@$rule) {
+
         # Prune any exhausted items.
         shift @$seq while @$seq && _is_empty( $seq->[0] );
         if ( @$seq && defined $seq->[0] ) {
