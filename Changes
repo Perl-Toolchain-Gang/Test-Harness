@@ -8,6 +8,7 @@ Revision history for Test-Harness
         - added ignore_exit option to TAP::Parser and corresponding
           interfaces to TAP::Harness and Test::Harness. Requested for
           Parrot.
+        - Implemented rule based parallel scheduler.
 
 3.10    2008-02-26
         - fix undefined value warnings with bleadperl.
