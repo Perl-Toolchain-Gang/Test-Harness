@@ -358,10 +358,21 @@ sub runtests {
     $aggregate->start;
     $self->aggregate_tests( $aggregate, @tests );
     $aggregate->stop;
-    $self->formatter->summary($aggregate);
+    $self->summary($aggregate);
     $self->_make_callback( 'after_runtests', $aggregate );
 
     return $aggregate;
+}
+
+=head3 C<summary>
+
+Output the summary for a TAP::Parser::Aggregator.
+
+=cut
+
+sub summary {
+    my ( $self, $aggregate ) = @_;
+    $self->formatter->summary($aggregate);
 }
 
 sub _after_test {
