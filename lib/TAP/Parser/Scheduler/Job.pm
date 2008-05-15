@@ -39,10 +39,11 @@ Returns a new C<TAP::Parser::Scheduler::Job> object.
 =cut
 
 sub new {
-    my ( $class, $name, $desc ) = @_;
+    my ( $class, $name, $desc, @ctx ) = @_;
     return bless {
         filename    => $name,
-        description => $desc
+        description => $desc,
+        context     => \@ctx,
     }, $class;
 }
 
@@ -74,10 +75,13 @@ sub finish {
 
 =head3 C<description>
 
+=head3 C<context>
+
 =cut
 
 sub filename    { shift->{filename} }
 sub description { shift->{description} }
+sub context     { @{ shift->{context} } }
 
 =head3 C<as_array_ref>
 
@@ -87,7 +91,7 @@ For backwards compatibility in callbacks.
 
 sub as_array_ref {
     my $self = shift;
-    return [ $self->filename, $self->description ];
+    return [ $self->filename, $self->description, $self->context ];
 }
 
 =head3 C<is_spinner>
