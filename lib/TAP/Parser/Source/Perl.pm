@@ -169,7 +169,8 @@ sub _get_command_for_switches {
     my ( $file, @args ) = @{ $self->source };
     my $command = $self->_get_perl;
 
-    $file = qq["$file"] if ( $file =~ /\s/ ) && ( $file !~ /^".*"$/ );
+    # XXX we never need to quote if we treat the parts as atoms (except maybe vms)
+    #$file = qq["$file"] if ( $file =~ /\s/ ) && ( $file !~ /^".*"$/ );
     my @command = ( $command, @switches, $file, @args );
     return @command;
 }
