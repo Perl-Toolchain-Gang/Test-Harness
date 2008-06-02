@@ -542,12 +542,8 @@ different name.
 sub aggregate_tests {
     my ( $self, $aggregate, @tests ) = @_;
 
-    my $jobs = $self->jobs;
-
-    my $scheduler = TAP::Parser::Scheduler->new(
-        tests => \@tests,
-        rules => $self->rules
-    );
+    my $jobs      = $self->jobs;
+    my $scheduler = $self->make_scheduler(@tests);
 
     # #12458
     local $ENV{HARNESS_IS_VERBOSE} = 1
@@ -569,6 +565,23 @@ sub aggregate_tests {
     }
 
     return;
+}
+
+=head3 C<make_scheduler>
+
+Called by the harness when it needs to create a
+L<TAP::Parser::Scheduler>. Override in a subclass to provide an
+alternative scheduler. C<make_scheduler> is passed the list of tests
+that was passed to C<aggregate_tests>.
+
+=cut
+
+sub make_scheduler {
+    my ( $self, @tests ) = @_;
+    return TAP::Parser::Scheduler->new(
+        tests => \@tests,
+        rules => $self->rules
+    );
 }
 
 =head3 C<jobs>
