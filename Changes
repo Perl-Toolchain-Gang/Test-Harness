@@ -9,6 +9,13 @@ Revision history for Test-Harness
           interfaces to TAP::Harness and Test::Harness. Requested for
           Parrot.
         - Implemented rule based parallel scheduler.
+        - Moved filename -> display name mapping out of formatter. This
+          prevents the formatter's strip-extensions logic from stripping
+          extensions from supplied descriptions.
+        - Only strip extensions from test names if all tests have the
+          same extension. Previously we stripped extensions if all names
+          had /any/ extension making it impossible to distinguish tests
+          whose name differed only in the extension.
 
 3.10    2008-02-26
         - fix undefined value warnings with bleadperl.

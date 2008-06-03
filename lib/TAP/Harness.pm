@@ -567,6 +567,30 @@ sub aggregate_tests {
     return;
 }
 
+sub _add_descriptions {
+    my $self = shift;
+
+    # First transformation: turn scalars into single element arrays
+    my @t = map { 'ARRAY' eq ref $_ ? $_ : [$_] } @_;
+
+    # Work out how many different extensions we have
+    my %ext;
+    for (@t) {
+        $ext{$1}++ if $_->[0] =~ /\.(\w+)$/;
+    }
+
+    if ( keys %ext > 1 ) {
+        return map { @$_ == 1 ? [ @$_, @$_ ] : $_ } @t;
+    }
+    else {
+        for (@t) {
+            ( $_->[1] = $_->[0] ) =~ s/\.\w+$//
+              if @$_ == 1;
+        }
+        return @t;
+    }
+}
+
 =head3 C<make_scheduler>
 
 Called by the harness when it needs to create a
@@ -579,7 +603,7 @@ that was passed to C<aggregate_tests>.
 sub make_scheduler {
     my ( $self, @tests ) = @_;
     return TAP::Parser::Scheduler->new(
-        tests => \@tests,
+        tests => [ $self->_add_descriptions(@tests) ],
         rules => $self->rules
     );
 }
