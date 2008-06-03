@@ -8,10 +8,10 @@ use Net::Telnet;
 $| = 1;
 
 # Seems that the only working Perl is on...
-use constant TELNETHOST => 'td183.testdrive.hp.com';
+use constant TELNETHOST => 'td184.testdrive.hp.com';
 
 # ...and FTP only works on...
-use constant FTPHOST => 'td183.testdrive.hp.com';
+use constant FTPHOST => 'td184.testdrive.hp.com';
 
 use constant TESTDRIVERC => glob('~/.testdriverc');
 use constant CLEANUP     => qr{^TEST-HARNESS-[^;]+;\d+\s*$}i;
