@@ -579,16 +579,14 @@ sub _add_descriptions {
         $ext{$1}++ if $_->[0] =~ /\.(\w+)$/;
     }
 
-    if ( keys %ext > 1 ) {
-        return map { @$_ == 1 ? [ @$_, @$_ ] : $_ } @t;
-    }
-    else {
-        for (@t) {
-            ( $_->[1] = $_->[0] ) =~ s/\.\w+$//
-              if @$_ == 1;
+    for (@t) {
+        if ( @$_ == 1 ) {
+            $_->[1] = $_->[0];
+            $_->[1] =~ s/\.\w+$//
+              if keys %ext > 1;
         }
-        return @t;
     }
+    return @t;
 }
 
 =head3 C<make_scheduler>
