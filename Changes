@@ -16,6 +16,8 @@ Revision history for Test-Harness
           same extension. Previously we stripped extensions if all names
           had /any/ extension making it impossible to distinguish tests
           whose name differed only in the extension.
+        - Removed privacy test that made it impossible to subclass
+          TAP::Parser.
 
 3.10    2008-02-26
         - fix undefined value warnings with bleadperl.

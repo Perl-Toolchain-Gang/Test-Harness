@@ -12,7 +12,7 @@ BEGIN {
     }
 }
 
-use Test::More tests => 284;
+use Test::More tests => 282;
 use IO::c55Capture;
 
 use File::Spec;
@@ -435,29 +435,6 @@ is $test->raw, 'ok 2 - read the rest of the file',
 
 is scalar $parser->passed, 2,
   'Empty junk lines should not affect the correct number of tests passed';
-
-# coverage tests
-{
-
-    # calling a TAP::Parser internal method with a 'foreign' class
-
-    my $foreigner = bless {}, 'Foreigner';
-
-    my @die;
-
-    eval {
-        local $SIG{__DIE__} = sub { push @die, @_ };
-
-        TAP::Parser::_stream $foreigner, qw(a b c);
-    };
-
-    unless ( is @die, 1, 'coverage testing for TAP::Parser accessors' ) {
-        diag " >>> $_ <<<\n" for @die;
-    }
-
-    like pop @die, qr/_stream[(][)] may not be set externally/,
-      '... and we died with expected message';
-}
 
 {
 

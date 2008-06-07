@@ -59,28 +59,11 @@ BEGIN {    # making accessors
       )
     {
         no strict 'refs';
-
-        # another tiny performance hack
-        if ( $method =~ /^_/ ) {
-            *$method = sub {
-                my $self = shift;
-                return $self->{$method} unless @_;
-
-                # Trusted methods
-                unless ( ( ref $self ) =~ /^TAP::Parser/ ) {
-                    Carp::croak("$method() may not be set externally");
-                }
-
-                $self->{$method} = shift;
-            };
-        }
-        else {
-            *$method = sub {
-                my $self = shift;
-                return $self->{$method} unless @_;
-                $self->{$method} = shift;
-            };
-        }
+        *$method = sub {
+            my $self = shift;
+            return $self->{$method} unless @_;
+            $self->{$method} = shift;
+        };
     }
 }    # done making accessors
 
