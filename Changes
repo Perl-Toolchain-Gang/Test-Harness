@@ -18,6 +18,8 @@ Revision history for Test-Harness
           whose name differed only in the extension.
         - Removed privacy test that made it impossible to subclass
           TAP::Parser.
+        - Delayed initialisation of grammar making it easier to replace
+          the TAP::Parser stream after instantiation.
 
 3.10    2008-02-26
         - fix undefined value warnings with bleadperl.
