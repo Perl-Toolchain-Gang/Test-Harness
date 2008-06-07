@@ -20,6 +20,8 @@ Revision history for Test-Harness
           TAP::Parser.
         - Delayed initialisation of grammar making it easier to replace
           the TAP::Parser stream after instantiation.
+        - Make it possible to supply import parameters to a replacement
+          harness with prove.
 
 3.10    2008-02-26
         - fix undefined value warnings with bleadperl.

@@ -515,10 +515,15 @@ Load a harness replacement class.
 sub require_harness {
     my ( $self, $for, $class ) = @_;
 
-    eval("require $class");
+    my ($class_name) = $class =~ /^(\w+(?:::\w+)*)/;
+
+    # Emulate Perl's -MModule=arg1,arg2 behaviour
+    $class =~ s!^(\w+(?:::\w+)*)=(.*)$!$1 split(/,/,q{$2})!;
+
+    eval("use $class;");
     die "$class is required to use the --$for feature: $@" if $@;
 
-    $self->{harness_class} = $class;
+    $self->{harness_class} = $class_name;
 
     return;
 }
