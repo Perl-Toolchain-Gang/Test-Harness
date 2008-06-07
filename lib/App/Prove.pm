@@ -521,7 +521,7 @@ sub require_harness {
     $class =~ s!^(\w+(?:::\w+)*)=(.*)$!$1 split(/,/,q{$2})!;
 
     eval("use $class;");
-    die "$class is required to use the --$for feature: $@" if $@;
+    die "$class_name is required to use the --$for feature: $@" if $@;
 
     $self->{harness_class} = $class_name;
 
