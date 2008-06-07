@@ -22,6 +22,8 @@ Revision history for Test-Harness
           the TAP::Parser stream after instantiation.
         - Make it possible to supply import parameters to a replacement
           harness with prove.
+        - Make it possible to replace either _grammar /or/ _stream
+          before reading from a TAP::Parser.
 
 3.10    2008-02-26
         - fix undefined value warnings with bleadperl.

@@ -42,7 +42,6 @@ BEGIN {    # making accessors
         qw(
         _stream
         _spool
-        _grammar
         exec
         exit
         is_good_plan
@@ -1230,15 +1229,23 @@ sub _make_grammar_with_stream {
     return $grammar;
 }
 
+sub _grammar {
+    my $self = shift;
+    if (@_) {
+        return $self->{_grammar} = shift;
+    }
+
+    return $self->{_grammar}
+      ||= $self->_make_grammar_with_stream( $self->_stream );
+}
+    
 sub _iter {
     my $self        = shift;
     my $stream      = $self->_stream;
+    my $grammar     = $self->_grammar;
     my $spool       = $self->_spool;
     my $state       = 'INIT';
     my $state_table = $self->_make_state_table;
-
-    my $grammar = $self->_make_grammar_with_stream($stream);
-    $self->_grammar($grammar);
 
     $self->start_time( $self->get_time );
 
