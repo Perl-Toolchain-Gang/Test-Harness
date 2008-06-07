@@ -1223,6 +1223,13 @@ determine the readiness of this parser.
 
 sub get_select_handles { shift->_stream->get_select_handles }
 
+sub _make_grammar_with_stream {
+    my ( $self, $stream ) = @_;
+    my $grammar = TAP::Parser::Grammar->new($stream);
+    $grammar->set_version( $self->version );
+    return $grammar;
+}
+
 sub _iter {
     my $self        = shift;
     my $stream      = $self->_stream;
@@ -1230,8 +1237,7 @@ sub _iter {
     my $state       = 'INIT';
     my $state_table = $self->_make_state_table;
 
-    my $grammar = TAP::Parser::Grammar->new($stream);
-    $grammar->set_version( $self->version );
+    my $grammar = $self->_make_grammar_with_stream($stream);
     $self->_grammar($grammar);
 
     $self->start_time( $self->get_time );
