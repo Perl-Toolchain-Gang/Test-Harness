@@ -359,13 +359,8 @@ sub run {
         }
 
         $self->_stream($stream);
-        my $grammar = TAP::Parser::Grammar->new($stream);
-        $grammar->set_version( $self->version );
-        $self->_grammar($grammar);
         $self->_spool($spool);
         $self->ignore_exit($ignore_exit);
-
-        $self->start_time( $self->get_time );
 
         return $self;
     }
@@ -1232,9 +1227,14 @@ sub _iter {
     my $self        = shift;
     my $stream      = $self->_stream;
     my $spool       = $self->_spool;
-    my $grammar     = $self->_grammar;
     my $state       = 'INIT';
     my $state_table = $self->_make_state_table;
+
+    my $grammar = TAP::Parser::Grammar->new($stream);
+    $grammar->set_version( $self->version );
+    $self->_grammar($grammar);
+
+    $self->start_time( $self->get_time );
 
     # Make next_state closure
     my $next_state = sub {
