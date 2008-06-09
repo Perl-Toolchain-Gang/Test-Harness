@@ -78,9 +78,10 @@ package main;
     my @call_log = ();
 
     local $^W;    # no warnings
-    no warnings;
 
     my $orig_new = TAP::Parser::Iterator::Process->can('new');
+    # Avoid "used only once" warning
+    *TAP::Parser::Iterator::Process::new = 
     *TAP::Parser::Iterator::Process::new = sub {
         push @call_log, [ 'new', @_ ];
 
