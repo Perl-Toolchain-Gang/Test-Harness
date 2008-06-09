@@ -1714,6 +1714,8 @@ Michael Peters <mpeters at plusthree dot com>
 
 Leif Eriksen <leif dot eriksen at bigpond dot com>
 
+Steve Purkis <steve at purkis dot ca>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to
