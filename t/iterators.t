@@ -7,7 +7,7 @@ use Test::More tests => 76;
 
 use File::Spec;
 use TAP::Parser;
-use TAP::Parser::Iterator;
+use TAP::Parser::IteratorFactory;
 use Config;
 
 sub array_ref_from {
@@ -86,7 +86,7 @@ for my $test (@schedule) {
         skip "No open3", $need_open3 if $need_open3 && !_can_open3();
         my $subclass = $test->{subclass};
         my $source   = $test->{source};
-        my $class    = $test->{class} || 'TAP::Parser::Iterator';
+        my $class    = $test->{class} || 'TAP::Parser::IteratorFactory';
         ok my $iter = $class->new($source),
           "$name: We should be able to create a new iterator";
         isa_ok $iter, 'TAP::Parser::Iterator',
@@ -126,7 +126,7 @@ for my $test (@schedule) {
 
     # coverage tests for the ctor
 
-    my $stream = TAP::Parser::Iterator->new( IO::Handle->new );
+    my $stream = TAP::Parser::IteratorFactory->new( IO::Handle->new );
 
     isa_ok $stream, 'TAP::Parser::Iterator::Stream';
 
@@ -135,7 +135,7 @@ for my $test (@schedule) {
     eval {
         local $SIG{__DIE__} = sub { push @die, @_ };
 
-        TAP::Parser::Iterator->new( \1 );    # a ref to a scalar
+        TAP::Parser::IteratorFactory->new( \1 );    # a ref to a scalar
     };
 
     is @die, 1, 'coverage of error case';
@@ -148,7 +148,7 @@ for my $test (@schedule) {
 
     # coverage test for VMS case
 
-    my $stream = TAP::Parser::Iterator->new(
+    my $stream = TAP::Parser::IteratorFactory->new(
         [   'not ',
             'ok 1 - I hate VMS',
         ]
@@ -159,7 +159,7 @@ for my $test (@schedule) {
 
     # coverage test for VMS case - nothing after 'not'
 
-    $stream = TAP::Parser::Iterator->new(
+    $stream = TAP::Parser::IteratorFactory->new(
         [   'not ',
         ]
     );
@@ -177,7 +177,7 @@ SKIP: {
     eval {
         local $SIG{__DIE__} = sub { push @die, @_ };
 
-        TAP::Parser::Iterator->new( {} );
+        TAP::Parser::IteratorFactory->new( {} );
     };
 
     is @die, 1, 'coverage testing for TPI::Process';
@@ -185,7 +185,7 @@ SKIP: {
     like pop @die, qr/Must supply a command to execute/,
       '...and we died as expected';
 
-    my $parser = TAP::Parser::Iterator->new(
+    my $parser = TAP::Parser::IteratorFactory->new(
         {   command => [
                 $^X,
                 File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' )

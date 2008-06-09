@@ -1,10 +1,11 @@
 package TAP::Formatter::Color;
 
 use strict;
-
-use vars qw($VERSION);
+use vars qw($VERSION @ISA);
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
+
+@ISA = qw(TAP::Object);
 
 my $NO_COLOR;
 
@@ -106,18 +107,19 @@ L<Term::ANSIColor> is not installed, returns undef.
 
 =cut
 
-sub new {
-    my $class = shift;
+# new() implementation supplied by TAP::Object
+
+sub _initialize {
+    my $self = shift;
 
     if ($NO_COLOR) {
-
         # shorten that message a bit
         ( my $error = $NO_COLOR ) =~ s/ in \@INC .*//s;
         warn "Note: Cannot run tests in color: $error\n";
-        return;
+        return; # abort object construction
     }
 
-    return bless {}, $class;
+    return $self;
 }
 
 ##############################################################################

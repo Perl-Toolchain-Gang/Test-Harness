@@ -1,6 +1,10 @@
 Revision history for Test-Harness
 
-3.11    2008-02-27
+3.12    ****-**-**
+        - applied Steve Purkis' huge refactoring patch which adds
+          configurable factories for most of the major internal classes.
+
+3.11    2008-06-09
         - applied Jim Keenan's patch that makes App::Prove::run return a
           rather than exit (#33609)
         - prove -r now recurses cwd rather than 't' by default (#33007)

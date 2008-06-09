@@ -18,7 +18,7 @@ use IO::c55Capture;
 use File::Spec;
 
 use TAP::Parser;
-use TAP::Parser::Iterator;
+use TAP::Parser::IteratorFactory;
 
 sub _get_results {
     my $parser = shift;
@@ -349,7 +349,7 @@ END_TAP
 my $aref = [ split /\n/ => $tap ];
 
 can_ok $PARSER, 'new';
-$parser = $PARSER->new( { stream => TAP::Parser::Iterator->new($aref) } );
+$parser = $PARSER->new( { stream => TAP::Parser::IteratorFactory->new($aref) } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 
 # results() is sane?
@@ -639,10 +639,10 @@ END_TAP
 
     _get_results($parser);
 
-    ok !$parser->failed;
-    ok $parser->todo_passed;
+    ok !$parser->failed, 'parser didnt fail';
+    ok $parser->todo_passed, '... and todo_passed is true';
 
-    ok !$parser->has_problems, 'and has_problems is false';
+    ok !$parser->has_problems, '... and has_problems is false';
 
     # now parse_errors
 
@@ -656,11 +656,11 @@ END_TAP
 
     _get_results($parser);
 
-    ok !$parser->failed;
-    ok !$parser->todo_passed;
-    ok $parser->parse_errors;
+    ok !$parser->failed, 'parser didnt fail';
+    ok !$parser->todo_passed, '... and todo_passed is false';
+    ok $parser->parse_errors, '... and parse_errors is true';
 
-    ok $parser->has_problems;
+    ok $parser->has_problems, '... and has_problems';
 
     # Now wait and exit are hard to do in an OS platform-independent way, so
     # we won't even bother
@@ -678,27 +678,27 @@ END_TAP
 
     $parser->wait(1);
 
-    ok !$parser->failed;
-    ok !$parser->todo_passed;
-    ok !$parser->parse_errors;
+    ok !$parser->failed, 'parser didnt fail';
+    ok !$parser->todo_passed, '... and todo_passed is false';
+    ok !$parser->parse_errors, '... and parse_errors is false';
 
-    ok $parser->wait;
+    ok $parser->wait, '... and wait is set';
 
-    ok $parser->has_problems;
+    ok $parser->has_problems, '... and has_problems';
 
     # and use the same for exit
 
     $parser->wait(0);
     $parser->exit(1);
 
-    ok !$parser->failed;
-    ok !$parser->todo_passed;
-    ok !$parser->parse_errors;
-    ok !$parser->wait;
+    ok !$parser->failed, 'parser didnt fail';
+    ok !$parser->todo_passed, '... and todo_passed is false';
+    ok !$parser->parse_errors, '... and parse_errors is false';
+    ok !$parser->wait, '... and wait is not set';
 
-    ok $parser->exit;
+    ok $parser->exit, '... and exit is set';
 
-    ok $parser->has_problems;
+    ok $parser->has_problems, '... and has_problems';
 }
 
 {
@@ -784,10 +784,6 @@ END_TAP
 
     @ISA = qw(TAP::Parser::Iterator);
 
-    sub new {
-        return bless {}, shift;
-    }
-
     sub next_raw {
         die 'this is the dying iterator';
     }
@@ -817,7 +813,8 @@ END_TAP
         $parser->_stream($stream);
 
         # build a new grammar
-        my $grammar = TAP::Parser::Grammar->new($stream);
+        my $grammar = TAP::Parser::Grammar->new({ stream => $stream,
+						  parser => $parser });
 
         # replace our grammar with this new one
         $parser->_grammar($grammar);
@@ -849,7 +846,8 @@ END_TAP
         $parser->_stream($stream);
 
         # build a new grammar
-        my $grammar = TAP::Parser::Grammar->new($stream);
+        my $grammar = TAP::Parser::Grammar->new({ stream => $stream,
+						  parser => $parser });
 
         # replace our grammar with this new one
         $parser->_grammar($grammar);

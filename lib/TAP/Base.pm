@@ -1,7 +1,11 @@
 package TAP::Base;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION @ISA);
+
+use TAP::Object;
+
+@ISA = qw(TAP::Object);
 
 =head1 NAME
 
@@ -114,14 +118,6 @@ sub _make_callback {
     my $cb = $self->_callback_for($event);
     return unless defined $cb;
     return map { $_->(@_) } @$cb;
-}
-
-sub _croak {
-    my ( $self, $message ) = @_;
-    require Carp;
-    Carp::croak($message);
-
-    return;
 }
 
 =head3 C<get_time>

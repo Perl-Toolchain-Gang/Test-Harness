@@ -1,0 +1,2812 @@
+Binary files Test-Harness-3.10.orig/..Test_Harness_lib.tgz and Test-Harness-3.10/..Test_Harness_lib.tgz differ
+diff -ruN Test-Harness-3.10.orig/HACKING.pod Test-Harness-3.10/HACKING.pod
+--- Test-Harness-3.10.orig/HACKING.pod	2008-02-10 12:14:46.000000000 +0000
++++ Test-Harness-3.10/HACKING.pod	2008-06-08 09:34:13.000000000 +0100
+@@ -18,9 +18,17 @@
+ 
+ =head1 Getting Started
+ 
+-See the resources section in META.yml (or Build.PL) for links to the
++See the resources section in I<META.yml> or I<Build.PL> for links to the
+ project mailing list, bug tracker, svn repository, etc.
+ 
++For ease of reference, at the time of writing the SVN repository was at:
++
++  http://svn.hexten.net/tapx
++
++To get the latest version of trunk:
++
++  svn co http://svn.hexten.net/tapx/trunk
++
+ For best results, read the rest of this file, check RT for bugs which
+ scratch your itch, join the mailing list, etc.
+ 
+@@ -88,6 +96,21 @@
+ =for eric_not_it
+   TODO explain no bundling, PERL_CORE, etc
+ 
++=head1 Use TAP::Object
++
++TAP::Object is the common base class to all TAP::* modules, and should be for
++any that you write.
++
++=head1 Exception Handling
++
++Exceptions should be raised with L<Carp>:
++
++  require Carp;
++  Carp::croak("Unsupported syntax version: $version");
++
++  require Carp;
++  Carp::confess("Unsupported syntax version: $version");
++
+ =head1 Documentation
+ 
+ The end-user and API documentation is all in the 'lib/' directory.  In
+@@ -121,7 +144,7 @@
+ =for eric_not_it
+   The following is how I would do it, but opposite of what we have.
+ 
+-The C<=head2> command documents a method.  The name of the method should have no adornment (e.g. don't CE<gt>method> or CE<gt>method($list, $of, $params)>.)
++The C<=head2> command documents a method.  The name of the method should have no adornment (e.g. don't CE<lt>method> or CE<lt>method($list, $of, $params)>.)
+ 
+ These sections should begin with a short description of what the method
+ does, followed by one or more examples of usage.  If needed, elaborate
+diff -ruN Test-Harness-3.10.orig/lib/App/Prove/State.pm Test-Harness-3.10/lib/App/Prove/State.pm
+--- Test-Harness-3.10.orig/lib/App/Prove/State.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/App/Prove/State.pm	2008-06-08 13:26:11.000000000 +0100
+@@ -1,6 +1,8 @@
+ package App::Prove::State;
+ 
+ use strict;
++use vars qw($VERSION @ISA);
++
+ use File::Find;
+ use File::Spec;
+ use Carp;
+@@ -8,7 +10,6 @@
+ use TAP::Parser::YAMLish::Writer ();
+ use TAP::Base;
+ 
+-use vars qw($VERSION @ISA);
+ @ISA = qw( TAP::Base );
+ 
+ use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
+@@ -47,6 +48,7 @@
+ 
+ =cut
+ 
++# override TAP::Base::new:
+ sub new {
+     my $class = shift;
+     my %args = %{ shift || {} };
+diff -ruN Test-Harness-3.10.orig/lib/App/Prove.pm Test-Harness-3.10/lib/App/Prove.pm
+--- Test-Harness-3.10.orig/lib/App/Prove.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/App/Prove.pm	2008-06-08 13:21:23.000000000 +0100
+@@ -1,6 +1,9 @@
+ package App::Prove;
+ 
+ use strict;
++use vars qw($VERSION @ISA);
++
++use TAP::Object ();
+ use TAP::Harness;
+ use TAP::Parser::Utils qw( split_shell );
+ use File::Spec;
+@@ -8,7 +11,7 @@
+ use App::Prove::State;
+ use Carp;
+ 
+-use vars qw($VERSION);
++@ISA = qw(TAP::Object);
+ 
+ =head1 NAME
+ 
+@@ -78,20 +81,18 @@
+ 
+ =cut
+ 
+-sub new {
+-    my $class = shift;
++# new() implementation supplied by TAP::Object
++
++sub _initialize {
++    my $self = shift;
+     my $args = shift || {};
+ 
+-    my $self = bless {
+-        argv          => [],
+-        rc_opts       => [],
+-        includes      => [],
+-        modules       => [],
+-        state         => [],
+-        plugins       => [],
+-        harness_class => 'TAP::Harness',
+-        _state        => App::Prove::State->new( { store => STATE_FILE } ),
+-    }, $class;
++    # setup defaults:
++    for my $key (qw( argv rc_opts includes modules state plugins )) {
++	$self->{$key} = [];
++    }
++    $self->{harness_class} = 'TAP::Harness';
++    $self->{_state} = App::Prove::State->new( { store => STATE_FILE } );
+ 
+     for my $attr (@ATTR) {
+         if ( exists $args->{$attr} ) {
+@@ -100,6 +101,7 @@
+             $self->{$attr} = $args->{$attr};
+         }
+     }
++
+     return $self;
+ }
+ 
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Base.pm Test-Harness-3.10/lib/TAP/Base.pm
+--- Test-Harness-3.10.orig/lib/TAP/Base.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Base.pm	2008-06-08 10:10:35.000000000 +0100
+@@ -1,7 +1,11 @@
+ package TAP::Base;
+ 
+ use strict;
+-use vars qw($VERSION);
++use vars qw($VERSION @ISA);
++
++use TAP::Object;
++
++@ISA = qw(TAP::Object);
+ 
+ =head1 NAME
+ 
+@@ -116,14 +120,6 @@
+     return map { $_->(@_) } @$cb;
+ }
+ 
+-sub _croak {
+-    my ( $self, $message ) = @_;
+-    require Carp;
+-    Carp::croak($message);
+-
+-    return;
+-}
+-
+ =head3 C<get_time>
+ 
+ Return the current time using Time::HiRes if available.
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Formatter/Color.pm Test-Harness-3.10/lib/TAP/Formatter/Color.pm
+--- Test-Harness-3.10.orig/lib/TAP/Formatter/Color.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Formatter/Color.pm	2008-06-08 13:28:25.000000000 +0100
+@@ -1,11 +1,12 @@
+ package TAP::Formatter::Color;
+ 
+ use strict;
+-
+-use vars qw($VERSION);
++use vars qw($VERSION @ISA);
+ 
+ use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
+ 
++@ISA = qw(TAP::Object);
++
+ my $NO_COLOR;
+ 
+ BEGIN {
+@@ -106,18 +107,19 @@
+ 
+ =cut
+ 
+-sub new {
+-    my $class = shift;
++# new() implementation supplied by TAP::Object
+ 
+-    if ($NO_COLOR) {
++sub _initialize {
++    my $self = shift;
+ 
++    if ($NO_COLOR) {
+         # shorten that message a bit
+         ( my $error = $NO_COLOR ) =~ s/ in \@INC .*//s;
+         warn "Note: Cannot run tests in color: $error\n";
+-        return;
++        return; # abort object construction
+     }
+ 
+-    return bless {}, $class;
++    return $self;
+ }
+ 
+ ##############################################################################
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Object.pm Test-Harness-3.10/lib/TAP/Object.pm
+--- Test-Harness-3.10.orig/lib/TAP/Object.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/lib/TAP/Object.pm	2008-06-08 10:43:18.000000000 +0100
+@@ -0,0 +1,100 @@
++package TAP::Object;
++
++use strict;
++use vars qw($VERSION);
++
++=head1 NAME
++
++TAP::Object - Base class that provides common functionality to all C<TAP::*> modules
++
++=head1 VERSION
++
++Version 3.10
++
++=cut
++
++$VERSION = '3.10';
++
++=head1 SYNOPSIS
++
++    package TAP::Whatever;
++
++    use strict;
++    use vars qw(@ISA);
++
++    use TAP::Object;
++
++    @ISA = qw(TAP::Object);
++
++    # new() implementation by TAP::Object
++    sub _initialize {
++        my ( $self, @args) = @_;
++        # initialize your object
++        return $self;
++    }
++
++    # ... later ...
++    my $obj = TAP::Whatever->new(@args);
++
++=head1 DESCRIPTION
++
++C<TAP::Object> provides a default constructor and exception model for all
++C<TAP::*> classes.  Exceptions are raised using L<Carp>.
++
++=head1 METHODS
++
++=head2 Class Methods
++
++=head3 C<new>
++
++Create a new object.  Any arguments passed to C<new> will be passed on to the
++L</_initialize> method.  Returns a new object.
++
++=cut
++
++sub new {
++    my $class = shift;
++    my $self = bless {}, $class;
++    return $self->_initialize(@_);
++}
++
++
++=head2 Instance Methods
++
++=head3 C<_initialize>
++
++Initializes a new object.  This method is a stub by default, you should override
++it as appropriate.
++
++I<Note:> L</new> expects you to return C<$self> or raise an exception.  See
++L</_croak>, and L<Carp>.
++
++=cut
++
++sub _initialize {
++    return $_[0];
++}
++
++
++=head3 C<_croak>
++
++Raise an exception using C<croak> from L<Carp>, eg:
++
++    $self->_croak( 'why me?', 'aaarrgh!' );
++
++May also be called as a I<class> method.
++
++    $class->_croak( 'this works too' );
++
++=cut
++
++sub _croak {
++    my $proto = shift;
++    require Carp;
++    Carp::croak(@_);
++    return;
++}
++
++
++1;
++
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Aggregator.pm Test-Harness-3.10/lib/TAP/Parser/Aggregator.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Aggregator.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Aggregator.pm	2008-06-08 10:19:02.000000000 +0100
+@@ -2,7 +2,11 @@
+ 
+ use strict;
+ use Benchmark;
+-use vars qw($VERSION);
++use vars qw($VERSION @ISA);
++
++use TAP::Object ();
++
++@ISA = qw(TAP::Object);
+ 
+ =head1 NAME
+ 
+@@ -51,6 +55,8 @@
+ 
+ =cut
+ 
++# new() implementation supplied by TAP::Object
++
+ my %SUMMARY_METHOD_FOR;
+ 
+ BEGIN {    # install summary methods
+@@ -79,13 +85,6 @@
+     }
+ }    # end install summary methods
+ 
+-sub new {
+-    my ($class) = @_;
+-    my $self = bless {}, $class;
+-    $self->_initialize;
+-    return $self;
+-}
+-
+ sub _initialize {
+     my ($self) = @_;
+     $self->{parser_for}  = {};
+@@ -395,12 +394,6 @@
+     goto &todo_passed;
+ }
+ 
+-sub _croak {
+-    my $proto = shift;
+-    require Carp;
+-    Carp::croak(@_);
+-}
+-
+ =head1 See Also
+ 
+ L<TAP::Parser>
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Grammar.pm Test-Harness-3.10/lib/TAP/Parser/Grammar.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Grammar.pm	2008-02-18 22:20:19.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Grammar.pm	2008-06-08 18:30:08.000000000 +0100
+@@ -1,11 +1,14 @@
+ package TAP::Parser::Grammar;
+ 
+ use strict;
+-use vars qw($VERSION);
++use vars qw($VERSION @ISA);
+ 
+-use TAP::Parser::Result          ();
++use TAP::Object                  ();
++use TAP::Parser::ResultFactory   ();
+ use TAP::Parser::YAMLish::Reader ();
+ 
++@ISA = qw(TAP::Object);
++
+ =head1 NAME
+ 
+ TAP::Parser::Grammar - A grammar for the Test Anything Protocol.
+@@ -37,16 +40,24 @@
+ 
+ =head3 C<new>
+ 
+-  my $grammar = TAP::Grammar->new($stream);
+-
+-Returns TAP grammar object that will parse the specified stream.
++  my $grammar = TAP::Parser::Grammar->new({
++      stream  => $stream,
++      parser  => $parser,
++      version => $version,
++  });
++
++Returns L<TAP::Parser> grammar object that will parse the specified stream.
++Both C<stream> and C<parser> are required arguments.  If C<version> is not set
++it defaults to C<12> (see L</set_version> for more details).
+ 
+ =cut
+ 
+-sub new {
+-    my ( $class, $stream ) = @_;
+-    my $self = bless { stream => $stream }, $class;
+-    $self->set_version(12);
++# new() implementation supplied by TAP::Object
++sub _initialize {
++    my ( $self, $args ) = @_;
++    $self->{stream} = $args->{stream}; # TODO: accessor
++    $self->{parser} = $args->{parser}; # TODO: accessor
++    $self->set_version($args->{version} || 12);
+     return $self;
+ }
+ 
+@@ -282,9 +293,10 @@
+ 
+     $token = $self->_make_unknown_token($line) unless $token;
+ 
+-    return TAP::Parser::Result->new($token);
++    return $self->{parser}->make_result($token);
+ }
+ 
++
+ ##############################################################################
+ 
+ =head3 C<token_types>
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Iterator/Array.pm Test-Harness-3.10/lib/TAP/Parser/Iterator/Array.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Iterator/Array.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Iterator/Array.pm	2008-06-08 12:42:56.000000000 +0100
+@@ -1,13 +1,15 @@
+ package TAP::Parser::Iterator::Array;
+ 
+ use strict;
+-use TAP::Parser::Iterator ();
+ use vars qw($VERSION @ISA);
++
++use TAP::Parser::Iterator ();
++
+ @ISA = 'TAP::Parser::Iterator';
+ 
+ =head1 NAME
+ 
+-TAP::Parser::Iterator::Array - Internal TAP::Parser Iterator
++TAP::Parser::Iterator::Array - Internal TAP::Parser array Iterator
+ 
+ =head1 VERSION
+ 
+@@ -19,8 +21,11 @@
+ 
+ =head1 SYNOPSIS
+ 
++  # see TAP::Parser::IteratorFactory for preferred usage
++
++  # to use directly:
+   use TAP::Parser::Iterator::Array;
+-  my $it = TAP::Parser::Iterator->new(\@array);
++  my $it = TAP::Parser::Iterator::Array->new(\@array);
+ 
+   my $line = $it->next;
+ 
+@@ -60,14 +65,15 @@
+ 
+ =cut
+ 
+-sub new {
+-    my ( $class, $thing ) = @_;
++# new() implementation supplied by TAP::Object
++
++sub _initialize {
++    my ( $self, $thing ) = @_;
+     chomp @$thing;
+-    bless {
+-        idx   => 0,
+-        array => $thing,
+-        exit  => undef,
+-    }, $class;
++    $self->{idx}   = 0;
++    $self->{array} = $thing;
++    $self->{exit}  = undef;
++    return $self;
+ }
+ 
+ sub wait { shift->exit }
+@@ -84,3 +90,13 @@
+ }
+ 
+ 1;
++
++=head1 SEE ALSO
++
++L<TAP::Object>,
++L<TAP::Parser>,
++L<TAP::Parser::Iterator>,
++L<TAP::Parser::IteratorFactory>,
++
++=cut
++
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Iterator/Base.pm Test-Harness-3.10/lib/TAP/Parser/Iterator/Base.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Iterator/Base.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/lib/TAP/Parser/Iterator/Base.pm	2008-06-08 11:15:38.000000000 +0100
+@@ -0,0 +1,126 @@
++package TAP::Parser::Iterator::Base;
++
++use strict;
++use vars qw($VERSION @ISA);
++
++use TAP::Object ();
++
++@ISA = qw(TAP::Object);
++
++=head1 NAME
++
++TAP::Parser::Iterator::Base - Internal base class for TAP::Parser Iterators
++
++=head1 VERSION
++
++Version 3.10
++
++=cut
++
++$VERSION = '3.10';
++
++=head1 SYNOPSIS
++
++  use vars qw(@ISA);
++  use TAP::Parser::Iterator::Base ();
++  @ISA = qw(TAP::Parser::Iterator::Base);
++  sub _initialize {
++    # see TAP::Object...
++  }
++
++=head1 DESCRIPTION
++
++B<FOR INTERNAL USE ONLY!>
++
++This is a simple iterator base class that defines the iterator API.  See
++C<TAP::Parser::Iterator> for a factory class that creates iterators.
++
++=head2 Class Methods
++
++=head3 C<new>
++
++Create an iterator.
++
++=cut
++
++# new() provided by TAP::Object
++
++
++=head2 Instance Methods
++
++=head3 C<next>
++
++ while ( my $item = $iter->next ) { ... }
++
++Iterate through it, of course.
++
++=head3 C<next_raw>
++
++ while ( my $item = $iter->next_raw ) { ... }
++
++Iterate raw input without applying any fixes for quirky input syntax.
++
++I<Note:> this method is abstract and should be overridden.
++
++=cut
++
++sub next {
++    my $self = shift;
++    my $line = $self->next_raw;
++
++    # vms nit:  When encountering 'not ok', vms often has the 'not' on a line
++    # by itself:
++    #   not
++    #   ok 1 - 'I hate VMS'
++    if ( defined($line) and $line =~ /^\s*not\s*$/ ) {
++        $line .= ( $self->next_raw || '' );
++    }
++
++    return $line;
++}
++
++sub next_raw {
++    require Carp;
++    my $msg = Carp::longmess('abstract method called directly!');
++    $_[0]->_croak( $msg );
++}
++
++
++=head3 C<handle_unicode>
++
++If necessary switch the input stream to handle unicode. This only has
++any effect for I/O handle based streams.
++
++The default implementation does nothing.
++
++=cut
++
++sub handle_unicode { }
++
++=head3 C<get_select_handles>
++
++Return a list of filehandles that may be used upstream in a select()
++call to signal that this Iterator is ready. Iterators that are not
++handle-based should return an empty list.
++
++The default implementation does nothing.
++
++=cut
++
++sub get_select_handles {
++    return
++}
++
++1;
++
++=head1 SEE ALSO
++
++L<TAP::Object>,
++L<TAP::Parser>,
++L<TAP::Parser::Iterator>,
++L<TAP::Parser::Iterator::Array>,
++L<TAP::Parser::Iterator::Stream>,
++L<TAP::Parser::Iterator::Process>,
++
++=cut
++
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Iterator/Process.pm Test-Harness-3.10/lib/TAP/Parser/Iterator/Process.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Iterator/Process.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Iterator/Process.pm	2008-06-08 12:50:22.000000000 +0100
+@@ -1,16 +1,14 @@
+ package TAP::Parser::Iterator::Process;
+ 
+ use strict;
+-
+-use TAP::Parser::Iterator ();
+-
+ use vars qw($VERSION @ISA);
+ 
+-@ISA = 'TAP::Parser::Iterator';
+-
++use TAP::Parser::Iterator ();
+ use Config;
+ use IO::Handle;
+ 
++@ISA = 'TAP::Parser::Iterator';
++
+ my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
+ 
+ =head1 NAME
+@@ -27,7 +25,10 @@
+ 
+ =head1 SYNOPSIS
+ 
+-  use TAP::Parser::Iterator;
++  # see TAP::Parser::IteratorFactory for preferred usage
++
++  # to use directly:
++  use TAP::Parser::Iterator::Process;
+   my $it = TAP::Parser::Iterator::Process->new(@args);
+ 
+   my $line = $it->next;
+@@ -44,13 +45,21 @@
+ 
+ =head3 C<new>
+ 
+-Create an iterator.
++Create an iterator.  Expects one argument containing a hashref of the form:
++
++   command  => \@command_to_execute
++   merge    => $attempt_merge_stderr_and_stdout?
++   setup    => $callback_to_setup_command
++   teardown => $callback_to_teardown_command
++
++Tries to uses L<IPC::Open3> & L<IO::Select> to communicate with the spawned
++process if they are available.  Falls back onto C<open()>.
+ 
+ =head2 Instance Methods
+ 
+ =head3 C<next>
+ 
+-Iterate through it, of course.
++Iterate through the process output, of course.
+ 
+ =head3 C<next_raw>
+ 
+@@ -95,9 +104,10 @@
+     }
+ }
+ 
+-sub new {
+-    my $class = shift;
+-    my $args  = shift;
++# new() implementation supplied by TAP::Object
++
++sub _initialize {
++    my ( $self, $args ) = @_;
+ 
+     my @command = @{ delete $args->{command} || [] }
+       or die "Must supply a command to execute";
+@@ -114,7 +124,7 @@
+ 
+     my $out = IO::Handle->new;
+ 
+-    if ( $class->_use_open3 ) {
++    if ( $self->_use_open3 ) {
+ 
+         # HOTPATCH {{{
+         my $xclose = \&IPC::Open3::xclose;
+@@ -158,14 +168,12 @@
+           or die "Could not execute ($command): $!";
+     }
+ 
+-    my $self = bless {
+-        out        => $out,
+-        err        => $err,
+-        sel        => $sel,
+-        pid        => $pid,
+-        exit       => undef,
+-        chunk_size => $chunk_size,
+-    }, $class;
++    $self->{out}  = $out;
++    $self->{err}  = $err;
++    $self->{sel}  = $sel;
++    $self->{pid}  = $pid;
++    $self->{exit} = undef;
++    $self->{chunk_size} = $chunk_size;
+ 
+     if ( my $teardown = delete $args->{teardown} ) {
+         $self->{teardown} = sub {
+@@ -344,3 +352,13 @@
+ }
+ 
+ 1;
++
++=head1 SEE ALSO
++
++L<TAP::Object>,
++L<TAP::Parser>,
++L<TAP::Parser::Iterator>,
++L<TAP::Parser::IteratorFactory>,
++
++=cut
++
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Iterator/Stream.pm Test-Harness-3.10/lib/TAP/Parser/Iterator/Stream.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Iterator/Stream.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Iterator/Stream.pm	2008-06-08 12:50:42.000000000 +0100
+@@ -1,8 +1,10 @@
+ package TAP::Parser::Iterator::Stream;
+ 
+ use strict;
+-use TAP::Parser::Iterator ();
+ use vars qw($VERSION @ISA);
++
++use TAP::Parser::Iterator ();
++
+ @ISA = 'TAP::Parser::Iterator';
+ 
+ =head1 NAME
+@@ -19,7 +21,10 @@
+ 
+ =head1 SYNOPSIS
+ 
+-  use TAP::Parser::Iterator;
++  # see TAP::Parser::IteratorFactory for preferred usage
++
++  # to use directly:
++  use TAP::Parser::Iterator::Stream;
+   my $it = TAP::Parser::Iterator::Stream->new(\*TEST);
+ 
+   my $line = $it->next;
+@@ -36,7 +41,18 @@
+ 
+ =head3 C<new>
+ 
+-Create an iterator.
++Create an iterator.  Expects one argument containing a filehandle.
++
++=cut
++
++# new() implementation supplied by TAP::Object
++
++sub _initialize {
++    my ( $self, $thing ) = @_;
++    $self->{fh} = $thing;
++    return $self;
++}
++
+ 
+ =head2 Instance Methods
+ 
+@@ -58,15 +74,6 @@
+ 
+ =cut
+ 
+-sub new {
+-    my ( $class, $thing ) = @_;
+-    bless {
+-        fh => $thing,
+-    }, $class;
+-}
+-
+-##############################################################################
+-
+ sub wait { shift->exit }
+ sub exit { shift->{fh} ? () : 0 }
+ 
+@@ -90,3 +97,13 @@
+ }
+ 
+ 1;
++
++=head1 SEE ALSO
++
++L<TAP::Object>,
++L<TAP::Parser>,
++L<TAP::Parser::Iterator>,
++L<TAP::Parser::IteratorFactory>,
++
++=cut
++
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Iterator.pm Test-Harness-3.10/lib/TAP/Parser/Iterator.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Iterator.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Iterator.pm	2008-06-08 11:27:12.000000000 +0100
+@@ -1,15 +1,15 @@
+ package TAP::Parser::Iterator;
+ 
+ use strict;
+-use vars qw($VERSION);
++use vars qw($VERSION @ISA);
+ 
+-use TAP::Parser::Iterator::Array   ();
+-use TAP::Parser::Iterator::Stream  ();
+-use TAP::Parser::Iterator::Process ();
++use TAP::Object ();
++
++@ISA = qw(TAP::Object);
+ 
+ =head1 NAME
+ 
+-TAP::Parser::Iterator - Internal TAP::Parser Iterator
++TAP::Parser::Iterator - Internal base class for TAP::Parser Iterators
+ 
+ =head1 VERSION
+ 
+@@ -21,28 +21,26 @@
+ 
+ =head1 SYNOPSIS
+ 
+-  use TAP::Parser::Iterator;
+-  my $it = TAP::Parser::Iterator->new(\*TEST);
+-  my $it = TAP::Parser::Iterator->new(\@array);
+-
+-  my $line = $it->next;
++  # see TAP::Parser::IteratorFactory for general usage
+ 
+-Originally ripped off from L<Test::Harness>.
++  # to subclass:
++  use vars qw(@ISA);
++  use TAP::Parser::Iterator ();
++  @ISA = qw(TAP::Parser::Iterator);
++  sub _initialize {
++    # see TAP::Object...
++  }
+ 
+ =head1 DESCRIPTION
+ 
+-B<FOR INTERNAL USE ONLY!>
+-
+-This is a simple iterator wrapper for arrays and filehandles.
++This is a simple iterator base class that defines the iterator API.  See
++C<TAP::Parser::IteratorFactory> for a factory class that creates iterators.
+ 
+ =head2 Class Methods
+ 
+ =head3 C<new>
+ 
+- my $iter = TAP::Parser::Iterator->new( $array_reference );
+- my $iter = TAP::Parser::Iterator->new( $filehandle );
+-
+-Create an iterator.
++Create an iterator.  Provided by L<TAP::Object>.
+ 
+ =head2 Instance Methods
+ 
+@@ -58,25 +56,9 @@
+ 
+ Iterate raw input without applying any fixes for quirky input syntax.
+ 
+-=cut
+-
+-sub new {
+-    my ( $proto, $thing ) = @_;
++I<Note:> this method is abstract and should be overridden.
+ 
+-    my $ref = ref $thing;
+-    if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
+-        return TAP::Parser::Iterator::Stream->new($thing);
+-    }
+-    elsif ( $ref eq 'ARRAY' ) {
+-        return TAP::Parser::Iterator::Array->new($thing);
+-    }
+-    elsif ( $ref eq 'HASH' ) {
+-        return TAP::Parser::Iterator::Process->new($thing);
+-    }
+-    else {
+-        die "Can't iterate with a $ref";
+-    }
+-}
++=cut
+ 
+ sub next {
+     my $self = shift;
+@@ -93,23 +75,49 @@
+     return $line;
+ }
+ 
++sub next_raw {
++    require Carp;
++    my $msg = Carp::longmess('abstract method called directly!');
++    $_[0]->_croak( $msg );
++}
++
++
+ =head3 C<handle_unicode>
+ 
+ If necessary switch the input stream to handle unicode. This only has
+ any effect for I/O handle based streams.
+ 
++The default implementation does nothing.
++
+ =cut
+ 
+ sub handle_unicode { }
+ 
++
+ =head3 C<get_select_handles>
+ 
+ Return a list of filehandles that may be used upstream in a select()
+ call to signal that this Iterator is ready. Iterators that are not
+-handle based should return an empty list.
++handle-based should return an empty list.
++
++The default implementation does nothing.
+ 
+ =cut
+ 
+-sub get_select_handles {return}
++sub get_select_handles {
++    return
++}
+ 
+ 1;
++
++=head1 SEE ALSO
++
++L<TAP::Object>,
++L<TAP::Parser>,
++L<TAP::Parser::IteratorFactory>,
++L<TAP::Parser::Iterator::Array>,
++L<TAP::Parser::Iterator::Stream>,
++L<TAP::Parser::Iterator::Process>,
++
++=cut
++
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/IteratorFactory.pm Test-Harness-3.10/lib/TAP/Parser/IteratorFactory.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/IteratorFactory.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/lib/TAP/Parser/IteratorFactory.pm	2008-06-08 16:50:26.000000000 +0100
+@@ -0,0 +1,130 @@
++package TAP::Parser::IteratorFactory;
++
++use strict;
++use vars qw($VERSION @ISA);
++
++use TAP::Object                    ();
++use TAP::Parser::Iterator::Array   ();
++use TAP::Parser::Iterator::Stream  ();
++use TAP::Parser::Iterator::Process ();
++
++@ISA = qw(TAP::Object);
++
++=head1 NAME
++
++TAP::Parser::IteratorFactory - Internal TAP::Parser Iterator
++
++=head1 VERSION
++
++Version 3.10
++
++=cut
++
++$VERSION = '3.10';
++
++=head1 SYNOPSIS
++
++  use TAP::Parser::IteratorFactory;
++  my $iter = TAP::Parser::IteratorFactory->new(\*TEST);
++  my $iter = TAP::Parser::IteratorFactory->new(\@array);
++  my $iter = TAP::Parser::IteratorFactory->new(\%hash);
++
++  my $line = $iter->next;
++
++Originally ripped off from L<Test::Harness>.
++
++=head1 DESCRIPTION
++
++B<FOR INTERNAL USE ONLY!>
++
++This is a factory class for simple iterator wrappers for arrays and
++filehandles.
++
++=head2 Class Methods
++
++=head3 C<new>
++
++Create an iterator.  The type of iterator created depends on
++the arguments to the constructor:
++
++  my $iter = TAP::Parser::Iterator->new( $filehandle );
++
++Creates a I<stream> iterator (see L</make_stream_iterator>).
++
++  my $iter = TAP::Parser::Iterator->new( $array_reference );
++
++Creates an I<array> iterator (see L</make_array_iterator>).
++
++  my $iter = TAP::Parser::Iterator->new( $hash_reference );
++
++Creates a I<process> iterator (see L</make_process_iterator>).
++
++=cut
++
++# override new() to do some custom factory class action...
++
++sub new {
++    my ( $proto, $thing ) = @_;
++
++    my $ref = ref $thing;
++    if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
++	return $proto->make_stream_iterator($thing);
++    }
++    elsif ( $ref eq 'ARRAY' ) {
++	return $proto->make_array_iterator($thing);
++    }
++    elsif ( $ref eq 'HASH' ) {
++	return $proto->make_process_iterator($thing);
++    }
++    else {
++        die "Can't iterate with a $ref";
++    }
++}
++
++
++=head3 C<make_stream_iterator>
++
++Make a new stream iterator and return it.  Passes through any arguments given.
++Defaults to a L<TAP::Parser::Iterator::Stream>.
++
++=head3 C<make_array_iterator>
++
++Make a new array iterator and return it.  Passes through any arguments given.
++Defaults to a L<TAP::Parser::Iterator::Array>.
++
++=head3 C<make_process_iterator>
++
++Make a new process iterator and return it.  Passes through any arguments given.
++Defaults to a L<TAP::Parser::Iterator::Process>.
++
++=cut
++
++sub make_stream_iterator {
++    my $proto = shift;
++    TAP::Parser::Iterator::Stream->new( @_ );
++}
++
++sub make_array_iterator {
++    my $proto = shift;
++    TAP::Parser::Iterator::Array->new( @_ );
++}
++
++sub make_process_iterator {
++    my $proto = shift;
++    TAP::Parser::Iterator::Process->new( @_ );
++}
++
++
++1;
++
++=head1 SEE ALSO
++
++L<TAP::Object>,
++L<TAP::Parser>,
++L<TAP::Parser::Iterator>,
++L<TAP::Parser::Iterator::Array>,
++L<TAP::Parser::Iterator::Stream>,
++L<TAP::Parser::Iterator::Process>,
++
++=cut
++
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Multiplexer.pm Test-Harness-3.10/lib/TAP/Parser/Multiplexer.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Multiplexer.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Multiplexer.pm	2008-06-08 12:54:03.000000000 +0100
+@@ -1,13 +1,17 @@
+ package TAP::Parser::Multiplexer;
+ 
+ use strict;
++use vars qw($VERSION @ISA);
++
+ use IO::Select;
+-use vars qw($VERSION);
++use TAP::Object ();
+ 
+ use constant IS_WIN32 => $^O =~ /^(MS)?Win32$/;
+ use constant IS_VMS => $^O eq 'VMS';
+ use constant SELECT_OK => !( IS_VMS || IS_WIN32 );
+ 
++@ISA = 'TAP::Object';
++
+ =head1 NAME
+ 
+ TAP::Parser::Multiplexer - Multiplex multiple TAP::Parsers
+@@ -51,13 +55,14 @@
+ 
+ =cut
+ 
+-sub new {
+-    my ($class) = @_;
+-    return bless {
+-        select => IO::Select->new,
+-        avid   => [],                # Parsers that can't select
+-        count  => 0,
+-    }, $class;
++# new() implementation supplied by TAP::Object
++
++sub _initialize {
++    my $self = shift;
++    $self->{select} = IO::Select->new;
++    $self->{avid}   = []; # Parsers that can't select
++    $self->{count}  = 0;
++    return $self;
+ }
+ 
+ ##############################################################################
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Result.pm Test-Harness-3.10/lib/TAP/Parser/Result.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Result.pm	2008-02-18 23:40:30.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Result.pm	2008-06-08 16:48:11.000000000 +0100
+@@ -1,35 +1,17 @@
+ package TAP::Parser::Result;
+ 
+ use strict;
+-use vars qw($VERSION);
++use vars qw($VERSION @ISA);
+ 
+-use TAP::Parser::Result::Bailout ();
+-use TAP::Parser::Result::Comment ();
+-use TAP::Parser::Result::Plan    ();
+-use TAP::Parser::Result::Pragma  ();
+-use TAP::Parser::Result::Test    ();
+-use TAP::Parser::Result::Unknown ();
+-use TAP::Parser::Result::Version ();
+-use TAP::Parser::Result::YAML    ();
+-
+-# note that this is bad.  Makes it very difficult to subclass, but then, it
+-# would be a lot of work to subclass this system.
+-my %class_for;
++use TAP::Object ();
+ 
+-BEGIN {
+-    %class_for = (
+-        plan    => 'TAP::Parser::Result::Plan',
+-        pragma  => 'TAP::Parser::Result::Pragma',
+-        test    => 'TAP::Parser::Result::Test',
+-        comment => 'TAP::Parser::Result::Comment',
+-        bailout => 'TAP::Parser::Result::Bailout',
+-        version => 'TAP::Parser::Result::Version',
+-        unknown => 'TAP::Parser::Result::Unknown',
+-        yaml    => 'TAP::Parser::Result::YAML',
+-    );
++@ISA = 'TAP::Object';
+ 
++BEGIN {
++    # make is_* methods
++    my @attrs = qw( plan pragma test comment bailout version unknown yaml );
+     no strict 'refs';
+-    for my $token ( keys %class_for ) {
++    for my $token ( @attrs ) {
+         my $method = "is_$token";
+         *$method = sub { return $token eq shift->type };
+     }
+@@ -39,7 +21,7 @@
+ 
+ =head1 NAME
+ 
+-TAP::Parser::Result - TAP::Parser output
++TAP::Parser::Result - Base class for TAP::Parser output objects
+ 
+ =head1 VERSION
+ 
+@@ -51,9 +33,8 @@
+ 
+ =head2 DESCRIPTION
+ 
+-This is merely a factory class which returns an object representing the
+-current bit of test data from TAP (usually a line).  It's for internal use
+-only and should not be relied upon.
++This is a base class for objects representing the current bit of test data from
++TAP (usually a line).
+ 
+ =cut
+ 
+@@ -63,22 +44,16 @@
+ 
+ =head3 C<new>
+ 
++  # see TAP::Parser::ResultFactory for preferred usage
++
++  # to use directly:
+   my $result = TAP::Parser::Result->new($token);
+ 
+ Returns an instance the appropriate class for the test token passed in.
+ 
+ =cut
+ 
+-sub new {
+-    my ( $class, $token ) = @_;
+-    my $type = $token->{type};
+-    return bless $token => $class_for{$type}
+-      if exists $class_for{$type};
+-    require Carp;
+-
+-    # this should never happen!
+-    Carp::croak("Could not determine class for\n$token->{type}");
+-}
++# new() implementation provided by TAP::Object
+ 
+ =head2 Boolean methods
+ 
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/ResultFactory.pm Test-Harness-3.10/lib/TAP/Parser/ResultFactory.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/ResultFactory.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/lib/TAP/Parser/ResultFactory.pm	2008-06-08 18:08:34.000000000 +0100
+@@ -0,0 +1,115 @@
++package TAP::Parser::ResultFactory;
++
++use strict;
++use vars qw($VERSION @ISA %CLASS_FOR);
++
++use TAP::Object                  ();
++use TAP::Parser::Result::Bailout ();
++use TAP::Parser::Result::Comment ();
++use TAP::Parser::Result::Plan    ();
++use TAP::Parser::Result::Pragma  ();
++use TAP::Parser::Result::Test    ();
++use TAP::Parser::Result::Unknown ();
++use TAP::Parser::Result::Version ();
++use TAP::Parser::Result::YAML    ();
++
++@ISA = 'TAP::Object';
++
++##############################################################################
++
++=head1 NAME
++
++TAP::Parser::ResultFactory - Factory for creating TAP::Parser output objects
++
++=head1 VERSION
++
++Version 3.10
++
++=cut
++
++$VERSION = '3.10';
++
++=head2 DESCRIPTION
++
++This is merely a factory class which returns a L<TAP::Parser::Result> subclass
++representing the current bit of test data from TAP (usually a line).  It is
++used primarily by L<TAP::Parser::Grammar>.
++
++=head2 METHODS
++
++=head3 new
++
++Returns an instance the appropriate class for the test token passed in.
++
++  my $result = TAP::Parser::ResultFactory->new($token);
++
++=cut
++
++# override new() to do some custom factory class action...
++
++sub new {
++    my ( $class, $token ) = @_;
++    my $type = $token->{type};
++
++    # TODO: call $CLASS_FOR{$type}->new !
++
++    # bless their token into the target class:
++    return bless $token => $CLASS_FOR{$type}
++      if exists $CLASS_FOR{$type};
++
++    # or complain:
++    require Carp;
++    Carp::croak("Could not determine class for\n$token->{type}");
++}
++
++
++=head3 register_type
++
++This lets you override an existing type with your own custom type, or register
++a completely new type, eg:
++
++  # create a custom result type:
++  package MyResult;
++  use strict;
++  use vars qw($VERSION @ISA);
++  @ISA = 'TAP::Parser::Result';
++
++  # register with the factory:
++  TAP::Parser::ResultFactory->register_type( 'my_type' => __PACKAGE__ );
++
++  # use it:
++  my $r = TAP::Parser::ResultFactory->( { type => 'my_type' } );
++
++Your custom type should then be picked up automatically by the L<TAP::Parser>.
++
++=cut
++
++BEGIN {
++    %CLASS_FOR = (
++        plan    => 'TAP::Parser::Result::Plan',
++        pragma  => 'TAP::Parser::Result::Pragma',
++        test    => 'TAP::Parser::Result::Test',
++        comment => 'TAP::Parser::Result::Comment',
++        bailout => 'TAP::Parser::Result::Bailout',
++        version => 'TAP::Parser::Result::Version',
++        unknown => 'TAP::Parser::Result::Unknown',
++        yaml    => 'TAP::Parser::Result::YAML',
++    );
++}
++
++sub register_type {
++    my ( $class, $type, $rclass ) = @_;
++    # register it blindly, assume they know what they're doing
++    $CLASS_FOR{$type} = $rclass;
++    return $class;
++}
++
++1;
++
++=head1 SEE ALSO
++
++L<TAP::Parser>,
++L<TAP::Parser::Result>,
++L<TAP::Parser::Grammar>
++
++=cut
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Source/Perl.pm Test-Harness-3.10/lib/TAP/Parser/Source/Perl.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Source/Perl.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Source/Perl.pm	2008-06-08 18:42:42.000000000 +0100
+@@ -33,7 +33,7 @@
+ =head1 SYNOPSIS
+ 
+     use TAP::Parser::Source::Perl;
+-    my $perl = TAP::Parser::Source::Perl->new;
++    my $perl = TAP::Parser::Source::Perl->new({ parser => $parser });
+     my $stream = $perl->source( [ $filename, @args ] )->get_stream;
+ 
+ =head1 METHODS
+@@ -42,7 +42,7 @@
+ 
+ =head3 C<new>
+ 
+- my $perl = TAP::Parser::Source::Perl->new;
++ my $perl = TAP::Parser::Source::Perl->new({ parser => $parser });
+ 
+ Returns a new C<TAP::Parser::Source::Perl> object.
+ 
+@@ -154,13 +154,12 @@
+     my @command = $self->_get_command_for_switches(@switches)
+       or $self->_croak("No command found!");
+ 
+-    return TAP::Parser::Iterator->new(
+-        {   command  => \@command,
+-            merge    => $self->merge,
+-            setup    => $setup,
+-            teardown => $teardown,
+-        }
+-    );
++    return $self->{parser}->make_iterator({
++        command  => \@command,
++        merge    => $self->merge,
++        setup    => $setup,
++        teardown => $teardown,
++    });
+ }
+ 
+ sub _get_command_for_switches {
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/Source.pm Test-Harness-3.10/lib/TAP/Parser/Source.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/Source.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/Source.pm	2008-06-08 18:42:59.000000000 +0100
+@@ -1,9 +1,12 @@
+ package TAP::Parser::Source;
+ 
+ use strict;
+-use vars qw($VERSION);
++use vars qw($VERSION @ISA);
+ 
+-use TAP::Parser::Iterator ();
++use TAP::Object                  ();
++use TAP::Parser::IteratorFactory ();
++
++@ISA = qw(TAP::Object);
+ 
+ # Causes problem on MacOS and shouldn't be necessary anyway
+ #$SIG{CHLD} = sub { wait };
+@@ -27,7 +30,7 @@
+ =head1 SYNOPSIS
+ 
+  use TAP::Parser::Source;
+- my $source = TAP::Parser::Source->new;
++ my $source = TAP::Parser::Source->new({ parser => $parser });
+  my $stream = $source->source(['/usr/bin/ruby', 'mytest.rb'])->get_stream;
+ 
+ =head1 METHODS
+@@ -36,17 +39,21 @@
+ 
+ =head3 C<new>
+ 
+- my $source = TAP::Parser::Source->new;
++ my $source = TAP::Parser::Source->new({ parser => $parser });
+ 
+ Returns a new C<TAP::Parser::Source> object.
+ 
+ =cut
+ 
+-sub new {
+-    my $class = shift;
++# new() implementation supplied by TAP::Object
++
++sub _initialize {
++    my ($self, $args) = @_;
++    $self->{switches} = [];
++    $self->{parser}   = $args->{parser}; # TODO: accessor
+     _autoflush( \*STDOUT );
+     _autoflush( \*STDERR );
+-    bless { switches => [] }, $class;
++    return $self;
+ }
+ 
+ ##############################################################################
+@@ -92,11 +99,10 @@
+     my @command = $self->_get_command
+       or $self->_croak('No command found!');
+ 
+-    return TAP::Parser::Iterator->new(
+-        {   command => \@command,
+-            merge   => $self->merge
+-        }
+-    );
++    return $self->{parser}->make_iterator({
++        command => \@command,
++        merge   => $self->merge
++    });
+ }
+ 
+ sub _get_command { return @{ shift->source || [] } }
+@@ -163,10 +169,4 @@
+     select $old_fh;
+ }
+ 
+-sub _croak {
+-    my $self = shift;
+-    require Carp;
+-    Carp::croak(@_);
+-}
+-
+ 1;
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/YAMLish/Reader.pm Test-Harness-3.10/lib/TAP/Parser/YAMLish/Reader.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/YAMLish/Reader.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/YAMLish/Reader.pm	2008-06-08 13:11:49.000000000 +0100
+@@ -1,9 +1,11 @@
+ package TAP::Parser::YAMLish::Reader;
+ 
+ use strict;
++use vars qw($VERSION @ISA);
+ 
+-use vars qw{$VERSION};
++use TAP::Object ();
+ 
++@ISA = 'TAP::Object';
+ $VERSION = '3.10';
+ 
+ # TODO:
+@@ -22,11 +24,7 @@
+ my $IS_END_YAML  = qr{ ^ \.\.\. \s* $ }x;
+ my $IS_QQ_STRING = qr{ ^ $QQ_STRING $ }x;
+ 
+-# Create an empty TAP::Parser::YAMLish::Reader object
+-sub new {
+-    my $class = shift;
+-    bless {}, $class;
+-}
++# new() implementation supplied by TAP::Object
+ 
+ sub read {
+     my $self = shift;
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser/YAMLish/Writer.pm Test-Harness-3.10/lib/TAP/Parser/YAMLish/Writer.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser/YAMLish/Writer.pm	2008-02-10 17:18:44.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser/YAMLish/Writer.pm	2008-06-08 13:12:32.000000000 +0100
+@@ -1,9 +1,11 @@
+ package TAP::Parser::YAMLish::Writer;
+ 
+ use strict;
++use vars qw($VERSION @ISA);
+ 
+-use vars qw{$VERSION};
++use TAP::Object ();
+ 
++@ISA = 'TAP::Object';
+ $VERSION = '3.10';
+ 
+ my $ESCAPE_CHAR = qr{ [ \x00-\x1f \" ] }x;
+@@ -16,11 +18,7 @@
+   x18  x19  x1a  e    x1c  x1d  x1e  x1f
+ );
+ 
+-# Create an empty TAP::Parser::YAMLish::Writer object
+-sub new {
+-    my $class = shift;
+-    bless {}, $class;
+-}
++# new() implementation supplied by TAP::Object
+ 
+ sub write {
+     my $self = shift;
+diff -ruN Test-Harness-3.10.orig/lib/TAP/Parser.pm Test-Harness-3.10/lib/TAP/Parser.pm
+--- Test-Harness-3.10.orig/lib/TAP/Parser.pm	2008-02-18 23:24:37.000000000 +0000
++++ Test-Harness-3.10/lib/TAP/Parser.pm	2008-06-08 18:44:24.000000000 +0100
+@@ -3,12 +3,14 @@
+ use strict;
+ use vars qw($VERSION @ISA);
+ 
+-use TAP::Base                 ();
+-use TAP::Parser::Grammar      ();
+-use TAP::Parser::Result       ();
+-use TAP::Parser::Source       ();
+-use TAP::Parser::Source::Perl ();
+-use TAP::Parser::Iterator     ();
++use TAP::Base                    ();
++use TAP::Parser::Grammar         ();
++use TAP::Parser::Result          ();
++use TAP::Parser::ResultFactory   ();
++use TAP::Parser::Source          ();
++use TAP::Parser::Source::Perl    ();
++use TAP::Parser::Iterator        ();
++use TAP::Parser::IteratorFactory ();
+ 
+ use Carp qw( confess );
+ 
+@@ -55,6 +57,11 @@
+         start_time
+         end_time
+         skip_all
++        source_class
++        perl_source_class
++        grammar_class
++        iterator_factory_class
++        result_factory_class
+         )
+       )
+     {
+@@ -220,11 +227,56 @@
+ Subtleties of this behavior may be platform-dependent and may change in
+ the future.
+ 
++=item * C<source_class>
++
++This option was introduced to let you easily customize which I<source> class
++the parser should use.  It defaults to L<TAP::Parser::Source>.
++
++See also L</make_source>.
++
++=item * C<perl_source_class>
++
++This option was introduced to let you easily customize which I<perl source>
++class the parser should use.  It defaults to L<TAP::Parser::Source::Perl>.
++
++See also L</make_perl_source>.
++
++=item * C<grammar_class>
++
++This option was introduced to let you easily customize which I<grammar> class
++the parser should use.  It defaults to L<TAP::Parser::Grammar>.
++
++See also L</make_grammar>.
++
++=item * C<iterator_factory_class>
++
++This option was introduced to let you easily customize which I<iterator>
++factory class the parser should use.  It defaults to
++L<TAP::Parser::IteratorFactory>.
++
++See also L</make_iterator>.
++
++=item * C<result_factory_class>
++
++This option was introduced to let you easily customize which I<result>
++factory class the parser should use.  It defaults to
++L<TAP::Parser::ResultFactory>.
++
++See also L</make_result>.
++
+ =back
+ 
+ =cut
+ 
+-# new implementation supplied by TAP::Base
++# new() implementation supplied by TAP::Base
++
++# This should make overriding behaviour of the Parser in subclasses easier:
++sub _default_source_class           { 'TAP::Parser::Source' }
++sub _default_perl_source_class      { 'TAP::Parser::Source::Perl' }
++sub _default_grammar_class          { 'TAP::Parser::Grammar' }
++sub _default_iterator_factory_class { 'TAP::Parser::IteratorFactory' }
++sub _default_result_factory_class   { 'TAP::Parser::ResultFactory' }
++
+ 
+ ##############################################################################
+ 
+@@ -270,8 +322,56 @@
+     }
+ }
+ 
+-{
+ 
++##############################################################################
++
++=head3 C<make_source>
++
++Make a new L<TAP::Parser::Source> object and return it.  Passes through any
++arguments given.
++
++The C<source_class> can be customized, as described in L</new>.
++
++=head3 C<make_perl_source>
++
++Make a new L<TAP::Parser::Source::Perl> object and return it.  Passes through
++any arguments given.
++
++The C<perl_source_class> can be customized, as described in L</new>.
++
++=head3 C<make_grammar>
++
++Make a new L<TAP::Parser::Grammar> object and return it.  Passes through any
++arguments given.
++
++The C<grammar_class> can be customized, as described in L</new>.
++
++=head3 C<make_iterator>
++
++Make a new L<TAP::Parser::Iterator> object using the parser's
++L<TAP::Parser::IteratorFactory>, and return it.  Passes through any arguments
++given.
++
++The C<iterator_factory_class> can be customized, as described in L</new>.
++
++=head3 C<make_result>
++
++Make a new L<TAP::Parser::Result> object using the parser's
++L<TAP::Parser::ResultFactory>, and return it.  Passes through any arguments
++given.
++
++The C<result_factory_class> can be customized, as described in L</new>.
++
++=cut
++
++# This should make overriding behaviour of the Parser in subclasses easier:
++sub make_source      { shift->source_class->new(@_); }
++sub make_perl_source { shift->perl_source_class->new(@_); }
++sub make_grammar     { shift->grammar_class->new(@_); }
++sub make_iterator    { shift->iterator_factory_class->new(@_); }
++sub make_result      { shift->result_factory_class->new(@_); }
++
++{
+     # of the following, anything beginning with an underscore is strictly
+     # internal and should not be exposed.
+     my %initialize = (
+@@ -316,6 +416,14 @@
+ 
+         $self->SUPER::_initialize( \%args, \@legal_callback );
+ 
++	# get any class overrides out first:
++	for my $key (qw( source_class perl_source_class grammar_class
++			 iterator_factory_class result_factory_class )) {
++	    my $default_method = "_default_$key";
++	    my $val = delete $args{$key} || $self->$default_method;
++	    $self->$key($val);
++	}
++
+         my $stream    = delete $args{stream};
+         my $tap       = delete $args{tap};
+         my $source    = delete $args{source};
+@@ -336,29 +444,26 @@
+         }
+ 
+         if ($tap) {
+-            $stream = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
++            $stream = $self->make_iterator( [ split "\n" => $tap ] );
+         }
+         elsif ($exec) {
+-            my $source = TAP::Parser::Source->new;
++            my $source = $self->make_source({ parser => $self });
+             $source->source( [ @$exec, @test_args ] );
+             $source->merge($merge);    # XXX should just be arguments?
+             $stream = $source->get_stream;
+         }
+         elsif ($source) {
+             if ( my $ref = ref $source ) {
+-                $stream = TAP::Parser::Iterator->new($source);
++                $stream = $self->make_iterator($source);
+             }
+             elsif ( -e $source ) {
+-
+-                my $perl = TAP::Parser::Source::Perl->new;
++                my $perl = $self->make_perl_source({ parser => $self });
+ 
+                 $perl->switches($switches)
+                   if $switches;
+ 
+                 $perl->merge($merge);    # XXX args to new()?
+-
+                 $perl->source( [ $source, @test_args ] );
+-
+                 $stream = $perl->get_stream;
+             }
+             else {
+@@ -374,9 +479,13 @@
+             $self->{$k} = 'ARRAY' eq ref $v ? [] : $v;
+         }
+ 
++        my $grammar = $self->make_grammar({
++            stream  => $stream,
++            parser  => $self,
++            version => $self->version
++        });
++
+         $self->_stream($stream);
+-        my $grammar = TAP::Parser::Grammar->new($stream);
+-        $grammar->set_version( $self->version );
+         $self->_grammar($grammar);
+         $self->_spool($spool);
+ 
+@@ -386,6 +495,7 @@
+     }
+ }
+ 
++
+ =head1 INDIVIDUAL RESULTS
+ 
+ If you've read this far in the docs, you've seen this:
+@@ -1542,6 +1652,10 @@
+ 
+ =back
+ 
++=head1 SUBCLASSING
++
++This section has not yet been written...
++
+ =head1 ACKNOWLEDGEMENTS
+ 
+ All of the following have helped. Bug reports, patches, (im)moral
+diff -ruN Test-Harness-3.10.orig/t/000-load.t Test-Harness-3.10/t/000-load.t
+--- Test-Harness-3.10.orig/t/000-load.t	2008-02-18 22:11:58.000000000 +0000
++++ Test-Harness-3.10/t/000-load.t	2008-06-08 16:49:27.000000000 +0100
+@@ -3,7 +3,7 @@
+ use strict;
+ use lib 't/lib';
+ 
+-use Test::More tests => 62;
++use Test::More tests => 66;
+ 
+ BEGIN {
+ 
+@@ -20,11 +20,13 @@
+       TAP::Harness
+       TAP::Parser::Aggregator
+       TAP::Parser::Grammar
++      TAP::Parser::Iterator
+       TAP::Parser::Iterator::Array
+       TAP::Parser::Iterator::Process
+       TAP::Parser::Iterator::Stream
+-      TAP::Parser::Iterator
++      TAP::Parser::IteratorFactory
+       TAP::Parser::Multiplexer
++      TAP::Parser::Result
+       TAP::Parser::Result::Bailout
+       TAP::Parser::Result::Comment
+       TAP::Parser::Result::Plan
+@@ -33,7 +35,7 @@
+       TAP::Parser::Result::Unknown
+       TAP::Parser::Result::Version
+       TAP::Parser::Result::YAML
+-      TAP::Parser::Result
++      TAP::Parser::ResultFactory
+       TAP::Parser::Source::Perl
+       TAP::Parser::Source
+       TAP::Parser::YAMLish::Reader
+diff -ruN Test-Harness-3.10.orig/t/aggregator.t Test-Harness-3.10/t/aggregator.t
+--- Test-Harness-3.10.orig/t/aggregator.t	2007-11-28 21:33:59.000000000 +0000
++++ Test-Harness-3.10/t/aggregator.t	2008-06-08 11:38:13.000000000 +0100
+@@ -7,7 +7,7 @@
+ use Test::More tests => 79;
+ 
+ use TAP::Parser;
+-use TAP::Parser::Iterator;
++use TAP::Parser::IteratorFactory;
+ use TAP::Parser::Aggregator;
+ 
+ my $tap = <<'END_TAP';
+@@ -21,7 +21,7 @@
+ ok 5 # skip we have no description
+ END_TAP
+ 
+-my $stream = TAP::Parser::Iterator->new( [ split /\n/ => $tap ] );
++my $stream = TAP::Parser::IteratorFactory->new( [ split /\n/ => $tap ] );
+ isa_ok $stream, 'TAP::Parser::Iterator';
+ 
+ my $parser1 = TAP::Parser->new( { stream => $stream } );
+diff -ruN Test-Harness-3.10.orig/t/callbacks.t Test-Harness-3.10/t/callbacks.t
+--- Test-Harness-3.10.orig/t/callbacks.t	2007-11-29 19:21:03.000000000 +0000
++++ Test-Harness-3.10/t/callbacks.t	2008-06-08 11:38:42.000000000 +0100
+@@ -6,7 +6,7 @@
+ use Test::More tests => 10;
+ 
+ use TAP::Parser;
+-use TAP::Parser::Iterator;
++use TAP::Parser::IteratorFactory;
+ 
+ my $tap = <<'END_TAP';
+ 1..5
+@@ -36,7 +36,7 @@
+     }
+ );
+ 
+-my $stream = TAP::Parser::Iterator->new( [ split /\n/ => $tap ] );
++my $stream = TAP::Parser::IteratorFactory->new( [ split /\n/ => $tap ] );
+ my $parser = TAP::Parser->new(
+     {   stream    => $stream,
+         callbacks => \%callbacks,
+@@ -77,7 +77,7 @@
+     },
+ );
+ 
+-$stream = TAP::Parser::Iterator->new( [ split /\n/ => $tap ] );
++$stream = TAP::Parser::IteratorFactory->new( [ split /\n/ => $tap ] );
+ $parser = TAP::Parser->new(
+     {   stream    => $stream,
+         callbacks => \%callbacks,
+@@ -102,7 +102,7 @@
+     ELSES    => sub { },
+ );
+ 
+-$stream = TAP::Parser::Iterator->new( [ split /\n/ => $tap ] );
++$stream = TAP::Parser::IteratorFactory->new( [ split /\n/ => $tap ] );
+ eval {
+     $parser = TAP::Parser->new(
+         {   stream    => $stream,
+diff -ruN Test-Harness-3.10.orig/t/grammar.t Test-Harness-3.10/t/grammar.t
+--- Test-Harness-3.10.orig/t/grammar.t	2008-02-18 22:21:58.000000000 +0000
++++ Test-Harness-3.10/t/grammar.t	2008-06-08 18:36:52.000000000 +0100
+@@ -5,6 +5,7 @@
+ 
+ use Test::More tests => 94;
+ 
++use EmptyParser;
+ use TAP::Parser::Grammar;
+ use TAP::Parser::Iterator::Array;
+ 
+@@ -33,8 +34,9 @@
+ package main;
+ 
+ my $stream = SS->new;
++my $parser = EmptyParser->new;
+ can_ok $GRAMMAR, 'new';
+-my $grammar = $GRAMMAR->new($stream);
++my $grammar = $GRAMMAR->new({ stream => $stream, parser => $parser });
+ isa_ok $grammar, $GRAMMAR, '... and the object it returns';
+ 
+ # Note:  all methods are actually class methods.  See the docs for the reason
+@@ -341,9 +343,9 @@
+ 
+ # tokenize
+ {
+-    my $stream = SS->new;
+-
+-    my $grammar = $GRAMMAR->new($stream);
++    my $stream  = SS->new;
++    my $parser  = EmptyParser->new;
++    my $grammar = $GRAMMAR->new({ stream => $stream, parser => $parser });
+ 
+     my $plan = '';
+ 
+@@ -357,7 +359,8 @@
+ # _make_plan_token
+ 
+ {
+-    my $grammar = $GRAMMAR->new;
++    my $parser  = EmptyParser->new;
++    my $grammar = $GRAMMAR->new({ parser => $parser });
+ 
+     my $plan
+       = '1..1 # SKIP with explanation';  # trigger warning in _make_plan_token
+@@ -384,9 +387,9 @@
+ # _make_yaml_token
+ 
+ {
+-    my $stream = SS->new;
+-
+-    my $grammar = $GRAMMAR->new($stream);
++    my $stream  = SS->new;
++    my $parser  = EmptyParser->new;
++    my $grammar = $GRAMMAR->new({ stream => $stream, parser => $parser });
+ 
+     $grammar->set_version(13);
+ 
+diff -ruN Test-Harness-3.10.orig/t/iterators.t Test-Harness-3.10/t/iterators.t
+--- Test-Harness-3.10.orig/t/iterators.t	2007-12-20 15:38:21.000000000 +0000
++++ Test-Harness-3.10/t/iterators.t	2008-06-08 11:41:26.000000000 +0100
+@@ -7,7 +7,7 @@
+ 
+ use File::Spec;
+ use TAP::Parser;
+-use TAP::Parser::Iterator;
++use TAP::Parser::IteratorFactory;
+ use Config;
+ 
+ sub array_ref_from {
+@@ -86,7 +86,7 @@
+         skip "No open3", $need_open3 if $need_open3 && !_can_open3();
+         my $subclass = $test->{subclass};
+         my $source   = $test->{source};
+-        my $class    = $test->{class} || 'TAP::Parser::Iterator';
++        my $class    = $test->{class} || 'TAP::Parser::IteratorFactory';
+         ok my $iter = $class->new($source),
+           "$name: We should be able to create a new iterator";
+         isa_ok $iter, 'TAP::Parser::Iterator',
+@@ -126,7 +126,7 @@
+ 
+     # coverage tests for the ctor
+ 
+-    my $stream = TAP::Parser::Iterator->new( IO::Handle->new );
++    my $stream = TAP::Parser::IteratorFactory->new( IO::Handle->new );
+ 
+     isa_ok $stream, 'TAP::Parser::Iterator::Stream';
+ 
+@@ -135,7 +135,7 @@
+     eval {
+         local $SIG{__DIE__} = sub { push @die, @_ };
+ 
+-        TAP::Parser::Iterator->new( \1 );    # a ref to a scalar
++        TAP::Parser::IteratorFactory->new( \1 );    # a ref to a scalar
+     };
+ 
+     is @die, 1, 'coverage of error case';
+@@ -148,7 +148,7 @@
+ 
+     # coverage test for VMS case
+ 
+-    my $stream = TAP::Parser::Iterator->new(
++    my $stream = TAP::Parser::IteratorFactory->new(
+         [   'not ',
+             'ok 1 - I hate VMS',
+         ]
+@@ -159,7 +159,7 @@
+ 
+     # coverage test for VMS case - nothing after 'not'
+ 
+-    $stream = TAP::Parser::Iterator->new(
++    $stream = TAP::Parser::IteratorFactory->new(
+         [   'not ',
+         ]
+     );
+@@ -177,7 +177,7 @@
+     eval {
+         local $SIG{__DIE__} = sub { push @die, @_ };
+ 
+-        TAP::Parser::Iterator->new( {} );
++        TAP::Parser::IteratorFactory->new( {} );
+     };
+ 
+     is @die, 1, 'coverage testing for TPI::Process';
+@@ -185,7 +185,7 @@
+     like pop @die, qr/Must supply a command to execute/,
+       '...and we died as expected';
+ 
+-    my $parser = TAP::Parser::Iterator->new(
++    my $parser = TAP::Parser::IteratorFactory->new(
+         {   command => [
+                 $^X,
+                 File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' )
+diff -ruN Test-Harness-3.10.orig/t/lib/EmptyParser.pm Test-Harness-3.10/t/lib/EmptyParser.pm
+--- Test-Harness-3.10.orig/t/lib/EmptyParser.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/EmptyParser.pm	2008-06-08 18:39:36.000000000 +0100
+@@ -0,0 +1,27 @@
++package EmptyParser;
++
++use strict;
++use vars qw(@ISA);
++
++use TAP::Parser ();
++
++@ISA = qw(TAP::Parser);
++
++sub _initialize {
++    shift->_set_defaults;
++}
++
++# this should really be in TAP::Parser itself...
++sub _set_defaults {
++    my $self = shift;
++
++    for my $key (qw( source_class perl_source_class grammar_class
++		     iterator_factory_class result_factory_class )) {
++	my $default_method = "_default_$key";
++	$self->$key($self->$default_method);
++    }
++
++    return $self;
++}
++
++1;
+diff -ruN Test-Harness-3.10.orig/t/lib/MyCustom.pm Test-Harness-3.10/t/lib/MyCustom.pm
+--- Test-Harness-3.10.orig/t/lib/MyCustom.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/MyCustom.pm	2008-06-08 19:01:44.000000000 +0100
+@@ -0,0 +1,12 @@
++# avoid cut-n-paste exhaustion with this mixin
++
++package MyCustom;
++use strict;
++
++sub custom {
++    my $self = shift;
++    $main::CUSTOM{ref($self)}++;
++    return $self;
++}
++
++1;
+diff -ruN Test-Harness-3.10.orig/t/lib/MyGrammar.pm Test-Harness-3.10/t/lib/MyGrammar.pm
+--- Test-Harness-3.10.orig/t/lib/MyGrammar.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/MyGrammar.pm	2008-06-08 19:06:59.000000000 +0100
+@@ -0,0 +1,21 @@
++# subclass for testing customizing & subclassing
++
++package MyGrammar;
++
++use strict;
++use vars '@ISA';
++
++use MyCustom;
++use TAP::Parser::Grammar;
++
++@ISA = qw( TAP::Parser::Grammar MyCustom );
++
++sub _initialize {
++    my $self = shift;
++    $self->SUPER::_initialize(@_);
++    $main::INIT{ref($self)}++;
++    $self->{initialized} = 1;
++    return $self;
++}
++
++1;
+diff -ruN Test-Harness-3.10.orig/t/lib/MyIterator.pm Test-Harness-3.10/t/lib/MyIterator.pm
+--- Test-Harness-3.10.orig/t/lib/MyIterator.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/MyIterator.pm	2008-06-08 19:06:57.000000000 +0100
+@@ -0,0 +1,21 @@
++# subclass for testing customizing & subclassing
++
++package MyIterator;
++
++use strict;
++use vars '@ISA';
++
++use MyCustom;
++use TAP::Parser::Iterator;
++
++@ISA = qw( TAP::Parser::Iterator MyCustom );
++
++sub _initialize {
++    my $self = shift;
++    $self->SUPER::_initialize(@_);
++    $main::INIT{ref($self)}++;
++    $self->{initialized} = 1;
++    return $self;
++}
++
++1;
+diff -ruN Test-Harness-3.10.orig/t/lib/MyIteratorFactory.pm Test-Harness-3.10/t/lib/MyIteratorFactory.pm
+--- Test-Harness-3.10.orig/t/lib/MyIteratorFactory.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/MyIteratorFactory.pm	2008-06-08 19:06:38.000000000 +0100
+@@ -0,0 +1,19 @@
++# subclass for testing customizing & subclassing
++
++package MyIteratorFactory;
++
++use strict;
++use vars '@ISA';
++
++use MyCustom;
++use MyIterator;
++use TAP::Parser::IteratorFactory;
++
++@ISA = qw( TAP::Parser::IteratorFactory MyCustom );
++
++sub new {
++    my $class = shift;
++    return MyIterator->new(@_);
++}
++
++1;
+diff -ruN Test-Harness-3.10.orig/t/lib/MyPerlSource.pm Test-Harness-3.10/t/lib/MyPerlSource.pm
+--- Test-Harness-3.10.orig/t/lib/MyPerlSource.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/MyPerlSource.pm	2008-06-08 19:07:01.000000000 +0100
+@@ -0,0 +1,27 @@
++# subclass for testing customizing & subclassing
++
++package MyPerlSource;
++
++use strict;
++use vars '@ISA';
++
++use MyCustom;
++use TAP::Parser::Source::Perl;
++
++@ISA = qw( TAP::Parser::Source::Perl MyCustom );
++
++sub _initialize {
++    my $self = shift;
++    $self->SUPER::_initialize(@_);
++    $main::INIT{ref($self)}++;
++    $self->{initialized} = 1;
++    return $self;
++}
++
++sub source {
++    my $self = shift;
++    return $self->SUPER::source(@_);
++}
++
++1;
++
+diff -ruN Test-Harness-3.10.orig/t/lib/MyResult.pm Test-Harness-3.10/t/lib/MyResult.pm
+--- Test-Harness-3.10.orig/t/lib/MyResult.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/MyResult.pm	2008-06-08 19:06:55.000000000 +0100
+@@ -0,0 +1,21 @@
++# subclass for testing customizing & subclassing
++
++package MyResult;
++
++use strict;
++use vars '@ISA';
++
++use MyCustom;
++use TAP::Parser::Result;
++
++@ISA = qw( TAP::Parser::Result MyCustom );
++
++sub _initialize {
++    my $self = shift;
++    $self->SUPER::_initialize(@_);
++    $main::INIT{ref($self)}++;
++    $self->{initialized} = 1;
++    return $self;
++}
++
++1;
+diff -ruN Test-Harness-3.10.orig/t/lib/MyResultFactory.pm Test-Harness-3.10/t/lib/MyResultFactory.pm
+--- Test-Harness-3.10.orig/t/lib/MyResultFactory.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/MyResultFactory.pm	2008-06-08 19:06:51.000000000 +0100
+@@ -0,0 +1,19 @@
++# subclass for testing customizing & subclassing
++
++package MyResultFactory;
++
++use strict;
++use vars '@ISA';
++
++use MyCustom;
++use MyResult;
++use TAP::Parser::ResultFactory;
++
++@ISA = qw( TAP::Parser::ResultFactory MyCustom );
++
++sub new {
++    my $class = shift;
++    return MyResult->new(@_);
++}
++
++1;
+diff -ruN Test-Harness-3.10.orig/t/lib/MySource.pm Test-Harness-3.10/t/lib/MySource.pm
+--- Test-Harness-3.10.orig/t/lib/MySource.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/MySource.pm	2008-06-08 19:20:22.000000000 +0100
+@@ -0,0 +1,33 @@
++# subclass for testing customizing & subclassing
++
++package MySource;
++
++use strict;
++use vars '@ISA';
++
++use MyCustom;
++use TAP::Parser::Source;
++
++@ISA = qw( TAP::Parser::Source MyCustom );
++
++sub _initialize {
++    my $self = shift;
++    $self->SUPER::_initialize(@_);
++    $main::INIT{ref($self)}++;
++    $self->{initialized} = 1;
++    return $self;
++}
++
++sub source {
++    my $self = shift;
++    return $self->SUPER::source(@_);
++}
++
++sub get_stream {
++    my $self = shift;
++    my $stream = $self->SUPER::get_stream(@_);
++    # re-bless it:
++    bless $stream, 'MyIterator';
++}
++
++1;
+diff -ruN Test-Harness-3.10.orig/t/lib/TAP/Parser/SubclassTest.pm Test-Harness-3.10/t/lib/TAP/Parser/SubclassTest.pm
+--- Test-Harness-3.10.orig/t/lib/TAP/Parser/SubclassTest.pm	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/lib/TAP/Parser/SubclassTest.pm	2008-06-08 19:20:52.000000000 +0100
+@@ -0,0 +1,39 @@
++# subclass for testing subclassing
++
++package TAP::Parser::SubclassTest;
++
++use strict;
++use vars qw(@ISA);
++
++use TAP::Parser;
++
++use MyCustom;
++use MySource;
++use MyPerlSource;
++use MyGrammar;
++use MyIteratorFactory;
++use MyResultFactory;
++
++@ISA = qw( TAP::Parser MyCustom );
++
++sub _default_source_class           { 'MySource' }
++sub _default_perl_source_class      { 'MyPerlSource' }
++sub _default_grammar_class          { 'MyGrammar' }
++sub _default_iterator_factory_class { 'MyIteratorFactory' }
++sub _default_result_factory_class   { 'MyResultFactory' }
++
++sub make_source      { shift->SUPER::make_source(@_)->custom }
++sub make_perl_source { shift->SUPER::make_perl_source(@_)->custom }
++sub make_grammar     { shift->SUPER::make_grammar(@_)->custom }
++sub make_iterator    { shift->SUPER::make_iterator(@_)->custom }
++sub make_result      { shift->SUPER::make_result(@_)->custom }
++
++sub _initialize {
++    my $self = shift;
++    $self->SUPER::_initialize(@_);
++    $main::INIT{ref($self)}++;
++    $self->{initialized} = 1;
++    return $self;
++}
++
++1;
+diff -ruN Test-Harness-3.10.orig/t/object.t Test-Harness-3.10/t/object.t
+--- Test-Harness-3.10.orig/t/object.t	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/object.t	2008-06-08 10:06:58.000000000 +0100
+@@ -0,0 +1,35 @@
++#!/usr/bin/perl -wT
++
++use strict;
++use lib 't/lib';
++
++use Test::More tests => 7;
++
++use_ok( 'TAP::Object' );
++
++can_ok( 'TAP::Object', 'new' );
++can_ok( 'TAP::Object', '_initialize' );
++can_ok( 'TAP::Object', '_croak' );
++
++{
++    package TAP::TestObj;
++    use vars qw(@ISA);
++    @ISA = qw(TAP::Object);
++    sub _initialize {
++        my $self = shift;
++	$self->{init} = 1;
++	$self->{args} = [@_];
++        return $self;
++    }
++}
++
++# I know these tests are simple, but they're documenting the base API, so
++# necessary none-the-less...
++my $obj = TAP::TestObj->new('foo', {bar=>'baz'});
++ok( $obj->{init}, '_initialize' );
++is_deeply( $obj->{args}, ['foo', {bar=>'baz'}], '_initialize: args' );
++
++eval { $obj->_croak( 'eek' ) };
++my $err = $@;
++like( $err, qr/^eek/, '_croak' );
++
+diff -ruN Test-Harness-3.10.orig/t/parse.t Test-Harness-3.10/t/parse.t
+--- Test-Harness-3.10.orig/t/parse.t	2008-02-18 23:23:41.000000000 +0000
++++ Test-Harness-3.10/t/parse.t	2008-06-08 18:13:48.000000000 +0100
+@@ -18,7 +18,7 @@
+ use File::Spec;
+ 
+ use TAP::Parser;
+-use TAP::Parser::Iterator;
++use TAP::Parser::IteratorFactory;
+ 
+ sub _get_results {
+     my $parser = shift;
+@@ -349,7 +349,7 @@
+ my $aref = [ split /\n/ => $tap ];
+ 
+ can_ok $PARSER, 'new';
+-$parser = $PARSER->new( { stream => TAP::Parser::Iterator->new($aref) } );
++$parser = $PARSER->new( { stream => TAP::Parser::IteratorFactory->new($aref) } );
+ isa_ok $parser, $PARSER, '... and calling it should succeed';
+ 
+ # results() is sane?
+@@ -662,10 +662,10 @@
+ 
+     _get_results($parser);
+ 
+-    ok !$parser->failed;
+-    ok $parser->todo_passed;
++    ok !$parser->failed, 'parser didnt fail';
++    ok $parser->todo_passed, '... and todo_passed is true';
+ 
+-    ok !$parser->has_problems, 'and has_problems is false';
++    ok !$parser->has_problems, '... and has_problems is false';
+ 
+     # now parse_errors
+ 
+@@ -679,11 +679,11 @@
+ 
+     _get_results($parser);
+ 
+-    ok !$parser->failed;
+-    ok !$parser->todo_passed;
+-    ok $parser->parse_errors;
++    ok !$parser->failed, 'parser didnt fail';
++    ok !$parser->todo_passed, '... and todo_passed is false';
++    ok $parser->parse_errors, '... and parse_errors is true';
+ 
+-    ok $parser->has_problems;
++    ok $parser->has_problems, '... and has_problems';
+ 
+     # Now wait and exit are hard to do in an OS platform-independent way, so
+     # we won't even bother
+@@ -701,27 +701,27 @@
+ 
+     $parser->wait(1);
+ 
+-    ok !$parser->failed;
+-    ok !$parser->todo_passed;
+-    ok !$parser->parse_errors;
++    ok !$parser->failed, 'parser didnt fail';
++    ok !$parser->todo_passed, '... and todo_passed is false';
++    ok !$parser->parse_errors, '... and parse_errors is false';
+ 
+-    ok $parser->wait;
++    ok $parser->wait, '... and wait is set';
+ 
+-    ok $parser->has_problems;
++    ok $parser->has_problems, '... and has_problems';
+ 
+     # and use the same for exit
+ 
+     $parser->wait(0);
+     $parser->exit(1);
+ 
+-    ok !$parser->failed;
+-    ok !$parser->todo_passed;
+-    ok !$parser->parse_errors;
+-    ok !$parser->wait;
++    ok !$parser->failed, 'parser didnt fail';
++    ok !$parser->todo_passed, '... and todo_passed is false';
++    ok !$parser->parse_errors, '... and parse_errors is false';
++    ok !$parser->wait, '... and wait is not set';
+ 
+-    ok $parser->exit;
++    ok $parser->exit, '... and exit is set';
+ 
+-    ok $parser->has_problems;
++    ok $parser->has_problems, '... and has_problems';
+ }
+ 
+ {
+@@ -807,10 +807,6 @@
+ 
+     @ISA = qw(TAP::Parser::Iterator);
+ 
+-    sub new {
+-        return bless {}, shift;
+-    }
+-
+     sub next_raw {
+         die 'this is the dying iterator';
+     }
+@@ -840,7 +836,8 @@
+         $parser->_stream($stream);
+ 
+         # build a new grammar
+-        my $grammar = TAP::Parser::Grammar->new($stream);
++        my $grammar = TAP::Parser::Grammar->new({ stream => $stream,
++						  parser => $parser });
+ 
+         # replace our grammar with this new one
+         $parser->_grammar($grammar);
+@@ -872,7 +869,8 @@
+         $parser->_stream($stream);
+ 
+         # build a new grammar
+-        my $grammar = TAP::Parser::Grammar->new($stream);
++        my $grammar = TAP::Parser::Grammar->new({ stream => $stream,
++						  parser => $parser });
+ 
+         # replace our grammar with this new one
+         $parser->_grammar($grammar);
+diff -ruN Test-Harness-3.10.orig/t/parser-config.t Test-Harness-3.10/t/parser-config.t
+--- Test-Harness-3.10.orig/t/parser-config.t	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/parser-config.t	2008-06-08 19:13:14.000000000 +0100
+@@ -0,0 +1,46 @@
++#!/usr/bin/perl -w
++
++BEGIN {
++    if ( $ENV{PERL_CORE} ) {
++        chdir 't';
++        @INC = ( '../lib', 'lib' );
++    }
++    else {
++        unshift @INC, 't/lib';
++    }
++}
++
++use strict;
++use vars qw(%INIT %CUSTOM);
++
++use Test::More tests => 11;
++use File::Spec::Functions qw( catfile );
++use TAP::Parser;
++
++use_ok( 'MySource' );
++use_ok( 'MyPerlSource' );
++use_ok( 'MyGrammar' );
++use_ok( 'MyIteratorFactory' );
++use_ok( 'MyResultFactory' );
++
++my $t_dir  = $ENV{PERL_CORE} ? 'lib' : 't';
++my $source = catfile( $t_dir, 'source_tests', 'source' );
++my %customize = (
++		 source_class      => 'MySource',
++		 perl_source_class => 'MyPerlSource',
++		 grammar_class     => 'MyGrammar',
++		 iterator_factory_class => 'MyIteratorFactory',
++		 result_factory_class   => 'MyResultFactory',
++		);
++my $p = TAP::Parser->new({
++			  source => $source,
++			  %customize,
++			 });
++ok( $p, 'new customized parser' );
++
++foreach my $key (keys %customize) {
++    is( $p->$key, $customize{$key}, "customized $key" );
++}
++
++
++# TODO: make sure these things are propogated down through the parser...
+diff -ruN Test-Harness-3.10.orig/t/parser-subclass.t Test-Harness-3.10/t/parser-subclass.t
+--- Test-Harness-3.10.orig/t/parser-subclass.t	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/parser-subclass.t	2008-06-08 19:17:14.000000000 +0100
+@@ -0,0 +1,66 @@
++#!/usr/bin/perl -w
++
++BEGIN {
++    if ( $ENV{PERL_CORE} ) {
++        chdir 't';
++        @INC = ( '../lib', 'lib' );
++    }
++    else {
++        unshift @INC, 't/lib';
++    }
++}
++
++use strict;
++use vars qw(%INIT %CUSTOM);
++
++use Test::More tests => 16;
++use File::Spec::Functions qw( catfile );
++
++use_ok( 'TAP::Parser::SubclassTest' );
++
++# TODO: foreach my $source ( ... )
++my $t_dir = $ENV{PERL_CORE} ? 'lib' : 't';
++
++{ # perl source
++    %INIT = %CUSTOM = ();
++    my $source = catfile( $t_dir, 'subclass_tests', 'perl_source' );
++    my $p = TAP::Parser::SubclassTest->new( { source => $source } );
++    ok( $p->{initialized}, 'new subclassed parser' );
++
++    is( $p->source_class      => 'MySource', 'source_class' );
++    is( $p->perl_source_class => 'MyPerlSource', 'perl_source_class' );
++    is( $p->grammar_class     => 'MyGrammar', 'grammar_class' );
++    is( $p->iterator_factory_class => 'MyIteratorFactory', 'iterator_factory_class' );
++    is( $p->result_factory_class   => 'MyResultFactory', 'result_factory_class' );
++
++    is( $INIT{MyPerlSource}, 1, 'initialized MyPerlSource' );
++    is( $INIT{MyGrammar}, 1, 'initialized MyGrammar' );
++
++    # make sure overrided make_* methods work...
++    %CUSTOM = ();
++    $p->make_source;
++    is( $CUSTOM{MySource}, 1, 'make custom source' );
++    $p->make_perl_source;
++    is( $CUSTOM{MyPerlSource}, 1, 'make custom perl source' );
++    $p->make_grammar;
++    is( $CUSTOM{MyGrammar}, 1, 'make custom grammar' );
++    $p->make_iterator;
++    is( $CUSTOM{MyIterator}, 1, 'make custom iterator' );
++    $p->make_result;
++    is( $CUSTOM{MyResult}, 1, 'make custom result' );
++}
++
++TODO: { # non-perl source
++    local $TODO = 'not yet tested';
++    %INIT = %CUSTOM = ();
++    my $source = catfile( $t_dir, 'subclass_tests', 'non_perl_source' );
++    my $p = TAP::Parser::SubclassTest->new( { source => $source } );
++
++    is( $INIT{MySource}, 1, 'initialized MySource subclass' );
++    is( $INIT{MyIterator}, 1, 'initialized MyIterator subclass' );
++}
++
++
++#use Data::Dumper;
++#print Dumper( \%INIT );
++#print Dumper( \%CUSTOM );
+diff -ruN Test-Harness-3.10.orig/t/premature-bailout.t Test-Harness-3.10/t/premature-bailout.t
+--- Test-Harness-3.10.orig/t/premature-bailout.t	2007-11-28 21:33:59.000000000 +0000
++++ Test-Harness-3.10/t/premature-bailout.t	2008-06-08 11:44:24.000000000 +0100
+@@ -6,7 +6,7 @@
+ use Test::More tests => 14;
+ 
+ use TAP::Parser;
+-use TAP::Parser::Iterator;
++use TAP::Parser::IteratorFactory;
+ 
+ sub tap_to_lines {
+     my $string = shift;
+@@ -27,7 +27,7 @@
+ END_TAP
+ 
+ my $parser = TAP::Parser->new(
+-    {   stream => TAP::Parser::Iterator->new( tap_to_lines($tap) ),
++    {   stream => TAP::Parser::IteratorFactory->new( tap_to_lines($tap) ),
+     }
+ );
+ 
+@@ -105,7 +105,7 @@
+ my $more_tap = "1..1\nok 1 - input file opened\n";
+ 
+ my $second_parser = TAP::Parser->new(
+-    {   stream => TAP::Parser::Iterator->new( [ split( /\n/, $more_tap ) ] ),
++    {   stream => TAP::Parser::IteratorFactory->new( [ split( /\n/, $more_tap ) ] ),
+     }
+ );
+ 
+diff -ruN Test-Harness-3.10.orig/t/proverun.t Test-Harness-3.10/t/proverun.t
+--- Test-Harness-3.10.orig/t/proverun.t	2007-12-20 20:08:19.000000000 +0000
++++ Test-Harness-3.10/t/proverun.t	2008-06-08 17:08:12.000000000 +0100
+@@ -84,8 +84,9 @@
+     my @call_log = ();
+ 
+     local $^W;    # no warnings
++    no warnings;
+ 
+-    my $orig_new = \&TAP::Parser::Iterator::Process::new;
++    my $orig_new = TAP::Parser::Iterator::Process->can('new');
+     *TAP::Parser::Iterator::Process::new = sub {
+         push @call_log, [ 'new', @_ ];
+ 
+diff -ruN Test-Harness-3.10.orig/t/results.t Test-Harness-3.10/t/results.t
+--- Test-Harness-3.10.orig/t/results.t	2007-11-28 21:33:59.000000000 +0000
++++ Test-Harness-3.10/t/results.t	2008-06-08 17:03:11.000000000 +0100
+@@ -3,10 +3,12 @@
+ use strict;
+ use lib 't/lib';
+ 
+-use Test::More tests => 222;
++use Test::More tests => 226;
+ 
++use TAP::Parser::ResultFactory;
+ use TAP::Parser::Result;
+ 
++use constant FACTORY => 'TAP::Parser::ResultFactory';
+ use constant RESULT  => 'TAP::Parser::Result';
+ use constant PLAN    => 'TAP::Parser::Result::Plan';
+ use constant TEST    => 'TAP::Parser::Result::Test';
+@@ -46,11 +48,30 @@
+   '... but it should emit a deprecation warning';
+ 
+ can_ok RESULT, 'new';
+-eval { RESULT->new( { type => 'no_such_type' } ) };
++
++can_ok FACTORY, 'new';
++eval { FACTORY->new( { type => 'no_such_type' } ) };
+ ok my $error = $@, '... and calling it with an unknown class should fail';
+ like $error, qr/^Could not determine class for.*no_such_type/s,
+   '... with an appropriate error message';
+ 
++# register new Result types:
++can_ok FACTORY, 'register_type';
++{
++    package MyResult;
++    use strict;
++    use vars qw($VERSION @ISA);
++    @ISA = 'TAP::Parser::Result';
++    TAP::Parser::ResultFactory->register_type( 'my_type' => __PACKAGE__ );
++}
++
++{
++    my $r = eval { FACTORY->new( { type => 'my_type' } ) };
++    my $error = $@;
++    isa_ok( $r, 'MyResult', 'register custom type' );
++    ok( !$error, '... and no error' );
++}
++
+ #
+ # test unknown tokens
+ #
+@@ -246,7 +267,7 @@
+ sub instantiate {
+     my $instantiated = shift;
+     my $class        = $instantiated->{class};
+-    ok my $result = RESULT->new( $instantiated->{data} ),
++    ok my $result = FACTORY->new( $instantiated->{data} ),
+       'Creating $class results should succeed';
+     isa_ok $result, $class, '.. and the object it returns';
+     return $result;
+diff -ruN Test-Harness-3.10.orig/t/source.t Test-Harness-3.10/t/source.t
+--- Test-Harness-3.10.orig/t/source.t	2007-12-20 20:08:19.000000000 +0000
++++ Test-Harness-3.10/t/source.t	2008-06-08 18:38:09.000000000 +0100
+@@ -16,9 +16,11 @@
+ 
+ use File::Spec;
+ 
++use EmptyParser;
+ use TAP::Parser::Source;
+ use TAP::Parser::Source::Perl;
+ 
++my $parser = EmptyParser->new;
+ my $test = File::Spec->catfile(
+     ( $ENV{PERL_CORE} ? 'lib' : 't' ), 'source_tests',
+     'source'
+@@ -27,7 +29,7 @@
+ my $perl = $^X;
+ 
+ can_ok 'TAP::Parser::Source', 'new';
+-my $source = TAP::Parser::Source->new;
++my $source = TAP::Parser::Source->new({ parser => $parser });
+ isa_ok $source, 'TAP::Parser::Source';
+ 
+ can_ok $source, 'source';
+@@ -49,7 +51,7 @@
+ ok !$stream->next, '... and we should have no more results';
+ 
+ can_ok 'TAP::Parser::Source::Perl', 'new';
+-$source = TAP::Parser::Source::Perl->new;
++$source = TAP::Parser::Source::Perl->new({ parser => $parser });
+ isa_ok $source, 'TAP::Parser::Source::Perl', '... and the object it returns';
+ 
+ can_ok $source, 'source';
+@@ -79,7 +81,7 @@
+ 
+     # coverage for method get_steam
+ 
+-    my $source = TAP::Parser::Source->new();
++    my $source = TAP::Parser::Source->new({ parser => $parser });
+ 
+     my @die;
+ 
+@@ -98,7 +100,7 @@
+ 
+     # coverage testing for error
+ 
+-    my $source = TAP::Parser::Source->new();
++    my $source = TAP::Parser::Source->new({ parser => $parser });
+ 
+     my $error = $source->error;
+ 
+@@ -115,7 +117,7 @@
+ 
+     # coverage testing for exit
+ 
+-    my $source = TAP::Parser::Source->new();
++    my $source = TAP::Parser::Source->new({ parser => $parser });
+ 
+     my $exit = $source->exit;
+ 
+diff -ruN Test-Harness-3.10.orig/t/spool.t Test-Harness-3.10/t/spool.t
+--- Test-Harness-3.10.orig/t/spool.t	2007-12-20 21:24:08.000000000 +0000
++++ Test-Harness-3.10/t/spool.t	2008-06-08 11:45:37.000000000 +0100
+@@ -118,7 +118,7 @@
+ 
+     my $parser = TAP::Parser->new(
+         {   spool  => $spoolHandle,
+-            stream => TAP::Parser::Iterator->new( [ split /\n/ => $tap ] )
++            stream => TAP::Parser::IteratorFactory->new( [ split /\n/ => $tap ] )
+         }
+     );
+ 
+diff -ruN Test-Harness-3.10.orig/t/streams.t Test-Harness-3.10/t/streams.t
+--- Test-Harness-3.10.orig/t/streams.t	2007-12-12 21:56:41.000000000 +0000
++++ Test-Harness-3.10/t/streams.t	2008-06-08 11:47:57.000000000 +0100
+@@ -6,13 +6,15 @@
+ use Test::More tests => 47;
+ 
+ use TAP::Parser;
+-use TAP::Parser::Iterator;
++use TAP::Parser::IteratorFactory;
+ 
+-my ( $STREAMED, $ITER ) = ( 'TAP::Parser', 'TAP::Parser::Iterator' );
+-my $ITER_FH    = "${ITER}::Stream";
+-my $ITER_ARRAY = "${ITER}::Array";
++my $STREAMED     = 'TAP::Parser';
++my $ITER         = 'TAP::Parser::Iterator';
++my $ITER_FH      = "${ITER}::Stream";
++my $ITER_ARRAY   = "${ITER}::Array";
++my $ITER_FACTORY = 'TAP::Parser::IteratorFactory';
+ 
+-my $stream = TAP::Parser::Iterator->new( \*DATA );
++my $stream = TAP::Parser::IteratorFactory->new( \*DATA );
+ isa_ok $stream, 'TAP::Parser::Iterator';
+ my $parser = TAP::Parser->new( { stream => $stream } );
+ isa_ok $parser, 'TAP::Parser',
+@@ -55,7 +57,7 @@
+ 1..5
+ END_TAP
+ 
+-$stream = $ITER->new( [ split /\n/ => $tap ] );
++$stream = $ITER_FACTORY->new( [ split /\n/ => $tap ] );
+ ok $parser = TAP::Parser->new( { stream => $stream } ),
+   'Now we create a parser with the plan at the end';
+ isa_ok $parser->_stream, $ITER_ARRAY,
+@@ -93,7 +95,7 @@
+ ok 5 # skip we have no description
+ END_TAP
+ 
+-$stream = $ITER->new( [ split /\n/ => $tap ] );
++$stream = $ITER_FACTORY->new( [ split /\n/ => $tap ] );
+ 
+ ok $parser = TAP::Parser->new( { stream => $stream } ),
+   'Now we create a parser with a plan as the second line';
+@@ -131,7 +133,7 @@
+ ok 5 # skip we have no description
+ END_TAP
+ 
+-$stream = $ITER->new( [ split /\n/ => $tap ] );
++$stream = $ITER_FACTORY->new( [ split /\n/ => $tap ] );
+ 
+ ok $parser = TAP::Parser->new( { stream => $stream } ),
+   'Now we create a parser with the plan as the second to last line';
+diff -ruN Test-Harness-3.10.orig/t/subclass_tests/non_perl_source Test-Harness-3.10/t/subclass_tests/non_perl_source
+--- Test-Harness-3.10.orig/t/subclass_tests/non_perl_source	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/subclass_tests/non_perl_source	2008-06-08 12:31:26.000000000 +0100
+@@ -0,0 +1,3 @@
++#!/bin/sh
++echo "1..1"
++echo "ok 1 - this is a test"
+diff -ruN Test-Harness-3.10.orig/t/subclass_tests/perl_source Test-Harness-3.10/t/subclass_tests/perl_source
+--- Test-Harness-3.10.orig/t/subclass_tests/perl_source	1970-01-01 01:00:00.000000000 +0100
++++ Test-Harness-3.10/t/subclass_tests/perl_source	2008-06-08 08:37:47.000000000 +0100
+@@ -0,0 +1,6 @@
++#!/usr/bin/perl
++
++print <<'END_TESTS';
++1..1
++ok 1 - this is a test
++END_TESTS

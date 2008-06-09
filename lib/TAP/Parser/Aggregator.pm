@@ -2,7 +2,11 @@ package TAP::Parser::Aggregator;
 
 use strict;
 use Benchmark;
-use vars qw($VERSION);
+use vars qw($VERSION @ISA);
+
+use TAP::Object ();
+
+@ISA = qw(TAP::Object);
 
 =head1 NAME
 
@@ -51,6 +55,8 @@ Returns a new C<TAP::Parser::Aggregator> object.
 
 =cut
 
+# new() implementation supplied by TAP::Object
+
 my %SUMMARY_METHOD_FOR;
 
 BEGIN {    # install summary methods
@@ -78,13 +84,6 @@ BEGIN {    # install summary methods
         };
     }
 }    # end install summary methods
-
-sub new {
-    my ($class) = @_;
-    my $self = bless {}, $class;
-    $self->_initialize;
-    return $self;
-}
 
 sub _initialize {
     my ($self) = @_;
@@ -400,12 +399,6 @@ sub todo_failed {
     warn
       '"todo_failed" is deprecated.  Please use "todo_passed".  See the docs.';
     goto &todo_passed;
-}
-
-sub _croak {
-    my $proto = shift;
-    require Carp;
-    Carp::croak(@_);
 }
 
 =head1 See Also

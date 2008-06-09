@@ -1,35 +1,17 @@
 package TAP::Parser::Result;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION @ISA);
 
-use TAP::Parser::Result::Bailout ();
-use TAP::Parser::Result::Comment ();
-use TAP::Parser::Result::Plan    ();
-use TAP::Parser::Result::Pragma  ();
-use TAP::Parser::Result::Test    ();
-use TAP::Parser::Result::Unknown ();
-use TAP::Parser::Result::Version ();
-use TAP::Parser::Result::YAML    ();
+use TAP::Object ();
 
-# note that this is bad.  Makes it very difficult to subclass, but then, it
-# would be a lot of work to subclass this system.
-my %class_for;
+@ISA = 'TAP::Object';
 
 BEGIN {
-    %class_for = (
-        plan    => 'TAP::Parser::Result::Plan',
-        pragma  => 'TAP::Parser::Result::Pragma',
-        test    => 'TAP::Parser::Result::Test',
-        comment => 'TAP::Parser::Result::Comment',
-        bailout => 'TAP::Parser::Result::Bailout',
-        version => 'TAP::Parser::Result::Version',
-        unknown => 'TAP::Parser::Result::Unknown',
-        yaml    => 'TAP::Parser::Result::YAML',
-    );
-
+    # make is_* methods
+    my @attrs = qw( plan pragma test comment bailout version unknown yaml );
     no strict 'refs';
-    for my $token ( keys %class_for ) {
+    for my $token ( @attrs ) {
         my $method = "is_$token";
         *$method = sub { return $token eq shift->type };
     }
@@ -39,7 +21,7 @@ BEGIN {
 
 =head1 NAME
 
-TAP::Parser::Result - TAP::Parser output
+TAP::Parser::Result - Base class for TAP::Parser output objects
 
 =head1 VERSION
 
@@ -51,9 +33,8 @@ $VERSION = '3.12';
 
 =head2 DESCRIPTION
 
-This is merely a factory class which returns an object representing the
-current bit of test data from TAP (usually a line).  It's for internal use
-only and should not be relied upon.
+This is a base class for objects representing the current bit of test data from
+TAP (usually a line).
 
 =cut
 
@@ -63,22 +44,16 @@ only and should not be relied upon.
 
 =head3 C<new>
 
+  # see TAP::Parser::ResultFactory for preferred usage
+
+  # to use directly:
   my $result = TAP::Parser::Result->new($token);
 
 Returns an instance the appropriate class for the test token passed in.
 
 =cut
 
-sub new {
-    my ( $class, $token ) = @_;
-    my $type = $token->{type};
-    return bless $token => $class_for{$type}
-      if exists $class_for{$type};
-    require Carp;
-
-    # this should never happen!
-    Carp::croak("Could not determine class for\n$token->{type}");
-}
+# new() implementation provided by TAP::Object
 
 =head2 Boolean methods
 

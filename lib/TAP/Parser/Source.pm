@@ -1,9 +1,12 @@
 package TAP::Parser::Source;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION @ISA);
 
-use TAP::Parser::Iterator ();
+use TAP::Object                  ();
+use TAP::Parser::IteratorFactory ();
+
+@ISA = qw(TAP::Object);
 
 # Causes problem on MacOS and shouldn't be necessary anyway
 #$SIG{CHLD} = sub { wait };
@@ -27,7 +30,7 @@ Takes a command and hopefully returns a stream from it.
 =head1 SYNOPSIS
 
  use TAP::Parser::Source;
- my $source = TAP::Parser::Source->new;
+ my $source = TAP::Parser::Source->new({ parser => $parser });
  my $stream = $source->source(['/usr/bin/ruby', 'mytest.rb'])->get_stream;
 
 =head1 METHODS
@@ -36,17 +39,21 @@ Takes a command and hopefully returns a stream from it.
 
 =head3 C<new>
 
- my $source = TAP::Parser::Source->new;
+ my $source = TAP::Parser::Source->new({ parser => $parser });
 
 Returns a new C<TAP::Parser::Source> object.
 
 =cut
 
-sub new {
-    my $class = shift;
+# new() implementation supplied by TAP::Object
+
+sub _initialize {
+    my ($self, $args) = @_;
+    $self->{switches} = [];
+    $self->{parser}   = $args->{parser}; # TODO: accessor
     _autoflush( \*STDOUT );
     _autoflush( \*STDERR );
-    bless { switches => [] }, $class;
+    return $self;
 }
 
 ##############################################################################
@@ -92,11 +99,10 @@ sub get_stream {
     my @command = $self->_get_command
       or $self->_croak('No command found!');
 
-    return TAP::Parser::Iterator->new(
-        {   command => \@command,
-            merge   => $self->merge
-        }
-    );
+    return $self->{parser}->make_iterator({
+        command => \@command,
+        merge   => $self->merge
+    });
 }
 
 sub _get_command { return @{ shift->source || [] } }
@@ -161,12 +167,6 @@ sub _autoflush {
     my $old_fh  = select $flushed;
     $| = 1;
     select $old_fh;
-}
-
-sub _croak {
-    my $self = shift;
-    require Carp;
-    Carp::croak(@_);
 }
 
 1;

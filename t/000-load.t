@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 68;
+use Test::More tests => 74;
 
 BEGIN {
 
@@ -20,11 +20,14 @@ BEGIN {
       TAP::Harness
       TAP::Parser::Aggregator
       TAP::Parser::Grammar
+      TAP::Parser::Iterator
       TAP::Parser::Iterator::Array
       TAP::Parser::Iterator::Process
       TAP::Parser::Iterator::Stream
-      TAP::Parser::Iterator
+      TAP::Parser::IteratorFactory
       TAP::Parser::Multiplexer
+      TAP::Parser::Result
+      TAP::Parser::ResultFactory
       TAP::Parser::Result::Bailout
       TAP::Parser::Result::Comment
       TAP::Parser::Result::Plan

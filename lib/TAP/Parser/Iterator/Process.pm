@@ -1,15 +1,13 @@
 package TAP::Parser::Iterator::Process;
 
 use strict;
-
-use TAP::Parser::Iterator ();
-
 use vars qw($VERSION @ISA);
 
-@ISA = 'TAP::Parser::Iterator';
-
+use TAP::Parser::Iterator ();
 use Config;
 use IO::Handle;
+
+@ISA = 'TAP::Parser::Iterator';
 
 my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
 
@@ -27,7 +25,10 @@ $VERSION = '3.12';
 
 =head1 SYNOPSIS
 
-  use TAP::Parser::Iterator;
+  # see TAP::Parser::IteratorFactory for preferred usage
+
+  # to use directly:
+  use TAP::Parser::Iterator::Process;
   my $it = TAP::Parser::Iterator::Process->new(@args);
 
   my $line = $it->next;
@@ -44,13 +45,21 @@ This is a simple iterator wrapper for processes.
 
 =head3 C<new>
 
-Create an iterator.
+Create an iterator.  Expects one argument containing a hashref of the form:
+
+   command  => \@command_to_execute
+   merge    => $attempt_merge_stderr_and_stdout?
+   setup    => $callback_to_setup_command
+   teardown => $callback_to_teardown_command
+
+Tries to uses L<IPC::Open3> & L<IO::Select> to communicate with the spawned
+process if they are available.  Falls back onto C<open()>.
 
 =head2 Instance Methods
 
 =head3 C<next>
 
-Iterate through it, of course.
+Iterate through the process output, of course.
 
 =head3 C<next_raw>
 
@@ -95,9 +104,10 @@ sub _use_open3 {
     }
 }
 
-sub new {
-    my $class = shift;
-    my $args  = shift;
+# new() implementation supplied by TAP::Object
+
+sub _initialize {
+    my ( $self, $args ) = @_;
 
     my @command = @{ delete $args->{command} || [] }
       or die "Must supply a command to execute";
@@ -114,7 +124,7 @@ sub new {
 
     my $out = IO::Handle->new;
 
-    if ( $class->_use_open3 ) {
+    if ( $self->_use_open3 ) {
 
         # HOTPATCH {{{
         my $xclose = \&IPC::Open3::xclose;
@@ -158,14 +168,12 @@ sub new {
           or die "Could not execute ($command): $!";
     }
 
-    my $self = bless {
-        out        => $out,
-        err        => $err,
-        sel        => $sel,
-        pid        => $pid,
-        exit       => undef,
-        chunk_size => $chunk_size,
-    }, $class;
+    $self->{out}  = $out;
+    $self->{err}  = $err;
+    $self->{sel}  = $sel;
+    $self->{pid}  = $pid;
+    $self->{exit} = undef;
+    $self->{chunk_size} = $chunk_size;
 
     if ( my $teardown = delete $args->{teardown} ) {
         $self->{teardown} = sub {
@@ -344,3 +352,13 @@ sub get_select_handles {
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<TAP::Object>,
+L<TAP::Parser>,
+L<TAP::Parser::Iterator>,
+L<TAP::Parser::IteratorFactory>,
+
+=cut
+

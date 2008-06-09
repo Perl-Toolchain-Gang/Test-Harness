@@ -1,10 +1,13 @@
 package TAP::Parser::Grammar;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION @ISA);
 
-use TAP::Parser::Result          ();
+use TAP::Object                  ();
+use TAP::Parser::ResultFactory   ();
 use TAP::Parser::YAMLish::Reader ();
+
+@ISA = qw(TAP::Object);
 
 =head1 NAME
 
@@ -37,16 +40,24 @@ parser).
 
 =head3 C<new>
 
-  my $grammar = TAP::Grammar->new($stream);
+  my $grammar = TAP::Parser::Grammar->new({
+      stream  => $stream,
+      parser  => $parser,
+      version => $version,
+  });
 
-Returns TAP grammar object that will parse the specified stream.
+Returns L<TAP::Parser> grammar object that will parse the specified stream.
+Both C<stream> and C<parser> are required arguments.  If C<version> is not set
+it defaults to C<12> (see L</set_version> for more details).
 
 =cut
 
-sub new {
-    my ( $class, $stream ) = @_;
-    my $self = bless { stream => $stream }, $class;
-    $self->set_version(12);
+# new() implementation supplied by TAP::Object
+sub _initialize {
+    my ( $self, $args ) = @_;
+    $self->{stream} = $args->{stream}; # TODO: accessor
+    $self->{parser} = $args->{parser}; # TODO: accessor
+    $self->set_version($args->{version} || 12);
     return $self;
 }
 
@@ -280,8 +291,9 @@ sub tokenize {
 
     $token = $self->_make_unknown_token($line) unless $token;
 
-    return TAP::Parser::Result->new($token);
+    return $self->{parser}->make_result($token);
 }
+
 
 ##############################################################################
 

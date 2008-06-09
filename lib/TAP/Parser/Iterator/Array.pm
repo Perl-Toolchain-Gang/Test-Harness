@@ -1,13 +1,15 @@
 package TAP::Parser::Iterator::Array;
 
 use strict;
-use TAP::Parser::Iterator ();
 use vars qw($VERSION @ISA);
+
+use TAP::Parser::Iterator ();
+
 @ISA = 'TAP::Parser::Iterator';
 
 =head1 NAME
 
-TAP::Parser::Iterator::Array - Internal TAP::Parser Iterator
+TAP::Parser::Iterator::Array - Internal TAP::Parser array Iterator
 
 =head1 VERSION
 
@@ -19,8 +21,11 @@ $VERSION = '3.12';
 
 =head1 SYNOPSIS
 
+  # see TAP::Parser::IteratorFactory for preferred usage
+
+  # to use directly:
   use TAP::Parser::Iterator::Array;
-  my $it = TAP::Parser::Iterator->new(\@array);
+  my $it = TAP::Parser::Iterator::Array->new(\@array);
 
   my $line = $it->next;
 
@@ -60,14 +65,15 @@ be zero.
 
 =cut
 
-sub new {
-    my ( $class, $thing ) = @_;
+# new() implementation supplied by TAP::Object
+
+sub _initialize {
+    my ( $self, $thing ) = @_;
     chomp @$thing;
-    bless {
-        idx   => 0,
-        array => $thing,
-        exit  => undef,
-    }, $class;
+    $self->{idx}   = 0;
+    $self->{array} = $thing;
+    $self->{exit}  = undef;
+    return $self;
 }
 
 sub wait { shift->exit }
@@ -84,3 +90,13 @@ sub next_raw {
 }
 
 1;
+
+=head1 SEE ALSO
+
+L<TAP::Object>,
+L<TAP::Parser>,
+L<TAP::Parser::Iterator>,
+L<TAP::Parser::IteratorFactory>,
+
+=cut
+

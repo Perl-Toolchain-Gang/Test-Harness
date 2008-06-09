@@ -33,7 +33,7 @@ more methods.
 =head1 SYNOPSIS
 
     use TAP::Parser::Source::Perl;
-    my $perl = TAP::Parser::Source::Perl->new;
+    my $perl = TAP::Parser::Source::Perl->new({ parser => $parser });
     my $stream = $perl->source( [ $filename, @args ] )->get_stream;
 
 =head1 METHODS
@@ -42,7 +42,7 @@ more methods.
 
 =head3 C<new>
 
- my $perl = TAP::Parser::Source::Perl->new;
+ my $perl = TAP::Parser::Source::Perl->new({ parser => $parser });
 
 Returns a new C<TAP::Parser::Source::Perl> object.
 
@@ -154,13 +154,12 @@ sub get_stream {
     my @command = $self->_get_command_for_switches(@switches)
       or $self->_croak("No command found!");
 
-    return TAP::Parser::Iterator->new(
-        {   command  => \@command,
-            merge    => $self->merge,
-            setup    => $setup,
-            teardown => $teardown,
-        }
-    );
+    return $self->{parser}->make_iterator({
+        command  => \@command,
+        merge    => $self->merge,
+        setup    => $setup,
+        teardown => $teardown,
+    });
 }
 
 sub _get_command_for_switches {

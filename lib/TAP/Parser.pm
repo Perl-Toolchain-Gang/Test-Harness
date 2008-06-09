@@ -3,12 +3,14 @@ package TAP::Parser;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Base                 ();
-use TAP::Parser::Grammar      ();
-use TAP::Parser::Result       ();
-use TAP::Parser::Source       ();
-use TAP::Parser::Source::Perl ();
-use TAP::Parser::Iterator     ();
+use TAP::Base                    ();
+use TAP::Parser::Grammar         ();
+use TAP::Parser::Result          ();
+use TAP::Parser::ResultFactory   ();
+use TAP::Parser::Source          ();
+use TAP::Parser::Source::Perl    ();
+use TAP::Parser::Iterator        ();
+use TAP::Parser::IteratorFactory ();
 
 use Carp qw( confess );
 
@@ -54,6 +56,11 @@ BEGIN {    # making accessors
         start_time
         end_time
         skip_all
+        source_class
+        perl_source_class
+        grammar_class
+        iterator_factory_class
+        result_factory_class
         )
       )
     {
@@ -202,11 +209,55 @@ allow exact synchronization.
 Subtleties of this behavior may be platform-dependent and may change in
 the future.
 
+=item * C<source_class>
+
+This option was introduced to let you easily customize which I<source> class
+the parser should use.  It defaults to L<TAP::Parser::Source>.
+
+See also L</make_source>.
+
+=item * C<perl_source_class>
+
+This option was introduced to let you easily customize which I<perl source>
+class the parser should use.  It defaults to L<TAP::Parser::Source::Perl>.
+
+See also L</make_perl_source>.
+
+=item * C<grammar_class>
+
+This option was introduced to let you easily customize which I<grammar> class
+the parser should use.  It defaults to L<TAP::Parser::Grammar>.
+
+See also L</make_grammar>.
+
+=item * C<iterator_factory_class>
+
+This option was introduced to let you easily customize which I<iterator>
+factory class the parser should use.  It defaults to
+L<TAP::Parser::IteratorFactory>.
+
+See also L</make_iterator>.
+
+=item * C<result_factory_class>
+
+This option was introduced to let you easily customize which I<result>
+factory class the parser should use.  It defaults to
+L<TAP::Parser::ResultFactory>.
+
+See also L</make_result>.
+
 =back
 
 =cut
 
-# new implementation supplied by TAP::Base
+# new() implementation supplied by TAP::Base
+
+# This should make overriding behaviour of the Parser in subclasses easier:
+sub _default_source_class           {'TAP::Parser::Source'}
+sub _default_perl_source_class      {'TAP::Parser::Source::Perl'}
+sub _default_grammar_class          {'TAP::Parser::Grammar'}
+sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
+sub _default_result_factory_class   {'TAP::Parser::ResultFactory'}
 
 ##############################################################################
 
@@ -251,6 +302,54 @@ sub run {
         # do nothing
     }
 }
+
+##############################################################################
+
+=head3 C<make_source>
+
+Make a new L<TAP::Parser::Source> object and return it.  Passes through any
+arguments given.
+
+The C<source_class> can be customized, as described in L</new>.
+
+=head3 C<make_perl_source>
+
+Make a new L<TAP::Parser::Source::Perl> object and return it.  Passes through
+any arguments given.
+
+The C<perl_source_class> can be customized, as described in L</new>.
+
+=head3 C<make_grammar>
+
+Make a new L<TAP::Parser::Grammar> object and return it.  Passes through any
+arguments given.
+
+The C<grammar_class> can be customized, as described in L</new>.
+
+=head3 C<make_iterator>
+
+Make a new L<TAP::Parser::Iterator> object using the parser's
+L<TAP::Parser::IteratorFactory>, and return it.  Passes through any arguments
+given.
+
+The C<iterator_factory_class> can be customized, as described in L</new>.
+
+=head3 C<make_result>
+
+Make a new L<TAP::Parser::Result> object using the parser's
+L<TAP::Parser::ResultFactory>, and return it.  Passes through any arguments
+given.
+
+The C<result_factory_class> can be customized, as described in L</new>.
+
+=cut
+
+# This should make overriding behaviour of the Parser in subclasses easier:
+sub make_source      { shift->source_class->new(@_); }
+sub make_perl_source { shift->perl_source_class->new(@_); }
+sub make_grammar     { shift->grammar_class->new(@_); }
+sub make_iterator    { shift->iterator_factory_class->new(@_); }
+sub make_result      { shift->result_factory_class->new(@_); }
 
 {
 
@@ -298,6 +397,17 @@ sub run {
 
         $self->SUPER::_initialize( \%args, \@legal_callback );
 
+        # get any class overrides out first:
+        for my $key (
+            qw( source_class perl_source_class grammar_class
+            iterator_factory_class result_factory_class )
+          )
+        {
+            my $default_method = "_default_$key";
+            my $val = delete $args{$key} || $self->$default_method;
+            $self->$key($val);
+        }
+
         my $stream      = delete $args{stream};
         my $tap         = delete $args{tap};
         my $source      = delete $args{source};
@@ -319,29 +429,26 @@ sub run {
         }
 
         if ($tap) {
-            $stream = TAP::Parser::Iterator->new( [ split "\n" => $tap ] );
+            $stream = $self->make_iterator( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
-            my $source = TAP::Parser::Source->new;
+            my $source = $self->make_source( { parser => $self } );
             $source->source( [ @$exec, @test_args ] );
             $source->merge($merge);    # XXX should just be arguments?
             $stream = $source->get_stream;
         }
         elsif ($source) {
             if ( my $ref = ref $source ) {
-                $stream = TAP::Parser::Iterator->new($source);
+                $stream = $self->make_iterator($source);
             }
             elsif ( -e $source ) {
-
-                my $perl = TAP::Parser::Source::Perl->new;
+                my $perl = $self->make_perl_source( { parser => $self } );
 
                 $perl->switches($switches)
                   if $switches;
 
                 $perl->merge($merge);    # XXX args to new()?
-
                 $perl->source( [ $source, @test_args ] );
-
                 $stream = $perl->get_stream;
             }
             else {
@@ -1222,23 +1329,18 @@ determine the readiness of this parser.
 
 sub get_select_handles { shift->_stream->get_select_handles }
 
-sub _make_grammar_with_stream {
-    my ( $self, $stream ) = @_;
-    my $grammar = TAP::Parser::Grammar->new($stream);
-    $grammar->set_version( $self->version );
-    return $grammar;
-}
-
 sub _grammar {
     my $self = shift;
-    if (@_) {
-        return $self->{_grammar} = shift;
-    }
+    return $self->{_grammar} = shift if @_;
 
-    return $self->{_grammar}
-      ||= $self->_make_grammar_with_stream( $self->_stream );
+    return $self->{_grammar} ||= $self->make_grammar(
+        {   stream  => $self->_stream,
+            parser  => $self,
+            version => $self->version
+        }
+    );
 }
-    
+
 sub _iter {
     my $self        = shift;
     my $stream      = $self->_stream;
@@ -1552,6 +1654,10 @@ C<TAP::Parser>, these tests are not considered failed because they've
 never run. They're reported as parse failures (tests out of sequence).
 
 =back
+
+=head1 SUBCLASSING
+
+This section has not yet been written...
 
 =head1 ACKNOWLEDGEMENTS
 

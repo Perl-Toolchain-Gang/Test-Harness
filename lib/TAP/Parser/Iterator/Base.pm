@@ -1,4 +1,4 @@
-package TAP::Parser::Iterator;
+package TAP::Parser::Iterator::Base;
 
 use strict;
 use vars qw($VERSION @ISA);
@@ -9,7 +9,7 @@ use TAP::Object ();
 
 =head1 NAME
 
-TAP::Parser::Iterator - Internal base class for TAP::Parser Iterators
+TAP::Parser::Iterator::Base - Internal base class for TAP::Parser Iterators
 
 =head1 VERSION
 
@@ -21,26 +21,30 @@ $VERSION = '3.12';
 
 =head1 SYNOPSIS
 
-  # see TAP::Parser::IteratorFactory for general usage
-
-  # to subclass:
   use vars qw(@ISA);
-  use TAP::Parser::Iterator ();
-  @ISA = qw(TAP::Parser::Iterator);
+  use TAP::Parser::Iterator::Base ();
+  @ISA = qw(TAP::Parser::Iterator::Base);
   sub _initialize {
     # see TAP::Object...
   }
 
 =head1 DESCRIPTION
 
+B<FOR INTERNAL USE ONLY!>
+
 This is a simple iterator base class that defines the iterator API.  See
-C<TAP::Parser::IteratorFactory> for a factory class that creates iterators.
+C<TAP::Parser::Iterator> for a factory class that creates iterators.
 
 =head2 Class Methods
 
 =head3 C<new>
 
-Create an iterator.  Provided by L<TAP::Object>.
+Create an iterator.
+
+=cut
+
+# new() provided by TAP::Object
+
 
 =head2 Instance Methods
 
@@ -93,7 +97,6 @@ The default implementation does nothing.
 
 sub handle_unicode { }
 
-
 =head3 C<get_select_handles>
 
 Return a list of filehandles that may be used upstream in a select()
@@ -114,7 +117,7 @@ sub get_select_handles {
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::IteratorFactory>,
+L<TAP::Parser::Iterator>,
 L<TAP::Parser::Iterator::Array>,
 L<TAP::Parser::Iterator::Stream>,
 L<TAP::Parser::Iterator::Process>,

@@ -1,9 +1,11 @@
 package TAP::Parser::YAMLish::Reader;
 
 use strict;
+use vars qw($VERSION @ISA);
 
-use vars qw{$VERSION};
+use TAP::Object ();
 
+@ISA = 'TAP::Object';
 $VERSION = '3.12';
 
 # TODO:
@@ -22,11 +24,7 @@ my $IS_HASH_KEY  = qr{ ^ [\w\'\"] }x;
 my $IS_END_YAML  = qr{ ^ \.\.\. \s* $ }x;
 my $IS_QQ_STRING = qr{ ^ $QQ_STRING $ }x;
 
-# Create an empty TAP::Parser::YAMLish::Reader object
-sub new {
-    my $class = shift;
-    bless {}, $class;
-}
+# new() implementation supplied by TAP::Object
 
 sub read {
     my $self = shift;

@@ -18,8 +18,16 @@ L<http://testanything.org/wiki/index.php/TAP::Parser_Cookbook> instead.
 
 =head1 Getting Started
 
-See the resources section in META.yml (or Build.PL) for links to the
+See the resources section in I<META.yml> or I<Build.PL> for links to the
 project mailing list, bug tracker, svn repository, etc.
+
+For ease of reference, at the time of writing the SVN repository was at:
+
+  http://svn.hexten.net/tapx
+
+To get the latest version of trunk:
+
+  svn co http://svn.hexten.net/tapx/trunk
 
 For best results, read the rest of this file, check RT for bugs which
 scratch your itch, join the mailing list, etc.
@@ -88,6 +96,21 @@ For emacs, you can use this snippet from Sam Tregar
 =for eric_not_it
   TODO explain no bundling, PERL_CORE, etc
 
+=head1 Use TAP::Object
+
+TAP::Object is the common base class to all TAP::* modules, and should be for
+any that you write.
+
+=head1 Exception Handling
+
+Exceptions should be raised with L<Carp>:
+
+  require Carp;
+  Carp::croak("Unsupported syntax version: $version");
+
+  require Carp;
+  Carp::confess("Unsupported syntax version: $version");
+
 =head1 Documentation
 
 The end-user and API documentation is all in the 'lib/' directory.  In
@@ -121,7 +144,7 @@ Sections begin with an C<=head1> command and are all-caps.
 =for eric_not_it
   The following is how I would do it, but opposite of what we have.
 
-The C<=head2> command documents a method.  The name of the method should have no adornment (e.g. don't CE<gt>method> or CE<gt>method($list, $of, $params)>.)
+The C<=head2> command documents a method.  The name of the method should have no adornment (e.g. don't CE<lt>method> or CE<lt>method($list, $of, $params)>.)
 
 These sections should begin with a short description of what the method
 does, followed by one or more examples of usage.  If needed, elaborate

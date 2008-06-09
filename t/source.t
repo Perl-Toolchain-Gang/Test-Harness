@@ -16,9 +16,11 @@ use Test::More tests => 30;
 
 use File::Spec;
 
+use EmptyParser;
 use TAP::Parser::Source;
 use TAP::Parser::Source::Perl;
 
+my $parser = EmptyParser->new;
 my $test = File::Spec->catfile(
     ( $ENV{PERL_CORE} ? 'lib' : 't' ), 'source_tests',
     'source'
@@ -27,7 +29,7 @@ my $test = File::Spec->catfile(
 my $perl = $^X;
 
 can_ok 'TAP::Parser::Source', 'new';
-my $source = TAP::Parser::Source->new;
+my $source = TAP::Parser::Source->new({ parser => $parser });
 isa_ok $source, 'TAP::Parser::Source';
 
 can_ok $source, 'source';
@@ -49,7 +51,7 @@ is $stream->next, 'ok 1', '... as should the second';
 ok !$stream->next, '... and we should have no more results';
 
 can_ok 'TAP::Parser::Source::Perl', 'new';
-$source = TAP::Parser::Source::Perl->new;
+$source = TAP::Parser::Source::Perl->new({ parser => $parser });
 isa_ok $source, 'TAP::Parser::Source::Perl', '... and the object it returns';
 
 can_ok $source, 'source';
@@ -79,7 +81,7 @@ ok( grep( $_ =~ /^['"]?-T['"]?$/, $source->_switches ),
 
     # coverage for method get_steam
 
-    my $source = TAP::Parser::Source->new();
+    my $source = TAP::Parser::Source->new({ parser => $parser });
 
     my @die;
 
@@ -98,7 +100,7 @@ ok( grep( $_ =~ /^['"]?-T['"]?$/, $source->_switches ),
 
     # coverage testing for error
 
-    my $source = TAP::Parser::Source->new();
+    my $source = TAP::Parser::Source->new({ parser => $parser });
 
     my $error = $source->error;
 
@@ -115,7 +117,7 @@ ok( grep( $_ =~ /^['"]?-T['"]?$/, $source->_switches ),
 
     # coverage testing for exit
 
-    my $source = TAP::Parser::Source->new();
+    my $source = TAP::Parser::Source->new({ parser => $parser });
 
     my $exit = $source->exit;
 
