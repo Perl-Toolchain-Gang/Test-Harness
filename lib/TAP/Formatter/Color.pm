@@ -113,10 +113,11 @@ sub _initialize {
     my $self = shift;
 
     if ($NO_COLOR) {
+
         # shorten that message a bit
         ( my $error = $NO_COLOR ) =~ s/ in \@INC .*//s;
         warn "Note: Cannot run tests in color: $error\n";
-        return; # abort object construction
+        return;    # abort object construction
     }
 
     return $self;

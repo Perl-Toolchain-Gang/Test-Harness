@@ -8,10 +8,11 @@ use TAP::Object ();
 @ISA = 'TAP::Object';
 
 BEGIN {
+
     # make is_* methods
     my @attrs = qw( plan pragma test comment bailout version unknown yaml );
     no strict 'refs';
-    for my $token ( @attrs ) {
+    for my $token (@attrs) {
         my $method = "is_$token";
         *$method = sub { return $token eq shift->type };
     }

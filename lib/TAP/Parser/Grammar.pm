@@ -55,9 +55,9 @@ it defaults to C<12> (see L</set_version> for more details).
 # new() implementation supplied by TAP::Object
 sub _initialize {
     my ( $self, $args ) = @_;
-    $self->{stream} = $args->{stream}; # TODO: accessor
-    $self->{parser} = $args->{parser}; # TODO: accessor
-    $self->set_version($args->{version} || 12);
+    $self->{stream} = $args->{stream};    # TODO: accessor
+    $self->{parser} = $args->{parser};    # TODO: accessor
+    $self->set_version( $args->{version} || 12 );
     return $self;
 }
 
@@ -294,7 +294,6 @@ sub tokenize {
     return $self->{parser}->make_result($token);
 }
 
-
 ##############################################################################
 
 =head3 C<token_types>
@@ -378,7 +377,7 @@ sub _make_plan_token {
         warn
           "Specified SKIP directive in plan but more than 0 tests ($line)\n";
     }
-    
+
     return {
         type          => 'plan',
         raw           => $line,

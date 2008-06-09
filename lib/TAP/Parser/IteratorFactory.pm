@@ -68,19 +68,18 @@ sub new {
 
     my $ref = ref $thing;
     if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
-	return $proto->make_stream_iterator($thing);
+        return $proto->make_stream_iterator($thing);
     }
     elsif ( $ref eq 'ARRAY' ) {
-	return $proto->make_array_iterator($thing);
+        return $proto->make_array_iterator($thing);
     }
     elsif ( $ref eq 'HASH' ) {
-	return $proto->make_process_iterator($thing);
+        return $proto->make_process_iterator($thing);
     }
     else {
         die "Can't iterate with a $ref";
     }
 }
-
 
 =head3 C<make_stream_iterator>
 
@@ -101,19 +100,18 @@ Defaults to a L<TAP::Parser::Iterator::Process>.
 
 sub make_stream_iterator {
     my $proto = shift;
-    TAP::Parser::Iterator::Stream->new( @_ );
+    TAP::Parser::Iterator::Stream->new(@_);
 }
 
 sub make_array_iterator {
     my $proto = shift;
-    TAP::Parser::Iterator::Array->new( @_ );
+    TAP::Parser::Iterator::Array->new(@_);
 }
 
 sub make_process_iterator {
     my $proto = shift;
-    TAP::Parser::Iterator::Process->new( @_ );
+    TAP::Parser::Iterator::Process->new(@_);
 }
-
 
 1;
 

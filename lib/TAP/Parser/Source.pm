@@ -48,9 +48,9 @@ Returns a new C<TAP::Parser::Source> object.
 # new() implementation supplied by TAP::Object
 
 sub _initialize {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
     $self->{switches} = [];
-    $self->{parser}   = $args->{parser}; # TODO: accessor
+    $self->{parser}   = $args->{parser};    # TODO: accessor
     _autoflush( \*STDOUT );
     _autoflush( \*STDERR );
     return $self;
@@ -99,10 +99,11 @@ sub get_stream {
     my @command = $self->_get_command
       or $self->_croak('No command found!');
 
-    return $self->{parser}->make_iterator({
-        command => \@command,
-        merge   => $self->merge
-    });
+    return $self->{parser}->make_iterator(
+        {   command => \@command,
+            merge   => $self->merge
+        }
+    );
 }
 
 sub _get_command { return @{ shift->source || [] } }

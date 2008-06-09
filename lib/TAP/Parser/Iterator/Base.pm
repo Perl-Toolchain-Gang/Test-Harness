@@ -45,7 +45,6 @@ Create an iterator.
 
 # new() provided by TAP::Object
 
-
 =head2 Instance Methods
 
 =head3 C<next>
@@ -82,9 +81,8 @@ sub next {
 sub next_raw {
     require Carp;
     my $msg = Carp::longmess('abstract method called directly!');
-    $_[0]->_croak( $msg );
+    $_[0]->_croak($msg);
 }
-
 
 =head3 C<handle_unicode>
 
@@ -108,7 +106,7 @@ The default implementation does nothing.
 =cut
 
 sub get_select_handles {
-    return
+    return;
 }
 
 1;

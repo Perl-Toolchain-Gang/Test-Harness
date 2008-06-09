@@ -168,11 +168,11 @@ sub _initialize {
           or die "Could not execute ($command): $!";
     }
 
-    $self->{out}  = $out;
-    $self->{err}  = $err;
-    $self->{sel}  = $sel;
-    $self->{pid}  = $pid;
-    $self->{exit} = undef;
+    $self->{out}        = $out;
+    $self->{err}        = $err;
+    $self->{sel}        = $sel;
+    $self->{pid}        = $pid;
+    $self->{exit}       = undef;
     $self->{chunk_size} = $chunk_size;
 
     if ( my $teardown = delete $args->{teardown} ) {

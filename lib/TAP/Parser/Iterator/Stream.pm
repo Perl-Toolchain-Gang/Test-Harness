@@ -53,7 +53,6 @@ sub _initialize {
     return $self;
 }
 
-
 =head2 Instance Methods
 
 =head3 C<next>

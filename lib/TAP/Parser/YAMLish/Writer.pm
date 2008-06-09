@@ -5,7 +5,7 @@ use vars qw($VERSION @ISA);
 
 use TAP::Object ();
 
-@ISA = 'TAP::Object';
+@ISA     = 'TAP::Object';
 $VERSION = '3.12';
 
 my $ESCAPE_CHAR = qr{ [ \x00-\x1f \" ] }x;

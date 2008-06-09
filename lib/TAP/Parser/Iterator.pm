@@ -78,9 +78,8 @@ sub next {
 sub next_raw {
     require Carp;
     my $msg = Carp::longmess('abstract method called directly!');
-    $_[0]->_croak( $msg );
+    $_[0]->_croak($msg);
 }
-
 
 =head3 C<handle_unicode>
 
@@ -93,7 +92,6 @@ The default implementation does nothing.
 
 sub handle_unicode { }
 
-
 =head3 C<get_select_handles>
 
 Return a list of filehandles that may be used upstream in a select()
@@ -105,7 +103,7 @@ The default implementation does nothing.
 =cut
 
 sub get_select_handles {
-    return
+    return;
 }
 
 1;

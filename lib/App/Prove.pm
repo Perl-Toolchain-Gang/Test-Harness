@@ -89,7 +89,7 @@ sub _initialize {
 
     # setup defaults:
     for my $key (qw( argv rc_opts includes modules state plugins )) {
-	$self->{$key} = [];
+        $self->{$key} = [];
     }
     $self->{harness_class} = 'TAP::Harness';
     $self->{_state} = App::Prove::State->new( { store => STATE_FILE } );

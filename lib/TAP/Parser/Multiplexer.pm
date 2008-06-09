@@ -60,7 +60,7 @@ Returns a new C<TAP::Parser::Multiplexer> object.
 sub _initialize {
     my $self = shift;
     $self->{select} = IO::Select->new;
-    $self->{avid}   = []; # Parsers that can't select
+    $self->{avid}   = [];                # Parsers that can't select
     $self->{count}  = 0;
     return $self;
 }

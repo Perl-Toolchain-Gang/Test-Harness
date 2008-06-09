@@ -62,7 +62,6 @@ sub new {
     Carp::croak("Could not determine class for\n$token->{type}");
 }
 
-
 =head3 register_type
 
 This lets you override an existing type with your own custom type, or register
@@ -99,6 +98,7 @@ BEGIN {
 
 sub register_type {
     my ( $class, $type, $rclass ) = @_;
+
     # register it blindly, assume they know what they're doing
     $CLASS_FOR{$type} = $rclass;
     return $class;

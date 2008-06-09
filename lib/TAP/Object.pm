@@ -58,7 +58,6 @@ sub new {
     return $self->_initialize(@_);
 }
 
-
 =head2 Instance Methods
 
 =head3 C<_initialize>
@@ -74,7 +73,6 @@ L</_croak>, and L<Carp>.
 sub _initialize {
     return $_[0];
 }
-
 
 =head3 C<_croak>
 
@@ -94,7 +92,6 @@ sub _croak {
     Carp::croak(@_);
     return;
 }
-
 
 1;
 
