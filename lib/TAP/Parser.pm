@@ -386,6 +386,14 @@ sub make_result      { shift->result_factory_class->new(@_); }
       EOF
     );
 
+    my @class_overrides = qw(
+      source_class
+      perl_source_class
+      grammar_class
+      iterator_factory_class
+      result_factory_class
+    );
+
     sub _initialize {
         my ( $self, $arg_for ) = @_;
 
@@ -398,11 +406,7 @@ sub make_result      { shift->result_factory_class->new(@_); }
         $self->SUPER::_initialize( \%args, \@legal_callback );
 
         # get any class overrides out first:
-        for my $key (
-            qw( source_class perl_source_class grammar_class
-            iterator_factory_class result_factory_class )
-          )
-        {
+        for my $key (@class_overrides) {
             my $default_method = "_default_$key";
             my $val = delete $args{$key} || $self->$default_method();
             $self->$key($val);
