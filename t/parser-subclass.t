@@ -13,7 +13,7 @@ BEGIN {
 use strict;
 use vars qw(%INIT %CUSTOM);
 
-use Test::More tests => 16;
+use Test::More tests => 14;
 use File::Spec::Functions qw( catfile );
 
 use_ok( 'TAP::Parser::SubclassTest' );
@@ -55,15 +55,15 @@ my $t_dir = $ENV{PERL_CORE} ? 'lib' : 't';
     is( $CUSTOM{MyResult}, 1, 'make custom result' );
 }
 
-TODO: { # non-perl source
-    local $TODO = 'not yet tested';
-    %INIT = %CUSTOM = ();
-    my $source = catfile( $t_dir, 'subclass_tests', 'non_perl_source' );
-    my $p = TAP::Parser::SubclassTest->new( { source => $source } );
-
-    is( $INIT{MySource}, 1, 'initialized MySource subclass' );
-    is( $INIT{MyIterator}, 1, 'initialized MyIterator subclass' );
-}
+# TODO: { # non-perl source
+#     local $TODO = 'not yet tested';
+#     %INIT = %CUSTOM = ();
+#     my $source = catfile( $t_dir, 'subclass_tests', 'non_perl_source' );
+#     my $p = TAP::Parser::SubclassTest->new( { source => $source } );
+# 
+#     is( $INIT{MySource}, 1, 'initialized MySource subclass' );
+#     is( $INIT{MyIterator}, 1, 'initialized MyIterator subclass' );
+# }
 
 
 #use Data::Dumper;
