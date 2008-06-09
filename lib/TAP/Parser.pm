@@ -404,7 +404,7 @@ sub make_result      { shift->result_factory_class->new(@_); }
           )
         {
             my $default_method = "_default_$key";
-            my $val = delete $args{$key} || $self->$default_method;
+            my $val = delete $args{$key} || $self->$default_method();
             $self->$key($val);
         }
 
