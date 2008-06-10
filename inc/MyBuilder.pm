@@ -76,10 +76,27 @@ sub ACTION_tags {
 sub ACTION_tidy {
     my $self = shift;
 
-    my $pms = $self->find_pm_files;
-    for my $file ( keys %$pms ) {
-        system( 'perltidy', '-b', $file );
-        unlink("$file.bak") if $? == 0;
+    my @extra = qw(
+      Build.PL
+      Makefile.PL
+      bin/prove
+    );
+
+    my %found_files = map {%$_} $self->find_pm_files,
+      $self->_find_file_by_type( 'pm', 't' ),
+      $self->_find_file_by_type( 'pm', 'inc' ),
+      $self->_find_file_by_type( 't',  't' );
+
+    my @files = (
+        keys %found_files,
+        map { $self->localize_file_path($_) } @extra
+    );
+
+    for my $file (@files) {
+        print "$file\n";
+
+        # system( 'perltidy', '-b', $file );
+        # unlink("$file.bak") if $? == 0;
     }
 }
 
