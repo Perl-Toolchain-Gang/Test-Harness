@@ -93,10 +93,8 @@ sub ACTION_tidy {
     );
 
     for my $file (@files) {
-        print "$file\n";
-
-        # system( 'perltidy', '-b', $file );
-        # unlink("$file.bak") if $? == 0;
+        system( 'perltidy', '-b', $file );
+        unlink("$file.bak") if $? == 0;
     }
 }
 
