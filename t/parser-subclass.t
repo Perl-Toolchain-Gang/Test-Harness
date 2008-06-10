@@ -16,30 +16,32 @@ use vars qw(%INIT %CUSTOM);
 use Test::More tests => 14;
 use File::Spec::Functions qw( catfile );
 
-use_ok( 'TAP::Parser::SubclassTest' );
+use_ok('TAP::Parser::SubclassTest');
 
 # TODO: foreach my $source ( ... )
 my $t_dir = $ENV{PERL_CORE} ? 'lib' : 't';
 
-{ # perl source
+{    # perl source
     %INIT = %CUSTOM = ();
     my $source = catfile( $t_dir, 'subclass_tests', 'perl_source' );
     my $p = TAP::Parser::SubclassTest->new( { source => $source } );
-    
+
     # The grammar is lazily constructed so we need to ask for it to
     # trigger it's creation.
     my $grammer = $p->_grammar;
-    
+
     ok( $p->{initialized}, 'new subclassed parser' );
 
-    is( $p->source_class      => 'MySource', 'source_class' );
+    is( $p->source_class      => 'MySource',     'source_class' );
     is( $p->perl_source_class => 'MyPerlSource', 'perl_source_class' );
-    is( $p->grammar_class     => 'MyGrammar', 'grammar_class' );
-    is( $p->iterator_factory_class => 'MyIteratorFactory', 'iterator_factory_class' );
-    is( $p->result_factory_class   => 'MyResultFactory', 'result_factory_class' );
+    is( $p->grammar_class     => 'MyGrammar',    'grammar_class' );
+    is( $p->iterator_factory_class => 'MyIteratorFactory',
+        'iterator_factory_class' );
+    is( $p->result_factory_class => 'MyResultFactory',
+        'result_factory_class' );
 
     is( $INIT{MyPerlSource}, 1, 'initialized MyPerlSource' );
-    is( $INIT{MyGrammar}, 1, 'initialized MyGrammar' );
+    is( $INIT{MyGrammar},    1, 'initialized MyGrammar' );
 
     # make sure overrided make_* methods work...
     %CUSTOM = ();
@@ -60,11 +62,10 @@ my $t_dir = $ENV{PERL_CORE} ? 'lib' : 't';
 #     %INIT = %CUSTOM = ();
 #     my $source = catfile( $t_dir, 'subclass_tests', 'non_perl_source' );
 #     my $p = TAP::Parser::SubclassTest->new( { source => $source } );
-# 
+#
 #     is( $INIT{MySource}, 1, 'initialized MySource subclass' );
 #     is( $INIT{MyIterator}, 1, 'initialized MyIterator subclass' );
 # }
-
 
 #use Data::Dumper;
 #print Dumper( \%INIT );

@@ -13,7 +13,6 @@ use Test::Builder::Module;
 
 my $CLASS = __PACKAGE__;
 
-
 =head1 NAME
 
 Test::Simple - Basic utilities for writing tests.
@@ -80,7 +79,6 @@ will do what you mean (fail if stuff is empty)
 sub ok ($;$) {
     $CLASS->builder->ok(@_);
 }
-
 
 =back
 

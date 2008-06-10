@@ -20,7 +20,7 @@ my %mm_args = (
 );
 
 {
-    local $^W = 0; # Silence warning about non-numeric version    
+    local $^W = 0;    # Silence warning about non-numeric version
     if ( $ExtUtils::MakeMaker::VERSION >= '6.31' ) {
         $mm_args{LICENSE} = 'perl';
     }

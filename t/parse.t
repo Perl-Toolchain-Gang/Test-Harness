@@ -349,7 +349,8 @@ END_TAP
 my $aref = [ split /\n/ => $tap ];
 
 can_ok $PARSER, 'new';
-$parser = $PARSER->new( { stream => TAP::Parser::IteratorFactory->new($aref) } );
+$parser
+  = $PARSER->new( { stream => TAP::Parser::IteratorFactory->new($aref) } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 
 # results() is sane?
@@ -656,7 +657,7 @@ END_TAP
 
     _get_results($parser);
 
-    ok !$parser->failed, 'parser didnt fail';
+    ok !$parser->failed,      'parser didnt fail';
     ok !$parser->todo_passed, '... and todo_passed is false';
     ok $parser->parse_errors, '... and parse_errors is true';
 
@@ -678,8 +679,8 @@ END_TAP
 
     $parser->wait(1);
 
-    ok !$parser->failed, 'parser didnt fail';
-    ok !$parser->todo_passed, '... and todo_passed is false';
+    ok !$parser->failed,       'parser didnt fail';
+    ok !$parser->todo_passed,  '... and todo_passed is false';
     ok !$parser->parse_errors, '... and parse_errors is false';
 
     ok $parser->wait, '... and wait is set';
@@ -691,10 +692,10 @@ END_TAP
     $parser->wait(0);
     $parser->exit(1);
 
-    ok !$parser->failed, 'parser didnt fail';
-    ok !$parser->todo_passed, '... and todo_passed is false';
+    ok !$parser->failed,       'parser didnt fail';
+    ok !$parser->todo_passed,  '... and todo_passed is false';
     ok !$parser->parse_errors, '... and parse_errors is false';
-    ok !$parser->wait, '... and wait is not set';
+    ok !$parser->wait,         '... and wait is not set';
 
     ok $parser->exit, '... and exit is set';
 
@@ -813,8 +814,11 @@ END_TAP
         $parser->_stream($stream);
 
         # build a new grammar
-        my $grammar = TAP::Parser::Grammar->new({ stream => $stream,
-						  parser => $parser });
+        my $grammar = TAP::Parser::Grammar->new(
+            {   stream => $stream,
+                parser => $parser
+            }
+        );
 
         # replace our grammar with this new one
         $parser->_grammar($grammar);
@@ -846,8 +850,11 @@ END_TAP
         $parser->_stream($stream);
 
         # build a new grammar
-        my $grammar = TAP::Parser::Grammar->new({ stream => $stream,
-						  parser => $parser });
+        my $grammar = TAP::Parser::Grammar->new(
+            {   stream => $stream,
+                parser => $parser
+            }
+        );
 
         # replace our grammar with this new one
         $parser->_grammar($grammar);

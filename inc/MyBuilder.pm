@@ -50,7 +50,7 @@ sub ACTION_testreference {
 
 sub ACTION_testauthor {
     my $self = shift;
-    $self->test_files( 'xt/author' );
+    $self->test_files('xt/author');
     $self->ACTION_test;
 }
 
@@ -102,17 +102,18 @@ my @profiling_target = qw( -Mblib bin/prove --timer t/regression.t );
 
 sub ACTION_dprof {
     system( $^X, '-d:DProf', @profiling_target );
-    exec( qw( dprofpp -R ) );
+    exec(qw( dprofpp -R ));
 }
 
 sub ACTION_smallprof {
     system( $^X, '-d:SmallProf', @profiling_target );
     open( FH, 'smallprof.out' ) or die "Can't open smallprof.out: $!";
-    @rows = grep { /\d+:/ } <FH>;
+    @rows = grep {/\d+:/} <FH>;
     close FH;
 
-    @rows = reverse sort { (split(/\s+/,$a))[2] <=> (split(/\s+/,$b))[2] } @rows;
-    @rows = @rows[0..30];
+    @rows = reverse
+      sort { ( split( /\s+/, $a ) )[2] <=> ( split( /\s+/, $b ) )[2] } @rows;
+    @rows = @rows[ 0 .. 30 ];
     print join( '', @rows );
 }
 

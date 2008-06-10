@@ -1,6 +1,5 @@
 #!/usr/bin/perl -wT
 
-
 use strict;
 use lib 't/lib';
 
@@ -207,12 +206,9 @@ is $agg->todo_passed, 1,
   '... and the correct number of unexpectedly succeeded tests';
 ok $agg->has_problems,
   '... and it should report true that there are problems';
-is $agg->get_status, 'PASS',
-  '... and the status should be passing';
-ok !$agg->has_errors,
-  '.... but it should not report any errors';
-ok $agg->all_passed,
-  '... bonus tests should be passing tests, too';
+is $agg->get_status, 'PASS', '... and the status should be passing';
+ok !$agg->has_errors, '.... but it should not report any errors';
+ok $agg->all_passed, '... bonus tests should be passing tests, too';
 
 # 2. !failed && !todo_passed && parse_errors
 

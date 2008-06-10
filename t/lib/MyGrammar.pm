@@ -13,7 +13,7 @@ use TAP::Parser::Grammar;
 sub _initialize {
     my $self = shift;
     $self->SUPER::_initialize(@_);
-    $main::INIT{ref($self)}++;
+    $main::INIT{ ref($self) }++;
     $self->{initialized} = 1;
     return $self;
 }

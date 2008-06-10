@@ -80,15 +80,16 @@ package main;
     local $^W;    # no warnings
 
     my $orig_new = TAP::Parser::Iterator::Process->can('new');
+
     # Avoid "used only once" warning
-    *TAP::Parser::Iterator::Process::new = 
-    *TAP::Parser::Iterator::Process::new = sub {
+    *TAP::Parser::Iterator::Process::new
+      = *TAP::Parser::Iterator::Process::new = sub {
         push @call_log, [ 'new', @_ ];
 
         # And then new turns round and tramples on our args...
         $_[1] = { %{ $_[1] } };
         $orig_new->(@_);
-    };
+      };
 
     # Patch TAP::Formatter::Console;
     my $orig_output = \&TAP::Formatter::Console::_output;

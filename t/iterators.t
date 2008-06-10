@@ -41,8 +41,10 @@ my @schedule = (
         source   => {
             command => [
                 $^X,
-                File::Spec->catfile( ($ENV{PERL_CORE} ? 'lib' : 't'),
-				     'sample-tests', 'out_err_mix' )
+                File::Spec->catfile(
+                    ( $ENV{PERL_CORE} ? 'lib' : 't' ),
+                    'sample-tests', 'out_err_mix'
+                )
             ],
             merge    => 1,
             setup    => $setup,
@@ -194,7 +196,7 @@ SKIP: {
         }
     );
 
-    is $parser->{err}, '', 'confirm we set err to empty string';
+    is $parser->{err}, '',    'confirm we set err to empty string';
     is $parser->{sel}, undef, '...and selector to undef';
 
     # And then we read from the parser to sidestep the Mac OS / open3

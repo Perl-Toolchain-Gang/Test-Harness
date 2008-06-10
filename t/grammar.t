@@ -36,7 +36,7 @@ package main;
 my $stream = SS->new;
 my $parser = EmptyParser->new;
 can_ok $GRAMMAR, 'new';
-my $grammar = $GRAMMAR->new({ stream => $stream, parser => $parser });
+my $grammar = $GRAMMAR->new( { stream => $stream, parser => $parser } );
 isa_ok $grammar, $GRAMMAR, '... and the object it returns';
 
 # Note:  all methods are actually class methods.  See the docs for the reason
@@ -345,7 +345,7 @@ is_deeply $token, $expected,
 {
     my $stream  = SS->new;
     my $parser  = EmptyParser->new;
-    my $grammar = $GRAMMAR->new({ stream => $stream, parser => $parser });
+    my $grammar = $GRAMMAR->new( { stream => $stream, parser => $parser } );
 
     my $plan = '';
 
@@ -359,8 +359,8 @@ is_deeply $token, $expected,
 # _make_plan_token
 
 {
-    my $parser  = EmptyParser->new;
-    my $grammar = $GRAMMAR->new({ parser => $parser });
+    my $parser = EmptyParser->new;
+    my $grammar = $GRAMMAR->new( { parser => $parser } );
 
     my $plan
       = '1..1 # SKIP with explanation';  # trigger warning in _make_plan_token
@@ -389,7 +389,7 @@ is_deeply $token, $expected,
 {
     my $stream  = SS->new;
     my $parser  = EmptyParser->new;
-    my $grammar = $GRAMMAR->new({ stream => $stream, parser => $parser });
+    my $grammar = $GRAMMAR->new( { stream => $stream, parser => $parser } );
 
     $grammar->set_version(13);
 

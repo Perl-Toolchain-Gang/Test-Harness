@@ -58,6 +58,7 @@ like $error, qr/^Could not determine class for.*no_such_type/s,
 # register new Result types:
 can_ok FACTORY, 'register_type';
 {
+
     package MyResult;
     use strict;
     use vars qw($VERSION @ISA);
