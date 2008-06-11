@@ -583,7 +583,7 @@ sub _add_descriptions {
         if ( @$_ == 1 ) {
             $_->[1] = $_->[0];
             $_->[1] =~ s/\.\w+$//
-              if keys %ext > 1;
+              if keys %ext <= 1;
         }
     }
     return @t;
