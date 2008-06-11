@@ -277,7 +277,10 @@ sub tokenize {
     my $self = shift;
 
     my $line = $self->{stream}->next;
-    return unless defined $line;
+    unless ( defined $line ) {
+        delete $self->{parser};    # break circular ref
+        return;
+    }
 
     my $token;
 
