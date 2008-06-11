@@ -571,22 +571,22 @@ sub _add_descriptions {
     my $self = shift;
 
     # First transformation: turn scalars into single element arrays
-    my @t = map { 'ARRAY' eq ref $_ ? $_ : [$_] } @_;
+    my @tests = map { 'ARRAY' eq ref $_ ? $_ : [$_] } @_;
 
     # Work out how many different extensions we have
     my %ext;
-    for (@t) {
-        $ext{$1}++ if $_->[0] =~ /\.(\w+)$/;
+    for my $test (@tests) {
+        $ext{$1}++ if $test->[0] =~ /\.(\w+)$/;
     }
 
-    for (@t) {
-        if ( @$_ == 1 ) {
-            $_->[1] = $_->[0];
-            $_->[1] =~ s/\.\w+$//
+    for my $test (@tests) {
+        if ( @$test == 1 ) {
+            $test->[1] = $test->[0];
+            $test->[1] =~ s/\.\w+$//
               if keys %ext <= 1;
         }
     }
-    return @t;
+    return @tests;
 }
 
 =head3 C<make_scheduler>

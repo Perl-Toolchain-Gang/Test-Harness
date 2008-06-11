@@ -22,7 +22,7 @@ my $HARNESS = 'TAP::Harness';
 my $source_tests = $ENV{PERL_CORE} ? 'lib/source_tests' : 't/source_tests';
 my $sample_tests = $ENV{PERL_CORE} ? 'lib/sample-tests' : 't/sample-tests';
 
-plan tests => 106;
+plan tests => 111;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -819,4 +819,50 @@ sub _runtests {
         $ENV{PERL_TEST_HARNESS_DUMP_TAP},
         $source_tests, 'harness'
     );
+}
+
+{
+
+    # test name munging
+    my @cases = (
+        {   name   => 'all the same',
+            input  => [ 'foo.t', 'bar.t', 'fletz.t' ],
+            output => [
+                [ 'foo.t', 'foo' ], [ 'bar.t', 'bar' ], [ 'fletz.t', 'fletz' ]
+            ],
+        },
+        {   name   => 'all the same, already cooked',
+            input  => [ 'foo.t', [ 'bar.t', 'brip' ], 'fletz.t' ],
+            output => [
+                [ 'foo.t', 'foo' ], [ 'bar.t', 'brip' ],
+                [ 'fletz.t', 'fletz' ]
+            ],
+        },
+        {   name   => 'different exts',
+            input  => [ 'foo.t', 'bar.u', 'fletz.v' ],
+            output => [
+                [ 'foo.t', 'foo.t' ], [ 'bar.u', 'bar.u' ],
+                [ 'fletz.v', 'fletz.v' ]
+            ],
+        },
+        {   name   => 'different exts, one already cooked',
+            input  => [ 'foo.t', [ 'bar.u', 'bam' ], 'fletz.v' ],
+            output => [
+                [ 'foo.t', 'foo.t' ], [ 'bar.u', 'bam' ],
+                [ 'fletz.v', 'fletz.v' ]
+            ],
+        },
+        {   name   => 'different exts, two already cooked',
+            input  => [ 'foo.t', [ 'bar.u', 'bam.q' ], [ 'fletz.v', 'boo' ] ],
+            output => [
+                [ 'foo.t', 'foo.t' ], [ 'bar.u', 'bam.q' ],
+                [ 'fletz.v', 'boo' ]
+            ],
+        },
+    );
+
+    for my $case (@cases) {
+        is_deeply [ TAP::Harness->_add_descriptions( @{ $case->{input} } ) ],
+          $case->{output}, '_add_descriptions: ' . $case->{name};
+    }
 }
