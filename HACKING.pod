@@ -227,6 +227,18 @@ needs work.
 
 =back
 
+=head1 Committing to Subversion
+
+If you have commit access, please bear this in mind.
+
+Development is done either on trunk or a branch, as appropriate:
+
+If it's something that might be controversial, break the build or take a long
+time (more than a couple of weeks) to complete then it'd probably be
+appropriate to branch. Otherwise it can go in trunk.
+
+If in doubt discuss it on the mailing list before you commit.
+
 =cut
 
 =for developer
