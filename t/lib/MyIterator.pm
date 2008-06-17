@@ -15,7 +15,7 @@ sub _initialize {
     $self->SUPER::_initialize(@_);
     $main::INIT{ ref($self) }++;
     $self->{initialized} = 1;
-    $self->{content} = ['whats TAP all about then?', '1..1', 'ok 1' ];
+    $self->{content} = [ 'whats TAP all about then?', '1..1', 'ok 1' ];
     return $self;
 }
 

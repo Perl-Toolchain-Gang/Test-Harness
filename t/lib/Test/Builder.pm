@@ -1613,8 +1613,10 @@ error message.
 sub _sanity_check {
     my $self = shift;
 
-    $self->_whoa( $self->{Curr_Test} < 0,
-        'Says here you ran a negative number of tests!' );
+    $self->_whoa(
+        $self->{Curr_Test} < 0,
+        'Says here you ran a negative number of tests!'
+    );
     $self->_whoa(
         !$self->{Have_Plan} and $self->{Curr_Test},
         'Somehow your tests ran without a plan!'

@@ -35,12 +35,10 @@ my $t_dir = $ENV{PERL_CORE} ? 'lib' : 't';
     is( $p->source_class      => 'MySource',     'source_class' );
     is( $p->perl_source_class => 'MyPerlSource', 'perl_source_class' );
     is( $p->grammar_class     => 'MyGrammar',    'grammar_class' );
-    is(
-        $p->iterator_factory_class => 'MyIteratorFactory',
+    is( $p->iterator_factory_class => 'MyIteratorFactory',
         'iterator_factory_class'
     );
-    is(
-        $p->result_factory_class => 'MyResultFactory',
+    is( $p->result_factory_class => 'MyResultFactory',
         'result_factory_class'
     );
 
