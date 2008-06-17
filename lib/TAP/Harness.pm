@@ -188,7 +188,22 @@ TAP is fine.  You can use this argument to specify the name of the program
 (and optional switches) to run your tests with:
 
   exec => ['/usr/bin/ruby', '-w']
-  
+
+You can also pass a subroutine reference in order to determine and return the
+proper program to run based on a given test script. The subroutine reference
+should expect the TAP::Harness object itself as the first argument, and the
+file name as the second argument. It should return an array reference
+containing the command to be run and including the test file name. It can also
+simply return C<undef>, in which case TAP::Harness will fall back on executing
+the test script in Perl:
+
+  exec => sub {
+      my ( $harness, $test_file ) = @_;
+      # Let Perl tests run.
+      return undef if $test_file =~ /[.]t$/;
+      return [ qw( /usr/bin/ruby -w ), $test_file ] if $test_file =~ /[.]rb$/;
+  }
+
 =item * C<merge>
 
 If C<merge> is true the harness will create parsers that merge STDOUT
@@ -679,11 +694,14 @@ sub _get_parser_args {
     $args{switches}    = \@switches;
     $args{spool}       = $self->_open_spool($test_prog);
     $args{merge}       = $self->merge;
-    $args{exec}        = $self->exec;
     $args{ignore_exit} = $self->ignore_exit;
 
     if ( my $exec = $self->exec ) {
-        $args{exec} = [ @$exec, $test_prog ];
+        $args{exec}
+          = ref $exec eq 'CODE'
+          ? $exec->( $self, $test_prog )
+          : [ @$exec, $test_prog ];
+        $args{source} = $test_prog unless $args{exec};
     }
     else {
         $args{source} = $test_prog;

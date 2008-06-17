@@ -22,7 +22,7 @@ my $HARNESS = 'TAP::Harness';
 my $source_tests = $ENV{PERL_CORE} ? 'lib/source_tests' : 't/source_tests';
 my $sample_tests = $ENV{PERL_CORE} ? 'lib/sample-tests' : 't/sample-tests';
 
-plan tests => 111;
+plan tests => 113;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -526,6 +526,27 @@ SKIP: {
             $ENV{PERL_CORE} ? 'lib/data/catme.1' : 't/data/catme.1'
         );
     };
+
+    my @output = tied($$capture)->dump;
+    my $status = pop @output;
+    like $status, qr{^Result: PASS$},
+      '... and the status line should be correct';
+    pop @output;    # get rid of summary line
+    my $answer = pop @output;
+    is( $answer, "All tests successful.\n", 'cat meows' );
+}
+
+# make sure that we can exec with a code ref.
+{
+    my $capture = IO::c55Capture->new_handle;
+    my $harness = TAP::Harness->new(
+        {   verbosity => -2,
+            stdout    => $capture,
+            exec      => sub {undef},
+        }
+    );
+
+    _runtests( $harness, "$source_tests/harness" );
 
     my @output = tied($$capture)->dump;
     my $status = pop @output;

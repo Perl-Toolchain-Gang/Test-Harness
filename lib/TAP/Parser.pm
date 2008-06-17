@@ -1704,6 +1704,8 @@ support, or just words of encouragement have all been forthcoming.
 
 =item * Matt Kraai
 
+=item * David Wheeler
+
 =back
 
 =head1 AUTHORS
