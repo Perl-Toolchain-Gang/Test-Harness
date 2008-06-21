@@ -21,6 +21,12 @@ use TAP::Parser::Result::YAML    ();
 
 TAP::Parser::ResultFactory - Factory for creating TAP::Parser output objects
 
+=head1 SYNOPSIS
+
+  use TAP::Parser::ResultFactory;
+  my $token  = {...};
+  my $result = TAP::Parser::ResultFactory->make_result( $token );
+
 =head1 VERSION
 
 Version 3.12
@@ -37,32 +43,48 @@ used primarily by L<TAP::Parser::Grammar>.
 
 =head2 METHODS
 
-=head3 new
+=head2 Class Methods
+
+=head3 C<new>
+
+B<Will soon:>
+Creates a new factory class.
+I<Note:> You currently don't need to instantiate a factory in order to use it.
+
+=head3 C<make_result>
 
 Returns an instance the appropriate class for the test token passed in.
 
-  my $result = TAP::Parser::ResultFactory->new($token);
+  my $result = TAP::Parser::ResultFactory->make_result($token);
 
 =cut
 
 # override new() to do some custom factory class action...
 
 sub new {
-    my ( $class, $token ) = @_;
-    my $type = $token->{type};
-
-    # TODO: call $CLASS_FOR{$type}->new !
-
-    # bless their token into the target class:
-    return bless $token => $CLASS_FOR{$type}
-      if exists $CLASS_FOR{$type};
-
-    # or complain:
-    require Carp;
-    Carp::croak("Could not determine class for\n$token->{type}");
+    # cut-down new() method so we can instantiate factories in the future
+    my $class = shift;
+    return $class->make_result( @_ );
 }
 
-=head3 register_type
+sub make_result {
+    my ( $proto, $token ) = @_;
+    my $type   = $token->{type};
+    my $rclass = $proto->class_for( $type );
+    # TODO: call $CLASS_FOR{$type}->new !
+    # for now, rebless their token into the target class:
+    return bless $token => $rclass;
+}
+
+
+=head3 C<class_for>
+
+Takes one argument: C<$type>.  Returns the class for this $type, or C<croak>s
+with an error.
+
+=head3 C<register_type>
+
+Takes two arguments: C<$type>, C<$class>
 
 This lets you override an existing type with your own custom type, or register
 a completely new type, eg:
@@ -96,15 +118,73 @@ BEGIN {
     );
 }
 
+sub class_for {
+    my ( $class, $type ) = @_;
+    # return target class:
+    return $CLASS_FOR{$type} if exists $CLASS_FOR{$type};
+    # or complain:
+    require Carp;
+    Carp::croak("Could not determine class for result type '$type'");
+}
+
 sub register_type {
     my ( $class, $type, $rclass ) = @_;
-
     # register it blindly, assume they know what they're doing
     $CLASS_FOR{$type} = $rclass;
     return $class;
 }
 
 1;
+
+=head1 SUBCLASSING
+
+Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
+
+There are a few things to bear in mind when creating your own
+C<ResultFactory>:
+
+=over 4
+
+=item 1
+
+The factory itself is never instantiated (this I<may> change in the future).
+This means that C<_initialize> is never called.
+
+=item 2
+
+C<TAP::Parser::Result-E<gt>new> is never called, $tokens are reblessed.
+This I<will> change in a future version!
+
+=item 3
+
+L<TAP::Parser::Result> subclasses will register themselves with
+L<TAP::Parser::ResultFactory> directly:
+
+  package MyFooResult;
+  TAP::Parser::ResultFactory->register_type( foo => __PACKAGE__ );
+
+Of course, it's up to you to decide whether or not to ignore them.
+
+=back
+
+=head2 Example
+
+  package MyResultFactory;
+
+  use strict;
+  use vars '@ISA';
+
+  use MyResult;
+  use TAP::Parser::ResultFactory;
+
+  @ISA = qw( TAP::Parser::ResultFactory );
+
+  # force all results to be 'MyResult'
+  sub class_for {
+    return 'MyResult';
+  }
+
+  1;
 
 =head1 SEE ALSO
 

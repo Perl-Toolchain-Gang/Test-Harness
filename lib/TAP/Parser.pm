@@ -348,8 +348,8 @@ The C<result_factory_class> can be customized, as described in L</new>.
 sub make_source      { shift->source_class->new(@_); }
 sub make_perl_source { shift->perl_source_class->new(@_); }
 sub make_grammar     { shift->grammar_class->new(@_); }
-sub make_iterator    { shift->iterator_factory_class->new(@_); }
-sub make_result      { shift->result_factory_class->new(@_); }
+sub make_iterator    { shift->iterator_factory_class->make_iterator(@_); }
+sub make_result      { shift->result_factory_class->make_result(@_); }
 
 {
 
@@ -1661,7 +1661,99 @@ never run. They're reported as parse failures (tests out of sequence).
 
 =head1 SUBCLASSING
 
-This section has not yet been written...
+If you find you need to provide custom functionality (as you would have using
+L<Test::Harness::Straps>), you're in luck: C<TAP::Parser> and friends are
+designed to be easily subclassed.
+
+Before you start, it's important to know a few things:
+
+=over 2
+
+=item 1
+
+All C<TAP::*> objects inherit from L<TAP::Object>.
+
+=item 2
+
+Most C<TAP::*> classes have a I<SUBCLASSING> section to guide you.
+
+=item 3
+
+Note that C<TAP::Parser> is designed to be the central 'maker' - ie: it is
+responsible for creating new objects in the C<TAP::Parser::*> namespace.
+
+This makes it possible for you to have a single point of configuring what
+subclasses should be used, which in turn means that in many cases you'll find
+you only need to sub-class one of the parser's components.
+
+=back
+
+=head2 Parser Components
+
+=head3 Sources
+
+A TAP parser consumes input from a I<source>.  There are currently two types
+of sources: L<TAP::Parser::Source> for general non-perl commands, and
+L<TAP::Parser::Source::Perl>.  You can subclass both of them.  You'll need to
+customize your parser by setting the C<source_class> & C<perl_source_class>
+parameters.  See L</new> for more details.
+
+If you need to customize the objects on creation, subclass L<TAP::Parser> and
+override L</make_source> or L</make_perl_source>.
+
+=head3 Iterators
+
+A TAP parser uses I<iterators> to loop through the I<stream> provided by the
+parser's I<source>.  There are quite a few types of Iterators available.
+Choosing which class to use is the responsibility of the I<iterator factory>.
+
+To create your own iterators you'll have to subclass
+L<TAP::Parser::IteratorFactory> and L<TAP::Parser::Iterator>.  Then you'll
+need to customize the class used by your parser by setting the
+C<iterator_factory_class> parameter.  See L</new> for more details.
+
+If you need to customize the objects on creation, subclass L<TAP::Parser> and
+override L</make_iterator>.
+
+=head3 Results
+
+A TAP parser creates L<TAP::Parser::Result>s as it iterates through the
+input I<stream>.  There are quite a few result types available; choosing
+which class to use is the responsibility of the I<result factory>.
+
+To create your own result types you have two options:
+
+=over 2
+
+=item option 1
+
+Subclass L<TAP::Parser::Result> and register your new result type/class with
+the default L<TAP::Parser::ResultFactory>.
+
+=item option 2
+
+Subclass L<TAP::Parser::ResultFactory> itself and implement your own
+L<TAP::Parser::Result> creation logic.  Then you'll need to customize the
+class used by your parser by setting the C<result_factory_class> parameter.
+See L</new> for more details.
+
+=back
+
+If you need to customize the objects on creation, subclass L<TAP::Parser> and
+override L</make_result>.
+
+=head3 Grammar
+
+L<TAP::Parser::Grammar> is the heart of the parser - it tokenizes the TAP
+input I<stream> and produces results.  If you need to customize its behaviour
+you should probably familiarize yourself with the source first.  Enough
+lecturing.
+
+Subclass L<TAP::Parser::Grammar> and customize your parser by setting the
+C<grammar_class> parameter.  See L</new> for more details.
+
+If you need to customize the objects on creation, subclass L<TAP::Parser> and
+override L</make_grammar>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -1720,7 +1812,7 @@ Michael Peters <mpeters at plusthree dot com>
 
 Leif Eriksen <leif dot eriksen at bigpond dot com>
 
-Steve Purkis <steve at purkis dot ca>
+Steve Purkis <spurkis@cpan.org>
 
 =head1 BUGS
 

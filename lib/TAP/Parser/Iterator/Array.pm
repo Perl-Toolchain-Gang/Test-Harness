@@ -25,23 +25,23 @@ $VERSION = '3.12';
 
   # to use directly:
   use TAP::Parser::Iterator::Array;
-  my $it = TAP::Parser::Iterator::Array->new(\@array);
-
+  my @data = ('foo', 'bar', baz');
+  my $it   = TAP::Parser::Iterator::Array->new(\@data);
   my $line = $it->next;
-
-Originally ripped off from L<Test::Harness>.
 
 =head1 DESCRIPTION
 
-B<FOR INTERNAL USE ONLY!>
+This is a simple iterator wrapper for arrays of scalar content, used by
+L<TAP::Parser>.  Unless you're subclassing, you probably won't need to use
+this module directly.
 
-This is a simple iterator wrapper for arrays.
+=head1 METHODS
 
 =head2 Class Methods
 
 =head3 C<new>
 
-Create an iterator.
+Create an iterator.  Takes one argument: an C<$array_ref>
 
 =head2 Instance Methods
 
@@ -90,6 +90,11 @@ sub next_raw {
 }
 
 1;
+
+
+=head1 ATTRIBUTION
+
+Originally ripped off from L<Test::Harness>.
 
 =head1 SEE ALSO
 

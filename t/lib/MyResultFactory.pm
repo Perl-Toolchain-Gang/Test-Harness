@@ -11,9 +11,8 @@ use TAP::Parser::ResultFactory;
 
 @ISA = qw( TAP::Parser::ResultFactory MyCustom );
 
-sub new {
+sub make_result {
     my $class = shift;
-
     # I know, this is not really being initialized, but
     # for consistency's sake, deal with it :)
     $main::INIT{$class}++;

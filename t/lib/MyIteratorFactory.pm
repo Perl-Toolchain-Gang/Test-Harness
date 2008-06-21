@@ -11,7 +11,7 @@ use TAP::Parser::IteratorFactory;
 
 @ISA = qw( TAP::Parser::IteratorFactory MyCustom );
 
-sub new {
+sub make_iterator {
     my $class = shift;
     return MyIterator->new(@_);
 }

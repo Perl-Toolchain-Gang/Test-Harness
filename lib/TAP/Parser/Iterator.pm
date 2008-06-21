@@ -33,8 +33,11 @@ $VERSION = '3.12';
 
 =head1 DESCRIPTION
 
-This is a simple iterator base class that defines the iterator API.  See
-C<TAP::Parser::IteratorFactory> for a factory class that creates iterators.
+This is a simple iterator base class that defines L<TAP::Parser>'s iterator
+API.  See C<TAP::Parser::IteratorFactory> for the preferred way of creating
+iterators.
+
+=head1 METHODS
 
 =head2 Class Methods
 
@@ -52,11 +55,11 @@ Iterate through it, of course.
 
 =head3 C<next_raw>
 
+B<Note:> this method is abstract and should be overridden.
+
  while ( my $item = $iter->next_raw ) { ... }
 
 Iterate raw input without applying any fixes for quirky input syntax.
-
-I<Note:> this method is abstract and should be overridden.
 
 =cut
 
@@ -81,6 +84,7 @@ sub next_raw {
     $_[0]->_croak($msg);
 }
 
+
 =head3 C<handle_unicode>
 
 If necessary switch the input stream to handle unicode. This only has
@@ -91,6 +95,7 @@ The default implementation does nothing.
 =cut
 
 sub handle_unicode { }
+
 
 =head3 C<get_select_handles>
 
@@ -106,7 +111,50 @@ sub get_select_handles {
     return;
 }
 
+
+=head3 C<wait>
+
+B<Note:> this method is abstract and should be overridden.
+
+ my $wait_status = $iter->wait;
+
+Return the C<wait> status for this iterator.
+
+=head3 C<exit>
+
+B<Note:> this method is abstract and should be overridden.
+
+ my $wait_status = $iter->exit;
+
+Return the C<exit> status for this iterator.
+
+=cut
+
+sub wait {
+    require Carp;
+    my $msg = Carp::longmess('abstract method called directly!');
+    $_[0]->_croak($msg);
+}
+
+sub exit {
+    require Carp;
+    my $msg = Carp::longmess('abstract method called directly!');
+    $_[0]->_croak($msg);
+}
+
+
 1;
+
+=head1 SUBCLASSING
+
+Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
+
+You must override the abstract methods as noted above.
+
+=head2 Example
+
+L<TAP::Parser::Iterator::Array> is probably the easiest example to follow.
+There's not much point repeating it here.
 
 =head1 SEE ALSO
 

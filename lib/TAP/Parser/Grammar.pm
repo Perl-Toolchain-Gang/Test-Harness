@@ -21,6 +21,17 @@ Version 3.12
 
 $VERSION = '3.12';
 
+=head1 SYNOPSIS
+
+  use TAP::Parser::Grammar;
+  my $grammar = $self->make_grammar({
+    stream  => $tap_parser_stream,
+    parser  => $tap_parser,
+    version => 12,
+  });
+
+  my $result = $grammar->tokenize;
+
 =head1 DESCRIPTION
 
 C<TAP::Parser::Grammar> tokenizes lines from a TAP stream and constructs
@@ -31,12 +42,9 @@ here to ensure that we will be able to have pluggable grammars when TAP is
 expanded at some future date (plus, this stuff was really cluttering the
 parser).
 
-=cut
-
-##############################################################################
+=head1 METHODS
 
 =head2 Class Methods
-
 
 =head3 C<new>
 
@@ -483,6 +491,8 @@ sub _trim {
     return $data;
 }
 
+1;
+
 =head1 TAP GRAMMAR
 
 B<NOTE:>  This grammar is slightly out of date.  There's still some discussion
@@ -554,7 +564,18 @@ A formal grammar would look similar to the following:
  positiveInteger    ::= ( digit - '0' ) {digit}
  nonNegativeInteger ::= digit {digit}
 
+=head1 SUBCLASSING
+
+Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
+
+If you I<really> want to subclass L<TAP::Parser>'s grammar the best thing to
+do is read through the code.  There's no easy way of summarizing it here.
+
+=head1 SEE ALSO
+
+L<TAP::Object>,
+L<TAP::Parser>,
+L<TAP::Parser::Iterator>,
+L<TAP::Parser::Result>,
 
 =cut
-
-1;

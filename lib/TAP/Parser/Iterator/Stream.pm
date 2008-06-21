@@ -25,17 +25,17 @@ $VERSION = '3.12';
 
   # to use directly:
   use TAP::Parser::Iterator::Stream;
-  my $it = TAP::Parser::Iterator::Stream->new(\*TEST);
-
+  open( TEST, 'test.tap' );
+  my $it   = TAP::Parser::Iterator::Stream->new(\*TEST);
   my $line = $it->next;
-
-Originally ripped off from L<Test::Harness>.
 
 =head1 DESCRIPTION
 
-B<FOR INTERNAL USE ONLY!>
+This is a simple iterator wrapper for reading from filehandles, used by
+L<TAP::Parser>.  Unless you're subclassing, you probably won't need to use
+this module directly.
 
-This is a simple iterator wrapper for filehandles.
+=head1 METHODS
 
 =head2 Class Methods
 
@@ -96,6 +96,10 @@ sub _finish {
 }
 
 1;
+
+=head1 ATTRIBUTION
+
+Originally ripped off from L<Test::Harness>.
 
 =head1 SEE ALSO
 

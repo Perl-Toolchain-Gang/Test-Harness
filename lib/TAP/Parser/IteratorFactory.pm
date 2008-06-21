@@ -25,37 +25,41 @@ $VERSION = '3.12';
 =head1 SYNOPSIS
 
   use TAP::Parser::IteratorFactory;
-  my $iter = TAP::Parser::IteratorFactory->new(\*TEST);
-  my $iter = TAP::Parser::IteratorFactory->new(\@array);
-  my $iter = TAP::Parser::IteratorFactory->new(\%hash);
+  my $iter = TAP::Parser::IteratorFactory->make_iterator(\*TEST);
+  my $iter = TAP::Parser::IteratorFactory->make_iterator(\@array);
+  my $iter = TAP::Parser::IteratorFactory->make_iterator(\%hash);
 
   my $line = $iter->next;
 
-Originally ripped off from L<Test::Harness>.
-
 =head1 DESCRIPTION
 
-B<FOR INTERNAL USE ONLY!>
+This is a factory class for simple iterator wrappers for arrays, filehandles,
+and hashes.
 
-This is a factory class for simple iterator wrappers for arrays and
-filehandles.
+=head1 METHODS
 
 =head2 Class Methods
 
 =head3 C<new>
 
-Create an iterator.  The type of iterator created depends on
-the arguments to the constructor:
+B<Will soon:>
+Creates a new factory class.
+I<Note:> You currently don't need to instantiate a factory in order to use it.
 
-  my $iter = TAP::Parser::Iterator->new( $filehandle );
+=head3 C<make_iterator>
+
+Create an iterator.  The type of iterator created depends on the arguments to
+the constructor:
+
+  my $iter = TAP::Parser::Iterator->make_iterator( $filehandle );
 
 Creates a I<stream> iterator (see L</make_stream_iterator>).
 
-  my $iter = TAP::Parser::Iterator->new( $array_reference );
+  my $iter = TAP::Parser::Iterator->make_iterator( $array_reference );
 
 Creates an I<array> iterator (see L</make_array_iterator>).
 
-  my $iter = TAP::Parser::Iterator->new( $hash_reference );
+  my $iter = TAP::Parser::Iterator->make_iterator( $hash_reference );
 
 Creates a I<process> iterator (see L</make_process_iterator>).
 
@@ -64,6 +68,12 @@ Creates a I<process> iterator (see L</make_process_iterator>).
 # override new() to do some custom factory class action...
 
 sub new {
+    # cut-down new() method so we can instantiate factories in the future
+    my $class = shift;
+    return $class->make_iterator( @_ );
+}
+
+sub make_iterator {
     my ( $proto, $thing ) = @_;
 
     my $ref = ref $thing;
@@ -80,6 +90,7 @@ sub new {
         die "Can't iterate with a $ref";
     }
 }
+
 
 =head3 C<make_stream_iterator>
 
@@ -114,6 +125,47 @@ sub make_process_iterator {
 }
 
 1;
+
+
+=head1 SUBCLASSING
+
+Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
+
+There are a few things to bear in mind when creating your own
+C<ResultFactory>:
+
+=over 4
+
+=item 1
+
+The factory itself is never instantiated (this I<may> change in the future).
+This means that C<_initialize> is never called.
+
+=back
+
+=head2 Example
+
+  package MyIteratorFactory;
+
+  use strict;
+  use vars '@ISA';
+
+  use MyStreamIterator;
+  use TAP::Parser::IteratorFactory;
+
+  @ISA = qw( TAP::Parser::IteratorFactory );
+
+  # override stream iterator
+  sub make_stream_iterator {
+    my $proto = shift;
+    MyStreamIterator->new(@_);
+  }
+
+  1;
+
+=head1 ATTRIBUTION
+
+Originally ripped off from L<Test::Harness>.
 
 =head1 SEE ALSO
 

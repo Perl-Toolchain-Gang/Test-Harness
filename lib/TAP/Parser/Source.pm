@@ -23,15 +23,15 @@ Version 3.12
 
 $VERSION = '3.12';
 
-=head1 DESCRIPTION
-
-Takes a command and hopefully returns a stream from it.
-
 =head1 SYNOPSIS
 
  use TAP::Parser::Source;
  my $source = TAP::Parser::Source->new({ parser => $parser });
  my $stream = $source->source(['/usr/bin/ruby', 'mytest.rb'])->get_stream;
+
+=head1 DESCRIPTION
+
+Takes a command and hopefully returns a stream from it.
 
 =head1 METHODS
 
@@ -69,8 +69,8 @@ sub _initialize {
  $source->source(['/usr/bin/ruby', 't/ruby_test.rb']);
 
 Getter/setter for the source.  The source should generally consist of an array
-reference of strings which, when executed via L<&IPC::Open3::open3|IPC::Open3>, should
-return a filehandle which returns successive rows of TAP.
+reference of strings which, when executed via L<&IPC::Open3::open3|IPC::Open3>,
+should return a filehandle which returns successive rows of TAP.
 
 =cut
 
@@ -171,3 +171,20 @@ sub _autoflush {
 }
 
 1;
+
+=head1 SUBCLASSING
+
+Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
+
+=head2 Example
+
+Not yet.
+
+=head1 SEE ALSO
+
+L<TAP::Object>,
+L<TAP::Parser>,
+L<TAP::Parser::Source::Perl>,
+
+=cut
+
