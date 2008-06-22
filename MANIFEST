@@ -29,7 +29,6 @@ lib/TAP/Parser/Aggregator.pm
 lib/TAP/Parser/Grammar.pm
 lib/TAP/Parser/Iterator.pm
 lib/TAP/Parser/Iterator/Array.pm
-lib/TAP/Parser/Iterator/Base.pm
 lib/TAP/Parser/Iterator/Process.pm
 lib/TAP/Parser/Iterator/Stream.pm
 lib/TAP/Parser/IteratorFactory.pm
