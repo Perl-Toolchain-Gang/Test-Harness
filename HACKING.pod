@@ -111,6 +111,17 @@ Exceptions should be raised with L<Carp>:
   require Carp;
   Carp::confess("Unsupported syntax version: $version");
 
+=head1 Deprecation cycle
+
+Any I<documented> sub that needs to be changed or removed (and would therefore
+cause a backwards-compat issue) must go through a deprecation cycle to give
+developers a chance to adjust:
+
+  1. Document the deprecation
+  2. Release
+  3. Change the code
+  4. Release
+
 =head1 Documentation
 
 The end-user and API documentation is all in the 'lib/' directory.  In

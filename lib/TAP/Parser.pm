@@ -1686,6 +1686,14 @@ This makes it possible for you to have a single point of configuring what
 subclasses should be used, which in turn means that in many cases you'll find
 you only need to sub-class one of the parser's components.
 
+=item 4
+
+By subclassing, you may end up overriding undocumented methods.  That's not
+a bad thing per se, but be forewarned that undocumented methods may change
+without warning from one release to the next - we cannot guarantee backwards
+compatability.  If any I<documented> method needs changing, it will be
+deprecated first, and changed in a later release.
+
 =back
 
 =head2 Parser Components
