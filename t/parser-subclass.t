@@ -76,7 +76,7 @@ SKIP: {    # non-perl source
     %INIT = %CUSTOM = ();
     my $cat = '/bin/cat';
     unless ( -e $cat ) {
-        skip "no '$cat'", 2;
+        skip "no '$cat'", 4;
     }
     my $file = catfile( $t_dir, 'data', 'catme.1' );
     my $p = TAP::Parser::SubclassTest->new( { exec => [ $cat => $file ] } );
@@ -86,7 +86,3 @@ SKIP: {    # non-perl source
     is( $INIT{MyIterator},   1, 'initialized MyIterator subclass' );
     is( $CUSTOM{MyIterator}, 1, '... and it was customized' );
 }
-
-#use Data::Dumper;
-#print Dumper( \%INIT );
-#print Dumper( \%CUSTOM );
