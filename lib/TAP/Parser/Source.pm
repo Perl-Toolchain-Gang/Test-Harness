@@ -112,53 +112,6 @@ sub _get_command { return @{ shift->source || [] } }
 
 ##############################################################################
 
-=head3 C<error>
-
- unless ( my $stream = $source->get_stream ) {
-     die $source->error;
- }
-
-If a stream cannot be created, this method will return the error.
-
-I<Note:> this function may be removed in a future release.
-
-=cut
-
-# TODO: deprecate?
-# spurkis: is this actually used?  Not used by the Parser, and only referred
-# to once in the testsuite.
-sub error {
-    my $self = shift;
-    return $self->{error} unless @_;
-    $self->{error} = shift;
-    return $self;
-}
-
-##############################################################################
-
-=head3 C<exit>
-
-  my $exit = $source->exit;
-
-Returns the exit status of the process I<if and only if> an error occurs in
-opening the file.
-
-I<Note:> this function may be removed in a future release.
-
-=cut
-
-# TODO: deprecate?
-# spurkis: is this actually used?  Not used by the Parser, and only referred
-# to once in the testsuite.  What's more, see iterator->exit.
-sub exit {
-    my $self = shift;
-    return $self->{exit} unless @_;
-    $self->{exit} = shift;
-    return $self;
-}
-
-##############################################################################
-
 =head3 C<merge>
 
   my $merge = $source->merge;

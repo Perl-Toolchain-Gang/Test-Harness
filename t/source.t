@@ -12,7 +12,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 30;
+use Test::More tests => 26;
 
 use File::Spec;
 
@@ -96,36 +96,3 @@ ok( grep( $_ =~ /^['"]?-T['"]?$/, $source->_switches ),
     like pop @die, qr/No command found!/, '...and it failed as expect';
 }
 
-{
-
-    # coverage testing for error
-
-    my $source = TAP::Parser::Source->new( { parser => $parser } );
-
-    my $error = $source->error;
-
-    is $error, undef, 'coverage testing for error()';
-
-    $source->error('save me');
-
-    $error = $source->error;
-
-    is $error, 'save me', '...and we got the expected message';
-}
-
-{
-
-    # coverage testing for exit
-
-    my $source = TAP::Parser::Source->new( { parser => $parser } );
-
-    my $exit = $source->exit;
-
-    is $exit, undef, 'coverage testing for exit()';
-
-    $source->exit('save me');
-
-    $exit = $source->exit;
-
-    is $exit, 'save me', '...and we got the expected message';
-}
