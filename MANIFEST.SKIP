@@ -30,5 +30,6 @@
 ^reference/
 ^misc/
 ^tmon.out$
+^tags$
 ^harness_runs.db$
 
