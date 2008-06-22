@@ -5,6 +5,7 @@ Revision history for Test-Harness
           configurable factories for most of the major internal classes.
         - applied David Wheeler's patch to allow exec to be a code
           reference.
+        - made tests more robust in the presence of -MFoo in PERL5OPT.
 
 3.11    2008-06-09
         - applied Jim Keenan's patch that makes App::Prove::run return a
