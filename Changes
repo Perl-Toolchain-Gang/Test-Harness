@@ -1,6 +1,6 @@
 Revision history for Test-Harness
 
-3.12    ****-**-**
+3.12    2008-06-22
         - applied Steve Purkis' huge refactoring patch which adds
           configurable factories for most of the major internal classes.
         - applied David Wheeler's patch to allow exec to be a code
