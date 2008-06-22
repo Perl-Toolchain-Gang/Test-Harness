@@ -24,8 +24,9 @@ TAP::Parser::ResultFactory - Factory for creating TAP::Parser output objects
 =head1 SYNOPSIS
 
   use TAP::Parser::ResultFactory;
-  my $token  = {...};
-  my $result = TAP::Parser::ResultFactory->make_result( $token );
+  my $token   = {...};
+  my $factory = TAP::Parser::ResultFactory->new;
+  my $result  = $factory->make_result( $token );
 
 =head1 VERSION
 
@@ -48,9 +49,6 @@ you probably won't need to use this module directly.
 
 =head3 C<new>
 
-B<DEPRECATED>: simply calls L</make_result>.
-
-B<Will soon:>
 Creates a new factory class.
 I<Note:> You currently don't need to instantiate a factory in order to use it.
 
@@ -60,15 +58,9 @@ Returns an instance the appropriate class for the test token passed in.
 
   my $result = TAP::Parser::ResultFactory->make_result($token);
 
+Can also be called as an instance method.
+
 =cut
-
-# override new() to do some custom factory class action...
-
-sub new {
-    # cut-down new() method so we can instantiate factories in the future
-    my $class = shift;
-    return $class->make_result( @_ );
-}
 
 sub make_result {
     my ( $proto, $token ) = @_;

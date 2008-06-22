@@ -20,7 +20,8 @@ not ok 4 - this is a real failure
 ok 5 # skip we have no description
 END_TAP
 
-my $stream = TAP::Parser::IteratorFactory->new( [ split /\n/ => $tap ] );
+my $factory = TAP::Parser::IteratorFactory->new;
+my $stream  = $factory->make_iterator( [ split /\n/ => $tap ] );
 isa_ok $stream, 'TAP::Parser::Iterator';
 
 my $parser1 = TAP::Parser->new( { stream => $stream } );

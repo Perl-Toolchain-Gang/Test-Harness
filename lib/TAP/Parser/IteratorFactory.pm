@@ -25,16 +25,18 @@ $VERSION = '3.12';
 =head1 SYNOPSIS
 
   use TAP::Parser::IteratorFactory;
-  my $iter = TAP::Parser::IteratorFactory->make_iterator(\*TEST);
-  my $iter = TAP::Parser::IteratorFactory->make_iterator(\@array);
-  my $iter = TAP::Parser::IteratorFactory->make_iterator(\%hash);
+  my $factory = TAP::Parser::IteratorFactory->new;
+  my $iter = $factory->make_iterator(\*TEST);
+  my $iter = $factory->make_iterator(\@array);
+  my $iter = $factory->make_iterator(\%hash);
 
   my $line = $iter->next;
 
 =head1 DESCRIPTION
 
 This is a factory class for simple iterator wrappers for arrays, filehandles,
-and hashes.
+and hashes.  Unless you're subclassing, you probably won't need to use this
+module directly.
 
 =head1 METHODS
 
@@ -42,9 +44,6 @@ and hashes.
 
 =head3 C<new>
 
-B<DEPRECATED>: simply calls L</make_iterator>.
-
-B<Will soon:>
 Creates a new factory class.
 I<Note:> You currently don't need to instantiate a factory in order to use it.
 
@@ -66,14 +65,6 @@ Creates an I<array> iterator (see L</make_array_iterator>).
 Creates a I<process> iterator (see L</make_process_iterator>).
 
 =cut
-
-# override new() to do some custom factory class action...
-
-sub new {
-    # cut-down new() method so we can instantiate factories in the future
-    my $class = shift;
-    return $class->make_iterator( @_ );
-}
 
 sub make_iterator {
     my ( $proto, $thing ) = @_;

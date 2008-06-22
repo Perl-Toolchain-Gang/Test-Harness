@@ -26,8 +26,9 @@ Bail out!  We ran out of foobar.
 not ok 5
 END_TAP
 
-my $parser = TAP::Parser->new(
-    {   stream => TAP::Parser::IteratorFactory->new( tap_to_lines($tap) ),
+my $factory = TAP::Parser::IteratorFactory->new;
+my $parser  = TAP::Parser->new(
+    {   stream => $factory->make_iterator( tap_to_lines($tap) ),
     }
 );
 
@@ -106,7 +107,7 @@ my $more_tap = "1..1\nok 1 - input file opened\n";
 
 my $second_parser = TAP::Parser->new(
     {   stream =>
-          TAP::Parser::IteratorFactory->new( [ split( /\n/, $more_tap ) ] ),
+          $factory->make_iterator( [ split( /\n/, $more_tap ) ] ),
     }
 );
 

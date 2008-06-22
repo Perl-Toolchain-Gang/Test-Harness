@@ -41,6 +41,8 @@ my ( $PARSER, $PLAN, $PRAGMA, $TEST, $COMMENT, $BAILOUT, $UNKNOWN, $YAML, $VERSI
   TAP::Parser::Result::Version
 );
 
+my $factory = TAP::Parser::IteratorFactory->new;
+
 my $tap = <<'END_TAP';
 TAP version 13
 1..7
@@ -349,8 +351,7 @@ END_TAP
 my $aref = [ split /\n/ => $tap ];
 
 can_ok $PARSER, 'new';
-$parser
-  = $PARSER->new( { stream => TAP::Parser::IteratorFactory->new($aref) } );
+$parser = $PARSER->new( { stream => $factory->make_iterator($aref) } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 
 # results() is sane?

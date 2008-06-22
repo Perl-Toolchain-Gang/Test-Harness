@@ -3,12 +3,11 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 226;
+use Test::More tests => 227;
 
 use TAP::Parser::ResultFactory;
 use TAP::Parser::Result;
 
-use constant FACTORY => 'TAP::Parser::ResultFactory';
 use constant RESULT  => 'TAP::Parser::Result';
 use constant PLAN    => 'TAP::Parser::Result::Plan';
 use constant TEST    => 'TAP::Parser::Result::Test';
@@ -24,6 +23,7 @@ $SIG{__WARN__} = sub { $warning = shift };
 # found in the regression tests.
 #
 
+my $factory = TAP::Parser::ResultFactory->new;
 my %inherited_methods = (
     is_plan    => '',
     is_test    => '',
@@ -49,16 +49,16 @@ like $warning, qr/^\Qpassed() is deprecated.  Please use "is_ok()"/,
 
 can_ok RESULT, 'new';
 
-can_ok FACTORY, 'new';
-eval { FACTORY->new( { type => 'no_such_type' } ) };
+can_ok $factory, 'make_result';
+eval { $factory->make_result( { type => 'no_such_type' } ) };
 ok my $error = $@, '... and calling it with an unknown class should fail';
 like $error, qr/^Could not determine class for.*no_such_type/s,
   '... with an appropriate error message';
 
 # register new Result types:
-can_ok FACTORY, 'register_type';
+can_ok $factory, 'class_for';
+can_ok $factory, 'register_type';
 {
-
     package MyResult;
     use strict;
     use vars qw($VERSION @ISA);
@@ -67,7 +67,7 @@ can_ok FACTORY, 'register_type';
 }
 
 {
-    my $r = eval { FACTORY->new( { type => 'my_type' } ) };
+    my $r = eval { $factory->make_result( { type => 'my_type' } ) };
     my $error = $@;
     isa_ok( $r, 'MyResult', 'register custom type' );
     ok( !$error, '... and no error' );
@@ -268,7 +268,7 @@ sub run_tests {
 sub instantiate {
     my $instantiated = shift;
     my $class        = $instantiated->{class};
-    ok my $result = FACTORY->new( $instantiated->{data} ),
+    ok my $result = $factory->make_result( $instantiated->{data} ),
       'Creating $class results should succeed';
     isa_ok $result, $class, '.. and the object it returns';
     return $result;
