@@ -1,9 +1,2 @@
 print "1..1\n";
-
-# If someone loaded a module using PERL5OPT we're unsafe
-if ( $ENV{PERL5OPT} =~ m{(?:^|\s)-[dM]} ) {
-    print "not ok 1\n";
-}
-else {
-    print $INC{'strict.pm'} ? "ok 1\n" : "not ok 1\n";
-}
+print $INC{'strict.pm'} ? "ok 1\n" : "not ok 1\n";
