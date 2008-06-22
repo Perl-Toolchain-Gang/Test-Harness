@@ -42,6 +42,8 @@ and hashes.
 
 =head3 C<new>
 
+B<DEPRECATED>: simply calls L</make_iterator>.
+
 B<Will soon:>
 Creates a new factory class.
 I<Note:> You currently don't need to instantiate a factory in order to use it.

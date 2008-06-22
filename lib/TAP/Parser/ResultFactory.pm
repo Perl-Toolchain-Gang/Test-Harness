@@ -37,15 +37,18 @@ $VERSION = '3.12';
 
 =head2 DESCRIPTION
 
-This is merely a factory class which returns a L<TAP::Parser::Result> subclass
-representing the current bit of test data from TAP (usually a line).  It is
-used primarily by L<TAP::Parser::Grammar>.
+This is a simple factory class which returns a L<TAP::Parser::Result> subclass
+representing the current bit of test data from TAP (usually a single line).
+It is used primarily by L<TAP::Parser::Grammar>.  Unless you're subclassing,
+you probably won't need to use this module directly.
 
 =head2 METHODS
 
 =head2 Class Methods
 
 =head3 C<new>
+
+B<DEPRECATED>: simply calls L</make_result>.
 
 B<Will soon:>
 Creates a new factory class.
@@ -70,10 +73,7 @@ sub new {
 sub make_result {
     my ( $proto, $token ) = @_;
     my $type   = $token->{type};
-    my $rclass = $proto->class_for( $type );
-    # TODO: call $CLASS_FOR{$type}->new !
-    # for now, rebless their token into the target class:
-    return bless $token => $rclass;
+    return $proto->class_for( $type )->new( $token );
 }
 
 
@@ -92,7 +92,7 @@ a completely new type, eg:
   # create a custom result type:
   package MyResult;
   use strict;
-  use vars qw($VERSION @ISA);
+  use vars qw(@ISA);
   @ISA = 'TAP::Parser::Result';
 
   # register with the factory:

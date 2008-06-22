@@ -8,7 +8,6 @@ use TAP::Object ();
 @ISA = 'TAP::Object';
 
 BEGIN {
-
     # make is_* methods
     my @attrs = qw( plan pragma test comment bailout version unknown yaml );
     no strict 'refs';
@@ -32,14 +31,22 @@ Version 3.12
 
 $VERSION = '3.12';
 
+=head1 SYNOPSIS
+
+  # abstract class - not meany to be used directly
+  # see TAP::Parser::ResultFactory for preferred usage
+
+  # directly:
+  use TAP::Parser::Result;
+  my $token  = {...};
+  my $result = TAP::Parser::Result->new( $token );
+
 =head2 DESCRIPTION
 
-This is a base class for objects representing the current bit of test data from
-TAP (usually a line).
-
-=cut
-
-##############################################################################
+This is a simple base class used by L<TAP::Parser> to store objects that
+represent the current bit of test output data from TAP (usually a single
+line).  Unless you're subclassing, you probably won't need to use this module
+directly.
 
 =head2 METHODS
 
@@ -55,6 +62,17 @@ Returns an instance the appropriate class for the test token passed in.
 =cut
 
 # new() implementation provided by TAP::Object
+
+sub _initialize {
+    my ($self, $token) = @_;
+    if ($token) {
+	# make a shallow copy of the token:
+	$self->{$_} = $token->{$_} for (keys %$token);
+    }
+    return $self;
+}
+
+##############################################################################
 
 =head2 Boolean methods
 
@@ -236,3 +254,44 @@ sub set_directive {
 }
 
 1;
+
+
+=head1 SUBCLASSING
+
+Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
+
+Remember: if you want your subclass to be automatically used by the parser,
+you'll have to register it with L<TAP::Parser::ResultFactory/register_type>.
+
+If you're creating a completely new result I<type>, you'll probably need to
+subclass L<TAP::Parser::Grammar> too, or else it'll never get used.
+
+=head2 Example
+
+  package MyResult;
+
+  use strict;
+  use vars '@ISA';
+
+  @ISA = 'TAP::Parser::Result';
+
+  # register with the factory:
+  TAP::Parser::ResultFactory->register_type( 'my_type' => __PACKAGE__ );
+
+  sub as_string { 'My results all look the same' }
+
+=head1 SEE ALSO
+
+L<TAP::Object>,
+L<TAP::Parser>,
+L<TAP::Parser::ResultFactory>,
+L<TAP::Parser::Result::Bailout>,
+L<TAP::Parser::Result::Comment>,
+L<TAP::Parser::Result::Plan>,
+L<TAP::Parser::Result::Pragma>,
+L<TAP::Parser::Result::Test>,
+L<TAP::Parser::Result::Unknown>,
+L<TAP::Parser::Result::Version>,
+L<TAP::PARSER::RESULT::YAML>,
+
+=cut
