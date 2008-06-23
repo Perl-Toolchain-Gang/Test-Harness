@@ -298,8 +298,6 @@ This method merely runs the parser and parses all of the TAP.
 sub run {
     my $self = shift;
     while ( defined( my $result = $self->next ) ) {
-
-        print $result->as_string, "\n";
         # do nothing
     }
 }
