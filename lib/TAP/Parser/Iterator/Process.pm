@@ -311,6 +311,9 @@ sub _finish {
 
     my $status = $?;
 
+    # Avoid circular refs
+    $self->{_next} = sub {return};
+
     # If we have a subprocess we need to wait for it to terminate
     if ( defined $self->{pid} ) {
         if ( $self->{pid} == waitpid( $self->{pid}, 0 ) ) {

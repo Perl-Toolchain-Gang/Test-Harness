@@ -1447,6 +1447,15 @@ sub _finish {
 
     $self->end_time( $self->get_time );
 
+    # Avoid leaks
+    $self->_stream(undef);
+    $self->_grammar(undef);
+
+    # If we just delete the iter we won't get a fault if it's
+    # recreated. Instead we set it to a sub that returns an infinite
+    # stream of undef
+    $self->{_iter} = sub {return};
+
     # sanity checks
     if ( !$self->plan ) {
         $self->_add_error('No plan found in TAP output');

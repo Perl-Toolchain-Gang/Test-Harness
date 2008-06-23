@@ -227,6 +227,11 @@ sub _closures {
         },
 
         close_test => sub {
+
+            # Avoid circular references
+            $self->parser(undef);
+            $self->{_closures} = {};
+
             return if $really_quiet;
 
             if ($show_count) {
