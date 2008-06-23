@@ -38,6 +38,13 @@ sub ACTION_testprove {
     exec( $^X, '-Iblib/lib', 'bin/prove', '-b', '-r', 't' );
 }
 
+sub ACTION_testleaks {
+    my $self = shift;
+    $self->depends_on('code');
+    exec( $^X, '-MDevel::Leak::Object=GLOBAL_bless', '-Iblib/lib',
+        'bin/prove', '-b', '-r', 't' );
+}
+
 sub ACTION_testreference {
     my $self = shift;
     $self->depends_on('code');
