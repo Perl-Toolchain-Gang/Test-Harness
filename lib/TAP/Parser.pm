@@ -299,6 +299,7 @@ sub run {
     my $self = shift;
     while ( defined( my $result = $self->next ) ) {
 
+        print $result->as_string, "\n";
         # do nothing
     }
 }
@@ -1451,10 +1452,12 @@ sub _finish {
     $self->_stream(undef);
     $self->_grammar(undef);
 
-    # If we just delete the iter we won't get a fault if it's
-    # recreated. Instead we set it to a sub that returns an infinite
-    # stream of undef
-    $self->{_iter} = sub {return};
+    # If we just delete the iter we won't get a fault if it's recreated.
+    # Instead we set it to a sub that returns an infinite
+    # stream of undef. This segfaults on 5.5.4, presumably because
+    # we're still executing the closure that gets replaced and it hasn't
+    # been protected with a refcount.
+    $self->{_iter} = sub {return} if $] >= 5.006;
 
     # sanity checks
     if ( !$self->plan ) {

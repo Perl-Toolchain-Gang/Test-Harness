@@ -312,7 +312,7 @@ sub _finish {
     my $status = $?;
 
     # Avoid circular refs
-    $self->{_next} = sub {return};
+    $self->{_next} = sub {return} if $] >= 5.006;
 
     # If we have a subprocess we need to wait for it to terminate
     if ( defined $self->{pid} ) {
