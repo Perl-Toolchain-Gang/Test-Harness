@@ -118,9 +118,10 @@ cause a backwards-compat issue) must go through a deprecation cycle to give
 developers a chance to adjust:
 
   1. Document the deprecation
-  2. Release
-  3. Change the code
-  4. Release
+  2. Carp a suitable message
+  3. Release
+  4. Change the code
+  5. Release
 
 =head1 Documentation
 
