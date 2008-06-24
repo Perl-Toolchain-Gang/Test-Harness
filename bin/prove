@@ -23,7 +23,7 @@ Boolean options:
 
  -v,  --verbose     Print all test lines.
  -l,  --lib         Add 'lib' to the path for your tests (-Ilib).
- -b,  --blib        Add 'blib/lib' to the path for your tests (-Iblib/lib).
+ -b,  --blib        Add 'blib/lib' and 'blib/arch' to the path for your tests
  -s,  --shuffle     Run the tests in random order.
  -c,  --color       Colored test output (default).
       --nocolor     Do not color test output.
