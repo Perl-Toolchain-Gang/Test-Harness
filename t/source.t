@@ -29,7 +29,7 @@ my $test   = File::Spec->catfile(
 my $perl = $^X;
 
 can_ok 'TAP::Parser::Source', 'new';
-my $source = TAP::Parser::Source->new( { parser => $parser } );
+my $source = TAP::Parser::Source->new;
 isa_ok $source, 'TAP::Parser::Source';
 
 can_ok $source, 'source';
@@ -41,7 +41,7 @@ ok $source->source( [ $perl, '-It/lib', '-T', $test ] ),
   '... and calling it with valid args should succeed';
 
 can_ok $source, 'get_stream';
-my $stream = $source->get_stream;
+my $stream = $source->get_stream($parser);
 
 isa_ok $stream, 'TAP::Parser::Iterator::Process',
   'get_stream returns the right object';
@@ -51,7 +51,7 @@ is $stream->next, 'ok 1', '... as should the second';
 ok !$stream->next, '... and we should have no more results';
 
 can_ok 'TAP::Parser::Source::Perl', 'new';
-$source = TAP::Parser::Source::Perl->new( { parser => $parser } );
+$source = TAP::Parser::Source::Perl->new;
 isa_ok $source, 'TAP::Parser::Source::Perl', '... and the object it returns';
 
 can_ok $source, 'source';
@@ -59,7 +59,7 @@ ok $source->source( [$test] ),
   '... and calling it with valid args should succeed';
 
 can_ok $source, 'get_stream';
-$stream = $source->get_stream;
+$stream = $source->get_stream($parser);
 
 isa_ok $stream, 'TAP::Parser::Iterator::Process',
   '... and the object it returns';

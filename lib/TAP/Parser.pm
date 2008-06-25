@@ -298,6 +298,7 @@ This method merely runs the parser and parses all of the TAP.
 sub run {
     my $self = shift;
     while ( defined( my $result = $self->next ) ) {
+
         # do nothing
     }
 }
@@ -349,6 +350,20 @@ sub make_perl_source { shift->perl_source_class->new(@_); }
 sub make_grammar     { shift->grammar_class->new(@_); }
 sub make_iterator    { shift->iterator_factory_class->make_iterator(@_); }
 sub make_result      { shift->result_factory_class->make_result(@_); }
+
+sub _iterator_for_source {
+    my ( $self, $source ) = @_;
+
+    # If the source has a get_stream method then use it. This makes it
+    # possible to pass a pre-existing source object to the parser's
+    # constructor.
+    if ( UNIVERSAL::can( $source, 'can' ) && $source->can('get_stream') ) {
+        return $source->get_stream($self);
+    }
+    else {
+        return $self->iterator_factory_class->make_iterator($source);
+    }
+}
 
 {
 
@@ -432,27 +447,27 @@ sub make_result      { shift->result_factory_class->make_result(@_); }
         }
 
         if ($tap) {
-            $stream = $self->make_iterator( [ split "\n" => $tap ] );
+            $stream = $self->_iterator_for_source( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
-            my $source = $self->make_source( { parser => $self } );
+            my $source = $self->make_source;
             $source->source( [ @$exec, @test_args ] );
             $source->merge($merge);    # XXX should just be arguments?
-            $stream = $source->get_stream;
+            $stream = $source->get_stream($self);
         }
         elsif ($source) {
-            if ( my $ref = ref $source ) {
-                $stream = $self->make_iterator($source);
+            if ( ref $source ) {
+                $stream = $self->_iterator_for_source($source);
             }
             elsif ( -e $source ) {
-                my $perl = $self->make_perl_source( { parser => $self } );
+                my $perl = $self->make_perl_source;
 
                 $perl->switches($switches)
                   if $switches;
 
                 $perl->merge($merge);    # XXX args to new()?
                 $perl->source( [ $source, @test_args ] );
-                $stream = $perl->get_stream;
+                $stream = $perl->get_stream($self);
             }
             else {
                 $self->_croak("Cannot determine source for $source");
@@ -1455,7 +1470,8 @@ sub _finish {
     # stream of undef. This segfaults on 5.5.4, presumably because
     # we're still executing the closure that gets replaced and it hasn't
     # been protected with a refcount.
-    $self->{_iter} = sub {return} if $] >= 5.006;
+    $self->{_iter} = sub {return}
+      if $] >= 5.006;
 
     # sanity checks
     if ( !$self->plan ) {
