@@ -273,6 +273,7 @@ Any keys for which the value is C<undef> will be ignored.
       before_runtests
       after_runtests
       after_test
+      job_done
     );
 
     sub _initialize {
@@ -393,7 +394,11 @@ sub summary {
 sub _after_test {
     my ( $self, $aggregate, $job, $parser ) = @_;
 
+    # after_test and job_done are essentially the same callback but
+    # after_test's interface doesn't expect a job object to be passed.
+    # TODO: deprecate after_test in favour of job_done
     $self->_make_callback( 'after_test', $job->as_array_ref, $parser );
+    $self->_make_callback( 'job_done', $job, $parser );
     $aggregate->add( $job->description, $parser );
 }
 
@@ -583,7 +588,7 @@ sub aggregate_tests {
 }
 
 sub _add_descriptions {
-    my $self = shift;
+    my $class = shift;
 
     # First transformation: turn scalars into single element arrays
     my @tests = map { 'ARRAY' eq ref $_ ? $_ : [$_] } @_;

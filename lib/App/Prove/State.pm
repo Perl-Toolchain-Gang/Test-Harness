@@ -9,11 +9,24 @@ use Carp;
 use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
 use TAP::Base;
+use TAP::Harness;
 
 @ISA = qw( TAP::Base );
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant NEED_GLOB => IS_WIN32;
+
+# Version 1:
+# No version key
+# Structure is
+# {tests}->{$test_name}->{...hash of test data...}
+#
+# Version 2:
+# Structure is
+# {tests}->
+#   {$test_description}->
+#      {...hash of test data including name...}
+use constant FORMAT => 2;
 
 =head1 NAME
 
@@ -56,7 +69,8 @@ sub new {
     my $self = bless {
         _ => {
             tests      => {},
-            generation => 1
+            generation => 1,
+            version    => FORMAT,
         },
         select    => [],
         seq       => 1,
@@ -151,7 +165,7 @@ sub apply_switch {
     my $self = shift;
     my @opts = @_;
 
-    my $last_gen = $self->{_}->{generation} - 1;
+    my $last_gen = $self->{_}{generation} - 1;
     my $now      = $self->get_time;
 
     my @switches = map { split /,/ } @opts;
@@ -251,7 +265,7 @@ sub _query {
     my $self = shift;
     if ( my @sel = @{ $self->{select} } ) {
         warn "No saved state, selection will be empty\n"
-          unless keys %{ $self->{_}->{tests} };
+          unless keys %{ $self->{_}{tests} };
         return map { $self->_query_clause($_) } @sel;
     }
     return;
@@ -260,7 +274,7 @@ sub _query {
 sub _query_clause {
     my ( $self, $clause ) = @_;
     my @got;
-    my $tests = $self->{_}->{tests};
+    my $tests = $self->{_}{tests};
     my $where = $clause->{where} || sub {1};
 
     # Select
@@ -337,9 +351,9 @@ Store the results of a test.
 =cut
 
 sub observe_test {
-    my ( $self, $test, $parser ) = @_;
+    my ( $self, $job, $parser ) = @_;
     $self->_record_test(
-        $test, scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
+        $job, scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
         scalar( $parser->todo ), $parser->start_time, $parser->end_time
     );
 }
@@ -355,11 +369,13 @@ sub observe_test {
 #     state generation
 
 sub _record_test {
-    my ( $self, $test, $fail, $todo, $start_time, $end_time ) = @_;
-    my $rec = $self->{_}->{tests}->{ $test->[0] } ||= {};
+    my ( $self, $job, $fail, $todo, $start_time, $end_time ) = @_;
+    my $rec = $self->{_}{tests}{ $job->description } ||= {};
 
-    $rec->{seq} = $self->{seq}++;
-    $rec->{gen} = $self->{_}->{generation};
+    $rec->{filename} = $job->filename;
+
+    $rec->{seq}      = $self->{seq}++;
+    $rec->{gen}      = $self->{_}{generation};
 
     $rec->{last_run_time} = $end_time;
     $rec->{last_result}   = $fail;
@@ -402,36 +418,64 @@ sub load {
     my $reader = TAP::Parser::YAMLish::Reader->new;
     local *FH;
     open FH, "<$name" or croak "Can't read $name ($!)";
-    $self->{_} = $reader->read(
+    my $data = $reader->read(
         sub {
             my $line = <FH>;
             defined $line && chomp $line;
             return $line;
         }
     );
-
-    # $writer->write( $self->{tests} || {}, \*FH );
     close FH;
+    $self->{_} = $self->_prune_and_stamp( $self->_upgrade_format($data) );
     $self->_regen_seq;
-    $self->_prune_and_stamp;
-    $self->{_}->{generation}++;
+    $self->{_}{generation}++;
+}
+
+sub _upgrade_tests {
+    my ( $self, $v1tests ) = @_;
+
+    my $v2tests = {};
+
+    my @t = TAP::Harness->_add_descriptions( keys %$v1tests );
+    for my $test (@t) {
+        my ( $filename, $description ) = @$test;
+        $v2tests->{$description} = $v1tests->{$filename};
+        $v2tests->{$description}{filename} = $filename;
+    }
+    return $v2tests;
+}
+
+sub _upgrade_format {
+    my ( $self, $data ) = @_;
+
+    my $format = $data->{version} || 1;
+    return $data if $format >= FORMAT;
+
+    $data->{tests} = $self->_upgrade_tests( $data->{tests} || {} );
+    $data->{version} = FORMAT;
+
+    return $data;
 }
 
 sub _prune_and_stamp {
-    my $self = shift;
-    for my $name ( keys %{ $self->{_}->{tests} || {} } ) {
+    my ( $self, $data ) = @_;
+
+    for my $desc ( keys %{ $data->{tests} } ) {
+        my $name = $data->{tests}{$desc}{filename};
         if ( my @stat = stat $name ) {
-            $self->{_}->{tests}->{$name}->{mtime} = $stat[9];
+            $data->{tests}{$desc}{mtime} = $stat[9];
         }
         else {
-            delete $self->{_}->{tests}->{$name};
+            delete $data->{tests}{$desc};
         }
     }
+
+    return $data;
 }
 
 sub _regen_seq {
     my $self = shift;
-    for my $rec ( values %{ $self->{_}->{tests} || {} } ) {
+    for my $rec ( values %{ $self->{_}{tests} || {} } ) {
         $self->{seq} = $rec->{seq} + 1
           if defined $rec->{seq} && $rec->{seq} >= $self->{seq};
     }

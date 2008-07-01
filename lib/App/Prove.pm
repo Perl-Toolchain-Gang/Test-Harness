@@ -441,7 +441,7 @@ sub _runtests {
     my $harness = $harness_class->new($args);
 
     $harness->callback(
-        after_test => sub {
+        job_done => sub {
             $self->{_state}->observe_test(@_);
         }
     );
