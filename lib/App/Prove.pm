@@ -631,6 +631,8 @@ calling C<run>.
 
 =item C<recurse>
 
+=item C<rules>
+
 =item C<show_help>
 
 =item C<show_man>
