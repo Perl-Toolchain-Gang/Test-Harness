@@ -107,6 +107,7 @@ t/parser-subclass.t
 t/premature-bailout.t
 t/process.t
 t/prove.t
+t/proveenv.t
 t/proverc.t
 t/proverun.t
 t/regression.t

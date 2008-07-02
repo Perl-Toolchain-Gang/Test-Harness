@@ -102,6 +102,14 @@ sub _initialize {
         }
     }
 
+    my %env_provides_default = (
+        HARNESS_TIMER => 'timer',
+    );
+
+    while ( my ( $env, $attr ) = each %env_provides_default ) {
+        $self->{$attr} = 1 if $ENV{$env};
+    }
+
     return $self;
 }
 
