@@ -58,7 +58,7 @@ BEGIN {
       harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man
-      show_version test_args state dry extension ignore_exit
+      show_version test_args state dry extension ignore_exit rules
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -88,7 +88,7 @@ sub _initialize {
     my $args = shift || {};
 
     # setup defaults:
-    for my $key (qw( argv rc_opts includes modules state plugins )) {
+    for my $key (qw( argv rc_opts includes modules state plugins rules )) {
         $self->{$key} = [];
     }
     $self->{harness_class} = 'TAP::Harness';
@@ -231,6 +231,7 @@ sub process_args {
             't'           => \$self->{taint_warn},
             'W'           => \$self->{warnings_fail},
             'w'           => \$self->{warnings_warn},
+            'rules=s@'    => $self->{rules},
         ) or croak('Unable to continue');
 
         # Stash the remainder of argv for later
@@ -340,6 +341,19 @@ sub _get_args {
 
     if ( defined( my $test_args = $self->test_args ) ) {
         $args{test_args} = $test_args;
+    }
+
+    if ( @{ $self->rules } ) {
+        my @rules;
+        for ( @{ $self->rules } ) {
+            if (/^par=(.*)/) {
+                push @rules, $1;
+            }
+            elsif (/^seq=(.*)/) {
+                push @rules, { seq => $1 };
+            }
+        }
+        $args{rules} = { par => [@rules] };
     }
 
     return ( \%args, $self->{harness_class} );

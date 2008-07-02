@@ -3,7 +3,12 @@ Revision history for Test-Harness
 3.13    ****-**-**
         - fixed various closure related leaks
         - made prove honour HARNESS_TIMER
-        
+        - Applied patches supplied by Alex Vandiver
+          - add 'rules' switch to prove: allows parallel execution rules
+            to be specified on the command line.
+          - allow '**' (any path) wildcard in parallel rules
+          - fix bug report address
+          - make tprove_gtk example work again.
 
 3.12    2008-06-22
         - applied Steve Purkis' huge refactoring patch which adds

@@ -1832,6 +1832,8 @@ support, or just words of encouragement have all been forthcoming.
 
 =item * David Wheeler
 
+=item * Alex Vandiver
+
 =back
 
 =head1 AUTHORS
@@ -1851,8 +1853,8 @@ Steve Purkis <spurkis@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-tapx-parser@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TAP-Parser>.
+C<bug-test-harness@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Harness>.
 We will be notified, and then you'll automatically be notified of
 progress on your bug as we make changes.
 

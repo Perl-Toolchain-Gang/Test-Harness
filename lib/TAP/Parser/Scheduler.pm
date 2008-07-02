@@ -113,9 +113,10 @@ sub _rule_clause {
 sub _expand {
     my ( $self, $name, $tests ) = @_;
 
-    $name =~ s{(.)}{
-        $1 eq '?' ? '[^/]'
-      : $1 eq '*' ? '[^/]*'
+    $name =~ s{(\?|\*\*?|.)}{
+        $1 eq '?'  ? '[^/]'
+      : $1 eq '*'  ? '[^/]*'
+      : $1 eq '**' ? '.*?'
       :             quotemeta($1);
     }gex;
 
@@ -227,6 +228,7 @@ sub _as_string {
         return "$indent(undef)\n";
     }
     elsif ( 'ARRAY' eq ref $rule ) {
+        return unless @$rule;
         my $type = ( 'par', 'seq' )[ $depth % 2 ];
         return join(
             '', "$indent$type:\n",

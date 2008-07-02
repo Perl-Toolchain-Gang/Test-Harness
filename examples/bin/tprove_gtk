@@ -407,16 +407,8 @@ sub run {
     my $source = TAP::Parser::Source::Perl->new();
 
     foreach my $test ( @{ $self->{_tests} } ) {
-        my $stream = $source->source($test)->get_stream();
-        if ($stream) {
-            my $parser = $self->analyze( $test, $stream );
-
-            # $aggregate -> add($test, $parser);
-        }
-        else {
-            warn "Could not run `$test´: " . $source->error();
-            next;
-        }
+        my $parser = TAP::Parser->new( { source => $test } );
+        $self->analyze( $test, $parser ) if $parser;
     }
 
     my $writer = $self->{_writer};
@@ -425,12 +417,11 @@ sub run {
 }
 
 sub analyze {
-    my ( $self, $test, $stream ) = @_;
+    my ( $self, $test, $parser ) = @_;
 
     my $writer = $self->{_writer};
     my $result = $self->{_results}->{$test};
 
-    my $parser = TAP::Parser->new( { stream => $stream } );
     while ( my $line = $parser->next() ) {
         if ( $line->is_plan() ) {
             $result->[INDEX_TOTAL] = $line->tests_planned();
