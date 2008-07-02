@@ -43,7 +43,7 @@ sub new {
 
     my %args  = @_;
     my $tests = delete $args{tests} || croak "Need a 'tests' argument";
-    my $rules = delete $args{rules} || { par => '*' };
+    my $rules = delete $args{rules} || { par => '**' };
 
     croak "Unknown arg(s): ", join ', ', sort keys %args
       if keys %args;
