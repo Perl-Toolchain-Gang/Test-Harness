@@ -64,10 +64,9 @@ Can also be called as an instance method.
 
 sub make_result {
     my ( $proto, $token ) = @_;
-    my $type   = $token->{type};
-    return $proto->class_for( $type )->new( $token );
+    my $type = $token->{type};
+    return $proto->class_for($type)->new($token);
 }
-
 
 =head3 C<class_for>
 
@@ -112,8 +111,10 @@ BEGIN {
 
 sub class_for {
     my ( $class, $type ) = @_;
+
     # return target class:
     return $CLASS_FOR{$type} if exists $CLASS_FOR{$type};
+
     # or complain:
     require Carp;
     Carp::croak("Could not determine class for result type '$type'");
@@ -121,6 +122,7 @@ sub class_for {
 
 sub register_type {
     my ( $class, $type, $rclass ) = @_;
+
     # register it blindly, assume they know what they're doing
     $CLASS_FOR{$type} = $rclass;
     return $class;

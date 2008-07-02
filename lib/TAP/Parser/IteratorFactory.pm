@@ -84,7 +84,6 @@ sub make_iterator {
     }
 }
 
-
 =head3 C<make_stream_iterator>
 
 Make a new stream iterator and return it.  Passes through any arguments given.
@@ -118,7 +117,6 @@ sub make_process_iterator {
 }
 
 1;
-
 
 =head1 SUBCLASSING
 

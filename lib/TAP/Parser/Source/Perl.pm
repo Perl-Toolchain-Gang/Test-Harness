@@ -102,7 +102,7 @@ this is a TAP::Parser instance.
 =cut
 
 sub get_stream {
-    my ($self, $factory) = @_;
+    my ( $self, $factory ) = @_;
 
     my @extra_libs;
 
@@ -278,7 +278,6 @@ sub _get_perl {
 }
 
 1;
-
 
 =head1 SUBCLASSING
 

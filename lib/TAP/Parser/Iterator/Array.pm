@@ -91,7 +91,6 @@ sub next_raw {
 
 1;
 
-
 =head1 ATTRIBUTION
 
 Originally ripped off from L<Test::Harness>.

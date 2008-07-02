@@ -23,7 +23,7 @@ $SIG{__WARN__} = sub { $warning = shift };
 # found in the regression tests.
 #
 
-my $factory = TAP::Parser::ResultFactory->new;
+my $factory           = TAP::Parser::ResultFactory->new;
 my %inherited_methods = (
     is_plan    => '',
     is_test    => '',
@@ -59,6 +59,7 @@ like $error, qr/^Could not determine class for.*no_such_type/s,
 can_ok $factory, 'class_for';
 can_ok $factory, 'register_type';
 {
+
     package MyResult;
     use strict;
     use vars qw($VERSION @ISA);

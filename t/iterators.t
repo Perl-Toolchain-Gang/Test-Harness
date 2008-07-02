@@ -90,9 +90,11 @@ for my $test (@schedule) {
         my $subclass = $test->{subclass};
         my $source   = $test->{source};
         my $class    = $test->{class};
-	my $iter = $class ? $class->new($source)
-	                  : $factory->make_iterator($source);
-        ok $iter, "$name: We should be able to create a new iterator";
+        my $iter
+          = $class
+          ? $class->new($source)
+          : $factory->make_iterator($source);
+        ok $iter,     "$name: We should be able to create a new iterator";
         isa_ok $iter, 'TAP::Parser::Iterator',
           '... and the object it returns';
         isa_ok $iter, $subclass, '... and the object it returns';

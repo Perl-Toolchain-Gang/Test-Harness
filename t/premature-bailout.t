@@ -106,8 +106,7 @@ is( $bailout->explanation, 'We ran out of foobar.',
 my $more_tap = "1..1\nok 1 - input file opened\n";
 
 my $second_parser = TAP::Parser->new(
-    {   stream =>
-          $factory->make_iterator( [ split( /\n/, $more_tap ) ] ),
+    {   stream => $factory->make_iterator( [ split( /\n/, $more_tap ) ] ),
     }
 );
 

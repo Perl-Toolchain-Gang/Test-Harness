@@ -13,6 +13,7 @@ use TAP::Parser::ResultFactory;
 
 sub make_result {
     my $class = shift;
+
     # I know, this is not really being initialized, but
     # for consistency's sake, deal with it :)
     $main::INIT{$class}++;
