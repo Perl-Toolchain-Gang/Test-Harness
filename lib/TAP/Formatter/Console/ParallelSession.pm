@@ -125,9 +125,12 @@ sub result {
     if ( $result->is_test ) {
         $context->{tests}++;
 
-        my $test_print_modulus = 1;
-        my $ceiling            = $context->{tests} / 5;
-        $test_print_modulus *= 2 while $test_print_modulus < $ceiling;
+        my $ceiling = $context->{tests} / 5;
+
+        # Find the next highest power of two, in linear time.
+        my $binary = unpack "B*", pack "N", $ceiling;
+        $binary =~ /^0+/;
+        my $test_print_modulus = 1 << length $binary;
 
         unless ( $context->{tests} % $test_print_modulus ) {
             $self->_output_ruler;
