@@ -318,8 +318,9 @@ sub _expand_dir_recursive {
 
     my @tests;
     find(
-        {   follow => 1,      #21938
-            wanted => sub {
+        {   follow      => 1,      #21938
+            follow_skip => 2,
+            wanted      => sub {
                 -f 
                   && /\Q$extension\E$/
                   && push @tests => $File::Find::name;
