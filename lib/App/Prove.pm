@@ -64,8 +64,8 @@ BEGIN {
         no strict 'refs';
         *$attr = sub {
             my $self = shift;
-            croak "$attr is read-only" if @_;
-            $self->{$attr};
+            $self->{$attr} = shift if @_;
+            return $self->{$attr};
         };
     }
 }
