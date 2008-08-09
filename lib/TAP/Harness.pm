@@ -160,6 +160,10 @@ Append run time for each test to output. Uses L<Time::HiRes> if available.
 
 Only show test failures (this is a no-op if C<verbose> is selected).
 
+=item * C<show_count>
+
+Update the running test count during testing.
+
 =item * C<lib>
 
 Accepts a scalar value or array ref of scalar values indicating which paths to
