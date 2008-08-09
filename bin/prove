@@ -27,6 +27,8 @@ Boolean options:
  -s,  --shuffle     Run the tests in random order.
  -c,  --color       Colored test output (default).
       --nocolor     Do not color test output.
+      --count       Show the X/Y test count when not verbose (default)
+      --nocount     Disable the X/Y test count.
  -D   --dry         Dry run. Show test that would have run.
       --ext         Set the extension for tests (default '.t')
  -f,  --failures    Only show failed tests.

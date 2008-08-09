@@ -54,11 +54,11 @@ my @ATTR;
 
 BEGIN {
     @ATTR = qw(
-      archive argv blib color directives exec failures fork formatter
-      harness includes modules plugins jobs lib merge parse quiet
+      archive argv blib show_count color directives exec failures fork
+      formatter harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
-      verbose warnings_fail warnings_warn show_help show_man
-      show_version test_args state dry extension ignore_exit rules
+      verbose warnings_fail warnings_warn show_help show_man show_version
+      test_args state dry extension ignore_exit rules
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -202,6 +202,7 @@ sub process_args {
             's|shuffle'   => \$self->{shuffle},
             'color!'      => \$self->{color},
             'colour!'     => \$self->{color},
+            'count!'      => \$self->{show_count},
             'c'           => \$self->{color},
             'D|dry'       => \$self->{dry},
             'ext=s'       => \$self->{extension},
@@ -277,6 +278,12 @@ sub _get_args {
 
     if ( defined $self->color ? $self->color : $self->_color_default ) {
         $args{color} = 1;
+    }
+    if ( !defined $self->show_count ) {
+        $args{show_count} = 1;
+    }
+    else {
+        $args{show_count} = $self->show_count;
     }
 
     if ( $self->archive ) {

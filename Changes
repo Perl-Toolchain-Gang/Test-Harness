@@ -1,5 +1,9 @@
 Revision history for Test-Harness
 
+3.14
+        - Added --count and --nocount options to prove to control X/Y display
+          while running tests.
+
 3.13    2008-07-27
         - fixed various closure related leaks
         - made prove honour HARNESS_TIMER

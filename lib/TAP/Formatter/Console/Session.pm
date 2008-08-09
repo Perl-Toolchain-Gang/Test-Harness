@@ -11,7 +11,7 @@ my @ACCESSOR;
 
 BEGIN {
 
-    @ACCESSOR = qw( name formatter parser );
+    @ACCESSOR = qw( name formatter parser show_count );
 
     for my $method (@ACCESSOR) {
         no strict 'refs';
@@ -71,6 +71,8 @@ The constructor returns a new C<TAP::Formatter::Console::Session> object.
 
 =item * C<name>
 
+=item * C<show_count>
+
 =back
 
 =cut
@@ -84,6 +86,13 @@ sub _initialize {
 
     for my $name (@ACCESSOR) {
         $self->{$name} = delete $arg_for{$name};
+    }
+
+    if ( !defined $self->show_count ) {
+        $self->{show_count} = 1;   # defaults to true
+    }
+    if ( $self->show_count ) {     # but may be a damned lie!
+        $self->{show_count} = $self->_should_show_count;
     }
 
     if ( my @props = sort keys %arg_for ) {
@@ -151,8 +160,8 @@ sub _closures {
 
     my $parser     = $self->parser;
     my $formatter  = $self->formatter;
-    my $show_count = $self->_should_show_count;
     my $pretty     = $formatter->_format_name( $self->name );
+    my $show_count = $self->show_count;
 
     my $really_quiet = $formatter->really_quiet;
     my $quiet        = $formatter->quiet;

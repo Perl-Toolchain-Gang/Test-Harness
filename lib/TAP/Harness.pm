@@ -64,7 +64,7 @@ sub _error {
 BEGIN {
 
     @FORMATTER_ARGS = qw(
-      directives verbosity timer failures errors stdout color
+      directives verbosity timer failures errors stdout color show_count
     );
 
     %VALIDATION_FOR = (

@@ -20,6 +20,7 @@ BEGIN {
         errors     => sub { shift; shift },
         color      => sub { shift; shift },
         jobs       => sub { shift; shift },
+        show_count => sub { shift; shift },
         stdout     => sub {
             my ( $self, $ref ) = @_;
             $self->_croak("option 'stdout' needs a filehandle")
@@ -179,6 +180,11 @@ the current platform and output is not being redirected.
 
 The number of concurrent jobs this formatter will handle.
 
+=item * C<show_count>
+
+Boolean value.  If false, disables the C<X/Y> test count which shows up while
+tests are running.
+
 =back
 
 Any keys for which the value is C<undef> will be ignored.
@@ -250,9 +256,10 @@ sub open_test {
     $self->_croak($@) if $@;
 
     my $session = $class->new(
-        {   name      => $test,
-            formatter => $self,
-            parser    => $parser
+        {   name       => $test,
+            formatter  => $self,
+            parser     => $parser,
+            show_count => $self->show_count,
         }
     );
 
