@@ -110,18 +110,57 @@ sub _rule_clause {
     );
 }
 
+sub _glob_to_regexp {
+    my ( $self, $glob ) = @_;
+
+    my $pattern;
+
+    while (1) {
+        if ( $glob =~ /\G\*\*/gc ) {
+
+            # ** is any number of characters, including /, within a pathname
+            $pattern .= '.*?';
+        }
+        elsif ( $glob =~ /\G\*/gc ) {
+
+            # * is zero or more characters within a filename/directory name
+            $pattern .= '[^/]*';
+        }
+        elsif ( $glob =~ /\G\?/gc ) {
+
+            # ? is exactly one character within a filename/directory name
+            $pattern .= '[^/]';
+        }
+        elsif ( $glob =~ /\G\{([^}]+)\}/gc ) {
+
+            # {foo,bar,baz} is any of foo, bar or baz.
+            # Can't cope with nested {} yet
+            $pattern
+              .= '(?:'
+              . join( '|', map { $self->_glob_to_regexp($_) } split ',', $1 )
+              . ')';
+        }
+        elsif ( $glob =~ /\G(\\.)/gc ) {
+
+            # A quoted literal
+            $pattern .= $1;
+        }
+        else {
+
+            # Eat everything that is not a meta character.
+            $glob =~ /\G([^{?*\\]*)/gc;
+            $pattern .= quotemeta $1;
+        }
+        return $pattern if pos $glob == length $glob;
+    }
+}
+
 sub _expand {
     my ( $self, $name, $tests ) = @_;
 
-    $name =~ s{(\?|\*\*?|.)}{
-        $1 eq '?'  ? '[^/]'
-      : $1 eq '*'  ? '[^/]*'
-      : $1 eq '**' ? '.*?'
-      :             quotemeta($1);
-    }gex;
-
-    my $pattern = qr{^$name$};
-    my @match   = ();
+    my $pattern = $self->_glob_to_regexp($name);
+    $pattern = qr/^ $pattern $/x;
+    my @match = ();
 
     for ( my $ti = 0; $ti < @$tests; $ti++ ) {
         if ( $tests->[$ti]->filename =~ $pattern ) {
