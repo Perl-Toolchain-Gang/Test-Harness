@@ -9,11 +9,6 @@ use IO::Handle;
 
 use TAP::Base;
 
-# use TAP::Parser;
-# use TAP::Parser::Aggregator;
-# use TAP::Parser::Multiplexer;
-# use TAP::Parser::Scheduler;
-
 use vars qw($VERSION @ISA);
 
 @ISA = qw(TAP::Base);
