@@ -374,7 +374,6 @@ sub _find_module {
 
     for my $pfx (@search) {
         my $name = join( '::', $pfx, $class );
-        print "$name\n";
         eval "require $name";
         return $name unless $@;
     }

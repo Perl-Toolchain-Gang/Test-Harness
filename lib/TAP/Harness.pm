@@ -8,10 +8,11 @@ use File::Path;
 use IO::Handle;
 
 use TAP::Base;
-use TAP::Parser;
-use TAP::Parser::Aggregator;
-use TAP::Parser::Multiplexer;
-use TAP::Parser::Scheduler;
+
+# use TAP::Parser;
+# use TAP::Parser::Aggregator;
+# use TAP::Parser::Multiplexer;
+# use TAP::Parser::Scheduler;
 
 use vars qw($VERSION @ISA);
 
@@ -74,16 +75,20 @@ BEGIN {
 
             return [ map {"-I$_"} @$libs ];
         },
-        switches        => sub { shift; shift },
-        exec            => sub { shift; shift },
-        merge           => sub { shift; shift },
-        formatter_class => sub { shift; shift },
-        formatter       => sub { shift; shift },
-        jobs            => sub { shift; shift },
-        fork            => sub { shift; shift },
-        test_args       => sub { shift; shift },
-        ignore_exit     => sub { shift; shift },
-        rules           => sub { shift; shift },
+        switches          => sub { shift; shift },
+        exec              => sub { shift; shift },
+        merge             => sub { shift; shift },
+        aggregator_class  => sub { shift; shift },
+        formatter_class   => sub { shift; shift },
+        multiplexer_class => sub { shift; shift },
+        parser_class      => sub { shift; shift },
+        scheduler_class   => sub { shift; shift },
+        formatter         => sub { shift; shift },
+        jobs              => sub { shift; shift },
+        fork              => sub { shift; shift },
+        test_args         => sub { shift; shift },
+        ignore_exit       => sub { shift; shift },
+        rules             => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -213,10 +218,30 @@ the test script in Perl:
 If C<merge> is true the harness will create parsers that merge STDOUT
 and STDERR together for any processes they start.
 
+=item * C<aggregator_class>
+
+The name of the class to use to aggregate test results. The default is
+L<TAP::Parser::Aggregator>.
+
 =item * C<formatter_class>
 
 The name of the class to use to format output. The default is
 L<TAP::Formatter::Console>.
+
+=item * C<multiplexer_class>
+
+The name of the class to use to multiplex tests during parallel testing.
+The default is L<TAP::Parser::Multiplexer>.
+
+=item * C<parser_class>
+
+The name of the class to use to parse TAP. The default is
+L<TAP::Parser>.
+
+=item * C<scheduler_class>
+
+The name of the class to use to schedule test execution. The default is
+L<TAP::Parser::Scheduler>.
 
 =item * C<formatter>
 
@@ -279,6 +304,14 @@ Any keys for which the value is C<undef> will be ignored.
       after_test
     );
 
+    my %default_class = (
+        aggregator_class  => 'TAP::Parser::Aggregator',
+        formatter_class   => 'TAP::Formatter::Console',
+        multiplexer_class => 'TAP::Parser::Multiplexer',
+        parser_class      => 'TAP::Parser',
+        scheduler_class   => 'TAP::Parser::Scheduler',
+    );
+
     sub _initialize {
         my ( $self, $arg_for ) = @_;
         $arg_for ||= {};
@@ -301,16 +334,11 @@ Any keys for which the value is C<undef> will be ignored.
 
         $self->jobs(1) unless defined $self->jobs;
 
+        while ( my ( $attr, $class ) = each %default_class ) {
+            $self->$attr( $self->$attr() || $class );
+        }
+
         unless ( $self->formatter ) {
-
-            $self->formatter_class( my $class = $self->formatter_class
-                  || 'TAP::Formatter::Console' );
-
-            croak "Bad module name $class"
-              unless $class =~ /^ \w+ (?: :: \w+ ) *$/x;
-
-            eval "require $class";
-            $self->_croak("Can't load $class") if $@;
 
             # This is a little bodge to preserve legacy behaviour. It's
             # pretty horrible that we know which args are destined for
@@ -322,7 +350,9 @@ Any keys for which the value is C<undef> will be ignored.
                 }
             }
 
-            $self->formatter( $class->new( \%formatter_args ) );
+            $self->formatter(
+                $self->_construct( $self->formatter_class, \%formatter_args )
+            );
         }
 
         if ( my @props = sort keys %arg_for ) {
@@ -371,7 +401,7 @@ Returns a L<TAP::Parser::Aggregator> containing the test results.
 sub runtests {
     my ( $self, @tests ) = @_;
 
-    my $aggregate = TAP::Parser::Aggregator->new;
+    my $aggregate = $self->_construct( $self->aggregator_class );
 
     $self->_make_callback( 'before_runtests', $aggregate );
     $aggregate->start;
@@ -446,7 +476,7 @@ sub _aggregate_parallel {
     my ( $self, $aggregate, $scheduler ) = @_;
 
     my $jobs = $self->jobs;
-    my $mux  = TAP::Parser::Multiplexer->new;
+    my $mux  = $self->_construct( $self->multiplexer_class );
 
     RESULT: {
 
@@ -619,7 +649,8 @@ that was passed to C<aggregate_tests>.
 
 sub make_scheduler {
     my ( $self, @tests ) = @_;
-    return TAP::Parser::Scheduler->new(
+    return $self->_construct(
+        $self->scheduler_class,
         tests => [ $self->_add_descriptions(@tests) ],
         rules => $self->rules
     );
@@ -733,7 +764,7 @@ sub make_parser {
 
     my $args = $self->_get_parser_args($job);
     $self->_make_callback( 'parser_args', $args, $job->as_array_ref );
-    my $parser = TAP::Parser->new($args);
+    my $parser = $self->_construct( $self->parser_class, $args );
 
     $self->_make_callback( 'made_parser', $parser, $job->as_array_ref );
     my $session = $self->formatter->open_test( $job->description, $parser );

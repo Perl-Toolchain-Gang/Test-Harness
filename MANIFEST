@@ -76,6 +76,7 @@ t/data/proverc
 t/data/sample.yml
 t/errors.t
 t/grammar.t
+t/harness-subclass.t
 t/harness.t
 t/iterators.t
 t/lib/App/Prove/Plugin/Dummy.pm
@@ -92,6 +93,7 @@ t/lib/MyResult.pm
 t/lib/MyResultFactory.pm
 t/lib/MySource.pm
 t/lib/NoFork.pm
+t/lib/NOP.pm
 t/lib/TAP/Parser/SubclassTest.pm
 t/lib/Test/Builder.pm
 t/lib/Test/Builder/Module.pm
