@@ -75,6 +75,7 @@ t/data/catme.1
 t/data/proverc
 t/data/sample.yml
 t/errors.t
+t/glob-to-regexp.t
 t/grammar.t
 t/harness-subclass.t
 t/harness.t

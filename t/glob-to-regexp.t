@@ -1,0 +1,34 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Test::More;
+
+require TAP::Parser::Scheduler;
+
+my @tests;
+while (<DATA>) {
+    my ($glob, $pattern, $name) = /^(\S+)\t+(\S+)(?:\t+(.*))?$/;
+    die "'$_'" unless $pattern;
+    push @tests, [$glob, $pattern, $name];
+}
+
+plan tests => scalar @tests;
+
+foreach (@tests) {
+    my ($glob, $pattern, $name) = @$_;
+    is (TAP::Parser::Scheduler->_glob_to_regexp($glob), $pattern, $name)
+}
+__DATA__
+Pie			Pie
+*.t			[^/]*\.t
+**.t			.*?\.t
+A?B			A[^/]B
+*/*.t			[^/]*\/[^/]*\.t
+A,B			A\,B				, outside {} not special
+{A,B}			(?:A|B)
+A{B}C			A(?:B)C
+A{B,C}D			A(?:B|C)D
+A{B,C,D}E{F,G,H}I,J	A(?:B|C|D)E(?:F|G|H)I\,J
+{Perl,Rules}		(?:Perl|Rules)
+A}B			A\}B				Bare } corner case
