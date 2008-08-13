@@ -17,7 +17,8 @@ plan tests => scalar @tests;
 
 foreach (@tests) {
     my ($glob, $pattern, $name) = @$_;
-    is (TAP::Parser::Scheduler->_glob_to_regexp($glob), $pattern, $name)
+    is (TAP::Parser::Scheduler->_glob_to_regexp($glob), $pattern,
+	defined $name ? "$glob  -- $name" : $glob);
 }
 __DATA__
 Pie			Pie
@@ -32,3 +33,7 @@ A{B,C}D			A(?:B|C)D
 A{B,C,D}E{F,G,H}I,J	A(?:B|C|D)E(?:F|G|H)I\,J
 {Perl,Rules}		(?:Perl|Rules)
 A}B			A\}B				Bare } corner case
+A{B,C}D}E		A(?:B|C)D\}E
+},A{B,C}D},E		\}\,A(?:B|C)D\}\,E
+{A{1,2},D{3,4}}		(?:A(?:1|2)|D(?:3|4))
+{A,{B,C},D}		(?:A|(?:B|C)|D)

@@ -112,7 +112,7 @@ sub _rule_clause {
 
 sub _glob_to_regexp {
     my ( $self, $glob ) = @_;
-
+    my $nesting;
     my $pattern;
 
     while (1) {
@@ -131,24 +131,37 @@ sub _glob_to_regexp {
             # ? is exactly one character within a filename/directory name
             $pattern .= '[^/]';
         }
-        elsif ( $glob =~ /\G\{([^}]+)\}/gc ) {
+        elsif ( $glob =~ /\G\{/gc ) {
 
             # {foo,bar,baz} is any of foo, bar or baz.
-            # Can't cope with nested {} yet
-            $pattern
-              .= '(?:'
-              . join( '|', map { $self->_glob_to_regexp($_) } split ',', $1 )
-              . ')';
+            $pattern .= '(?:';
+            ++$nesting;
+        }
+        elsif ( $nesting and $glob =~ /\G,/gc ) {
+
+            # , is only special inside {}
+            $pattern .= '|';
+        }
+        elsif ( $nesting and $glob =~ /\G\}/gc ) {
+
+            # } that matches { is special. But unbalanced } are not.
+            $pattern .= ')';
+            --$nesting;
         }
         elsif ( $glob =~ /\G(\\.)/gc ) {
 
             # A quoted literal
             $pattern .= $1;
         }
+        elsif ( $glob =~ /\G([\},])/gc ) {
+
+            # Sometimes meta characters
+            $pattern .= '\\' . $1;
+        }
         else {
 
             # Eat everything that is not a meta character.
-            $glob =~ /\G([^{?*\\]*)/gc;
+            $glob =~ /\G([^{?*\\\},]*)/gc;
             $pattern .= quotemeta $1;
         }
         return $pattern if pos $glob == length $glob;
