@@ -37,3 +37,7 @@ A{B,C}D}E		A(?:B|C)D\}E
 },A{B,C}D},E		\}\,A(?:B|C)D\}\,E
 {A{1,2},D{3,4}}		(?:A(?:1|2)|D(?:3|4))
 {A,{B,C},D}		(?:A|(?:B|C)|D)
+A{B,C\}D,E\,F}G		A(?:B|C\}D|E\,F)G
+A\\B			A\\B
+A(B)C			A\(B\)C
+1{A(B)C,D|E}2		1(?:A\(B\)C|D\|E)2
