@@ -105,24 +105,14 @@ sub _output_ruler {
 
 sub result {
     my ( $self, $result ) = @_;
-    my $parser    = $self->parser;
     my $formatter = $self->formatter;
-    my $context   = $shared{$formatter};
-
     $self->_refresh;
 
     # my $really_quiet = $formatter->really_quiet;
     # my $show_count   = $self->_should_show_count;
-    my $planned = $parser->tests_planned;
-
-    if ( $result->is_bailout ) {
-        $formatter->_failure_output(
-                "Bailout called.  Further testing stopped:  "
-              . $result->explanation
-              . "\n" );
-    }
 
     if ( $result->is_test ) {
+        my $context = $shared{$formatter};
         $context->{tests}++;
 
         my $ceiling = $context->{tests} / 5;
@@ -135,6 +125,11 @@ sub result {
         unless ( $context->{tests} % $test_print_modulus ) {
             $self->_output_ruler;
         }
+    } elsif ( $result->is_bailout ) {
+        $formatter->_failure_output(
+                "Bailout called.  Further testing stopped:  "
+              . $result->explanation
+              . "\n" );
     }
 }
 
