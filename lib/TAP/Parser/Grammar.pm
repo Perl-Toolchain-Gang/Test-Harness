@@ -149,7 +149,7 @@ my %language_for;
                 }
                 return $self->_make_test_token(
                     $line,   $ok, $num, $desc,
-                    uc $dir, $explanation
+                    $dir, $explanation
                 );
             },
         },
