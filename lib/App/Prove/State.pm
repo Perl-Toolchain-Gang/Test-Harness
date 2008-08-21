@@ -64,6 +64,7 @@ sub new {
         seq       => 1,
         store     => delete $args{store},
         extension => delete $args{extension} || '.t',
+        test_num  => 1,
     }, $class;
 
     my $store = $self->{store};
@@ -93,7 +94,7 @@ object.
 
 =cut
 
-sub results { shift->{_} || App::Prove::State::Results->new }
+sub results { shift->{_} || App::Prove::State::Result->new }
 
 sub DESTROY {
     my $self = shift;
@@ -353,7 +354,6 @@ sub observe_test {
     $self->_record_test(
         $test, scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
         scalar( $parser->todo ), $parser->start_time, $parser->end_time,
-
     );
 }
 
@@ -371,8 +371,9 @@ sub _record_test {
     my ( $self, $test, $fail, $todo, $start_time, $end_time ) = @_;
     my $rec = $self->results->tests->{ $test->[0] } ||= {};
 
-    $rec->{seq} = $self->{seq}++;
-    $rec->{gen} = $self->results->generation;
+    $rec->{test_num} = $self->{test_num}++;
+    $rec->{seq}      = $self->{seq}++;
+    $rec->{gen}      = $self->results->generation;
 
     $rec->{last_run_time} = $end_time;
     $rec->{last_result}   = $fail;
@@ -400,7 +401,7 @@ sub save {
     my $writer = TAP::Parser::YAMLish::Writer->new;
     local *FH;
     open FH, ">$name" or croak "Can't write $name ($!)";
-    $writer->write( $self->results, \*FH );
+    $writer->write( $self->results->raw, \*FH );
     close FH;
 }
 

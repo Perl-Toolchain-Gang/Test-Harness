@@ -98,4 +98,16 @@ Returns the number of tests for a given test suite result.
 
 sub num_tests { keys %{ shift->{tests} } }
 
+=head3 C<raw>
+
+Returns a hashref of raw results, suitable for serialization by YAML.
+
+=cut
+
+sub raw { 
+    my $self = shift;
+    my %raw = %$self;
+    return \%raw;
+}
+
 1;
