@@ -86,7 +86,7 @@ sub tests {
         $self->{tests} = shift;
         return $self;
     }
-    my $tests = $self->{tests} || {};
+    my $tests = $self->{tests} ||= {};
     return wantarray ? %$tests : $tests;
 }
 
