@@ -111,7 +111,7 @@ foreach my $test_args ( get_arg_sets() ) {
     chomp(@output);
 
     my @expected = (
-        "$source_tests/harness....",
+        "$source_tests/harness ..",
         '1..1',
         '[[reset]]',
         'ok 1 - this is a test',
@@ -142,7 +142,7 @@ foreach my $test_args ( get_arg_sets() ) {
     chomp(@output);
 
     @expected = (
-        'My Nice Test....',
+        'My Nice Test ..',
         '1..1',
         '[[reset]]',
         'ok 1 - this is a test',
@@ -175,13 +175,13 @@ foreach my $test_args ( get_arg_sets() ) {
     chomp(@output);
 
     @expected = (
-        'My Nice Test..........',
+        'My Nice Test ........',
         '1..1',
         '[[reset]]',
         'ok 1 - this is a test',
         '[[reset]]',
         'ok',
-        'My Nice Test Again....',
+        'My Nice Test Again ..',
         '1..1',
         '[[reset]]',
         'ok 1 - this is a test',
@@ -207,7 +207,7 @@ foreach my $test_args ( get_arg_sets() ) {
 
     chomp(@output);
     @expected = (
-        "$source_tests/harness....",
+        "$source_tests/harness ..",
         'ok',
         'All tests successful.',
     );
@@ -259,7 +259,7 @@ foreach my $test_args ( get_arg_sets() ) {
     @output = @output[ 0 .. 9 ];
 
     @expected = (
-        "$source_tests/harness_failure....",
+        "$source_tests/harness_failure ..",
         '1..2',
         '[[reset]]',
         'ok 1 - this is a test',
@@ -300,7 +300,7 @@ foreach my $test_args ( get_arg_sets() ) {
     $status   = pop @output;
     $summary  = pop @output;
     @expected = (
-        "$source_tests/harness_failure....",
+        "$source_tests/harness_failure ..",
         'Failed 1/2 subtests',
         'Test Summary Report',
         '-------------------',
@@ -347,7 +347,7 @@ foreach my $test_args ( get_arg_sets() ) {
     chomp(@output);
 
     @expected = (
-        "$source_tests/harness_directives....",
+        "$source_tests/harness_directives ..",
         'not ok 2 - we have a something # TODO some output',
         "ok 3 houston, we don't have liftoff # SKIP no funding",
         'ok',
@@ -405,7 +405,7 @@ foreach my $test_args ( get_arg_sets() ) {
     @summary  = @output[ 12 .. ( $#output - 1 ) ];
     @output   = @output[ 0 .. 11 ];
     @expected = (
-        "$source_tests/harness_badtap....",
+        "$source_tests/harness_badtap ..",
         '1..2',
         '[[reset]]',
         'ok 1 - this is a test',
@@ -459,7 +459,7 @@ foreach my $test_args ( get_arg_sets() ) {
     chomp(@output);
 
     @expected = (
-        "$source_tests/harness_failure....",
+        "$source_tests/harness_failure ..",
         'not ok 2 - this is another test',
         'Failed 1/2 subtests',
         'Test Summary Report',
@@ -485,7 +485,7 @@ foreach my $test_args ( get_arg_sets() ) {
     chomp(@output);
 
     @expected = (
-        "$sample_tests/no_output....",
+        "$sample_tests/no_output ..",
         'No subtests run',
         'Test Summary Report',
         '-------------------',
