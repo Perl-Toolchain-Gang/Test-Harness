@@ -6,6 +6,8 @@ use vars qw($VERSION @ISA);
 use File::Find;
 use File::Spec;
 use Carp;
+
+use App::Prove::State::Result;
 use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
 use TAP::Base;
@@ -54,10 +56,10 @@ sub new {
     my %args = %{ shift || {} };
 
     my $self = bless {
-        _ => {
+        _ => App::Prove::State::Result->new({
             tests      => {},
             generation => 1
-        },
+        }),
         select    => [],
         seq       => 1,
         store     => delete $args{store},
@@ -83,6 +85,15 @@ sub extension {
     $self->{extension} = shift if @_;
     return $self->{extension};
 }
+
+=head2 C<results>
+
+Get the results of the last test run.  Returns an L<App::Prove::State::Result>
+object.
+
+=cut
+
+sub results { shift->{_} || App::Prove::State::Results->new }
 
 sub DESTROY {
     my $self = shift;
@@ -151,7 +162,7 @@ sub apply_switch {
     my $self = shift;
     my @opts = @_;
 
-    my $last_gen = $self->{_}->{generation} - 1;
+    my $last_gen = $self->results->generation - 1;
     my $now      = $self->get_time;
 
     my @switches = map { split /,/ } @opts;
@@ -251,7 +262,7 @@ sub _query {
     my $self = shift;
     if ( my @sel = @{ $self->{select} } ) {
         warn "No saved state, selection will be empty\n"
-          unless keys %{ $self->{_}->{tests} };
+          unless $self->results->num_tests;
         return map { $self->_query_clause($_) } @sel;
     }
     return;
@@ -260,7 +271,7 @@ sub _query {
 sub _query_clause {
     my ( $self, $clause ) = @_;
     my @got;
-    my $tests = $self->{_}->{tests};
+    my $tests = $self->results->tests;
     my $where = $clause->{where} || sub {1};
 
     # Select
@@ -341,7 +352,8 @@ sub observe_test {
     my ( $self, $test, $parser ) = @_;
     $self->_record_test(
         $test, scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
-        scalar( $parser->todo ), $parser->start_time, $parser->end_time
+        scalar( $parser->todo ), $parser->start_time, $parser->end_time,
+
     );
 }
 
@@ -357,10 +369,10 @@ sub observe_test {
 
 sub _record_test {
     my ( $self, $test, $fail, $todo, $start_time, $end_time ) = @_;
-    my $rec = $self->{_}->{tests}->{ $test->[0] } ||= {};
+    my $rec = $self->results->tests->{ $test->[0] } ||= {};
 
     $rec->{seq} = $self->{seq}++;
-    $rec->{gen} = $self->{_}->{generation};
+    $rec->{gen} = $self->results->generation;
 
     $rec->{last_run_time} = $end_time;
     $rec->{last_result}   = $fail;
@@ -388,7 +400,7 @@ sub save {
     my $writer = TAP::Parser::YAMLish::Writer->new;
     local *FH;
     open FH, ">$name" or croak "Can't write $name ($!)";
-    $writer->write( $self->{_} || {}, \*FH );
+    $writer->write( $self->results, \*FH );
     close FH;
 }
 
@@ -403,37 +415,44 @@ sub load {
     my $reader = TAP::Parser::YAMLish::Reader->new;
     local *FH;
     open FH, "<$name" or croak "Can't read $name ($!)";
-    $self->{_} = $reader->read(
-        sub {
-            my $line = <FH>;
-            defined $line && chomp $line;
-            return $line;
-        }
+
+    # XXX this is temporary
+    $self->{_} = App::Prove::State::Result->new(
+        $reader->read(
+            sub {
+                my $line = <FH>;
+                defined $line && chomp $line;
+                return $line;
+            }
+        )
     );
 
     # $writer->write( $self->{tests} || {}, \*FH );
     close FH;
     $self->_regen_seq;
     $self->_prune_and_stamp;
-    $self->{_}->{generation}++;
+    $self->results->generation( $self->results->generation + 1 );
 }
 
 sub _prune_and_stamp {
     my $self = shift;
-    for my $name ( keys %{ $self->{_}->{tests} || {} } ) {
+    my $tests = $self->results->tests;
+    for my $name ( keys %$tests ) {
         if ( my @stat = stat $name ) {
-            $self->{_}->{tests}->{$name}->{mtime} = $stat[9];
+            $tests->{$name}->{mtime} = $stat[9];
         }
         else {
-            delete $self->{_}->{tests}->{$name};
+            delete $tests->{$name};
         }
     }
 }
 
 sub _regen_seq {
     my $self = shift;
-    for my $rec ( values %{ $self->{_}->{tests} || {} } ) {
+    for my $rec ( values %{ $self->results->tests } ) {
         $self->{seq} = $rec->{seq} + 1
           if defined $rec->{seq} && $rec->{seq} >= $self->{seq};
     }
 }
+
+1;

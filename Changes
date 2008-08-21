@@ -1,6 +1,7 @@
 Revision history for Test-Harness
 
 3.14
+        - Start developing a proper API for inspecting save test suite state.
         - After discussion with Andy, agreed to clean up the test output
           somewhat.  t/foo.....ok becomes t/foo ... ok
         - Added --count and --nocount options to prove to control X/Y display

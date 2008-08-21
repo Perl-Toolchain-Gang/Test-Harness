@@ -175,7 +175,7 @@ for my $test (@schedule) {
 }
 
 sub get_state {
-    return {
+    return App::Prove::State::Result->new({
         'generation' => '51',
         'tests'      => {
             mn('t/compat/failure.t') => {
@@ -248,5 +248,5 @@ sub get_state {
                 'mtime'          => 1186285639,
             },
         }
-    };
+    });
 }
