@@ -849,14 +849,15 @@ sub _runtests {
         {   name   => 'all the same',
             input  => [ 'foo.t', 'bar.t', 'fletz.t' ],
             output => [
-                [ 'foo.t', 'foo' ], [ 'bar.t', 'bar' ], [ 'fletz.t', 'fletz' ]
+                [ 'foo.t', 'foo.t' ], [ 'bar.t', 'bar.t' ],
+                [ 'fletz.t', 'fletz.t' ]
             ],
         },
         {   name   => 'all the same, already cooked',
             input  => [ 'foo.t', [ 'bar.t', 'brip' ], 'fletz.t' ],
             output => [
-                [ 'foo.t', 'foo' ], [ 'bar.t', 'brip' ],
-                [ 'fletz.t', 'fletz' ]
+                [ 'foo.t', 'foo.t' ], [ 'bar.t', 'brip' ],
+                [ 'fletz.t', 'fletz.t' ]
             ],
         },
         {   name   => 'different exts',

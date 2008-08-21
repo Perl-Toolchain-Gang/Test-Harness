@@ -614,23 +614,10 @@ sub aggregate_tests {
 sub _add_descriptions {
     my $self = shift;
 
-    # First transformation: turn scalars into single element arrays
-    my @tests = map { 'ARRAY' eq ref $_ ? $_ : [$_] } @_;
-
-    # Work out how many different extensions we have
-    my %ext;
-    for my $test (@tests) {
-        $ext{$1}++ if $test->[0] =~ /\.(\w+)$/;
-    }
-
-    for my $test (@tests) {
-        if ( @$test == 1 ) {
-            $test->[1] = $test->[0];
-            $test->[1] =~ s/\.\w+$//
-              if keys %ext <= 1;
-        }
-    }
-    return @tests;
+    # Turn unwrapped scalars into anonymous arrays and copy the name as
+    # the description for tests that have only a name.
+    return map { @$_ == 1 ? [ $_->[0], $_->[0] ] : $_ }
+      map { 'ARRAY' eq ref $_ ? $_ : [$_] } @_;
 }
 
 =head3 C<make_scheduler>
