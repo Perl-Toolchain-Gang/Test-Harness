@@ -127,7 +127,7 @@ sub _write_obj {
             }
         }
         else {
-            die "Don't know how to enocde $ref";
+            die "Don't know how to encode $ref";
         }
     }
     else {
