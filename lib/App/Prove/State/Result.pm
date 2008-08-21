@@ -104,9 +104,9 @@ Returns a hashref of raw results, suitable for serialization by YAML.
 
 =cut
 
-sub raw { 
+sub raw {
     my $self = shift;
-    my %raw = %$self;
+    my %raw  = %$self;
     return \%raw;
 }
 

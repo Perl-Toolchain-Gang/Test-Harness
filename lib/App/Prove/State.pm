@@ -56,10 +56,11 @@ sub new {
     my %args = %{ shift || {} };
 
     my $self = bless {
-        _ => App::Prove::State::Result->new({
-            tests      => {},
-            generation => 1
-        }),
+        _ => App::Prove::State::Result->new(
+            {   tests      => {},
+                generation => 1
+            }
+        ),
         select    => [],
         seq       => 1,
         store     => delete $args{store},
@@ -436,7 +437,7 @@ sub load {
 }
 
 sub _prune_and_stamp {
-    my $self = shift;
+    my $self  = shift;
     my $tests = $self->results->tests;
     for my $name ( keys %$tests ) {
         if ( my @stat = stat $name ) {
