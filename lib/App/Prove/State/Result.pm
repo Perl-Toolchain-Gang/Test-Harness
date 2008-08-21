@@ -1,7 +1,6 @@
 package App::Prove::State::Result;
 
 use strict;
-use warnings;
 
 use vars qw($VERSION);
 
