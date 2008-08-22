@@ -470,8 +470,13 @@ sub _runtests {
 
     $harness->callback(
         after_test => sub {
-        $DB::single = 1;
             $self->{_state}->observe_test(@_);
+        }
+    );
+
+    $harness->callback(
+        after_runtests => sub {
+            $self->{_state}->commit(@_);
         }
     );
 

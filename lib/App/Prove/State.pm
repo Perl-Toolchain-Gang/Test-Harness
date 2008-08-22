@@ -97,7 +97,13 @@ object.
 
 sub results { shift->{_} || App::Prove::State::Result->new }
 
-sub DESTROY {
+=head2 C<commit>
+
+Save the test results. Should be called after all tests have run.
+
+=cut
+
+sub commit {
     my $self = shift;
     if ( $self->{should_save} && defined( my $store = $self->{store} ) ) {
         $self->save($store);
