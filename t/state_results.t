@@ -11,7 +11,7 @@ BEGIN {
 }
 
 use strict;
-use Test::More 'no_plan';
+use Test::More tests => 25;
 use App::Prove::State;
 
 my $test_suite_data = test_suite_data();
@@ -38,8 +38,6 @@ is $result->num_tests, scalar keys %{ $test_suite_data->{tests} },
 can_ok $result, 'raw';
 is_deeply $result->raw, $test_suite_data,
   '... and it should return the raw, unblessed data';
-use Test::Most;
-explain $result->raw;
 
 #
 # Check individual tests.
