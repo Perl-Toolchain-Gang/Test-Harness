@@ -141,7 +141,7 @@ for my $test (@SCHEDULE) {
     # Why does this make the output from the test spew out of
     # our STDOUT?
     ok eval { $app->run }, 'run returned true';
-    ok !$@, 'no errors';
+    ok !$@, 'no errors' or diag $@;
 
     my @log = get_log();
 

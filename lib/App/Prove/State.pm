@@ -8,6 +8,7 @@ use File::Spec;
 use Carp;
 
 use App::Prove::State::Result;
+use App::Prove::State::Result::Test;
 use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
 use TAP::Base;
@@ -58,14 +59,13 @@ sub new {
     my $self = bless {
         _ => App::Prove::State::Result->new(
             {   tests      => {},
-                generation => 1
+                generation => 1,
             }
         ),
         select    => [],
         seq       => 1,
         store     => delete $args{store},
         extension => delete $args{extension} || '.t',
-        test_num  => 1,
     }, $class;
 
     my $store = $self->{store};
@@ -178,45 +178,45 @@ sub apply_switch {
     my %handler = (
         last => sub {
             $self->_select(
-                where => sub { $_->{gen} >= $last_gen },
-                order => sub { $_->{seq} }
+                where => sub { $_->generation >= $last_gen },
+                order => sub { $_->sequence }
             );
         },
         failed => sub {
             $self->_select(
-                where => sub { $_->{last_result} != 0 },
-                order => sub { -$_->{last_result} }
+                where => sub { $_->result != 0 },
+                order => sub { -$_->result }
             );
         },
         passed => sub {
-            $self->_select( where => sub { $_->{last_result} == 0 } );
+            $self->_select( where => sub { $_->result == 0 } );
         },
         all => sub {
             $self->_select();
         },
         todo => sub {
             $self->_select(
-                where => sub { $_->{last_todo} != 0 },
-                order => sub { -$_->{last_todo}; }
+                where => sub { $_->num_todo != 0 },
+                order => sub { -$_->num_todo; }
             );
         },
         hot => sub {
             $self->_select(
-                where => sub { defined $_->{last_fail_time} },
-                order => sub { $now - $_->{last_fail_time} }
+                where => sub { defined $_->last_fail_time },
+                order => sub { $now - $_->last_fail_time }
             );
         },
         slow => sub {
-            $self->_select( order => sub { -$_->{elapsed} } );
+            $self->_select( order => sub { -$_->elapsed } );
         },
         fast => sub {
-            $self->_select( order => sub { $_->{elapsed} } );
+            $self->_select( order => sub { $_->elapsed } );
         },
         new => sub {
-            $self->_select( order => sub { -$_->{mtime} } );
+            $self->_select( order => sub { -$_->mtime } );
         },
         old => sub {
-            $self->_select( order => sub { $_->{mtime} } );
+            $self->_select( order => sub { $_->mtime } );
         },
         save => sub {
             $self->{should_save}++;
@@ -279,14 +279,14 @@ sub _query {
 sub _query_clause {
     my ( $self, $clause ) = @_;
     my @got;
-    my $tests = $self->results->tests;
-    my $where = $clause->{where} || sub {1};
+    my $results = $self->results;
+    my $where   = $clause->{where} || sub {1};
 
     # Select
-    for my $test ( sort keys %$tests ) {
-        next unless -f $test;
-        local $_ = $tests->{$test};
-        push @got, $test if $where->();
+    for my $name ( $results->test_names ) {
+        next unless -f $name;
+        local $_ = $results->test($name);
+        push @got, $name if $where->();
     }
 
     # Sort
@@ -297,7 +297,7 @@ sub _query_clause {
               || ( ( $a->[1] || 0 ) <=> ( $b->[1] || 0 ) )
           } map {
             [   $_,
-                do { local $_ = $tests->{$_}; $order->() }
+                do { local $_ = $results->test($_); $order->() }
             ]
           } @got;
     }
@@ -359,7 +359,7 @@ Store the results of a test.
 sub observe_test {
     my ( $self, $test, $parser ) = @_;
     $self->_record_test(
-        $test, scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
+        $test->[0], scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
         scalar( $parser->todo ), $parser->start_time, $parser->end_time,
     );
 }
@@ -375,25 +375,24 @@ sub observe_test {
 #     state generation
 
 sub _record_test {
-    my ( $self, $test, $fail, $todo, $start_time, $end_time ) = @_;
-    my $rec = $self->results->tests->{ $test->[0] } ||= {};
+    my ( $self, $name, $fail, $todo, $start_time, $end_time ) = @_;
+    my $test = $self->results->test($name);
 
-    $rec->{test_num} = $self->{test_num}++;
-    $rec->{seq}      = $self->{seq}++;
-    $rec->{gen}      = $self->results->generation;
+    $test->sequence( $self->{seq}++ );
+    $test->generation( $self->results->generation );
 
-    $rec->{last_run_time} = $end_time;
-    $rec->{last_result}   = $fail;
-    $rec->{last_todo}     = $todo;
-    $rec->{elapsed}       = $end_time - $start_time;
+    $test->run_time($end_time);
+    $test->result($fail);
+    $test->num_todo($todo);
+    $test->elapsed( $end_time - $start_time );
 
     if ($fail) {
-        $rec->{total_failures}++;
-        $rec->{last_fail_time} = $end_time;
+        $test->total_failures( $test->total_failures + 1 );
+        $test->last_fail_time($end_time);
     }
     else {
-        $rec->{total_passes}++;
-        $rec->{last_pass_time} = $end_time;
+        $test->total_passes( $test->total_passes + 1 );
+        $test->last_pass_time($end_time);
     }
 }
 
@@ -444,22 +443,25 @@ sub load {
 
 sub _prune_and_stamp {
     my $self  = shift;
-    my $tests = $self->results->tests;
-    for my $name ( keys %$tests ) {
+
+    my $results = $self->results;
+    my @tests = $self->results->tests;
+    for my $test ( @tests ) {
+        my $name = $test->name;
         if ( my @stat = stat $name ) {
-            $tests->{$name}->{mtime} = $stat[9];
+            $test->mtime($stat[9]);
         }
         else {
-            delete $tests->{$name};
+            $results->remove($name);
         }
     }
 }
 
 sub _regen_seq {
     my $self = shift;
-    for my $rec ( values %{ $self->results->tests } ) {
-        $self->{seq} = $rec->{seq} + 1
-          if defined $rec->{seq} && $rec->{seq} >= $self->{seq};
+    for my $test ( $self->results->tests ) {
+        $self->{seq} = $test->sequence + 1
+          if defined $test->sequence && $test->sequence >= $self->{seq};
     }
 }
 

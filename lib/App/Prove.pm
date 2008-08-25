@@ -92,7 +92,6 @@ sub _initialize {
         $self->{$key} = [];
     }
     $self->{harness_class} = 'TAP::Harness';
-    $self->{_state} = App::Prove::State->new( { store => STATE_FILE } );
 
     for my $attr (@ATTR) {
         if ( exists $args->{$attr} ) {
@@ -109,6 +108,7 @@ sub _initialize {
     while ( my ( $env, $attr ) = each %env_provides_default ) {
         $self->{$attr} = 1 if $ENV{$env};
     }
+    $self->{_state} = App::Prove::State->new( { store => STATE_FILE } );
 
     return $self;
 }
@@ -414,7 +414,7 @@ command line tool consists of the following code:
 
     my $app = App::Prove->new;
     $app->process_args(@ARGV);
-    $app->run;
+    exit( $app->run ? 0 : 1 );  # if you need the exit code
 
 =cut
 

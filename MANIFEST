@@ -18,6 +18,7 @@ inc/MyBuilder.pm
 lib/App/Prove.pm
 lib/App/Prove/State.pm
 lib/App/Prove/State/Result.pm
+lib/App/Prove/State/Result/Test.pm
 lib/TAP/Base.pm
 lib/TAP/Formatter/Color.pm
 lib/TAP/Formatter/Console.pm
@@ -180,6 +181,7 @@ t/source_tests/harness_failure
 t/source_tests/source
 t/spool.t
 t/state.t
+t/state_results.t
 t/streams.t
 t/subclass_tests/non_perl_source
 t/subclass_tests/perl_source

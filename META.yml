@@ -25,6 +25,9 @@ provides:
   App::Prove::State::Result:
     file: lib/App/Prove/State/Result.pm
     version: 3.14
+  App::Prove::State::Result::Test:
+    file: lib/App/Prove/State/Result/Test.pm
+    version: 3.14
   TAP::Base:
     file: lib/TAP/Base.pm
     version: 3.14
