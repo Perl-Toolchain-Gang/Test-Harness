@@ -145,7 +145,7 @@ sub get_stream {
     # Taint mode ignores environment variables so we must retranslate
     # PERL5LIB as -I switches and place PERL5OPT on the command line
     # in order that it be seen.
-    if ( grep { $_ eq "-T" } @switches ) {
+    if ( grep { $_ eq "-T" || $_ eq "-t" } @switches ) {
         push @switches,
           $self->_libs2switches(
             split $path_pat,
