@@ -5,7 +5,7 @@ use strict;
 BEGIN {
     if ( $ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ( '../lib', 'lib' );
+        @INC = ( '../lib', '../ext/Test/Harness/t/lib' );
     }
     else {
         use lib 't/lib';
@@ -605,8 +605,8 @@ END_TAP
 
     my $parser = TAP::Parser->new(
         {   source => File::Spec->catfile(
-                ( $ENV{PERL_CORE} ? 'lib' : 't' ),
-                'sample-tests', 'simple'
+                ( $ENV{PERL_CORE} ? ( File::Spec->updir(), 'ext', 'Test', 'Harness' ) : () ),
+                't', 'sample-tests', 'simple'
             ),
         }
     );
