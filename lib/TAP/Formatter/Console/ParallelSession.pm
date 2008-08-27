@@ -156,8 +156,7 @@ sub close_test {
 
         # my $output = $self->_output_method;
         $formatter->_output(
-            $formatter->_format_name( $self->name ),
-            ' '
+            $formatter->_format_name( $self->name )
         );
     }
 
