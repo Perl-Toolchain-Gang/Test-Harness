@@ -170,8 +170,9 @@ sub apply_switch {
     my $self = shift;
     my @opts = @_;
 
-    my $last_gen = $self->results->generation - 1;
-    my $now      = $self->get_time;
+    my $last_gen      = $self->results->generation - 1;
+    my $last_run_time = $self->results->last_run_time;
+    my $now           = $self->get_time;
 
     my @switches = map { split /,/ } @opts;
 
@@ -217,6 +218,9 @@ sub apply_switch {
         },
         old => sub {
             $self->_select( order => sub { $_->mtime } );
+        },
+        fresh => sub {
+            $self->_select( where => sub { $_->mtime >= $last_run_time } );
         },
         save => sub {
             $self->{should_save}++;
@@ -405,6 +409,9 @@ Write the state to a file.
 
 sub save {
     my ( $self, $name ) = @_;
+
+    $self->results->last_run_time( $self->get_time );
+
     my $writer = TAP::Parser::YAMLish::Writer->new;
     local *FH;
     open FH, ">$name" or croak "Can't write $name ($!)";

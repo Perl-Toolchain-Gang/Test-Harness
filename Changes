@@ -6,6 +6,8 @@ Revision history for Test-Harness
           somewhat.  t/foo.....ok becomes t/foo ... ok
         - Added --count and --nocount options to prove to control X/Y display
           while running tests.
+        - Added 'fresh' state option to run test scripts that have been
+          touched since the test run.
 
 3.13    2008-07-27
         - fixed various closure related leaks

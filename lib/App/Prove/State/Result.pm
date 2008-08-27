@@ -81,25 +81,36 @@ Returns the current version of state storage.
 
 sub state_version {STATE_VERSION}
 
+my %methods = (
+    generation    => { method => 'generation',    default => 0 },
+    last_run_time => { method => 'last_run_time', default => undef },
+);
+
+while ( my ( $key, $description ) = each %methods ) {
+    my $default = $description->{default};
+    no strict 'refs';
+    *{ $description->{method} } = sub {
+        my $self = shift;
+        if (@_) {
+            $self->{$key} = shift;
+            return $self;
+        }
+        return $self->{$key} || $default;
+    };
+}
+
 =head3 C<generation>
 
 Getter/setter for the "generation" of the test suite run. The first
 generation is 1 (one) and subsequent generations are 2, 3, etc.
 
-=cut
+=head3 C<last_run_time>
 
-sub generation {
-    my $self = shift;
-    if (@_) {
-        $self->{generation} = shift;
-        return $self;
-    }
-    return $self->{generation} || 0;
-}
+Getter/setter for the time of the test suite run.
 
 =head3 C<tests>
 
-Returns the tests for a given generation. This is a hashref of a hash,
+Returns the tests for a given generation. This is a hashref or a hash,
 depending on context called. The keys to the hash are the individual
 test names and the value is a hashref with various interesting values.
 Each k/v pair might resemble something like this:
