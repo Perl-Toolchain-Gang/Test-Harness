@@ -8,17 +8,18 @@ require TAP::Parser::Scheduler;
 
 my @tests;
 while (<DATA>) {
-    my ($glob, $pattern, $name) = /^(\S+)\t+(\S+)(?:\t+(.*))?$/;
+    my ( $glob, $pattern, $name ) = /^(\S+)\t+(\S+)(?:\t+(.*))?$/;
     die "'$_'" unless $pattern;
-    push @tests, [$glob, $pattern, $name];
+    push @tests, [ $glob, $pattern, $name ];
 }
 
 plan tests => scalar @tests;
 
 foreach (@tests) {
-    my ($glob, $pattern, $name) = @$_;
-    is (TAP::Parser::Scheduler->_glob_to_regexp($glob), $pattern,
-	defined $name ? "$glob  -- $name" : $glob);
+    my ( $glob, $pattern, $name ) = @$_;
+    is( TAP::Parser::Scheduler->_glob_to_regexp($glob), $pattern,
+        defined $name ? "$glob  -- $name" : $glob
+    );
 }
 __DATA__
 Pie			Pie

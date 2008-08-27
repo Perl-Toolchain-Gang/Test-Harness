@@ -53,8 +53,13 @@ for my $class ( values %class_map ) {
 
     my $aggregate = $harness->runtests(
         File::Spec->catfile(
-            ( $ENV{PERL_CORE} ? ( File::Spec->updir, 'ext', 'Test', 'Harness' ) : () ),
-            't', 'sample-tests', 'simple'
+            (   $ENV{PERL_CORE}
+                ? ( File::Spec->updir, 'ext', 'Test', 'Harness' )
+                : ()
+            ),
+            't',
+            'sample-tests',
+            'simple'
         )
     );
 

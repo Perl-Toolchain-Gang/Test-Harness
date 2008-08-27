@@ -148,8 +148,8 @@ my %language_for;
                     ( $desc, $dir, $explanation ) = ( $1, $2, $3 );
                 }
                 return $self->_make_test_token(
-                    $line,   $ok, $num, $desc,
-                    $dir, $explanation
+                    $line, $ok, $num, $desc,
+                    $dir,  $explanation
                 );
             },
         },

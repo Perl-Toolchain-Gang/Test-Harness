@@ -89,9 +89,9 @@ sub _initialize {
     }
 
     if ( !defined $self->show_count ) {
-        $self->{show_count} = 1;   # defaults to true
+        $self->{show_count} = 1;    # defaults to true
     }
-    if ( $self->show_count ) {     # but may be a damned lie!
+    if ( $self->show_count ) {      # but may be a damned lie!
         $self->{show_count} = $self->_should_show_count;
     }
 

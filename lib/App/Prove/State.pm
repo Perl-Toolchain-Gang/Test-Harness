@@ -280,7 +280,7 @@ sub _query_clause {
     my ( $self, $clause ) = @_;
     my @got;
     my $results = $self->results;
-    my $where   = $clause->{where} || sub {1};
+    my $where = $clause->{where} || sub {1};
 
     # Select
     for my $name ( $results->test_names ) {
@@ -359,7 +359,8 @@ Store the results of a test.
 sub observe_test {
     my ( $self, $test, $parser ) = @_;
     $self->_record_test(
-        $test->[0], scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
+        $test->[0],
+        scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
         scalar( $parser->todo ), $parser->start_time, $parser->end_time,
     );
 }
@@ -442,14 +443,14 @@ sub load {
 }
 
 sub _prune_and_stamp {
-    my $self  = shift;
+    my $self = shift;
 
     my $results = $self->results;
-    my @tests = $self->results->tests;
-    for my $test ( @tests ) {
+    my @tests   = $self->results->tests;
+    for my $test (@tests) {
         my $name = $test->name;
         if ( my @stat = stat $name ) {
-            $test->mtime($stat[9]);
+            $test->mtime( $stat[9] );
         }
         else {
             $results->remove($name);

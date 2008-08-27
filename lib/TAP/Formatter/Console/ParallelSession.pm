@@ -125,7 +125,8 @@ sub result {
         unless ( $context->{tests} % $test_print_modulus ) {
             $self->_output_ruler;
         }
-    } elsif ( $result->is_bailout ) {
+    }
+    elsif ( $result->is_bailout ) {
         $formatter->_failure_output(
                 "Bailout called.  Further testing stopped:  "
               . $result->explanation

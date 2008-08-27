@@ -31,16 +31,16 @@ single test.
 
 my %methods = (
     name           => { method => 'name' },
-    elapsed        => { method => 'elapsed',        default => 0 },
-    gen            => { method => 'generation',     default => 1 },
+    elapsed        => { method => 'elapsed', default => 0 },
+    gen            => { method => 'generation', default => 1 },
     last_pass_time => { method => 'last_pass_time', default => undef },
     last_fail_time => { method => 'last_fail_time', default => undef },
-    last_result    => { method => 'result',         default => 0 },
-    last_run_time  => { method => 'run_time',       default => undef },
-    last_todo      => { method => 'num_todo',       default => 0 },
-    mtime          => { method => 'mtime',          default => undef },
-    seq            => { method => 'sequence',       default => 1 },
-    total_passes   => { method => 'total_passes',   default => 0 },
+    last_result    => { method => 'result', default => 0 },
+    last_run_time  => { method => 'run_time', default => undef },
+    last_todo      => { method => 'num_todo', default => 0 },
+    mtime          => { method => 'mtime', default => undef },
+    seq            => { method => 'sequence', default => 1 },
+    total_passes   => { method => 'total_passes', default => 0 },
     total_failures => { method => 'total_failures', default => 0 },
 );
 
@@ -136,7 +136,7 @@ The number of times the test has failed.
 
 sub raw {
     my $self = shift;
-    my %raw = %$self;
+    my %raw  = %$self;
 
     # this is backwards-compatibility hack and is not gauranteed.
     delete $raw{name};

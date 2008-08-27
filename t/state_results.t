@@ -49,32 +49,31 @@ can_ok $result, 'test';
 eval { $result->test };
 my $error = $@;
 like $error, qr/^\Qtest() requires a test name/,
-    '... and it should croak() if a test name is not supplied';
+  '... and it should croak() if a test name is not supplied';
 
 my $name = 't/compat/failure.t';
 ok my $test = $result->test('t/compat/failure.t'),
-    'result() should succeed if the test name is found';
+  'result() should succeed if the test name is found';
 isa_ok $test, 'App::Prove::State::Result::Test',
-    '... and the object it returns';
+  '... and the object it returns';
 
 can_ok $test, 'name';
 is $test->name, $name, '... and it should return the test name';
 
 can_ok $test, 'last_pass_time';
 like $test->last_pass_time, qr/^\d+\.\d+$/,
-    '... and it should return a numeric value';
+  '... and it should return a numeric value';
 
 can_ok $test, 'last_fail_time';
 ok !defined $test->last_fail_time,
-    '... and it should return undef if the test has never failed';
+  '... and it should return undef if the test has never failed';
 
 can_ok $result, 'remove';
 ok $result->remove($name), '... and calling it should succeed';
 
 ok $test = $result->test($name),
   '... and fetching the removed test should suceed';
-ok !defined $test->last_pass_time,
-    '... and it should have clean values';
+ok !defined $test->last_pass_time, '... and it should have clean values';
 
 sub test_suite_data {
     return {
