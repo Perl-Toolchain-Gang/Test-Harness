@@ -163,7 +163,6 @@ sub close_test {
           unless $formatter->really_quiet;
     }
 
-    $self->_output_ruler;
 
     # $self->SUPER::close_test;
     my $active = $context->{active};
@@ -175,8 +174,9 @@ sub close_test {
 
     $self->_need_refresh;
 
-    unless (@$active) {
-
+    if (@$active) {
+        $self->_output_ruler;
+    } else {
         # $self->formatter->_output("\n");
         delete $shared{$formatter};
     }
