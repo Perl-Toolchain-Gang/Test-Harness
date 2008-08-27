@@ -83,7 +83,7 @@ sub state_version {STATE_VERSION}
 
 =head3 C<generation>
 
-Getter/setter for the "generation" of the test suite run.  The first
+Getter/setter for the "generation" of the test suite run. The first
 generation is 1 (one) and subsequent generations are 2, 3, etc.
 
 =cut
@@ -99,10 +99,10 @@ sub generation {
 
 =head3 C<tests>
 
-Returns the tests for a give generation.  This is a hashref of a hash,
-depending on context called.  The keys to the hash are the individual test
-names and the value is a hashref with various interesting values.  Each k/v
-pair might resemble something like this:
+Returns the tests for a given generation. This is a hashref of a hash,
+depending on context called. The keys to the hash are the individual
+test names and the value is a hashref with various interesting values.
+Each k/v pair might resemble something like this:
 
  't/foo.t' => {
     elapsed        => '0.0428488254547119',
@@ -170,7 +170,7 @@ sub test_names {
  $result->remove($test_name);            # remove the test
  my $test = $result->test($test_name);   # fatal error
 
-Removes a give test from results.  This is a no-op if the test name is not
+Removes a given test from results.  This is a no-op if the test name is not
 found.
 
 =cut
