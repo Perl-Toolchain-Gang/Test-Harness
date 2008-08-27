@@ -115,6 +115,12 @@ sub result {
         my $context = $shared{$formatter};
         $context->{tests}++;
 
+	my $active = $context->{active};
+	if ( @$active == 1 ) {
+            # There is only one test, so use the serial output format.
+            return $self->SUPER::result( $result );
+        }
+
         my $ceiling = $context->{tests} / 5;
 
         # Find the next highest power of two, in linear time.
@@ -174,9 +180,9 @@ sub close_test {
 
     $self->_need_refresh;
 
-    if (@$active) {
+    if (@$active > 1) {
         $self->_output_ruler;
-    } else {
+    } elsif (@$active < 1) {
         # $self->formatter->_output("\n");
         delete $shared{$formatter};
     }
