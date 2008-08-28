@@ -125,7 +125,7 @@ sub result {
 
         # Find the next highest power of two, in linear time.
         my $binary = unpack "B*", pack "N", $ceiling;
-        $binary =~ /^0+/;
+        $binary =~ s/^0+//;
         my $test_print_modulus = 1 << length $binary;
 
         unless ( $context->{tests} % $test_print_modulus ) {
