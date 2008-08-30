@@ -114,6 +114,11 @@ Called by the harness for each line of TAP it receives.
 
 Called to close a test session.
 
+=head3 C<clear_for_close>
+
+Called by C<close_test> to clear the line showing test progress, or the parallel
+test ruler, prior to printing the final test result.
+
 =cut
 
 sub _get_output_result {
