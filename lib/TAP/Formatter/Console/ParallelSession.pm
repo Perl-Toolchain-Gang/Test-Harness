@@ -85,16 +85,42 @@ sub _clear_ruler {
     $self->formatter->_output( "\r" . ( ' ' x WIDTH ) . "\r" );
 }
 
+my $now = 0;
+my $start;
+
+my $trailer = '... )===';
+my $chop_length = WIDTH - length $trailer;
+
 sub _output_ruler {
-    my $self      = shift;
+    my ($self, $refresh) = @_;
+    my $new_now = time;
+    return if $new_now == $now and !$refresh;
+    $now = $new_now;
+    $start ||= $now;
     my $formatter = $self->formatter;
     return if $formatter->really_quiet;
 
     my $context = $shared{$formatter};
 
-    my $ruler = sprintf( "===( %7d )", $context->{tests} );
-    $ruler .= ( '=' x ( WIDTH - length $ruler ) );
-    $formatter->_output("\r$ruler");
+    my $ruler = sprintf '===( %7d;%d  ', $context->{tests}, $now - $start;
+
+    foreach my $active ( @{$context->{active}} ) {
+	my $parser = $active->parser;
+	my $tests = $parser->tests_run;
+	my $planned = $parser->tests_planned || '?';
+
+	$ruler .= sprintf '%' . length ($planned) . "d/$planned  ", $tests;
+    }
+    chop $ruler; # Remove a trailing space
+    $ruler .= ')===';
+
+    if ( length $ruler > WIDTH ) {
+	$ruler =~ s/(.{$chop_length}).*/$1$trailer/o;
+    }
+    else {
+	$ruler .= '=' x ( WIDTH - length( $ruler ) );
+    }
+    $formatter->_output( "\r$ruler");
 }
 
 =head3 C<result>
@@ -121,16 +147,7 @@ sub result {
             return $self->SUPER::result( $result );
         }
 
-        my $ceiling = $context->{tests} / 5;
-
-        # Find the next highest power of two, in linear time.
-        my $binary = unpack "B*", pack "N", $ceiling;
-        $binary =~ s/^0+//;
-        my $test_print_modulus = 1 << length $binary;
-
-        unless ( $context->{tests} % $test_print_modulus ) {
-            $self->_output_ruler;
-        }
+	$self->_output_ruler( $self->parser->tests_run == 1 );
     }
     elsif ( $result->is_bailout ) {
         $formatter->_failure_output(
@@ -180,7 +197,7 @@ sub close_test {
     $self->_need_refresh;
 
     if (@$active > 1) {
-        $self->_output_ruler;
+        $self->_output_ruler( 1 );
     } elsif (@$active < 1) {
         # $self->formatter->_output("\n");
         delete $shared{$formatter};
