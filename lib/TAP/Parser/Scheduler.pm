@@ -193,7 +193,9 @@ Get a list of all remaining tests.
 
 sub get_all {
     my $self = shift;
-    $self->_gather( $self->{schedule} );
+    my @all = $self->_gather( $self->{schedule} );
+    $self->{count} = @all;
+    @all;
 }
 
 sub _gather {
@@ -213,12 +215,15 @@ jobs but none are available to run right now.
 
 sub get_job {
     my $self = shift;
+    $self->{count} ||= $self->get_all;
     my @jobs = $self->_find_next_job( $self->{schedule} );
-    return $jobs[0] if @jobs;
+    if (@jobs) {
+	--$self->{count};
+	return $jobs[0];
+    }
 
-    # TODO: This isn't very efficient...
     return TAP::Parser::Scheduler::Spinner->new
-      if $self->get_all;
+      if $self->{count};
 
     return;
 }
