@@ -236,19 +236,27 @@ sub _find_next_job {
     my ( $self, $rule ) = @_;
 
     my @queue = ();
-    for my $seq (@$rule) {
-
+    my $index = 0;
+    while ($index < @$rule) {
+        my $seq = $rule->[$index];
         # Prune any exhausted items.
         shift @$seq while @$seq && _is_empty( $seq->[0] );
-        if ( @$seq && defined $seq->[0] ) {
-            if ( 'ARRAY' eq ref $seq->[0] ) {
-                push @queue, $seq;
+        if ( @$seq ) {
+            if ( defined $seq->[0] ) {
+                if ( 'ARRAY' eq ref $seq->[0] ) {
+                    push @queue, $seq;
+                }
+                else {
+                    my $job = splice @$seq, 0, 1, undef;
+                    $job->on_finish( sub { shift @$seq } );
+                    return $job;
+                }
             }
-            else {
-                my $job = splice @$seq, 0, 1, undef;
-                $job->on_finish( sub { shift @$seq } );
-                return $job;
-            }
+            ++$index;
+        }
+        else {
+            # Remove the empty sub-array from the array
+            splice @$rule, $index, 1;
         }
     }
 
