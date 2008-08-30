@@ -211,10 +211,11 @@ sub _closures {
                 my $number = $result->number;
                 my $now    = CORE::time;
 
-                # Print status on first number, and roughly once per second
-                if (   ( $number == 1 )
-                    || ( $last_status_printed != $now ) )
-                {
+                # Print status roughly once per second.
+		# We will always get the first number as a side effect of
+		# $last_status_printed starting with the value 0, which $now
+		# will never be. (Unless someone sets their clock to 1970)
+                if ( $last_status_printed != $now ) {
                     $formatter->$output("\r$pretty$number$plan");
                     $last_status_printed = $now;
                 }
