@@ -18,7 +18,7 @@ BEGIN {
         *$method = sub { shift->{$method} };
     }
 
-    my @CLOSURE_BINDING = qw( header result close_test );
+    my @CLOSURE_BINDING = qw( header result clear_for_close close_test );
 
     for my $method (@CLOSURE_BINDING) {
         no strict 'refs';
@@ -235,19 +235,23 @@ sub _closures {
             }
         },
 
+        clear_for_close => sub {
+            my $spaces = ' ' x
+              length( '.' . $pretty . $plan . $parser->tests_run );
+            $formatter->$output("\r$spaces");
+        },
+            
         close_test => sub {
+            if ($show_count && !$really_quiet) {
+                $self->clear_for_close;
+                $formatter->$output("\r$pretty");
+            }
 
             # Avoid circular references
             $self->parser(undef);
             $self->{_closures} = {};
 
             return if $really_quiet;
-
-            if ($show_count) {
-                my $spaces = ' ' x
-                  length( '.' . $pretty . $plan . $parser->tests_run );
-                $formatter->$output("\r$spaces\r$pretty");
-            }
 
             if ( my $skip_all = $parser->skip_all ) {
                 $formatter->_output("skipped: $skip_all\n");

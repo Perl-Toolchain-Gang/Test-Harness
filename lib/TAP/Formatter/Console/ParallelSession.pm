@@ -80,7 +80,7 @@ sub header {
 sub _refresh {
 }
 
-sub _clear_line {
+sub _clear_ruler {
     my $self = shift;
     $self->formatter->_output( "\r" . ( ' ' x WIDTH ) . "\r" );
 }
@@ -140,6 +140,23 @@ sub result {
     }
 }
 
+=head3 C<clear_for_close>
+
+=cut
+
+sub clear_for_close {
+    my $self      = shift;
+    my $formatter = $self->formatter;
+    return if $formatter->really_quiet;
+    my $context   = $shared{$formatter};
+    if ( @{ $context->{active} } == 1 ) {
+	$self->SUPER::clear_for_close;
+    }
+    else {
+	$self->_clear_ruler;
+    }
+}
+
 =head3 C<close_test>
 
 =cut
@@ -151,25 +168,8 @@ sub close_test {
     my $formatter = $self->formatter;
     my $context   = $shared{$formatter};
 
-    unless ( $formatter->really_quiet ) {
-        $self->_clear_line;
+    $self->SUPER::close_test;
 
-        # my $output = $self->_output_method;
-        $formatter->_output(
-            $formatter->_format_name( $self->name )
-        );
-    }
-
-    if ( $parser->has_problems ) {
-        $self->_output_test_failure($parser);
-    }
-    else {
-        $formatter->_output("ok\n")
-          unless $formatter->really_quiet;
-    }
-
-
-    # $self->SUPER::close_test;
     my $active = $context->{active};
 
     my @pos = grep { $active->[$_]->name eq $name } 0 .. $#$active;
