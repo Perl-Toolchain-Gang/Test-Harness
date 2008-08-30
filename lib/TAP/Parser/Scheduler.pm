@@ -200,7 +200,7 @@ sub _gather {
     my ( $self, $rule ) = @_;
     return unless defined $rule;
     return $rule unless 'ARRAY' eq ref $rule;
-    return map { $self->_gather($_) } grep {defined} map {@$_} @$rule;
+    return map { defined () ? $self->_gather($_) : () } map {@$_} @$rule;
 }
 
 =head3 C<get_job>
