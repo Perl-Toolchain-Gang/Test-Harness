@@ -1850,6 +1850,8 @@ Leif Eriksen <leif dot eriksen at bigpond dot com>
 
 Steve Purkis <spurkis@cpan.org>
 
+Nicholas Clark <nick@ccl4.org>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to
