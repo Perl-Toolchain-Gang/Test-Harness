@@ -231,7 +231,9 @@ sub get_job {
 sub _not_empty {
     my $ar = shift;
     return 1 unless defined $ar && 'ARRAY' eq ref $ar;
-    return 1 if grep { _not_empty($_) } @$ar;
+    foreach (@$ar) {
+        return 1 if _not_empty($_);
+    }
     return;
 }
 
