@@ -68,8 +68,10 @@ sub _initialize {
     my ( $self, $token ) = @_;
     if ($token) {
 
-        # make a shallow copy of the token:
-        $self->{$_} = $token->{$_} for ( keys %$token );
+        # assign to a hash slice to make a shallow copy of the token.
+        # I guess we could assign to the hash as (by default) there are not
+        # contents, but that seems less helpful if someone wants to subclass us
+        @{$self}{keys %$token} = values %$token;
     }
     return $self;
 }
