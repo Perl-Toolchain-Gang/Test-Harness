@@ -184,7 +184,12 @@ sub close_test {
 
     if (@$active > 1) {
         $self->_output_ruler( 1 );
-    } elsif (@$active < 1) {
+    }
+    elsif (@$active == 1) {
+        # Print out "test/name.t ...."
+        $active->[0]->SUPER::header;
+    }
+    else {
         # $self->formatter->_output("\n");
         delete $shared{$formatter};
     }
