@@ -36,12 +36,6 @@ sub _create_shared_context {
     };
 }
 
-sub _need_refresh {
-    my $self      = shift;
-    my $formatter = $self->formatter;
-    $shared{$formatter}->{need_refresh}++;
-}
-
 =head1 NAME
 
 TAP::Formatter::Console::ParallelSession - Harness output delegate for parallel console output
@@ -73,11 +67,6 @@ Output test preamble
 =cut
 
 sub header {
-    my $self = shift;
-    $self->_need_refresh;
-}
-
-sub _refresh {
 }
 
 sub _clear_ruler {
@@ -132,7 +121,6 @@ sub _output_ruler {
 sub result {
     my ( $self, $result ) = @_;
     my $formatter = $self->formatter;
-    $self->_refresh;
 
     # my $really_quiet = $formatter->really_quiet;
     # my $show_count   = $self->_should_show_count;
@@ -193,8 +181,6 @@ sub close_test {
 
     die "Can't find myself" unless @pos;
     splice @$active, $pos[0], 1;
-
-    $self->_need_refresh;
 
     if (@$active > 1) {
         $self->_output_ruler( 1 );
