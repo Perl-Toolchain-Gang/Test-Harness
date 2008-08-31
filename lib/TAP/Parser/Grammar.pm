@@ -405,7 +405,7 @@ sub _make_test_token {
         ok          => $ok,
         test_num    => $num,
         description => _trim($desc),
-        directive   => uc( defined $dir ? $dir : '' ),
+        directive   => ( defined $dir ? uc $dir : '' ),
         explanation => _trim($explanation),
         raw         => $line,
         type        => 'test',
