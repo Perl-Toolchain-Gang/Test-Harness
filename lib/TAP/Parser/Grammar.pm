@@ -401,7 +401,7 @@ sub _make_plan_token {
 
 sub _make_test_token {
     my ( $self, $line, $ok, $num, $desc, $dir, $explanation ) = @_;
-    my %test = (
+    return {
         ok          => $ok,
         test_num    => $num,
         description => _trim($desc),
@@ -409,8 +409,7 @@ sub _make_test_token {
         explanation => _trim($explanation),
         raw         => $line,
         type        => 'test',
-    );
-    return \%test;
+    };
 }
 
 sub _make_unknown_token {
