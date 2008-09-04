@@ -58,7 +58,7 @@ BEGIN {
       formatter harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
-      test_args state dry extension ignore_exit rules
+      test_args state dry extension ignore_exit rules state_manager
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -108,7 +108,8 @@ sub _initialize {
     while ( my ( $env, $attr ) = each %env_provides_default ) {
         $self->{$attr} = 1 if $ENV{$env};
     }
-    $self->{_state} = $self->state_class->new( { store => STATE_FILE } );
+    $self->state_manager(
+        $self->state_class->new( { store => STATE_FILE } ) );
 
     return $self;
 }
@@ -117,6 +118,10 @@ sub _initialize {
 
 Returns the name of the class used for maintaining state.  This class should
 either subclass from C<App::Prove::State> or provide an identical interface.
+
+=head3 C<state_manager>
+
+Getter/setter for the an instane of the C<state_class>.
 
 =cut
 
@@ -460,7 +465,7 @@ sub run {
 sub _get_tests {
     my $self = shift;
 
-    my $state = $self->{_state};
+    my $state = $self->state_manager;
     my $ext   = $self->extension;
     $state->extension($ext) if defined $ext;
     if ( defined( my $state_switch = $self->state ) ) {
@@ -479,15 +484,17 @@ sub _runtests {
     my ( $self, $args, $harness_class, @tests ) = @_;
     my $harness = $harness_class->new($args);
 
+    my $state = $self->state_manager;
+
     $harness->callback(
         after_test => sub {
-            $self->{_state}->observe_test(@_);
+            $state->observe_test(@_);
         }
     );
 
     $harness->callback(
         after_runtests => sub {
-            $self->{_state}->commit(@_);
+            $state->commit(@_);
         }
     );
 
