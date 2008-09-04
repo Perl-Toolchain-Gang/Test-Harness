@@ -8,7 +8,6 @@ use File::Spec;
 use Carp;
 
 use App::Prove::State::Result;
-use App::Prove::State::Result::Test;
 use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
 use TAP::Base;
@@ -57,7 +56,7 @@ sub new {
     my %args = %{ shift || {} };
 
     my $self = bless {
-        _ => App::Prove::State::Result->new(
+        _ => $class->result_class->new(
             {   tests      => {},
                 generation => 1,
             }
@@ -75,6 +74,18 @@ sub new {
     return $self;
 }
 
+=head2 C<result_class>
+
+Returns the name of the class used for tracking test results.  This class
+should either subclass from C<App::Prove::State::Result> or provide an
+identical interface.
+
+=cut
+
+sub result_class {
+    return 'App::Prove::State::Result';
+}
+
 =head2 C<extension>
 
 Get or set the extension files must have in order to be considered
@@ -90,12 +101,14 @@ sub extension {
 
 =head2 C<results>
 
-Get the results of the last test run.  Returns an L<App::Prove::State::Result>
-object.
+Get the results of the last test run.  Returns a C<result_class()> instance.
 
 =cut
 
-sub results { shift->{_} || App::Prove::State::Result->new }
+sub results {
+    my $self = shift;
+    $self->{_} || $self->result_class->new 
+}
 
 =head2 C<commit>
 
@@ -432,7 +445,7 @@ sub load {
     open FH, "<$name" or croak "Can't read $name ($!)";
 
     # XXX this is temporary
-    $self->{_} = App::Prove::State::Result->new(
+    $self->{_} = $self->result_class->new(
         $reader->read(
             sub {
                 my $line = <FH>;

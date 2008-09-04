@@ -108,9 +108,20 @@ sub _initialize {
     while ( my ( $env, $attr ) = each %env_provides_default ) {
         $self->{$attr} = 1 if $ENV{$env};
     }
-    $self->{_state} = App::Prove::State->new( { store => STATE_FILE } );
+    $self->{_state} = $self->state_class->new( { store => STATE_FILE } );
 
     return $self;
+}
+
+=head3 C<state_class>
+
+Returns the name of the class used for maintaining state.  This class should
+either subclass from C<App::Prove::State> or provide an identical interface.
+
+=cut
+
+sub state_class {
+    return 'App::Prove::State';
 }
 
 =head3 C<add_rc_file>

@@ -63,11 +63,10 @@ sub _initialize {
     my ( $self, $tests ) = @_;
     my %tests;
     while ( my ( $name, $test ) = each %$tests ) {
-        $tests{$name} = App::Prove::State::Result::Test->new(
-            {   %$test,
-                name => $name
-            }
-        );
+        $tests{$name} = $self->test_class->new({
+            %$test, 
+            name => $name
+        });
     }
     $self->tests( \%tests );
     return $self;
@@ -80,6 +79,18 @@ Returns the current version of state storage.
 =cut
 
 sub state_version {STATE_VERSION}
+
+=head2 C<test_class>
+
+Returns the name of the class used for tracking individual tests.  This class
+should either subclass from C<App::Prove::State::Result::Test> or provide an
+identical interface.
+
+=cut
+
+sub test_class {
+    return 'App::Prove::State::Result::Test';
+}
 
 my %methods = (
     generation    => { method => 'generation',    default => 0 },
@@ -159,7 +170,7 @@ sub test {
         return $test;
     }
     else {
-        my $test = App::Prove::State::Result::Test->new( { name => $name } );
+        my $test = $self->test_class->new({name => $name});
         $self->{tests}->{$name} = $test;
         return $test;
     }
