@@ -493,7 +493,7 @@ sub _runtests {
 
     my $aggregator = $harness->runtests(@tests);
 
-    return $aggregator->has_problems ? 0 : 1;
+    return !$aggregator->has_errors;
 }
 
 sub _get_switches {
