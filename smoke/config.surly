@@ -37,4 +37,4 @@ tasks:
       - ./Build testprove
       - ./Build distclean
     subdir: trunk
-    svn: http://svn.hexten.net/tapx/trunk
+    svn: https://svn.hexten.net/tapx/trunk

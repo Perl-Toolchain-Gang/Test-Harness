@@ -5,11 +5,7 @@ use warnings;
 use File::Spec;
 use File::Path;
 use Fcntl ':flock';
-
-# use IO::Handle;
 use IPC::Run qw( run );
-
-# use IO::Select;
 use Mail::Send;
 use Getopt::Long;
 use Sys::Hostname;
@@ -75,7 +71,7 @@ sub get_revision {
         chomp;
         if (/^Revision:\s+(\d+)/) {
             $rev = $1;
-            last LINE;
+            #last LINE;
         }
     }
     close $svn or die "Can't $cmd ($!)\n";
