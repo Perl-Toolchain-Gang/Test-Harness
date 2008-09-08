@@ -11,7 +11,7 @@ use Getopt::Long;
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
-my $VERSION = 0.005;
+my $VERSION = 0.006;
 
 # Reopen STDIN.
 my $pty;
@@ -67,11 +67,10 @@ sub get_revision {
     my $cmd  = join( ' ', @cmd );
     my $rev  = undef;
     open my $svn, '-|', @cmd or die "Can't $cmd ($!)\n";
-    LINE: while (<$svn>) {
+    while (<$svn>) {
         chomp;
         if (/^Revision:\s+(\d+)/) {
             $rev = $1;
-            #last LINE;
         }
     }
     close $svn or die "Can't $cmd ($!)\n";
