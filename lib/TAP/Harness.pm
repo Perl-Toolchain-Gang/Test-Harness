@@ -137,8 +137,8 @@ BEGIN {
  )
  my $harness = TAP::Harness->new( \%args );
 
-The constructor returns a new C<TAP::Harness> object.  It accepts an optional
-hashref whose allowed keys are:
+The constructor returns a new C<TAP::Harness> object. It accepts an
+optional hashref whose allowed keys are:
 
 =over 4
 
@@ -154,7 +154,8 @@ Set the verbosity level:
 
 =item * C<timer>
 
-Append run time for each test to output. Uses L<Time::HiRes> if available.
+Append run time for each test to output. Uses L<Time::HiRes> if
+available.
 
 =item * C<failures>
 
@@ -166,15 +167,16 @@ Update the running test count during testing.
 
 =item * C<lib>
 
-Accepts a scalar value or array ref of scalar values indicating which paths to
-allowed libraries should be included if Perl tests are executed.  Naturally,
-this only makes sense in the context of tests written in Perl.
+Accepts a scalar value or array ref of scalar values indicating which
+paths to allowed libraries should be included if Perl tests are
+executed. Naturally, this only makes sense in the context of tests
+written in Perl.
 
 =item * C<switches>
 
-Accepts a scalar value or array ref of scalar values indicating which switches
-should be included if Perl tests are executed.  Naturally, this only makes
-sense in the context of tests written in Perl.
+Accepts a scalar value or array ref of scalar values indicating which
+switches should be included if Perl tests are executed. Naturally, this
+only makes sense in the context of tests written in Perl.
 
 =item * C<test_args>
 
@@ -187,26 +189,28 @@ Attempt to produce color output.
 
 =item * C<exec>
 
-Typically, Perl tests are run through this.  However, anything which spits out
-TAP is fine.  You can use this argument to specify the name of the program
-(and optional switches) to run your tests with:
+Typically, Perl tests are run through this. However, anything which
+spits out TAP is fine. You can use this argument to specify the name of
+the program (and optional switches) to run your tests with:
 
   exec => ['/usr/bin/ruby', '-w']
 
-You can also pass a subroutine reference in order to determine and return the
-proper program to run based on a given test script. The subroutine reference
-should expect the TAP::Harness object itself as the first argument, and the
-file name as the second argument. It should return an array reference
-containing the command to be run and including the test file name. It can also
-simply return C<undef>, in which case TAP::Harness will fall back on executing
-the test script in Perl:
+You can also pass a subroutine reference in order to determine and
+return the proper program to run based on a given test script. The
+subroutine reference should expect the TAP::Harness object itself as the
+first argument, and the file name as the second argument. It should
+return an array reference containing the command to be run and including
+the test file name. It can also simply return C<undef>, in which case
+TAP::Harness will fall back on executing the test script in Perl:
 
-  exec => sub {
-      my ( $harness, $test_file ) = @_;
-      # Let Perl tests run.
-      return undef if $test_file =~ /[.]t$/;
-      return [ qw( /usr/bin/ruby -w ), $test_file ] if $test_file =~ /[.]rb$/;
-  }
+    exec => sub {
+        my ( $harness, $test_file ) = @_;
+
+        # Let Perl tests run.
+        return undef if $test_file =~ /[.]t$/;
+        return [ qw( /usr/bin/ruby -w ), $test_file ]
+          if $test_file =~ /[.]rb$/;
+      }
 
 =item * C<merge>
 
@@ -245,16 +249,17 @@ TAP output. See L<TAP::Formatter::Console> for an example.
 
 =item * C<errors>
 
-If parse errors are found in the TAP output, a note of this will be made
-in the summary report.  To see all of the parse errors, set this argument to
-true:
+If parse errors are found in the TAP output, a note of this will be
+made in the summary report. To see all of the parse errors, set this
+argument to true:
 
   errors => 1
 
 =item * C<directives>
 
-If set to a true value, only test results with directives will be displayed.
-This overrides other settings such as C<verbose> or C<failures>.
+If set to a true value, only test results with directives will be
+displayed. This overrides other settings such as C<verbose> or
+C<failures>.
 
 =item * C<ignore_exit>
 
@@ -366,10 +371,10 @@ Any keys for which the value is C<undef> will be ignored.
 
     $harness->runtests(@tests);
 
-Accepts and array of C<@tests> to be run.  This should generally be the names
-of test files, but this is not required.  Each element in C<@tests> will be
-passed to C<TAP::Parser::new()> as a C<source>.  See L<TAP::Parser> for more
-information.
+Accepts and array of C<@tests> to be run. This should generally be the
+names of test files, but this is not required. Each element in C<@tests>
+will be passed to C<TAP::Parser::new()> as a C<source>. See
+L<TAP::Parser> for more information.
 
 It is possible to provide aliases that will be displayed in place of the
 test name by supplying the test as a reference to an array containing
@@ -550,18 +555,22 @@ may be run using different C<TAP::Harness> settings. This is useful, for
 example, in the case where some tests should run in parallel but others
 are unsuitable for parallel execution.
 
-    my $formatter = TAP::Formatter::Console->new;
+    my $formatter   = TAP::Formatter::Console->new;
     my $ser_harness = TAP::Harness->new( { formatter => $formatter } );
-    my $par_harness = TAP::Harness->new( { formatter => $formatter,
-                                           jobs => 9 } );
+    my $par_harness = TAP::Harness->new(
+        {   formatter => $formatter,
+            jobs      => 9
+        }
+    );
     my $aggregator = TAP::Parser::Aggregator->new;
-    
+
     $aggregator->start();
     $ser_harness->aggregate_tests( $aggregator, @ser_tests );
     $par_harness->aggregate_tests( $aggregator, @par_tests );
     $aggregator->stop();
-    $formatter->summary( $aggregator );
+    $formatter->summary($aggregator);
 
+=foo
 Note that for simpler testing requirements it will often be possible to
 replace the above code with a single call to C<runtests>.
 
@@ -640,9 +649,10 @@ sub make_scheduler {
 
 =head3 C<jobs>
 
-Returns the number of concurrent test runs the harness is handling. For the default
-harness this value is always 1. A parallel harness such as L<TAP::Harness::Parallel>
-will override this to return the number of jobs it is handling.
+Returns the number of concurrent test runs the harness is handling. For
+the default harness this value is always 1. A parallel harness such as
+L<TAP::Harness::Parallel> will override this to return the number of
+jobs it is handling.
 
 =head3 C<fork>
 
@@ -656,8 +666,9 @@ L<Parallel::Iterator> to be installed.
 
 =head1 SUBCLASSING
 
-C<TAP::Harness> is designed to be (mostly) easy to subclass.  If you don't
-like how a particular feature functions, just override the desired methods.
+C<TAP::Harness> is designed to be (mostly) easy to subclass. If you
+don't like how a particular feature functions, just override the
+desired methods.
 
 =head2 Methods
 
@@ -670,21 +681,22 @@ subclass C<TAP::Harness>.
 
   $harness->summary( \%args );
 
-C<summary> prints the summary report after all tests are run.  The argument is
-a hashref with the following keys:
+C<summary> prints the summary report after all tests are run. The
+argument is a hashref with the following keys:
 
 =over 4
 
 =item * C<start>
 
-This is created with C<< Benchmark->new >> and it the time the tests started.
-You can print a useful summary time, if desired, with:
+This is created with C<< Benchmark->new >> and it the time the tests
+started. You can print a useful summary time, if desired, with:
 
-  $self->output(timestr( timediff( Benchmark->new, $start_time ), 'nop' ));
+    $self->output(
+        timestr( timediff( Benchmark->new, $start_time ), 'nop' ) );
 
 =item * C<tests>
 
-This is an array reference of all test names.  To get the L<TAP::Parser>
+This is an array reference of all test names. To get the L<TAP::Parser>
 object for individual tests:
 
  my $aggregate = $args->{aggregate};
@@ -737,7 +749,6 @@ Make a new parser and display formatter session. Typically used and/or
 overridden in subclasses.
 
     my ( $parser, $session ) = $harness->make_parser;
-
 
 =cut
 
