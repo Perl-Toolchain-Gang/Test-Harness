@@ -571,7 +571,6 @@ are unsuitable for parallel execution.
     $aggregator->stop();
     $formatter->summary($aggregator);
 
-=foo
 Note that for simpler testing requirements it will often be possible to
 replace the above code with a single call to C<runtests>.
 
