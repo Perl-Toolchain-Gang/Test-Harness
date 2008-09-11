@@ -151,6 +151,7 @@ Set the verbosity level:
     -1   quiet          Suppress some test output (mostly failures 
                         while tests are running).
     -2   really quiet   Suppress everything but the tests summary.
+    -3   silent         Suppress everything.
 
 =item * C<timer>
 
