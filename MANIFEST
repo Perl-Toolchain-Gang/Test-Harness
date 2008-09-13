@@ -2,6 +2,7 @@ bin/prove
 Build.PL
 Changes
 Changes-2.64
+examples/analyze_tests.pl
 examples/bin/forked_tests.pl
 examples/bin/test_html.pl
 examples/bin/tprove_gtk
