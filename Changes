@@ -1,6 +1,5 @@
 Revision history for Test-Harness
 
-        - fixed bug where PERL5OPT was not properly split  
 
 3.14
         - Created a proper (ha!) API for prove state results and tests.
@@ -10,6 +9,7 @@ Revision history for Test-Harness
           while running tests.
         - Added 'fresh' state option to run test scripts that have been
           touched since the test run.
+        - fixed bug where PERL5OPT was not properly split  
 
 3.13    2008-07-27
         - fixed various closure related leaks
