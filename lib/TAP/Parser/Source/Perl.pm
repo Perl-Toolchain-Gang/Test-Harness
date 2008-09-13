@@ -154,7 +154,7 @@ sub get_stream {
             $ENV{PERL5LIB} || $ENV{PERLLIB} || ''
           );
 
-        push @switches, split_shell($ENV{PERL5OPT}) if length $ENV{PERL5OPT};
+        push @switches, split_shell( $ENV{PERL5OPT} );
     }
 
     my @command = $self->_get_command_for_switches(@switches)
