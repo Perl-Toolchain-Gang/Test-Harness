@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - fixed bug where PERL5OPT was not properly split  
+
 3.14
         - Created a proper (ha!) API for prove state results and tests.
         - After discussion with Andy, agreed to clean up the test output

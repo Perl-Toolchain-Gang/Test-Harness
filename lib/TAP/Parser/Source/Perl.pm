@@ -8,6 +8,8 @@ use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS => ( $^O eq 'VMS' );
 
 use TAP::Parser::Source;
+use TAP::Parser::Utils qw( split_shell );
+
 @ISA = 'TAP::Parser::Source';
 
 =head1 NAME
@@ -152,7 +154,7 @@ sub get_stream {
             $ENV{PERL5LIB} || $ENV{PERLLIB} || ''
           );
 
-        push @switches, $ENV{PERL5OPT} || ();
+        push @switches, split_shell($ENV{PERL5OPT}) if length $ENV{PERL5OPT};
     }
 
     my @command = $self->_get_command_for_switches(@switches)
