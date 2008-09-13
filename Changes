@@ -3,8 +3,6 @@ Revision history for Test-Harness
 
 3.14
         - Created a proper (ha!) API for prove state results and tests.
-        - After discussion with Andy, agreed to clean up the test output
-          somewhat.  t/foo.....ok becomes t/foo ... ok
         - Added --count and --nocount options to prove to control X/Y display
           while running tests.
         - Added 'fresh' state option to run test scripts that have been
