@@ -295,6 +295,6 @@ L<TAP::Parser::Result::Pragma>,
 L<TAP::Parser::Result::Test>,
 L<TAP::Parser::Result::Unknown>,
 L<TAP::Parser::Result::Version>,
-L<TAP::PARSER::RESULT::YAML>,
+L<TAP::Parser::Result::YAML>,
 
 =cut
