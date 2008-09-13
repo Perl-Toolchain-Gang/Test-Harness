@@ -61,7 +61,7 @@ sub new {
         select    => [],
         seq       => 1,
         store     => delete $args{store},
-        extension => delete $args{extension} || '.t',
+        extension => delete $args{extension} || { '.t' => undef },
     }, $class;
 
     my $store = $self->{store};
@@ -73,8 +73,10 @@ sub new {
 
 =head2 C<extension>
 
-Get or set the extension files must have in order to be considered
-tests. Defaults to '.t'.
+Get or set the extension map hash. Keys in the hash correspond
+with extensions that are considered to be tests. Defaults to
+
+    { '.t' => undef }
 
 =cut
 
@@ -286,6 +288,11 @@ sub _query_clause {
     return @got;
 }
 
+sub _regex_from_keys {
+    my ( $self, $hash ) = @_;
+    return '(?:' . join( '|', map quotemeta, sort keys %$hash ) . ')$';
+}
+
 sub _get_raw_tests {
     my $self    = shift;
     my $recurse = shift;
@@ -294,7 +301,7 @@ sub _get_raw_tests {
 
     # Do globbing on Win32.
     @argv = map { glob "$_" } @argv if NEED_GLOB;
-    my $extension = $self->{extension};
+    my $ext_re = $self->_regex_from_keys( $self->{extension} );
 
     for my $arg (@argv) {
         if ( '-' eq $arg ) {
@@ -306,15 +313,25 @@ sub _get_raw_tests {
         push @tests,
             sort -d $arg
           ? $recurse
-              ? $self->_expand_dir_recursive( $arg, $extension )
-              : glob( File::Spec->catfile( $arg, "*$extension" ) )
+              ? $self->_expand_dir_recursive( $arg, $ext_re )
+              : $self->_expand_dir( $arg, $ext_re )
           : $arg;
     }
     return @tests;
 }
 
+sub _expand_dir {
+    my ( $self, $dir, $ext_re ) = @_;
+    local *D;
+    opendir D, $dir or die "Can't read $dir ($!)\n";
+    print "$ext_re\n";
+    my @tests = grep {/$ext_re/} grep { $_ !~ /^\.\.?$/ } readdir D;
+    closedir D;
+    return @tests;
+}
+
 sub _expand_dir_recursive {
-    my ( $self, $dir, $extension ) = @_;
+    my ( $self, $dir, $ext_re ) = @_;
 
     my @tests;
     find(
@@ -322,7 +339,7 @@ sub _expand_dir_recursive {
             follow_skip => 2,
             wanted      => sub {
                 -f 
-                  && /\Q$extension\E$/
+                  && /$ext_re/
                   && push @tests => $File::Find::name;
               }
         },

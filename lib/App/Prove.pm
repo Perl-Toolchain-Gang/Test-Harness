@@ -145,6 +145,20 @@ Dies on invalid arguments.
 
 =cut
 
+sub _fixup_extensions {
+    my $self = shift;
+
+    # Getopt::Long /nearly/ does this for us - but it doesn't allow the
+    # equal sign to be optional.
+    $self->extension(
+        {   map { /^(.+?)=(.*)/ ? ( $1, $2 ) : ( $_, undef ) }
+              @{ $self->extension || ['.t'] }
+        }
+    );
+    use Data::Dumper;
+    print Dumper($self);
+}
+
 sub process_args {
     my $self = shift;
 
@@ -205,7 +219,7 @@ sub process_args {
             'count!'      => \$self->{show_count},
             'c'           => \$self->{color},
             'D|dry'       => \$self->{dry},
-            'ext=s'       => \$self->{extension},
+            'X|ext=s@'    => \$self->{extension},
             'harness=s'   => \$self->{harness},
             'ignore-exit' => \$self->{ignore_exit},
             'formatter=s' => \$self->{formatter},
@@ -238,6 +252,8 @@ sub process_args {
         # Stash the remainder of argv for later
         $self->{argv} = [@ARGV];
     }
+
+    $self->_fixup_extensions;
 
     return;
 }
@@ -451,8 +467,7 @@ sub _get_tests {
     my $self = shift;
 
     my $state = $self->{_state};
-    my $ext   = $self->extension;
-    $state->extension($ext) if defined $ext;
+    $state->extension( $self->extension );
     if ( defined( my $state_switch = $self->state ) ) {
         $state->apply_switch(@$state_switch);
     }
@@ -665,3 +680,6 @@ calling C<run>.
 =item C<warnings_warn>
 
 =back
+669:	To save a full .LOG file rerun with -g
+670:	To save a full .LOG file rerun with -g
+673:	To save a full .LOG file rerun with -g
