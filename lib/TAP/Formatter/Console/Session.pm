@@ -315,18 +315,18 @@ sub _output_test_failure {
     if ( my $exit = $parser->exit ) {
         my $wstat = $parser->wait;
         my $status = sprintf( "%d (wstat %d, 0x%x)", $exit, $wstat, $wstat );
-        $formatter->_failure_output("Dubious, test returned $status\n");
+        $formatter->_failure_output(" Dubious, test returned $status\n");
     }
 
     if ( $failed == 0 ) {
         $formatter->_failure_output(
             $total
-            ? "All $total subtests passed "
-            : 'No subtests run '
+            ? " All $total subtests passed "
+            : ' No subtests run '
         );
     }
     else {
-        $formatter->_failure_output("Failed $failed/$total subtests ");
+        $formatter->_failure_output(" Failed $failed/$total subtests ");
         if ( !$total ) {
             $formatter->_failure_output("\nNo tests run!");
         }
