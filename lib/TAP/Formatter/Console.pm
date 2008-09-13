@@ -219,7 +219,8 @@ sub _format_now { strftime "[%H:%M:%S]", localtime }
 sub _format_name {
     my ( $self, $test ) = @_;
     my $name = $test;
-    my $periods = '.' x ( $self->_longest + 4 - length $test );
+    my $periods = '.' x ( $self->_longest + 2 - length $test );
+    $periods = " $periods ";
 
     if ( $self->timer ) {
         my $stamp = $self->_format_now();
