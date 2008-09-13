@@ -267,6 +267,18 @@ C<failures>.
 If set to a true value instruct C<TAP::Parser> to ignore exit and wait
 status from test scripts.
 
+=item * C<jobs>
+
+The maximum number of parallel tests to run at any time.  Which tests
+can be run in parallel is controlled by C<rules>.  The default is to
+run only one test at a time.
+
+=item * C<fork>
+
+If true the harness will attempt to fork and run the parser for each
+test in a separate process. Currently this option requires
+L<Parallel::Iterator> to be installed.
+
 =item * C<rules>
 
 A reference to a hash of rules that control which tests may be
@@ -662,9 +674,9 @@ sub make_scheduler {
 
 =head3 C<jobs>
 
-Returns the number of concurrent test runs the harness is handling. For
-the default harness this value is always 1. A parallel harness such as
-L<TAP::Harness::Parallel> will override this to return the number of
+Gets or sets the number of concurrent test runs the harness is handling.
+For the default harness this value is always 1. A parallel harness such
+as L<TAP::Harness::Parallel> will override this to return the number of
 jobs it is handling.
 
 =head3 C<fork>

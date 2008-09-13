@@ -50,7 +50,8 @@ $VERSION = '3.14';
 
 =head1 DESCRIPTION
 
-This provides console orientated output formatting for L<TAP::Harness::Parallel>.
+This provides console orientated output formatting for L<TAP::Harness>
+when run with multiple L<TAP::Harness/jobs>.
 
 =head1 SYNOPSIS
 
