@@ -1,11 +1,13 @@
 ---
 global:
   perls:
-    - /home/andy/Works/Perl/versions/blead/bin/perl
     - /home/andy/Works/Perl/versions/5.0.5/bin/perl
     - /home/andy/Works/Perl/versions/5.6.1/bin/perl
     - /home/andy/Works/Perl/versions/5.6.2/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.1/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.2/bin/perl
     - /home/andy/Works/Perl/versions/5.8.3/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.4/bin/perl
     - /home/andy/Works/Perl/versions/5.8.5/bin/perl
     - interp: /home/andy/Works/Perl/versions/RHEL4/bin/perl
       desc: with RHEL4 @INC patch
@@ -13,6 +15,7 @@ global:
     - /home/andy/Works/Perl/versions/5.8.7/bin/perl
     - /usr/bin/perl
     - /alt/local/bin/perl
+    - /home/andy/Works/Perl/versions/blead/bin/perl
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
   shell: /bin/bash
