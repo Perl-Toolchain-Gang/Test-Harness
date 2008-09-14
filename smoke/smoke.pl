@@ -164,6 +164,7 @@ sub test_and_report {
                           . ": $task->{name} r$cur_rev ("
                           . join( ', ', hostname, $version, $interp )
                           . ")" );
+                    $msg->add( 'X-Is-Alert', $failed ? 'Yes' : 'No' );
 
                     my $fh = $msg->open(
                         @{ $Config->{global}->{mailargs} || [] } );
