@@ -14,13 +14,13 @@ global:
       desc: with RHEL4 @INC patch
     - /home/andy/Works/Perl/versions/5.8.6/bin/perl
     - /home/andy/Works/Perl/versions/5.8.7/bin/perl
+    - /usr/bin/perl
     - /home/andy/Works/Perl/versions/5.9.0/bin/perl
     - /home/andy/Works/Perl/versions/5.9.1/bin/perl
     - /home/andy/Works/Perl/versions/5.9.2/bin/perl
     - /home/andy/Works/Perl/versions/5.9.3/bin/perl
     - /home/andy/Works/Perl/versions/5.9.4/bin/perl
     - /home/andy/Works/Perl/versions/5.9.5/bin/perl
-    - /usr/bin/perl
     - /alt/local/bin/perl
     - /home/andy/Works/Perl/versions/blead/bin/perl
   status: /home/andy/.smoke-tapx
