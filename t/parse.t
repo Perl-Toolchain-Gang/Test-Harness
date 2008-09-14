@@ -954,7 +954,7 @@ END_TAP
 SKIP: {
 
     # http://markmail.org/message/rkxbo6ft7yorgnzb
-    skip "Crashes on older Perls", 2 if $] <= 5.008004;
+    skip "Crashes on older Perls", 2 if $] <= 5.008004 || $] == 5.009;
 
     # coverage testing of TAP::Parser::_finish
 
