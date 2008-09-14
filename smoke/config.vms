@@ -4,6 +4,7 @@ global:
     - /alt/local/bin/perl
   status: /home/andy/.smoke-tapx-vms
   svn: /usr/bin/svn
+  rsync: /usr/bin/rsync
   work: /home/andy/.smoke-work-vms
 tasks:
   - mailto:

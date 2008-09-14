@@ -7,6 +7,7 @@ global:
     - /usr/bin/perl
     - /home/andy/Works/Perl/versions/blead/bin/perl5.*
   status: /home/andy/.smoke-tapx
+  rsync: /usr/local/bin/rsync
   svn: /usr/local/bin/svn
   shell: /usr/local/bin/bash
   work: /home/andy/.smoke-work

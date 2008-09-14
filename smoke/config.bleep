@@ -6,6 +6,7 @@ global:
     - /home/andy/Works/Perl/versions/blead/bin/perl
   status: /home/andy/.smoke-tapx
   svn: /usr/pkg/bin/svn
+  rsync: /usr/pgg/bin/rsync
   shell: /usr/pkg/bin/bash
   work: /home/andy/.smoke-work
   description: NetBSD 3.1

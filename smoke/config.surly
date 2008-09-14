@@ -18,6 +18,7 @@ global:
     - /home/andy/Works/Perl/versions/blead/bin/perl
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
+  rsync: /usr/bin/rsync
   shell: /bin/bash
   work: /home/andy/.smoke-work
   description: Ubuntu Fiesty box with Test::Harness 3.06
