@@ -462,7 +462,7 @@ sub _aggregate_forked {
             my ( $parser, $session ) = $self->make_parser($job);
 
             while ( defined( my $result = $parser->next ) ) {
-                exit 1 if $result->is_bailout;
+                $self->_bailout($result) if $result->is_bailout;
             }
 
             $self->finish_parser( $parser, $session );
@@ -483,6 +483,13 @@ sub _aggregate_forked {
     }
 
     return;
+}
+
+sub _bailout {
+    my ( $self, $result ) = @_;
+    my $explanation = $result->explanation;
+    die "FAILED--Further testing stopped"
+      . ( $explanation ? ": $explanation\n" : ".\n" );
 }
 
 sub _aggregate_parallel {
@@ -509,7 +516,7 @@ sub _aggregate_parallel {
             my ( $session, $job ) = @$stash;
             if ( defined $result ) {
                 $session->result($result);
-                exit 1 if $result->is_bailout;
+                $self->_bailout($result) if $result->is_bailout;
             }
             else {
 
@@ -541,7 +548,7 @@ sub _aggregate_single {
                 # Keep reading until input is exhausted in the hope
                 # of allowing any pending diagnostics to show up.
                 1 while $parser->next;
-                exit 1;
+                $self->_bailout($result);
             }
         }
 
