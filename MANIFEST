@@ -21,10 +21,14 @@ lib/App/Prove/State.pm
 lib/App/Prove/State/Result.pm
 lib/App/Prove/State/Result/Test.pm
 lib/TAP/Base.pm
+lib/TAP/Formatter/Base.pm
 lib/TAP/Formatter/Color.pm
 lib/TAP/Formatter/Console.pm
 lib/TAP/Formatter/Console/ParallelSession.pm
 lib/TAP/Formatter/Console/Session.pm
+lib/TAP/Formatter/File.pm
+lib/TAP/Formatter/File/Session.pm
+lib/TAP/Formatter/Session.pm
 lib/TAP/Harness.pm
 lib/TAP/Object.pm
 lib/TAP/Parser.pm
@@ -78,6 +82,7 @@ t/data/catme.1
 t/data/proverc
 t/data/sample.yml
 t/errors.t
+t/file.t
 t/glob-to-regexp.t
 t/grammar.t
 t/harness-bailout.t

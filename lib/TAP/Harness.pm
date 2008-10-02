@@ -226,7 +226,8 @@ L<TAP::Parser::Aggregator>.
 =item * C<formatter_class>
 
 The name of the class to use to format output. The default is
-L<TAP::Formatter::Console>.
+L<TAP::Formatter::Console>, or L<TAP::Formatter::File> if the output
+isn't a TTY.
 
 =item * C<multiplexer_class>
 
@@ -346,6 +347,9 @@ Any keys for which the value is C<undef> will be ignored.
         }
 
         $self->jobs(1) unless defined $self->jobs;
+
+        local $default_class{formatter_class} = 'TAP::Formatter::File'
+          unless -t ( $arg_for{stdout} || \*STDOUT );
 
         while ( my ( $attr, $class ) = each %default_class ) {
             $self->$attr( $self->$attr() || $class );

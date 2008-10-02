@@ -5,6 +5,9 @@ Revision history for Test-Harness
           somewhat.  t/foo.....ok becomes t/foo ... ok
         - Make Bail out! die instead of exiting. Dies with the same
           message as 2.64 for (belated) backwards compatibility.
+        - Alex Vaniver's patch to refactor TAP::Formatter::Console into
+          a new class, TAP::Formatter::File and a common base class: 
+          TAP::Formatter::Base.
 
 3.14    2008-09-13
         - Created a proper (ha!) API for prove state results and tests.

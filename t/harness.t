@@ -83,8 +83,7 @@ foreach my $test_args ( get_arg_sets() ) {
 {
     my @output;
     local $^W;
-    local *TAP::Formatter::Console::_should_show_count = sub {0};
-    local *TAP::Formatter::Console::_output = sub {
+    local *TAP::Formatter::Base::_output = sub {
         my $self = shift;
         push @output => grep { $_ ne '' }
           map {
@@ -93,11 +92,16 @@ foreach my $test_args ( get_arg_sets() ) {
             trim($_)
           } @_;
     };
-    my $harness            = TAP::Harness->new( { verbosity  => 1 } );
-    my $harness_whisper    = TAP::Harness->new( { verbosity  => -1 } );
-    my $harness_mute       = TAP::Harness->new( { verbosity  => -2 } );
-    my $harness_directives = TAP::Harness->new( { directives => 1 } );
-    my $harness_failures   = TAP::Harness->new( { failures   => 1 } );
+    my $harness = TAP::Harness->new(
+        { verbosity => 1, formatter_class => "TAP::Formatter::Console" } );
+    my $harness_whisper = TAP::Harness->new(
+        { verbosity => -1, formatter_class => "TAP::Formatter::Console" } );
+    my $harness_mute = TAP::Harness->new(
+        { verbosity => -2, formatter_class => "TAP::Formatter::Console" } );
+    my $harness_directives = TAP::Harness->new(
+        { directives => 1, formatter_class => "TAP::Formatter::Console" } );
+    my $harness_failures = TAP::Harness->new(
+        { failures => 1, formatter_class => "TAP::Formatter::Console" } );
 
     colorize($harness);
 
