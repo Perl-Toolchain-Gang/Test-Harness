@@ -672,10 +672,9 @@ sub make_scheduler {
 
 =head3 C<jobs>
 
-Gets or sets the number of concurrent test runs the harness is handling.
-For the default harness this value is always 1. A parallel harness such
-as L<TAP::Harness::Parallel> will override this to return the number of
-jobs it is handling.
+Gets or sets the number of concurrent test runs the harness is
+handling.  By default, this value is 1 -- for parallel testing, this
+should be set higher.
 
 =head3 C<fork>
 
