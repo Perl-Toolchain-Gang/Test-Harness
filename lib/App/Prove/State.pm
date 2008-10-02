@@ -107,7 +107,7 @@ Get the results of the last test run.  Returns a C<result_class()> instance.
 
 sub results {
     my $self = shift;
-    $self->{_} || $self->result_class->new 
+    $self->{_} || $self->result_class->new;
 }
 
 =head2 C<commit>
