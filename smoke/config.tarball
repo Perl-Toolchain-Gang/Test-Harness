@@ -3,7 +3,7 @@ global:
   perls:
     - /usr/bin/perl
   status: /home/andy/.smoke-tapx
-  svn: /usr/bin/svn
+  svn: /opt/local/bin/svn
   rsync: /usr/bin/rsync
   work: /home/andy/.smoke-work
   OUTDIR: /usr/local/apache-php/home/hexten.net/htdocs/tapx
