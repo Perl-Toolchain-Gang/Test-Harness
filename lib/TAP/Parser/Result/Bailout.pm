@@ -12,11 +12,11 @@ TAP::Parser::Result::Bailout - Bailout result token.
 
 =head1 VERSION
 
-Version 3.14
+Version 3.15
 
 =cut
 
-$VERSION = '3.14';
+$VERSION = '3.15';
 
 =head1 DESCRIPTION
 

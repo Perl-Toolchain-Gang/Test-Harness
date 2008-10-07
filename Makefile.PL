@@ -7,6 +7,8 @@ use ExtUtils::MakeMaker qw/WriteMakefile prompt/;
 
 use strict;
 
+my $core = grep { $_ eq 'PERL_CORE=1' } @ARGV;
+
 my %mm_args = (
     'NAME'         => 'Test::Harness',
     'VERSION_FROM' => 'lib/Test/Harness.pm',
@@ -16,7 +18,13 @@ my %mm_args = (
     'INSTALLDIRS' => 'perl',
     'PL_FILES'    => {},
     'test'        => { 'TESTS' => 't/*.t t/compat/*.t' },
-    'EXE_FILES'   => ['bin/prove'],
+
+    # In the core pods will be built by installman, and prove found by
+    # utils/prove.PL
+    $core
+    ? ( 'MAN3PODS' => {} )
+    : ( 'EXE_FILES' => ['bin/prove'],
+    ),
 );
 
 {

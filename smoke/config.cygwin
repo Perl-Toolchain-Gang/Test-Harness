@@ -4,6 +4,7 @@ global:
     - /usr/bin/perl
   status: /home/Administrator/.smoke-tapx
   svn: /usr/bin/svn
+  rsync: /usr/bin/rsync
   shell: /usr/bin/bash
   work: /home/Administrator/.smoke-work
   description: CygWin on Windows XP

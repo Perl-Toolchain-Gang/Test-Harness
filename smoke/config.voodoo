@@ -5,6 +5,7 @@ global:
     - /alt/local/bin/perl
   status: /Users/andy/.smoke-tapx
   svn: /usr/bin/svn
+  rsync: /usr/bin/rsync
   shell: /bin/bash
   work: /Users/andy/.smoke-work
   description: MacBook Pro

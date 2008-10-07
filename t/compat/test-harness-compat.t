@@ -21,7 +21,8 @@ use Test::Harness qw(execute_tests);
 # unset this global when self-testing ('testcover' and etc issue)
 local $ENV{HARNESS_PERL_SWITCHES};
 
-my $TEST_DIR = $ENV{PERL_CORE} ? 'lib/sample-tests' : 't/sample-tests';
+my $TEST_DIR
+  = $ENV{PERL_CORE} ? '../ext/Test/Harness/t/sample-tests' : 't/sample-tests';
 
 {
 

@@ -19,11 +19,11 @@ App::Prove - Implements the C<prove> command.
 
 =head1 VERSION
 
-Version 3.14
+Version 3.15
 
 =cut
 
-$VERSION = '3.14';
+$VERSION = '3.15';
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ BEGIN {
       formatter harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
-      test_args state dry extension ignore_exit rules
+      test_args state dry extension ignore_exit rules state_manager
     );
     for my $attr (@ATTR) {
         no strict 'refs';
@@ -92,7 +92,6 @@ sub _initialize {
         $self->{$key} = [];
     }
     $self->{harness_class} = 'TAP::Harness';
-    $self->{_state} = App::Prove::State->new( { store => STATE_FILE } );
 
     for my $attr (@ATTR) {
         if ( exists $args->{$attr} ) {
@@ -109,8 +108,25 @@ sub _initialize {
     while ( my ( $env, $attr ) = each %env_provides_default ) {
         $self->{$attr} = 1 if $ENV{$env};
     }
+    $self->state_manager(
+        $self->state_class->new( { store => STATE_FILE } ) );
 
     return $self;
+}
+
+=head3 C<state_class>
+
+Returns the name of the class used for maintaining state.  This class should
+either subclass from C<App::Prove::State> or provide an identical interface.
+
+=head3 C<state_manager>
+
+Getter/setter for the an instane of the C<state_class>.
+
+=cut
+
+sub state_class {
+    return 'App::Prove::State';
 }
 
 =head3 C<add_rc_file>
@@ -390,7 +406,6 @@ sub _find_module {
 
     for my $pfx (@search) {
         my $name = join( '::', $pfx, $class );
-        print "$name\n";
         eval "require $name";
         return $name unless $@;
     }
@@ -431,7 +446,7 @@ command line tool consists of the following code:
 
     my $app = App::Prove->new;
     $app->process_args(@ARGV);
-    $app->run;
+    exit( $app->run ? 0 : 1 );  # if you need the exit code
 
 =cut
 
@@ -466,7 +481,7 @@ sub run {
 sub _get_tests {
     my $self = shift;
 
-    my $state = $self->{_state};
+    my $state = $self->state_manager;
     $state->extension( $self->extension );
     if ( defined( my $state_switch = $self->state ) ) {
         $state->apply_switch(@$state_switch);
@@ -484,15 +499,23 @@ sub _runtests {
     my ( $self, $args, $harness_class, @tests ) = @_;
     my $harness = $harness_class->new($args);
 
+    my $state = $self->state_manager;
+
     $harness->callback(
         after_test => sub {
-            $self->{_state}->observe_test(@_);
+            $state->observe_test(@_);
+        }
+    );
+
+    $harness->callback(
+        after_runtests => sub {
+            $state->commit(@_);
         }
     );
 
     my $aggregator = $harness->runtests(@tests);
 
-    return $aggregator->has_problems ? 0 : 1;
+    return !$aggregator->has_errors;
 }
 
 sub _get_switches {
@@ -654,6 +677,8 @@ calling C<run>.
 =item C<recurse>
 
 =item C<rules>
+
+=item C<show_count>
 
 =item C<show_help>
 

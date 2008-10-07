@@ -14,11 +14,11 @@ TAP::Parser::Aggregator - Aggregate TAP::Parser results
 
 =head1 VERSION
 
-Version 3.14
+Version 3.15
 
 =cut
 
-$VERSION = '3.14';
+$VERSION = '3.15';
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,8 @@ BEGIN {    # install summary methods
       wait
       exit
     );
-    $SUMMARY_METHOD_FOR{total} = 'tests_run';
+    $SUMMARY_METHOD_FOR{total}   = 'tests_run';
+    $SUMMARY_METHOD_FOR{planned} = 'tests_planned';
 
     foreach my $method ( keys %SUMMARY_METHOD_FOR ) {
         next if 'total' eq $method;
@@ -297,6 +298,8 @@ for an explanation of description.
 =item * parse_errors
 
 =item * passed
+
+=item * planned
 
 =item * skipped
 

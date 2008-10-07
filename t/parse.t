@@ -5,7 +5,7 @@ use strict;
 BEGIN {
     if ( $ENV{PERL_CORE} ) {
         chdir 't';
-        @INC = ( '../lib', 'lib' );
+        @INC = ( '../lib', '../ext/Test/Harness/t/lib' );
     }
     else {
         use lib 't/lib';
@@ -605,8 +605,13 @@ END_TAP
 
     my $parser = TAP::Parser->new(
         {   source => File::Spec->catfile(
-                ( $ENV{PERL_CORE} ? 'lib' : 't' ),
-                'sample-tests', 'simple'
+                (   $ENV{PERL_CORE}
+                    ? ( File::Spec->updir(), 'ext', 'Test', 'Harness' )
+                    : ()
+                ),
+                't',
+                'sample-tests',
+                'simple'
             ),
         }
     );
@@ -946,7 +951,10 @@ END_TAP
     like pop @die, qr/Can't use/, '...and the message is as we expect';
 }
 
-{
+SKIP: {
+
+    # http://markmail.org/message/rkxbo6ft7yorgnzb
+    skip "Crashes on older Perls", 2 if $] <= 5.008004 || $] == 5.009;
 
     # coverage testing of TAP::Parser::_finish
 

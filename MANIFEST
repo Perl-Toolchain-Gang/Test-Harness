@@ -2,6 +2,7 @@ bin/prove
 Build.PL
 Changes
 Changes-2.64
+examples/analyze_tests.pl
 examples/bin/forked_tests.pl
 examples/bin/test_html.pl
 examples/bin/tprove_gtk
@@ -17,11 +18,17 @@ HACKING.pod
 inc/MyBuilder.pm
 lib/App/Prove.pm
 lib/App/Prove/State.pm
+lib/App/Prove/State/Result.pm
+lib/App/Prove/State/Result/Test.pm
 lib/TAP/Base.pm
+lib/TAP/Formatter/Base.pm
 lib/TAP/Formatter/Color.pm
 lib/TAP/Formatter/Console.pm
 lib/TAP/Formatter/Console/ParallelSession.pm
 lib/TAP/Formatter/Console/Session.pm
+lib/TAP/Formatter/File.pm
+lib/TAP/Formatter/File/Session.pm
+lib/TAP/Formatter/Session.pm
 lib/TAP/Harness.pm
 lib/TAP/Object.pm
 lib/TAP/Parser.pm
@@ -75,7 +82,11 @@ t/data/catme.1
 t/data/proverc
 t/data/sample.yml
 t/errors.t
+t/file.t
+t/glob-to-regexp.t
 t/grammar.t
+t/harness-bailout.t
+t/harness-subclass.t
 t/harness.t
 t/iterators.t
 t/lib/App/Prove/Plugin/Dummy.pm
@@ -92,6 +103,7 @@ t/lib/MyResult.pm
 t/lib/MyResultFactory.pm
 t/lib/MySource.pm
 t/lib/NoFork.pm
+t/lib/NOP.pm
 t/lib/TAP/Parser/SubclassTest.pm
 t/lib/Test/Builder.pm
 t/lib/Test/Builder/Module.pm
@@ -176,6 +188,7 @@ t/source_tests/harness_failure
 t/source_tests/source
 t/spool.t
 t/state.t
+t/state_results.t
 t/streams.t
 t/subclass_tests/non_perl_source
 t/subclass_tests/perl_source

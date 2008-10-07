@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -6,16 +6,14 @@ use File::Spec;
 use File::Path;
 use Fcntl ':flock';
 
-# use IO::Handle;
 use IPC::Run qw( run );
 
-# use IO::Select;
 use Mail::Send;
 use Getopt::Long;
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
-my $VERSION = 0.005;
+my $VERSION = 0.007;
 
 # Reopen STDIN.
 my $pty;
@@ -75,7 +73,6 @@ sub get_revision {
         chomp;
         if (/^Revision:\s+(\d+)/) {
             $rev = $1;
-            last LINE;
         }
     }
     close $svn or die "Can't $cmd ($!)\n";
@@ -114,92 +111,115 @@ sub test_and_report {
           && exists $Status->{revision}
           && $Status->{revision} == $cur_rev;
 
-    my @results = ();
-    my $failed  = 0;
+    mention("Checking for updates");
 
-    for my $perl ( @{ $Config->{global}->{perls} } ) {
-        $perl = { interp => $perl } unless 'HASH' eq ref $perl;
-        for my $interp ( glob( $perl->{interp} ) ) {
-            my $version = perl_version($interp);
-            if ( defined $version ) {
-                mention("Testing against $interp ($version)");
-                my $rv = test_against_perl(
-                    $version, $interp, $task, $cur_rev,
-                    $perl->{desc}
-                );
-                $failed += $rv->{failed};
-                push @results, $rv;
-            }
-        }
-    }
+    # Freshen the repo
+    my $co_dir = checkout_dir($task);
+    mkpath($co_dir);
+    chdir($co_dir);
+    if ( checkout( $task, $cur_rev ) || $FORCE ) {
 
-    return unless @results;
+        for my $perl ( @{ $Config->{global}->{perls} } ) {
+            $perl = { interp => $perl } unless 'HASH' eq ref $perl;
+            INTERP: for my $interp ( glob( $perl->{interp} ) ) {
+                my @results = ();
+                my $failed  = 0;
 
-    my $mailto = $task->{mailto};
+                my $version = perl_version($interp);
+                if ( defined $version ) {
+                    mention("Testing against $interp ($version)");
+                    my $rv = test_against_perl(
+                        $version, $interp, $task, $cur_rev,
+                        $perl->{desc}
+                    );
+                    $failed += $rv->{failed};
+                    push @results, $rv;
+                }
 
-    for my $mail ( 'ARRAY' eq ref $mailto ? @$mailto : ($mailto) ) {
-        $mail = { email => $mail } unless 'HASH' eq ref $mail;
+                next INTERP unless @results;
 
-        my $filter = $mail->{filter} || 'all';
+                my $mailto = $task->{mailto};
 
-        die "Illegal filter spec: $filter\n"
-          unless $filter =~ /^all|passed|failed$/;
+                for my $mail ( 'ARRAY' eq ref $mailto ? @$mailto : ($mailto) )
+                {
+                    $mail = { email => $mail } unless 'HASH' eq ref $mail;
 
-        my $verbose = exists $mail->{verbose} ? $mail->{verbose} : $failed;
-        my $to      = $mail->{email};
-        my @to      = 'ARRAY' eq ref $to ? @$to : ($to);
+                    my $filter = $mail->{filter} || 'all';
 
-        next
-          unless $filter eq 'all'
-              || $filter eq ( $failed ? 'failed' : 'passed' );
+                    die "Illegal filter spec: $filter\n"
+                      unless $filter =~ /^all|passed|failed$/;
 
-        my $msg = Mail::Send->new;
-        $msg->to(@to);
-        $msg->subject( fail_pass( !$failed )
-              . ": Test report for $task->{name} r$cur_rev ("
-              . hostname
-              . ")" );
+                    my $verbose
+                      = exists $mail->{verbose} ? $mail->{verbose} : $failed;
+                    my $to = $mail->{email};
+                    my @to = 'ARRAY' eq ref $to ? @$to : ($to);
 
-        my $fh = $msg->open( @{ $Config->{global}->{mailargs} || [] } );
+                    next
+                      unless $filter eq 'all'
+                          || $filter eq ( $failed ? 'failed' : 'passed' );
 
-        print $fh "To obtain this release use the following command:\n\n";
-        print $fh "  svn checkout -r$cur_rev $task->{svn}\n\n";
+                    my $msg = Mail::Send->new;
+                    $msg->to(@to);
+                    $msg->subject( fail_pass( !$failed )
+                          . ": $task->{name} r$cur_rev ("
+                          . join( ', ', hostname, $version, $interp )
+                          . ")" );
+                    $msg->add( 'X-Is-Alert', $failed ? 'Yes' : 'No' );
 
-        if ( my $desc = $Config->{global}->{description} ) {
-            print $fh sprintf(
-                "Tests run by smoke.pl $VERSION on %s which is a %s.\n\n",
-                hostname,
-                $desc
-            );
-        }
+                    my $fh = $msg->open(
+                        @{ $Config->{global}->{mailargs} || [] } );
 
-        for my $result (@results) {
-            print $fh $result->{title}, "\n\n";
+                    print $fh
+                      "To obtain this release use the following command:\n\n";
+                    print $fh "  svn checkout -r$cur_rev $task->{svn}\n\n";
 
-            for my $cmd ( @{ $result->{commands} } ) {
-                print $fh sprintf(
-                    "%s: %s\n", fail_pass( $cmd->{passed} ),
-                    $cmd->{cmd}
-                );
-                if ($verbose) {
-                    print $fh '  ', $_, "\n" for @{ $cmd->{output} };
-                    print $fh '  Status: ', $cmd->{status}, "\n\n";
+                    if ( my $desc = $Config->{global}->{description} ) {
+                        print $fh sprintf(
+                            "Tests run by smoke.pl $VERSION on %s which is a %s.\n\n",
+                            hostname, $desc
+                        );
+                    }
+
+                    for my $result (@results) {
+                        print $fh $result->{title}, "\n\n";
+
+                        for my $cmd ( @{ $result->{commands} } ) {
+                            print $fh sprintf(
+                                "%s: %s\n",
+                                fail_pass( $cmd->{passed} ),
+                                $cmd->{cmd}
+                            );
+                            if ($verbose) {
+                                print $fh '  ', $_, "\n"
+                                  for @{ $cmd->{output} };
+                                print $fh '  Status: ', $cmd->{status},
+                                  "\n\n";
+                            }
+                        }
+
+                        if ($verbose) {
+                            print $fh $result->{env};
+                        }
+
+                        print $fh "\n";
+                    }
+
+                    $fh->close;
+
+                    mention( "Mail sent to ", join( ', ', @to ) );
                 }
             }
-
-            if ($verbose) {
-                print $fh $result->{env};
-            }
-
-            print $fh "\n";
         }
-
-        $fh->close;
-
-        mention( "Mail sent to ", join( ', ', @to ) );
     }
 
     $Status->{revision} = $cur_rev;
+}
+
+sub checkout_dir {
+    File::Spec->catdir(
+        $Config->{global}->{work},
+        'checkout', split /::/, shift->{name}
+    );
 }
 
 sub work_dir {
@@ -210,8 +230,8 @@ sub work_dir {
         $version = join( '_', $version, $desc );
     }
     return File::Spec->catdir(
-        $Config->{global}->{work}, $version,
-        split /::/,                $name
+        $Config->{global}->{work},
+        $version, split /::/, $name
     );
 }
 
@@ -219,12 +239,15 @@ sub checkout {
     my $task = shift;
     my $rev  = shift;
     my @svn  = (
-        $Config->{global}->{svn}, 'checkout',
-        ( defined $rev ? ("-r$rev") : () ), $task->{svn}
+        $Config->{global}->{svn},
+        ( -d '.svn'    ? 'up'       : 'checkout' ),
+        ( defined $rev ? ("-r$rev") : () ),
+        $task->{svn}
     );
     my $result = capture_command(@svn);
     die join( ' ', @svn ), " failed: $result->{status}"
       if $result->{status};
+    return @{ $result->{output} } > 1;
 }
 
 sub expand {
@@ -233,17 +256,21 @@ sub expand {
     return $str;
 }
 
+sub copy_to_work {
+    my ( $src, $dst ) = @_;
+    mention("Copying $src to $dst");
+    mkpath($dst);
+    my @cmd = ( $Config->{global}->{rsync}, '-a', '--delete', $src, $dst );
+    system @cmd and die "Failed to ", join( ' ', @cmd ), " ($?)\n";
+}
+
 sub test_against_perl {
     my ( $version, $interp, $task, $rev, $desc ) = @_;
-    my $work = work_dir( $task, $version, $desc );
-
-    rmtree($work) if -d $work;
-    mkpath($work);
-
-    chdir($work);
-    checkout( $task, $rev );
-
+    my $co_dir    = checkout_dir($task);
+    my $work      = work_dir( $task, $version, $desc );
     my $build_dir = File::Spec->catdir( $work, $task->{subdir} );
+
+    copy_to_work( File::Spec->catdir( $co_dir, $task->{subdir} ), $work );
     chdir($build_dir);
 
     my $bind = {
@@ -329,11 +356,8 @@ sub capture_command {
         mention( $lines[-1] );
     };
 
-    run(\@cmd,
-        '>',
-        sub { $got_chunk->( 'O', @_ ) },
-        '2>',
-        sub { $got_chunk->( 'E', @_ ) }
+    run(\@cmd, '>', sub                  { $got_chunk->( 'O', @_ ) },
+        '2>',  sub  { $got_chunk->( 'E', @_ ) }
     );
 
     return {

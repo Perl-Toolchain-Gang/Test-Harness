@@ -29,7 +29,7 @@ sub ACTION_test {
     require TAP::Harness;
     my $harness = TAP::Harness->new( { lib => 'blib/lib' } );
     my $aggregator = $harness->runtests(@$tests);
-    exit $aggregator->has_problems ? 1 : 0;
+    die "Failed!\n" if $aggregator->has_problems;
 }
 
 sub ACTION_testprove {

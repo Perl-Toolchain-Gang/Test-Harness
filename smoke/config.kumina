@@ -6,6 +6,7 @@ global:
     - /opt/local/bin/perl
   status: /Users/andy/.smoke-tapx
   svn: /opt/local/bin/svn
+  rsync: /usr/bin/rsync
   work: /Users/andy/.smoke-work
 tasks:
   - mailto:
