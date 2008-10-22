@@ -128,41 +128,41 @@ sub _aggregate {
     # Don't propagate to our children
     local $ENV{HARNESS_OPTIONS};
 
-    if (IS_VMS) {
-
-        # Jiggery pokery doesn't appear to work on VMS - so disable it
-        # pending investigation.
-        _aggregate_tests( $harness, $aggregate, @tests );
-    }
-    else {
-        my $path_sep  = $Config{path_sep};
-        my $path_pat  = qr{$path_sep};
-        my @extra_inc = _filtered_inc();
-
-        # Supply -I switches in taint mode
-        $harness->callback(
-            parser_args => sub {
-                my ( $args, $test ) = @_;
-                if ( _has_taint( $test->[0] ) ) {
-                    push @{ $args->{switches} }, map {"-I$_"} _filtered_inc();
-                }
-            }
-        );
-
-        my $previous = $ENV{PERL5LIB};
-        local $ENV{PERL5LIB};
-
-        if ($previous) {
-            push @extra_inc, split( $path_pat, $previous );
-        }
-
-        if (@extra_inc) {
-            $ENV{PERL5LIB} = join( $path_sep, @extra_inc );
-        }
-
-        _aggregate_tests( $harness, $aggregate, @tests );
-    }
+    local $ENV{PERL5LIB} = _apply_extra_INC($harness);
+    _aggregate_tests( $harness, $aggregate, @tests );
 }
+
+
+# By hook or by crook, make sure the child seens all the extra junk
+# in @INC either by shoving it into PERL5LIB or using -I switches
+# in taint mode.
+sub _apply_extra_INC {
+    my $harness = shift;
+
+    # Jiggery pokery doesn't appear to work on VMS - so disable it
+    # pending investigation.
+    return if IS_VMS;
+
+    # Supply -I switches in taint mode
+    $harness->callback(
+        parser_args => sub {
+            my ( $args, $test ) = @_;
+            if ( _has_taint( $test->[0] ) ) {
+                push @{ $args->{switches} }, map {"-I$_"} _filtered_inc();
+            }
+        }
+    );
+
+    my @extra_inc = _filtered_inc();
+
+    my $perl5lib = $ENV{PERL5LIB};
+    return join(
+        $Config{path_sep},
+        grep defined, $perl5lib, @extra_inc
+    );
+}
+
+
 
 sub _aggregate_tests {
     my ( $harness, $aggregate, @tests ) = @_;
@@ -320,6 +320,10 @@ sub _filtered_inc {
 
     sub _default_inc {
         return @inc if @inc;
+
+        local $ENV{PERL5LIB};
+        local $ENV{PERLLIB};
+
         my $perl = $ENV{HARNESS_PERL} || $^X;
         chomp( @inc = `$perl -le "print join qq[\\n], \@INC"` );
         return @inc;

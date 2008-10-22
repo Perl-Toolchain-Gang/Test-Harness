@@ -8,6 +8,8 @@ Revision history for Test-Harness
         - Alex Vaniver's patch to refactor TAP::Formatter::Console into
           a new class, TAP::Formatter::File and a common base class: 
           TAP::Formatter::Base.
+        - Fix a bug where PERL5LIB might be put in the wrong spot in @INC.
+          [rt.cpan.org 40257]
 
 3.14    2008-09-13
         - Created a proper (ha!) API for prove state results and tests.

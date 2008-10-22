@@ -5,6 +5,7 @@
 
 use strict;
 use lib 't/lib';
+use Config;
 
 sub has_crazy_patch {
     my $sentinel = 'blirpzoffle';
@@ -19,13 +20,23 @@ sub has_crazy_patch {
 use Test::More (
       $^O eq 'VMS' ? ( skip_all => 'VMS' )
     : has_crazy_patch() ? ( skip_all => 'Incompatible @INC patch' )
-    : ( tests => 2 )
+    : ( tests => 3 )
 );
 
 use Test::Harness;
 
 # Change @INC so we ensure it's preserved.
 use lib 'wibble';
+
+{
+    local $ENV{PERL5LIB} = 'from/perl5lib';
+    my $harness = TAP::Harness->new();
+    my $perl5lib = Test::Harness::_apply_extra_INC($harness);
+    my $start_of_perl5lib = join $Config{path_sep}, $ENV{PERL5LIB}, 'wibble', 't/lib';
+    like $perl5lib, qr/^\Q$start_of_perl5lib\E/, '_apply_extra_INC puts PERL5LIB at the front';
+}
+
+
 
 my $test_template = <<'END';
 #!/usr/bin/perl %s
