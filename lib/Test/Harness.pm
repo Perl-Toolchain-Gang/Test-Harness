@@ -132,7 +132,6 @@ sub _aggregate {
     _aggregate_tests( $harness, $aggregate, @tests );
 }
 
-
 # By hook or by crook, make sure the child seens all the extra junk
 # in @INC either by shoving it into PERL5LIB or using -I switches
 # in taint mode.
@@ -161,8 +160,6 @@ sub _apply_extra_INC {
         grep defined, $perl5lib, @extra_inc
     );
 }
-
-
 
 sub _aggregate_tests {
     my ( $harness, $aggregate, @tests ) = @_;
