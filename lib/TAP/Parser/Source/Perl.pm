@@ -260,11 +260,12 @@ sub _switches {
     my $taint = $self->get_taint($shebang);
     push @switches, "-$taint" if defined $taint;
 
-    # Quote the argument if there's any whitespace in it, or if
-    # we're VMS, since VMS requires all parms quoted.  Also, don't quote
-    # it if it's already quoted.
-    for (@switches) {
-        $_ = qq["$_"] if ( ( /\s/ || IS_VMS ) && !/^".*"$/ );
+    # Quote the argument if we're VMS, since VMS will downcase anything
+    # not quoted.
+    if( IS_VMS ) {
+        for (@switches) {
+            $_ = qq["$_"];
+        }
     }
 
     return @switches;
