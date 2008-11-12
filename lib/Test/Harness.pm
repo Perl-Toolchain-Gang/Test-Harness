@@ -128,36 +128,19 @@ sub _aggregate {
     # Don't propagate to our children
     local $ENV{HARNESS_OPTIONS};
 
-    local $ENV{PERL5LIB} = _apply_extra_INC($harness);
+    _apply_extra_INC($harness);
     _aggregate_tests( $harness, $aggregate, @tests );
 }
 
-# By hook or by crook, make sure the child seens all the extra junk
-# in @INC either by shoving it into PERL5LIB or using -I switches
-# in taint mode.
+# Make sure the child seens all the extra junk in @INC
 sub _apply_extra_INC {
     my $harness = shift;
 
-    # Jiggery pokery doesn't appear to work on VMS - so disable it
-    # pending investigation.
-    return if IS_VMS;
-
-    # Supply -I switches in taint mode
     $harness->callback(
         parser_args => sub {
             my ( $args, $test ) = @_;
-            if ( _has_taint( $test->[0] ) ) {
-                push @{ $args->{switches} }, map {"-I$_"} _filtered_inc();
-            }
+            push @{ $args->{switches} }, map {"-I$_"} _filtered_inc();
         }
-    );
-
-    my @extra_inc = _filtered_inc();
-
-    my $perl5lib = $ENV{PERL5LIB};
-    return join(
-        $Config{path_sep},
-        grep defined, $perl5lib, @extra_inc
     );
 }
 

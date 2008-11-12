@@ -110,20 +110,25 @@ sub get_stream {
     my $path_sep = $Config{path_sep};
     my $path_pat = qr{$path_sep};
 
+    # Filter out any -I switches to be handled as libs later.
+    #
     # Nasty kludge. It might be nicer if we got the libs separately
     # although at least this way we find any -I switches that were
     # supplied other then as explicit libs.
+    #
     # We filter out any names containing colons because they will break
     # PERL5LIB
     my @libs;
-    for ( grep { $_ !~ $path_pat } @switches ) {
-        push @libs, $1 if / ^ ['"]? -I (.*?) ['"]? $ /x;
+    my @filtered_switches;
+    for ( @switches ) {
+        if( !/$path_pat/ && / ^ ['"]? -I ['"]? (.*?) ['"]? $ /x ) {
+            push @libs, $1;
+        }
+        else {
+            push @filtered_switches, $_;
+        }
     }
-
-    my $previous = $ENV{PERL5LIB};
-    if ($previous) {
-        push @libs, split( $path_pat, $previous );
-    }
+    @switches = @filtered_switches;
 
     my $setup = sub {
         if (@libs) {
@@ -133,8 +138,9 @@ sub get_stream {
 
     # Cargo culted from comments seen elsewhere about VMS / environment
     # variables. I don't know if this is actually necessary.
+    my $previous = $ENV{PERL5LIB};
     my $teardown = sub {
-        if ($previous) {
+        if (defined $previous) {
             $ENV{PERL5LIB} = $previous;
         }
         else {
@@ -146,12 +152,7 @@ sub get_stream {
     # PERL5LIB as -I switches and place PERL5OPT on the command line
     # in order that it be seen.
     if ( grep { $_ eq "-T" || $_ eq "-t" } @switches ) {
-        push @switches,
-          $self->_libs2switches(
-            split $path_pat,
-            $ENV{PERL5LIB} || $ENV{PERLLIB} || ''
-          );
-
+        push @switches, $self->_libs2switches(@libs);
         push @switches, split_shell( $ENV{PERL5OPT} );
     }
 

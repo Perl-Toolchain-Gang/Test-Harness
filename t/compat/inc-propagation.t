@@ -20,7 +20,7 @@ sub has_crazy_patch {
 use Test::More (
       $^O eq 'VMS' ? ( skip_all => 'VMS' )
     : has_crazy_patch() ? ( skip_all => 'Incompatible @INC patch' )
-    : ( tests => 3 )
+    : ( tests => 2 )
 );
 
 use Test::Harness;
@@ -28,24 +28,13 @@ use Test::Harness;
 # Change @INC so we ensure it's preserved.
 use lib 'wibble';
 
-{
-    local $ENV{PERL5LIB} = 'from/perl5lib';
-    my $harness           = TAP::Harness->new();
-    my $perl5lib          = Test::Harness::_apply_extra_INC($harness);
-    my $start_of_perl5lib = join $Config{path_sep}, $ENV{PERL5LIB}, 'wibble',
-      't/lib';
-    like $perl5lib, qr/^\Q$start_of_perl5lib\E/,
-      '_apply_extra_INC puts PERL5LIB at the front';
-}
-
 my $test_template = <<'END';
 #!/usr/bin/perl %s
 
 use Test::More tests => 2;
 
-# Make sure we did something sensible with PERL5LIB
+is $INC[0], "wibble", 'basic order of @INC preserved' or diag "\@INC: @INC";
 like $ENV{PERL5LIB}, qr{wibble};
-ok grep { $_ eq 'wibble' } @INC;
 
 END
 
