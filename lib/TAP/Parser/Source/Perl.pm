@@ -106,8 +106,6 @@ this is a TAP::Parser instance.
 sub get_stream {
     my ( $self, $factory ) = @_;
 
-    my @extra_libs;
-
     my @switches = $self->_switches;
     my $path_sep = $Config{path_sep};
     my $path_pat = qr{$path_sep};
