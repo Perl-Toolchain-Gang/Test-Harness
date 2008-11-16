@@ -305,6 +305,9 @@ sub summary {
             if ( my $exit = $parser->exit ) {
                 $self->_summary_test_header( $test, $parser );
                 $self->_failure_output("  Non-zero exit status: $exit\n");
+            } elsif ( my $wait = $parser->wait ) {
+                $self->_summary_test_header( $test, $parser );
+                $self->_failure_output("  Non-zero wait status: $wait\n");
             }
 
             if ( my @errors = $parser->parse_errors ) {
