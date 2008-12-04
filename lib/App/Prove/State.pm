@@ -137,8 +137,8 @@ Save the test results. Should be called after all tests have run.
 
 sub commit {
     my $self = shift;
-    if ( $self->{should_save} && defined( my $store = $self->{store} ) ) {
-        $self->save($store);
+    if ( $self->{should_save} ) {
+        $self->save;
     }
 }
 
@@ -441,13 +441,14 @@ Write the state to a file.
 =cut
 
 sub save {
-    my ( $self, $name ) = @_;
+    my ($self) = @_;
 
+    my $store = $self->{store} or return;
     $self->results->last_run_time( $self->get_time );
 
     my $writer = TAP::Parser::YAMLish::Writer->new;
     local *FH;
-    open FH, ">$name" or croak "Can't write $name ($!)";
+    open FH, ">$store" or croak "Can't write $store ($!)";
     $writer->write( $self->results->raw, \*FH );
     close FH;
 }

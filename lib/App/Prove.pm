@@ -425,8 +425,10 @@ command line tool consists of the following code:
 sub run {
     my $self = shift;
 
-    $self->state_manager(
-        $self->state_class->new( { store => STATE_FILE } ) );
+    unless ( $self->state_manager ) {
+        $self->state_manager(
+            $self->state_class->new( { store => STATE_FILE } ) );
+    }
 
     if ( $self->show_help ) {
         $self->_help(1);
