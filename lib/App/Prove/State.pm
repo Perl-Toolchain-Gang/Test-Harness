@@ -373,15 +373,6 @@ Store the results of a test.
 
 =cut
 
-sub observe_test {
-    my ( $self, $test, $parser ) = @_;
-    $self->_record_test(
-        $test->[0],
-        scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 ),
-        scalar( $parser->todo ), $parser->start_time, $parser->end_time,
-    );
-}
-
 # Store:
 #     last fail time
 #     last pass time
@@ -391,9 +382,17 @@ sub observe_test {
 #     total failures
 #     total passes
 #     state generation
+#     parser
 
-sub _record_test {
-    my ( $self, $name, $fail, $todo, $start_time, $end_time ) = @_;
+sub observe_test {
+
+    my ( $self, $test_info, $parser ) = @_;
+    my $name = $test_info->[0];
+    my $fail = scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 );
+    my $todo = scalar( $parser->todo );
+    my $start_time = $parser->start_time;
+    my $end_time   = $parser->end_time,
+
     my $test = $self->results->test($name);
 
     $test->sequence( $self->{seq}++ );
@@ -403,6 +402,8 @@ sub _record_test {
     $test->result($fail);
     $test->num_todo($todo);
     $test->elapsed( $end_time - $start_time );
+
+    $test->parser($parser);
 
     if ($fail) {
         $test->total_failures( $test->total_failures + 1 );
