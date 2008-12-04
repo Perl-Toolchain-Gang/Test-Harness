@@ -58,7 +58,7 @@ BEGIN {
       formatter harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
-      test_args state dry extension ignore_exit rules state_manager
+      state_class test_args state dry extension ignore_exit rules state_manager
     );
     __PACKAGE__->mk_methods(@ATTR);
 }
@@ -101,26 +101,21 @@ sub _initialize {
     while ( my ( $env, $attr ) = each %env_provides_default ) {
         $self->{$attr} = 1 if $ENV{$env};
     }
-    $self->state_manager(
-        $self->state_class->new( { store => STATE_FILE } ) );
-
+    $self->state_class('App::Prove::State');
     return $self;
 }
 
 =head3 C<state_class>
 
-Returns the name of the class used for maintaining state.  This class should
-either subclass from C<App::Prove::State> or provide an identical interface.
+Getter/setter for the name of the class used for maintaining state.  This
+class should either subclass from C<App::Prove::State> or provide an identical
+interface.
 
 =head3 C<state_manager>
 
-Getter/setter for the an instane of the C<state_class>.
+Getter/setter for the instance of the C<state_class>.
 
 =cut
-
-sub state_class {
-    return 'App::Prove::State';
-}
 
 =head3 C<add_rc_file>
 
@@ -430,6 +425,9 @@ command line tool consists of the following code:
 sub run {
     my $self = shift;
 
+    $self->state_manager(
+        $self->state_class->new( { store => STATE_FILE } ) );
+
     if ( $self->show_help ) {
         $self->_help(1);
     }
@@ -667,6 +665,8 @@ calling C<run>.
 =item C<shuffle>
 
 =item C<state>
+
+=item C<state_class>
 
 =item C<taint_fail>
 

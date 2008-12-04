@@ -12,7 +12,10 @@ use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
 use TAP::Base;
 
-@ISA = qw( TAP::Base );
+BEGIN {
+    @ISA = qw( TAP::Base );
+    __PACKAGE__->mk_methods('result_class');
+}
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant NEED_GLOB => IS_WIN32;
@@ -48,6 +51,24 @@ and the operations that may be performed on it.
 
 =head3 C<new>
 
+Accepts a hashref with the following key/value pairs:
+
+=over 4
+
+=item * C<store>
+
+The filename of the data store holding the data that App::Prove::State reads.
+
+=item * C<extension> (optional)
+
+The test name extension.  Defaults to C<.t>.
+
+=item * C<result_class> (optional)
+
+The name of the C<result_class>.  Defaults to C<App::Prove::State::Result>.
+
+=back
+
 =cut
 
 # override TAP::Base::new:
@@ -56,17 +77,19 @@ sub new {
     my %args = %{ shift || {} };
 
     my $self = bless {
-        _ => $class->result_class->new(
-            {   tests      => {},
-                generation => 1,
-            }
-        ),
         select    => [],
         seq       => 1,
         store     => delete $args{store},
-        extension => delete $args{extension} || '.t',
+        extension => ( delete $args{extension} || '.t' ),
+        result_class =>
+          ( delete $args{result_class} || 'App::Prove::State::Result' ),
     }, $class;
 
+    $self->{_} = $self->result_class->new(
+        {   tests      => {},
+            generation => 1,
+        }
+    );
     my $store = $self->{store};
     $self->load($store)
       if defined $store && -f $store;
@@ -76,15 +99,11 @@ sub new {
 
 =head2 C<result_class>
 
-Returns the name of the class used for tracking test results.  This class
-should either subclass from C<App::Prove::State::Result> or provide an
+Getter/setter for the name of the class used for tracking test results.  This
+class should either subclass from C<App::Prove::State::Result> or provide an
 identical interface.
 
 =cut
-
-sub result_class {
-    return 'App::Prove::State::Result';
-}
 
 =head2 C<extension>
 
