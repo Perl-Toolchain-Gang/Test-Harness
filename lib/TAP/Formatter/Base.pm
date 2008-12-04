@@ -6,12 +6,13 @@ use POSIX qw(strftime);
 
 use vars qw($VERSION @ISA);
 
-@ISA = qw(TAP::Base);
 
 my $MAX_ERRORS = 5;
 my %VALIDATION_FOR;
 
 BEGIN {
+    @ISA = qw(TAP::Base);
+
     %VALIDATION_FOR = (
         directives => sub { shift; shift },
         verbosity  => sub { shift; shift },
@@ -36,14 +37,7 @@ BEGIN {
       _colorizer
     );
 
-    for my $method ( @getter_setters, keys %VALIDATION_FOR ) {
-        no strict 'refs';
-        *$method = sub {
-            my $self = shift;
-            return $self->{$method} unless @_;
-            $self->{$method} = shift;
-        };
-    }
+    __PACKAGE__->mk_methods( @getter_setters, keys %VALIDATION_FOR );
 }
 
 =head1 NAME

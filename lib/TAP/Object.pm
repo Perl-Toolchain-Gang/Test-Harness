@@ -114,5 +114,26 @@ sub _construct {
     return $class->new(@args);
 }
 
+=head3 C<mk_methods>
+
+Create simple getter/setters.
+
+ __PACKAGE__->mk_methods(@method_names);
+
+=cut
+
+sub mk_methods {
+    my ( $class, @methods ) = @_;
+    foreach my $method_name (@methods) {
+        my $method = "${class}::$method_name";
+        no strict 'refs';
+        *$method = sub {
+            my $self = shift;
+            $self->{$method_name} = shift if @_;
+            return $self->{$method_name};
+        };
+    }
+}
+
 1;
 

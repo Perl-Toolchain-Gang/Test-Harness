@@ -11,8 +11,6 @@ use Getopt::Long;
 use App::Prove::State;
 use Carp;
 
-@ISA = qw(TAP::Object);
-
 =head1 NAME
 
 App::Prove - Implements the C<prove> command.
@@ -53,6 +51,8 @@ use constant PLUGINS => 'App::Prove::Plugin';
 my @ATTR;
 
 BEGIN {
+    @ISA = qw(TAP::Object);
+
     @ATTR = qw(
       archive argv blib show_count color directives exec failures fork
       formatter harness includes modules plugins jobs lib merge parse quiet
@@ -60,14 +60,7 @@ BEGIN {
       verbose warnings_fail warnings_warn show_help show_man show_version
       test_args state dry extension ignore_exit rules state_manager
     );
-    for my $attr (@ATTR) {
-        no strict 'refs';
-        *$attr = sub {
-            my $self = shift;
-            $self->{$attr} = shift if @_;
-            return $self->{$attr};
-        };
-    }
+    __PACKAGE__->mk_methods(@ATTR);
 }
 
 =head1 METHODS

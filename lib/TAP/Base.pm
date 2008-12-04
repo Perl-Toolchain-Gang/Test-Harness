@@ -9,7 +9,8 @@ use TAP::Object;
 
 =head1 NAME
 
-TAP::Base - Base class that provides common functionality to L<TAP::Parser> and L<TAP::Harness>
+TAP::Base - Base class that provides common functionality to L<TAP::Parser>
+and L<TAP::Harness>
 
 =head1 VERSION
 
