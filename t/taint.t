@@ -29,12 +29,13 @@ sub run_test_file {
     printf TEST $test_template, @args;
     close TEST;
 
-    my $p = TAP::Parser->new({
-        source   => $test_file,
+    my $p = TAP::Parser->new(
+        {   source => $test_file,
 
-        # Test taint when there's spaces in a -I path
-        switches => [q["-Ifoo bar"]],
-    });
+            # Test taint when there's spaces in a -I path
+            switches => [q["-Ifoo bar"]],
+        }
+    );
     1 while $p->next;
     ok !$p->has_problems;
 

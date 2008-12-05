@@ -412,7 +412,7 @@ sub observe_test {
     my $start_time = $parser->start_time;
     my $end_time   = $parser->end_time,
 
-    my $test = $self->results->test($name);
+      my $test = $self->results->test($name);
 
     $test->sequence( $self->{seq}++ );
     $test->generation( $self->results->generation );

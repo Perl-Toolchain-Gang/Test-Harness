@@ -7,7 +7,7 @@ use Test::More tests => 1;
 use Test::Harness;
 
 # 28567
-my(@before, @after);
+my ( @before, @after );
 {
     local @INC;
     unshift @INC, 'wibble';

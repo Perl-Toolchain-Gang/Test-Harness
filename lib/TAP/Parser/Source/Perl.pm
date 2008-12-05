@@ -120,8 +120,8 @@ sub get_stream {
     # PERL5LIB
     my @libs;
     my @filtered_switches;
-    for ( @switches ) {
-        if( !/$path_pat/ && / ^ ['"]? -I ['"]? (.*?) ['"]? $ /x ) {
+    for (@switches) {
+        if ( !/$path_pat/ && / ^ ['"]? -I ['"]? (.*?) ['"]? $ /x ) {
             push @libs, $1;
         }
         else {
@@ -140,7 +140,7 @@ sub get_stream {
     # variables. I don't know if this is actually necessary.
     my $previous = $ENV{PERL5LIB};
     my $teardown = sub {
-        if (defined $previous) {
+        if ( defined $previous ) {
             $ENV{PERL5LIB} = $previous;
         }
         else {
@@ -263,7 +263,7 @@ sub _switches {
 
     # Quote the argument if we're VMS, since VMS will downcase anything
     # not quoted.
-    if( IS_VMS ) {
+    if (IS_VMS) {
         for (@switches) {
             $_ = qq["$_"];
         }
