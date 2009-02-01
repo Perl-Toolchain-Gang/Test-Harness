@@ -52,16 +52,7 @@ C<TAP::Base> provides callback management.
 
 =head2 Class Methods
 
-=head3 C<new>
-
 =cut
-
-sub new {
-    my ( $class, $arg_for ) = @_;
-
-    my $self = bless {}, $class;
-    return $self->_initialize($arg_for);
-}
 
 sub _initialize {
     my ( $self, $arg_for, $ok_callback ) = @_;
