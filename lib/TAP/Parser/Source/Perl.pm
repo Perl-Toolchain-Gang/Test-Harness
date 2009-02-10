@@ -132,7 +132,7 @@ sub get_stream {
 
     my $setup = sub {
         if (@libs) {
-            $ENV{PERL5LIB} = join( $path_sep, @libs );
+            $ENV{PERL5LIB} = join( $path_sep, grep {defined} @libs, $ENV{PERL5LIB} );
         }
     };
 

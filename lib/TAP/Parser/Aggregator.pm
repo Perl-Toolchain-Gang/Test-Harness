@@ -185,7 +185,8 @@ sub _get_parsers {
 
 =head3 C<descriptions>
 
-Get an array of descriptions in the order in which they were added to the aggregator.
+Get an array of descriptions in the order in which they were added to
+the aggregator.
 
 =cut
 
@@ -370,7 +371,7 @@ Returns true if I<any> of the parsers failed.  This includes:
 
 =item * Failed tests
 
-=item * Parse erros
+=item * Parse errors
 
 =item * Bad exit or wait status
 
