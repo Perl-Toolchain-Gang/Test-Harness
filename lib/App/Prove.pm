@@ -388,19 +388,22 @@ sub _find_module {
 }
 
 sub _load_extension {
-    my ( $self, $class, @search ) = @_;
+    my ( $self, $name, @search ) = @_;
 
     my @args = ();
-    if ( $class =~ /^(.*?)=(.*)/ ) {
-        $class = $1;
+    if ( $name =~ /^(.*?)=(.*)/ ) {
+        $name = $1;
         @args = split( /,/, $2 );
     }
 
-    if ( my $name = $self->_find_module( $class, @search ) ) {
-        $name->import(@args);
+    if ( my $class = $self->_find_module( $name, @search ) ) {
+	$class->import(@args);
+	if ($class->can( 'load' )) {
+	    $class->load({ app_prove => $self, args => [ @args ] });
+	}
     }
     else {
-        croak "Can't load module $class";
+        croak "Can't load module $name";
     }
 }
 
@@ -685,3 +688,88 @@ calling C<run>.
 =item C<warnings_warn>
 
 =back
+
+=head1 PLUGINS
+
+C<App::Prove> provides support for 3rd-party plugins.  These are currently
+loaded at run-time, I<after> arguments have been parsed (so you can not
+change the way arguments are processed, sorry), typically with the
+C<-P<plugin>> switch, eg:
+
+  prove -PMyPlugin
+
+This will search for a module named C<App::Prove::Plugin::MyPlugin>, or failing
+that, C<MyPlugin>.  If the plugin can't be found, C<prove> will complain & exit.
+
+You can pass an argument to your plugin by appending an C<=> after the plugin
+name, eg C<-PMyPlugin=foo>.  You can pass multiple arguments using commas:
+
+  prove -PMyPlugin=foo,bar,baz
+
+These are passed in to your plugin's C<load()> class method (if it has one),
+along with a reference to the C<App::Prove> object that is invoking your plugin:
+
+  sub load {
+      my ($class, $p) = @_;
+
+      my @args = @{ $p->{args} };
+      # @args will contain ( 'foo', 'bar', 'baz' )
+      $p->{app_prove}->do_something;
+      ...
+  }
+
+Note that the user's arguments are also passed to your plugin's C<import()>
+function as a list, eg:
+
+  sub import {
+      my ($class, @args) = @_;
+      # @args will contain ( 'foo', 'bar', 'baz' )
+      ...
+  }
+
+This is for backwards compatibility, and may be deprecated in the future.
+
+=head2 Sample Plugin
+
+Here's a sample plugin, for your reference:
+
+  package App::Prove::Plugin::Foo;
+
+  # Sample plugin, try running with:
+  # prove -PFoo=bar -r -j3
+  # prove -PFoo -Q
+  # prove -PFoo=bar,My::Formatter
+
+  use strict;
+  use warnings;
+
+  sub load {
+      my ($class, $p) = @_;
+      my @args = @{ $p->{args} };
+      my $app  = $p->{app_prove};
+
+      print "loading plugin: $class, args: ", join(', ', @args ), "\n";
+
+      # turn on verbosity
+      $app->verbose( 1 );
+
+      # set the formatter?
+      $app->formatter( $args[1] ) if @args > 1;
+
+      # print some of App::Prove's state:
+      for my $attr (qw( jobs quiet really_quiet recurse verbose )) {
+          my $val = $app->$attr;
+          $val    = 'undef' unless defined( $val );
+          print "$attr: $val\n";
+      }
+
+      return 1;
+  }
+
+  1;
+
+=head1 SEE ALSO
+
+L<prove>, L<TAP::Harness>
+
+=cut
