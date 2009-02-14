@@ -90,6 +90,7 @@ t/harness-subclass.t
 t/harness.t
 t/iterators.t
 t/lib/App/Prove/Plugin/Dummy.pm
+t/lib/App/Prove/Plugin/Dummy2.pm
 t/lib/Dev/Null.pm
 t/lib/EmptyParser.pm
 t/lib/if.pm
@@ -116,6 +117,7 @@ t/object.t
 t/parse.t
 t/parser-config.t
 t/parser-subclass.t
+t/perl5lib.t
 t/premature-bailout.t
 t/process.t
 t/prove.t
