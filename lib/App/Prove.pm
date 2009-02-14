@@ -694,7 +694,7 @@ calling C<run>.
 C<App::Prove> provides support for 3rd-party plugins.  These are currently
 loaded at run-time, I<after> arguments have been parsed (so you can not
 change the way arguments are processed, sorry), typically with the
-C<-P<plugin>> switch, eg:
+C<< -PI<plugin> >> switch, eg:
 
   prove -PMyPlugin
 

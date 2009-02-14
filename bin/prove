@@ -261,7 +261,7 @@ taint mode.
 
 =head1 PLUGINS
 
-Plugins can be loaded using the C<-P<plugin>> syntax, eg:
+Plugins can be loaded using the C<< -PI<plugin> >> syntax, eg:
 
   prove -PMyPlugin
 
