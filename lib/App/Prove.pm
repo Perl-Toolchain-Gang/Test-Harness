@@ -397,10 +397,10 @@ sub _load_extension {
     }
 
     if ( my $class = $self->_find_module( $name, @search ) ) {
-	$class->import(@args);
-	if ($class->can( 'load' )) {
-	    $class->load({ app_prove => $self, args => [ @args ] });
-	}
+        $class->import(@args);
+        if ( $class->can('load') ) {
+            $class->load( { app_prove => $self, args => [@args] } );
+        }
     }
     else {
         croak "Can't load module $name";

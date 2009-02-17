@@ -58,6 +58,7 @@ sub mabs {
 {
     my @import_log = ();
     sub test_log_import { push @import_log, [@_] }
+
     sub get_import_log {
         my @log = @import_log;
         @import_log = ();
@@ -66,6 +67,7 @@ sub mabs {
 
     my @plugin_load_log = ();
     sub test_log_plugin_load { push @plugin_load_log, [@_] }
+
     sub get_plugin_load_log {
         my @log = @plugin_load_log;
         @plugin_load_log = ();
@@ -1160,10 +1162,13 @@ BEGIN {    # START PLAN
 
                 my @loaded = get_plugin_load_log();
                 is( scalar @loaded, 1, 'Plugin->load called OK' );
-                my ($plugin_class, $args) = @{ shift @loaded };
-                is( $plugin_class, 'App::Prove::Plugin::Dummy2', 'plugin_class passed' );
-                isa_ok( $args->{app_prove}, 'App::Prove', 'app_prove object passed' );
-                is_deeply( $args->{args}, [qw( fou du fafa )], 'expected args passed' );
+                my ( $plugin_class, $args ) = @{ shift @loaded };
+                is( $plugin_class, 'App::Prove::Plugin::Dummy2',
+                    'plugin_class passed' );
+                isa_ok( $args->{app_prove}, 'App::Prove',
+                    'app_prove object passed' );
+                is_deeply( $args->{args}, [qw( fou du fafa )],
+                    'expected args passed' );
             },
             plan   => 5,
             runlog => [
