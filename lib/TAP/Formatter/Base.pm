@@ -15,6 +15,7 @@ BEGIN {
     %VALIDATION_FOR = (
         directives => sub { shift; shift },
         verbosity  => sub { shift; shift },
+        normalize  => sub { shift; shift },
         timer      => sub { shift; shift },
         failures   => sub { shift; shift },
         errors     => sub { shift; shift },

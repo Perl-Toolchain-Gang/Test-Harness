@@ -116,6 +116,11 @@ sub _should_show_count {
     return !$self->formatter->verbose && -t $self->formatter->stdout;
 }
 
+sub format_for_output {
+    my ($self, $result ) = @_;
+    return $self->formatter->normalize ? $result->as_string : $result->raw;
+}
+
 sub _output_test_failure {
     my ( $self, $parser ) = @_;
     my $formatter = $self->formatter;

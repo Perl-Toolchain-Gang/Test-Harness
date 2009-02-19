@@ -57,7 +57,7 @@ sub result {
             || ( $result->has_directive && $formatter->directives ) )
       )
     {
-        $self->{results} .= $result->as_string . "\n";
+        $self->{results} .= $self->format_for_output($result) . "\n";
     }
 }
 

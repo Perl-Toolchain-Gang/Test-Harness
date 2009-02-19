@@ -59,6 +59,7 @@ BEGIN {
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
       state_class test_args state dry extension ignore_exit rules state_manager
+      normalize
     );
     __PACKAGE__->mk_methods(@ATTR);
 }
@@ -236,6 +237,7 @@ sub process_args {
             't'           => \$self->{taint_warn},
             'W'           => \$self->{warnings_fail},
             'w'           => \$self->{warnings_warn},
+            'normalize'   => \$self->{normalize},
             'rules=s@'    => $self->{rules},
         ) or croak('Unable to continue');
 
@@ -340,7 +342,7 @@ sub _get_args {
 
     $args{verbosity} = shift @verb_adj || 0;
 
-    for my $a (qw( merge failures timer directives )) {
+    for my $a (qw( merge failures timer directives normalize )) {
         $args{$a} = 1 if $self->$a();
     }
 

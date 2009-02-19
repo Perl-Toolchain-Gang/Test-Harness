@@ -42,6 +42,7 @@ Boolean options:
  -p,  --parse       Show full list of TAP parse errors, if any.
       --directives  Only show results with TODO or SKIP directives.
       --timer       Print elapsed time after each test.
+      --normalize   Normalize TAP output in verbose output
  -T                 Enable tainting checks.
  -t                 Enable tainting warnings.
  -W                 Enable fatal warnings.
