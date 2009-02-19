@@ -7,6 +7,8 @@ use strict;
 use lib 't/lib';
 use Config;
 
+local $ENV{PERL5OPT}; # avoid any user-provided PERL5OPT from contaminating @INC
+
 sub has_crazy_patch {
     my $sentinel = 'blirpzoffle';
     local $ENV{PERL5LIB} = $sentinel;
