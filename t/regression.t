@@ -2562,6 +2562,8 @@ my %samples = (
         version       => 12,
     },
 
+    # For some reason mixing stdout with stderr is unreliable on Windows
+    ( $IsWin32 ? () : (
     stdout_stderr => {
         results => [
             {   is_comment => TRUE,
@@ -2652,7 +2654,7 @@ my %samples = (
         wait          => 0,
         version       => 12,
         need_open3    => 1,
-    },
+    })),
 
     junk_before_plan => {
         results => [
