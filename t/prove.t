@@ -1164,11 +1164,16 @@ BEGIN {    # START PLAN
                 is( scalar @loaded, 1, 'Plugin->load called OK' );
                 my ( $plugin_class, $args ) = @{ shift @loaded };
                 is( $plugin_class, 'App::Prove::Plugin::Dummy2',
-                    'plugin_class passed' );
-                isa_ok( $args->{app_prove}, 'App::Prove',
-                    'app_prove object passed' );
-                is_deeply( $args->{args}, [qw( fou du fafa )],
-                    'expected args passed' );
+                    'plugin_class passed'
+                );
+                isa_ok(
+                    $args->{app_prove}, 'App::Prove',
+                    'app_prove object passed'
+                );
+                is_deeply(
+                    $args->{args}, [qw( fou du fafa )],
+                    'expected args passed'
+                );
             },
             plan   => 5,
             runlog => [
