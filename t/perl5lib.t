@@ -32,11 +32,11 @@ use App::Prove;
 $ENV{PERL5LIB} = join($path_sep, 'wibble', $ENV{PERL5LIB});
 
 open TEST, ">perl5lib_check.t.tmp";
-print TEST <<'END';
+print TEST <<"END";
 #!/usr/bin/perl
 use strict;
 use Test::More tests => 1;
-like $ENV{PERL5LIB}, qr/(^|:)wibble:/;
+like \$ENV{PERL5LIB}, qr/(^|${path_sep})wibble${path_sep}/;
 END
 close TEST;
 
