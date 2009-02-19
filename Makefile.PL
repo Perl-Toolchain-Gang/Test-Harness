@@ -6,6 +6,7 @@
 use ExtUtils::MakeMaker qw/WriteMakefile prompt/;
 
 use strict;
+use Config;
 
 my $core = grep { $_ eq 'PERL_CORE=1' } @ARGV;
 
@@ -15,9 +16,13 @@ my %mm_args = (
     'PREREQ_PM'    => {
         'File::Spec' => 0.8,
     },
-    'INSTALLDIRS' => 'perl',
-    'PL_FILES'    => {},
-    'test'        => { 'TESTS' => 't/*.t t/compat/*.t' },
+    'INSTALLDIRS'    => 'perl',
+    'INSTALLPRIVLIB' => ( $] >= 5.011 )
+    ? $Config{installarchlib}
+    : $Config{installprivlib},
+
+    'PL_FILES' => {},
+    'test'     => { 'TESTS' => 't/*.t t/compat/*.t' },
 
     # In the core pods will be built by installman, and prove found by
     # utils/prove.PL
