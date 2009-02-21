@@ -149,7 +149,7 @@ sub _closures {
             if (!$quiet
                 && (   $verbose
                     || ( $is_test && $failures && !$result->is_ok )
-                    || ( $comments && $result->is_comment )
+                    || ( $comments   && $result->is_comment )
                     || ( $directives && $result->has_directive ) )
               )
             {

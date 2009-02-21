@@ -54,7 +54,7 @@ sub result {
     if (!$formatter->quiet
         && (   $formatter->verbose
             || ( $result->is_test && $formatter->failures && !$result->is_ok )
-            || ( $formatter->comments && $result->is_comment )
+            || ( $formatter->comments   && $result->is_comment )
             || ( $result->has_directive && $formatter->directives ) )
       )
     {

@@ -3129,9 +3129,9 @@ my %samples = (
         parse_errors  => [
             'Tests out of sequence.  Found (0) but expected (4)',
         ],
-        'exit'        => 0,
-        wait          => 0,
-        version       => 12,
+        'exit'  => 0,
+        wait    => 0,
+        version => 12,
     },
 );
 

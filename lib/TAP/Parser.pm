@@ -1197,7 +1197,7 @@ sub _make_state_table {
                     }
                 }
 
-                if (defined $number) {
+                if ( defined $number ) {
                     if ( $number != $tests_run ) {
                         my $count = $tests_run;
                         $self->_add_error( "Tests out of sequence.  Found "

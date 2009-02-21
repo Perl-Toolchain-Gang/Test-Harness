@@ -117,7 +117,7 @@ sub _should_show_count {
 }
 
 sub format_for_output {
-    my ($self, $result ) = @_;
+    my ( $self, $result ) = @_;
     return $self->formatter->normalize ? $result->as_string : $result->raw;
 }
 

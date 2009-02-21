@@ -42,21 +42,24 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
             trim($_)
           } map { split /\n/ } @_;
     };
+
     # Make sure verbosity 1 overrides failures and comments.
-    my $harness            = TAP::Harness->new({
-        verbosity => 1,
-        failures  => 1,
-        comments  => 1,
-    });
+    my $harness = TAP::Harness->new(
+        {   verbosity => 1,
+            failures  => 1,
+            comments  => 1,
+        }
+    );
     my $harness_whisper    = TAP::Harness->new( { verbosity  => -1 } );
     my $harness_mute       = TAP::Harness->new( { verbosity  => -2 } );
     my $harness_directives = TAP::Harness->new( { directives => 1 } );
     my $harness_failures   = TAP::Harness->new( { failures   => 1 } );
     my $harness_comments   = TAP::Harness->new( { comments   => 1 } );
-    my $harness_fandc      = TAP::Harness->new( {
-        failures => 1,
-        comments => 1
-    } );
+    my $harness_fandc      = TAP::Harness->new(
+        {   failures => 1,
+            comments => 1
+        }
+    );
 
     can_ok $harness, 'runtests';
 
@@ -155,7 +158,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
     @output = ();
     ok _runtests( $harness_whisper, "$source_tests/harness" ),
-        'Run tests with whisper';
+      'Run tests with whisper';
 
     chomp(@output);
     @expected = (
@@ -177,8 +180,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
     # normal tests in really_quiet mode
 
     @output = ();
-    ok _runtests( $harness_mute, "$source_tests/harness" ),
-        'Run tests mute';
+    ok _runtests( $harness_mute, "$source_tests/harness" ), 'Run tests mute';
 
     chomp(@output);
     @expected = (
@@ -200,13 +202,12 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
     @output = ();
     ok _runtests( $harness, "$source_tests/harness_failure" ),
-        'Run tests with failures';
+      'Run tests with failures';
 
     $status  = pop @output;
     $summary = pop @output;
 
-    like $status, qr{^Result: FAIL$},
-      '... the status line should be correct';
+    like $status, qr{^Result: FAIL$}, '... the status line should be correct';
 
     my @summary = @output[ 9 .. $#output ];
     @output = @output[ 0 .. 8 ];
@@ -241,7 +242,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
     @output = ();
     ok _runtests( $harness_whisper, "$source_tests/harness_failure" ),
-        'Run whisper tests with failures';
+      'Run whisper tests with failures';
 
     $status   = pop @output;
     $summary  = pop @output;
@@ -255,8 +256,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
         '2',
     );
 
-    like $status, qr{^Result: FAIL$},
-      '... the status line should be correct';
+    like $status, qr{^Result: FAIL$}, '... the status line should be correct';
 
     is_deeply \@output, \@expected,
       '... and failing test output should be correct';
@@ -265,7 +265,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
     @output = ();
     ok _runtests( $harness_mute, "$source_tests/harness_failure" ),
-        'Run mute tests with failures';
+      'Run mute tests with failures';
 
     $status   = pop @output;
     $summary  = pop @output;
@@ -277,8 +277,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
         '2',
     );
 
-    like $status, qr{^Result: FAIL$},
-      '... the status line should be correct';
+    like $status, qr{^Result: FAIL$}, '... the status line should be correct';
 
     is_deeply \@output, \@expected,
       '... and failing test output should be correct';
@@ -289,7 +288,8 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
     ok _runtests(
         $harness_directives,
         "$source_tests/harness_directives"
-    ), 'Run tests with directives';
+      ),
+      'Run tests with directives';
 
     chomp(@output);
 
@@ -324,7 +324,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
     @output = ();
     ok _runtests( $harness, "$source_tests/harness_badtap" ),
-        'Run tests with bad TAP';
+      'Run tests with bad TAP';
     chomp(@output);
 
     @output   = map { trim($_) } @output;
@@ -359,7 +359,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
     @output = ();
     ok _runtests( $harness_failures, "$source_tests/harness_failure" ),
-        'Run tests with failures only';
+      'Run tests with failures only';
 
     chomp(@output);
 
@@ -377,8 +377,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
     $status  = pop @output;
     $summary = pop @output;
 
-    like $status, qr{^Result: FAIL$},
-      '... the status line should be correct';
+    like $status, qr{^Result: FAIL$}, '... the status line should be correct';
     $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';
 
@@ -386,7 +385,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
     @output = ();
     ok _runtests( $harness_failures, "$sample_tests/no_output" ),
-        'Run tests with failures';
+      'Run tests with failures';
 
     chomp(@output);
 
@@ -402,8 +401,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
     $status  = pop @output;
     $summary = pop @output;
 
-    like $status, qr{^Result: FAIL$},
-      '... the status line should be correct';
+    like $status, qr{^Result: FAIL$}, '... the status line should be correct';
     $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';
 
@@ -412,7 +410,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
     @output = ();
     ok _runtests( $harness_comments, "$source_tests/harness_failure" ),
-        'Run tests with comments';
+      'Run tests with comments';
     chomp(@output);
 
     @expected = (
@@ -432,8 +430,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
     $status  = pop @output;
     $summary = pop @output;
 
-    like $status, qr{^Result: FAIL$},
-      '... the status line should be correct';
+    like $status, qr{^Result: FAIL$}, '... the status line should be correct';
     $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';
 
@@ -443,7 +440,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
     @output = ();
     $ENV{FOO} = 1;
     ok _runtests( $harness_fandc, "$source_tests/harness_failure" ),
-        'Run tests with failures and comments';
+      'Run tests with failures and comments';
     delete $ENV{FOO};
     chomp(@output);
 
@@ -465,8 +462,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
     $status  = pop @output;
     $summary = pop @output;
 
-    like $status, qr{^Result: FAIL$},
-      '... the status line should be correct';
+    like $status, qr{^Result: FAIL$}, '... the status line should be correct';
     $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';
 
