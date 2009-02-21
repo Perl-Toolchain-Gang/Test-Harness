@@ -13,7 +13,7 @@ use Getopt::Long;
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
-my $VERSION = 0.007;
+my $VERSION = 0.008;
 
 # Reopen STDIN.
 my $pty;
@@ -352,12 +352,14 @@ sub capture_command {
 
     my $got_chunk = sub {
         my ( $type, $line ) = @_;
-        push @lines, map {"$type| $_"} split /\n/, $line;
-        mention( $lines[-1] );
+        for my $ln ( map {"$type| $_"} split /\n/, $line ) {
+            push @lines, $ln;
+            mention($ln);
+        }
     };
 
-    run(\@cmd, '>', sub                  { $got_chunk->( 'O', @_ ) },
-        '2>',  sub  { $got_chunk->( 'E', @_ ) }
+    run(\@cmd, '>', sub { $got_chunk->( 'O', @_ ) }, '2>',
+        sub { $got_chunk->( 'E', @_ ) }
     );
 
     return {
