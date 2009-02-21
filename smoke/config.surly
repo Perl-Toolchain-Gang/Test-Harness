@@ -32,7 +32,7 @@ global:
 tasks:
   - mailto:
       - email: tapx-commit@hexten.net
-        filter: all
+        filter: failed
         verbose: 1
       - email: tapx-dev@hexten.net
         filter: failed
