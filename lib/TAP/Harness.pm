@@ -60,7 +60,8 @@ sub _error {
 BEGIN {
 
     @FORMATTER_ARGS = qw(
-      directives verbosity timer failures errors stdout color show_count normalize
+      directives verbosity timer failures comments errors stdout color
+      show_count normalize
     );
 
     %VALIDATION_FOR = (
@@ -160,7 +161,11 @@ available.
 
 =item * C<failures>
 
-Only show test failures (this is a no-op if C<verbose> is selected).
+Show test failures (this is a no-op if C<verbose> is selected).
+
+=item * C<comments>
+
+Show test comments (this is a no-op if C<verbose> is selected).
 
 =item * C<show_count>
 

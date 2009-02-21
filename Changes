@@ -1,5 +1,11 @@
 Revision history for Test-Harness
 
+3.17
+        - Changed the 'failures' so that it is overridden by verbosity rather
+          than the other way around.
+        - Added the 'comments' option, most useful when used in conjunction
+          with the 'failures' option.
+
 3.16    2009-02-19
         - Fix path splicing on platforms where the path separator
           is not ':'.

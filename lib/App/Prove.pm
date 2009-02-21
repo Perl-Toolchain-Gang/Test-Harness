@@ -54,7 +54,7 @@ BEGIN {
     @ISA = qw(TAP::Object);
 
     @ATTR = qw(
-      archive argv blib show_count color directives exec failures fork
+      archive argv blib show_count color directives exec failures comments fork
       formatter harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
@@ -202,6 +202,7 @@ sub process_args {
         GetOptions(
             'v|verbose'   => \$self->{verbose},
             'f|failures'  => \$self->{failures},
+            'o|comments'  => \$self->{comments},
             'l|lib'       => \$self->{lib},
             'b|blib'      => \$self->{blib},
             's|shuffle'   => \$self->{shuffle},
@@ -342,7 +343,7 @@ sub _get_args {
 
     $args{verbosity} = shift @verb_adj || 0;
 
-    for my $a (qw( merge failures timer directives normalize )) {
+    for my $a (qw( merge failures comments timer directives normalize )) {
         $args{$a} = 1 if $self->$a();
     }
 
@@ -630,6 +631,8 @@ calling C<run>.
 =item C<extension>
 
 =item C<failures>
+
+=item C<comments>
 
 =item C<fork>
 

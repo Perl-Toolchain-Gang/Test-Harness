@@ -92,6 +92,7 @@ sub _closures {
     my $verbose      = $formatter->verbose;
     my $directives   = $formatter->directives;
     my $failures     = $formatter->failures;
+    my $comments     = $formatter->comments;
 
     my $output_result = $self->_get_output_result;
 
@@ -146,9 +147,10 @@ sub _closures {
             }
 
             if (!$quiet
-                && (   ( $verbose && !$failures )
+                && (   $verbose
                     || ( $is_test && $failures && !$result->is_ok )
-                    || ( $result->has_directive && $directives ) )
+                    || ( $comments && $result->is_comment )
+                    || ( $directives && $result->has_directive ) )
               )
             {
                 unless ($newline_printed) {

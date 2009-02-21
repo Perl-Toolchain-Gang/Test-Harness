@@ -261,8 +261,8 @@ foreach my $test_args ( get_arg_sets() ) {
     like $status, qr{^Result: FAIL$},
       '... and the status line should be correct';
 
-    my @summary = @output[ 10 .. $#output ];
-    @output = @output[ 0 .. 9 ];
+    my @summary = @output[ 18 .. $#output ];
+    @output = @output[ 0 .. 17 ];
 
     @expected = (
         "$source_tests/harness_failure ..",
@@ -272,6 +272,14 @@ foreach my $test_args ( get_arg_sets() ) {
         '[[reset]]',
         '[[red]]',
         'not ok 2 - this is another test',
+        '[[reset]]',
+        q{#   Failed test 'this is another test'},
+        '[[reset]]',
+        '#   in harness_failure.t at line 5.',
+        '[[reset]]',
+        q{#          got: 'waffle'},
+        '[[reset]]',
+        q{#     expected: 'yarblokos'},
         '[[reset]]',
         '[[red]]',
         'Failed 1/2 subtests',

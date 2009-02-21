@@ -18,6 +18,7 @@ BEGIN {
         normalize  => sub { shift; shift },
         timer      => sub { shift; shift },
         failures   => sub { shift; shift },
+        comments   => sub { shift; shift },
         errors     => sub { shift; shift },
         color      => sub { shift; shift },
         jobs       => sub { shift; shift },
@@ -133,7 +134,11 @@ Append run time for each test to output. Uses L<Time::HiRes> if available.
 
 =item * C<failures>
 
-Only show test failures (this is a no-op if C<verbose> is selected).
+Show test failures (this is a no-op if C<verbose> is selected).
+
+=item * C<comments>
+
+Show test comments (this is a no-op if C<verbose> is selected).
 
 =item * C<quiet>
 
@@ -158,7 +163,7 @@ true:
 =item * C<directives>
 
 If set to a true value, only test results with directives will be displayed.
-This overrides other settings such as C<verbose> or C<failures>.
+This overrides other settings such as C<verbose>, C<failures>, or C<comments>.
 
 =item * C<stdout>
 

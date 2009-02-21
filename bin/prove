@@ -31,7 +31,8 @@ Boolean options:
       --nocount     Disable the X/Y test count.
  -D   --dry         Dry run. Show test that would have run.
       --ext         Set the extension for tests (default '.t')
- -f,  --failures    Only show failed tests.
+ -f,  --failures    Show failed tests.
+ -o,  --comments    Show comments.
       --fork        Fork to run harness in multiple processes.
       --ignore-exit Ignore exit status from test scripts.
  -m,  --merge       Merge test scripts' STDERR with their STDOUT.
