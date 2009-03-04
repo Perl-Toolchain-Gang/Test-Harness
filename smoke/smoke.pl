@@ -131,7 +131,7 @@ sub send_summary {
         boilerplate( $fh, $task, $cur_rev );
         for my $row (@summary) {
             my ( $cur_rev, $version, $interp, $failed ) = @$row;
-            print $fh fail_pass( !$failed ), "$interp ($version)\n";
+            print $fh fail_pass( !$failed ), " $interp ($version)\n";
         }
 
         $fh->close;
