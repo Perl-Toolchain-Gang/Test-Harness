@@ -31,12 +31,15 @@ global:
   description: Ubuntu Fiesty box with Test::Harness 3.06
 tasks:
   - mailto:
-      - email: tapx-commit@hexten.net
+      - email:
+          - tapx-commit@hexten.net
+          - tapx-dev@hexten.net
         filter: failed
         verbose: 1
-      - email: tapx-dev@hexten.net
-        filter: failed
-        verbose: 1
+      - email:
+          - tapx-commit@hexten.net
+          - tapx-dev@hexten.net
+        filter: summary
     name: TAP::Parser
     script:
       - yes n | %PERL% Makefile.PL

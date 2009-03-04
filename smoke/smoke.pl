@@ -93,6 +93,100 @@ sub perl_version {
 
 sub fail_pass { $_[0] ? 'PASS' : 'FAIL' }
 
+sub make_msg {
+    my ( $to, $task, $cur_rev, $failed, @extra ) = @_;
+    my @to = 'ARRAY' eq ref $to ? @$to : ($to);
+    my $msg = Mail::Send->new;
+    $msg->to(@to);
+    $msg->subject( fail_pass( !$failed )
+          . ": $task->{name} r$cur_rev ("
+          . join( ', ', grep defined, hostname, @extra )
+          . ")" );
+    $msg->add( 'X-Is-Alert', $failed ? 'Yes' : 'No' );
+    return $msg->open( @{ $Config->{global}{mailargs} || [] } );
+}
+
+sub boilerplate {
+    my ( $fh, $task, $cur_rev ) = @_;
+    print $fh "To obtain this release use the following command:\n\n";
+    print $fh "  svn checkout -r$cur_rev $task->{svn}\n\n";
+
+    if ( my $desc = $Config->{global}->{description} ) {
+        print $fh sprintf(
+            "Tests run by smoke.pl $VERSION on %s which is a %s.\n\n",
+            hostname, $desc
+        );
+    }
+}
+
+sub send_summary {
+    my ( $task, $cur_rev, $failed, @summary ) = @_;
+    my $mailto = $task->{mailto};
+    for my $mail ( 'ARRAY' eq ref $mailto ? @$mailto : ($mailto) ) {
+        $mail = { email => $mail } unless 'HASH' eq ref $mail;
+        next unless $mail->{filter} && $mail->{filter} eq 'summary';
+        my $to = $mail->{email};
+
+        my $fh = make_msg( $to, $task, $cur_rev, $failed, 'summary' );
+        boilerplate( $fh, $task, $cur_rev );
+        for my $row (@summary) {
+            my ( $cur_rev, $version, $interp, $failed ) = @$row;
+            print $fh fail_pass($failed), "$interp ($version)\n";
+        }
+
+        $fh->close;
+
+        mention("Mail sent ");
+    }
+}
+
+sub send_report {
+    my ( $task, $cur_rev, $version, $interp, $failed, @results ) = @_;
+    my $mailto = $task->{mailto};
+    for my $mail ( 'ARRAY' eq ref $mailto ? @$mailto : ($mailto) ) {
+        $mail = { email => $mail } unless 'HASH' eq ref $mail;
+
+        my $filter = $mail->{filter} || 'all';
+
+        die "Illegal filter spec: $filter\n"
+          unless $filter =~ /^(?:all|passed|failed|summary)$/;
+
+        next
+          unless $filter eq 'all'
+              || $filter eq ( $failed ? 'failed' : 'passed' );
+
+        my $verbose = exists $mail->{verbose} ? $mail->{verbose} : $failed;
+        my $to = $mail->{email};
+
+        my $fh = make_msg( $to, $task, $cur_rev, $failed, $version, $interp );
+
+        boilerplate( $fh, $task, $cur_rev );
+
+        for my $result (@results) {
+            print $fh $result->{title}, "\n\n";
+
+            for my $cmd ( @{ $result->{commands} } ) {
+                print $fh sprintf(
+                    "%s: %s\n",
+                    fail_pass( $cmd->{passed} ),
+                    $cmd->{cmd}
+                );
+                if ($verbose) {
+                    print $fh '  ', $_, "\n" for @{ $cmd->{output} };
+                    print $fh '  Status: ', $cmd->{status}, "\n\n";
+                }
+            }
+
+            print $fh $result->{env} if $verbose;
+            print $fh "\n";
+        }
+
+        $fh->close;
+
+        mention("Mail sent ");
+    }
+}
+
 sub test_and_report {
     my $task   = shift;
     my $name   = $task->{name};
@@ -118,7 +212,8 @@ sub test_and_report {
     mkpath($co_dir);
     chdir($co_dir);
     if ( checkout( $task, $cur_rev ) || $FORCE ) {
-
+        my @summary    = ();
+        my $sum_failed = 0;
         for my $perl ( @{ $Config->{global}->{perls} } ) {
             $perl = { interp => $perl } unless 'HASH' eq ref $perl;
             INTERP: for my $interp ( glob( $perl->{interp} ) ) {
@@ -132,84 +227,20 @@ sub test_and_report {
                         $version, $interp, $task, $cur_rev,
                         $perl->{desc}
                     );
-                    $failed += $rv->{failed};
+                    $failed     += $rv->{failed};
+                    $sum_failed += $rv->{failed};
                     push @results, $rv;
                 }
 
                 next INTERP unless @results;
-
-                my $mailto = $task->{mailto};
-
-                for my $mail ( 'ARRAY' eq ref $mailto ? @$mailto : ($mailto) )
-                {
-                    $mail = { email => $mail } unless 'HASH' eq ref $mail;
-
-                    my $filter = $mail->{filter} || 'all';
-
-                    die "Illegal filter spec: $filter\n"
-                      unless $filter =~ /^all|passed|failed$/;
-
-                    my $verbose
-                      = exists $mail->{verbose} ? $mail->{verbose} : $failed;
-                    my $to = $mail->{email};
-                    my @to = 'ARRAY' eq ref $to ? @$to : ($to);
-
-                    next
-                      unless $filter eq 'all'
-                          || $filter eq ( $failed ? 'failed' : 'passed' );
-
-                    my $msg = Mail::Send->new;
-                    $msg->to(@to);
-                    $msg->subject( fail_pass( !$failed )
-                          . ": $task->{name} r$cur_rev ("
-                          . join( ', ', hostname, $version, $interp )
-                          . ")" );
-                    $msg->add( 'X-Is-Alert', $failed ? 'Yes' : 'No' );
-
-                    my $fh = $msg->open(
-                        @{ $Config->{global}->{mailargs} || [] } );
-
-                    print $fh
-                      "To obtain this release use the following command:\n\n";
-                    print $fh "  svn checkout -r$cur_rev $task->{svn}\n\n";
-
-                    if ( my $desc = $Config->{global}->{description} ) {
-                        print $fh sprintf(
-                            "Tests run by smoke.pl $VERSION on %s which is a %s.\n\n",
-                            hostname, $desc
-                        );
-                    }
-
-                    for my $result (@results) {
-                        print $fh $result->{title}, "\n\n";
-
-                        for my $cmd ( @{ $result->{commands} } ) {
-                            print $fh sprintf(
-                                "%s: %s\n",
-                                fail_pass( $cmd->{passed} ),
-                                $cmd->{cmd}
-                            );
-                            if ($verbose) {
-                                print $fh '  ', $_, "\n"
-                                  for @{ $cmd->{output} };
-                                print $fh '  Status: ', $cmd->{status},
-                                  "\n\n";
-                            }
-                        }
-
-                        if ($verbose) {
-                            print $fh $result->{env};
-                        }
-
-                        print $fh "\n";
-                    }
-
-                    $fh->close;
-
-                    mention( "Mail sent to ", join( ', ', @to ) );
-                }
+                send_report(
+                    $task, $cur_rev, $version, $interp, $failed,
+                    @results
+                );
+                push @summary, [ $cur_rev, $version, $interp, $failed ];
             }
         }
+        send_summary( $task, $cur_rev, $sum_failed, @summary );
     }
 
     $Status->{revision} = $cur_rev;

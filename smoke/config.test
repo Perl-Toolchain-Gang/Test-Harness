@@ -1,0 +1,30 @@
+---
+global:
+  perls:
+    - /alt/local/bin/perl
+    - /usr/bin/perl
+  status: /Users/andy/.smoke-tapx
+  svn: /usr/bin/svn
+  rsync: /usr/bin/rsync
+  shell: /bin/bash
+  work: /Users/andy/.smoke-work
+  description: MacBook Pro
+tasks:
+  - mailto:
+      - email: andy@hexten.net
+        filter: all
+        verbose: 1
+      - email: andy@hexten.net
+        filter: summary
+      - email: andy@edfax.co.uk
+        filter: failed
+        verbose: 0
+    name: TAP::Parser
+    script:
+      - yes n | %PERL% Build.PL
+      - ./Build
+      - ./Build test
+      - ./Build testprove
+      - ./Build distclean
+    subdir: trunk
+    svn: http://svn.hexten.net/tapx/trunk
