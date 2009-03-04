@@ -12,13 +12,10 @@ global:
 tasks:
   - mailto:
       - email: andy@hexten.net
-        filter: all
+        filter: failed
         verbose: 1
       - email: andy@hexten.net
         filter: summary
-      - email: andy@edfax.co.uk
-        filter: failed
-        verbose: 0
     name: TAP::Parser
     script:
       - yes n | %PERL% Build.PL

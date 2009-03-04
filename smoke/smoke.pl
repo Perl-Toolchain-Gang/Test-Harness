@@ -13,7 +13,7 @@ use Getopt::Long;
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
-my $VERSION = 0.008;
+my $VERSION = 0.009;
 
 # Reopen STDIN.
 my $pty;
