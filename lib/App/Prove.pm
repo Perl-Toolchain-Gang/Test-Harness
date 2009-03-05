@@ -133,8 +133,9 @@ sub add_rc_file {
     local *RC;
     open RC, "<$rc_file" or croak "Can't read $rc_file ($!)";
     while ( defined( my $line = <RC> ) ) {
-        push @{ $self->{rc_opts} }, grep $_ && $_ !~ /^#/,
-          $line =~ m{ ' ([^']*) ' | " ([^"]*) " | (\#.*) | (\S*) }xg;
+        push @{ $self->{rc_opts} },
+          grep { defined and not /^#/ }
+          $line =~ m{ ' ([^']*) ' | " ([^"]*) " | (\#.*) | (\S+) }xg;
     }
     close RC;
 }
