@@ -171,6 +171,10 @@ Show test comments (this is a no-op if C<verbose> is selected).
 
 Update the running test count during testing.
 
+=item * C<normalize>
+
+Set to a true value to normalize the TAP that is emitted in verbose modes.
+
 =item * C<lib>
 
 Accepts a scalar value or array ref of scalar values indicating which

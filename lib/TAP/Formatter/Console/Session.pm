@@ -71,11 +71,11 @@ sub _get_output_result {
                 last;
             }
         }
-        $formatter->_output( $self->format_for_output($result) );
+        $formatter->_output( $self->_format_for_output($result) );
         $formatter->_set_colors('reset');
       }
       : sub {
-        $formatter->_output( $self->format_for_output(shift) );
+        $formatter->_output( $self->_format_for_output(shift) );
       };
 }
 
