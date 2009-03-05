@@ -1421,7 +1421,7 @@ sub _iter {
             }
             else {
                 $result = $end_handler->();
-                $self->_make_callback( 'EOF', $result )
+                $self->_make_callback( 'EOF', $self )
                   unless defined $result;
             }
 
