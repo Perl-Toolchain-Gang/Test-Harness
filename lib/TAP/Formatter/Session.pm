@@ -113,7 +113,10 @@ sub clear_for_close { }
 
 sub _should_show_count {
     my $self = shift;
-    return !$self->formatter->verbose && -t $self->formatter->stdout;
+    return
+         !$self->formatter->verbose
+      && -t $self->formatter->stdout
+      && !$ENV{HARNESS_NOTTY};
 }
 
 sub _format_for_output {

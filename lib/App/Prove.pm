@@ -54,7 +54,7 @@ BEGIN {
     @ISA = qw(TAP::Object);
 
     @ATTR = qw(
-      archive argv blib show_count color directives exec failures comments 
+      archive argv blib show_count color directives exec failures comments
       formatter harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
@@ -275,7 +275,7 @@ sub _help {
 sub _color_default {
     my $self = shift;
 
-    return -t STDOUT && !IS_WIN32;
+    return -t STDOUT && !$ENV{HARNESS_NOTTY} && !IS_WIN32;
 }
 
 sub _get_args {

@@ -351,7 +351,7 @@ Any keys for which the value is C<undef> will be ignored.
         $self->jobs(1) unless defined $self->jobs;
 
         local $default_class{formatter_class} = 'TAP::Formatter::File'
-          unless -t ( $arg_for{stdout} || \*STDOUT );
+          unless -t ( $arg_for{stdout} || \*STDOUT ) && !$ENV{HARNESS_NOTTY};
 
         while ( my ( $attr, $class ) = each %default_class ) {
             $self->$attr( $self->$attr() || $class );
