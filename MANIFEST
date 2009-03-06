@@ -123,6 +123,7 @@ t/process.t
 t/prove.t
 t/proveenv.t
 t/proverc.t
+t/proverc/emptyexec
 t/proverun.t
 t/regression.t
 t/results.t
@@ -180,6 +181,7 @@ t/sample-tests/version_late
 t/sample-tests/version_old
 t/sample-tests/vms_nit
 t/sample-tests/with_comments
+t/sample-tests/zero_valid
 t/scheduler.t
 t/source.t
 t/source_tests/harness

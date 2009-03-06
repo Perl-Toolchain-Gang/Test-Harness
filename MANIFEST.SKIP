@@ -32,4 +32,5 @@
 ^tmon.out$
 ^tags$
 ^harness_runs.db$
-
+^perltags$
+^Session\.vim$
