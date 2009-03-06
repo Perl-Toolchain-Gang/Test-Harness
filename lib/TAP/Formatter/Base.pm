@@ -248,6 +248,11 @@ sub open_test {
     die "Unimplemented.";
 }
 
+sub _output_success {
+    my ( $self, $msg ) = @_;
+    $self->_output($msg);
+}
+
 =head3 C<summary>
 
   $harness->summary( $aggregate );
@@ -278,7 +283,7 @@ sub summary {
     # the exit status is nonzero
 
     if ( $aggregate->all_passed ) {
-        $self->_output("All tests successful.\n");
+        $self->_output_success("All tests successful.\n");
     }
 
     # ~TODO option where $aggregate->skipped generates reports

@@ -123,7 +123,9 @@ foreach my $test_args ( get_arg_sets() ) {
         'ok 1 - this is a test',
         '[[reset]]',
         'ok',
+        '[[green]]',
         'All tests successful.',
+        '[[reset]]',
     );
     my $status           = pop @output;
     my $expected_status  = qr{^Result: PASS$};
@@ -154,7 +156,9 @@ foreach my $test_args ( get_arg_sets() ) {
         'ok 1 - this is a test',
         '[[reset]]',
         'ok',
+        '[[green]]',
         'All tests successful.',
+        '[[reset]]',
     );
     $status           = pop @output;
     $expected_status  = qr{^Result: PASS$};
@@ -193,7 +197,9 @@ foreach my $test_args ( get_arg_sets() ) {
         'ok 1 - this is a test',
         '[[reset]]',
         'ok',
+        '[[green]]',
         'All tests successful.',
+        '[[reset]]',
     );
     $status           = pop @output;
     $expected_status  = qr{^Result: PASS$};

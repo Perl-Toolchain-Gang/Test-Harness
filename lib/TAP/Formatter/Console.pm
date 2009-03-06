@@ -70,6 +70,13 @@ sub _set_colors {
     }
 }
 
+sub _output_success {
+    my ( $self, $msg ) = @_;
+    $self->_set_colors('green');
+    $self->_output($msg);
+    $self->_set_colors('reset');
+}
+
 sub _failure_output {
     my $self = shift;
     $self->_set_colors('red');
