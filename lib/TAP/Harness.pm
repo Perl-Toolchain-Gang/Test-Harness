@@ -81,7 +81,6 @@ BEGIN {
         scheduler_class   => sub { shift; shift },
         formatter         => sub { shift; shift },
         jobs              => sub { shift; shift },
-        fork              => sub { shift; shift },
         test_args         => sub { shift; shift },
         ignore_exit       => sub { shift; shift },
         rules             => sub { shift; shift },
@@ -283,12 +282,6 @@ The maximum number of parallel tests to run at any time.  Which tests
 can be run in parallel is controlled by C<rules>.  The default is to
 run only one test at a time.
 
-=item * C<fork>
-
-If true the harness will attempt to fork and run the parser for each
-test in a separate process. Currently this option requires
-L<Parallel::Iterator> to be installed.
-
 =item * C<rules>
 
 A reference to a hash of rules that control which tests may be
@@ -457,47 +450,6 @@ sub _after_test {
     $aggregate->add( $job->description, $parser );
 }
 
-sub _aggregate_forked {
-    my ( $self, $aggregate, $scheduler ) = @_;
-
-    eval { require Parallel::Iterator };
-
-    croak "Parallel::Iterator required for --fork option ($@)"
-      if $@;
-
-    my $iter = Parallel::Iterator::iterate(
-        { workers => $self->jobs || 0 },
-        sub {
-            my $job = shift;
-
-            return if $job->is_spinner;
-
-            my ( $parser, $session ) = $self->make_parser($job);
-
-            while ( defined( my $result = $parser->next ) ) {
-                $self->_bailout($result) if $result->is_bailout;
-            }
-
-            $self->finish_parser( $parser, $session );
-
-            # Can't serialise coderefs...
-            delete $parser->{_iter};
-            delete $parser->{_stream};
-            delete $parser->{_grammar};
-            return $parser;
-        },
-        sub { $scheduler->get_job }
-    );
-
-    while ( my ( $job, $parser ) = $iter->() ) {
-        next if $job->is_spinner;
-        $self->_after_test( $aggregate, $job, $parser );
-        $job->finish;
-    }
-
-    return;
-}
-
 sub _bailout {
     my ( $self, $result ) = @_;
     my $explanation = $result->explanation;
@@ -638,12 +590,7 @@ sub aggregate_tests {
     $self->formatter->prepare( map { $_->description } $scheduler->get_all );
 
     if ( $self->jobs > 1 ) {
-        if ( $self->fork ) {
-            $self->_aggregate_forked( $aggregate, $scheduler );
-        }
-        else {
-            $self->_aggregate_parallel( $aggregate, $scheduler );
-        }
+        $self->_aggregate_parallel( $aggregate, $scheduler );
     }
     else {
         $self->_aggregate_single( $aggregate, $scheduler );
@@ -684,12 +631,6 @@ sub make_scheduler {
 Gets or sets the number of concurrent test runs the harness is
 handling.  By default, this value is 1 -- for parallel testing, this
 should be set higher.
-
-=head3 C<fork>
-
-If true the harness will attempt to fork and run the parser for each
-test in a separate process. Currently this option requires
-L<Parallel::Iterator> to be installed.
 
 =cut
 

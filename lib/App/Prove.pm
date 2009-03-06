@@ -54,7 +54,7 @@ BEGIN {
     @ISA = qw(TAP::Object);
 
     @ATTR = qw(
-      archive argv blib show_count color directives exec failures comments fork
+      archive argv blib show_count color directives exec failures comments 
       formatter harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
@@ -218,7 +218,6 @@ sub process_args {
             'formatter=s' => \$self->{formatter},
             'r|recurse'   => \$self->{recurse},
             'reverse'     => \$self->{backwards},
-            'fork'        => \$self->{fork},
             'p|parse'     => \$self->{parse},
             'q|quiet'     => \$self->{quiet},
             'Q|QUIET'     => \$self->{really_quiet},
@@ -301,10 +300,6 @@ sub _get_args {
 
     if ( my $jobs = $self->jobs ) {
         $args{jobs} = $jobs;
-    }
-
-    if ( my $fork = $self->fork ) {
-        $args{fork} = $fork;
     }
 
     if ( my $harness_opt = $self->harness ) {
@@ -634,8 +629,6 @@ calling C<run>.
 =item C<failures>
 
 =item C<comments>
-
-=item C<fork>
 
 =item C<formatter>
 

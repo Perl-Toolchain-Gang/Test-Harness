@@ -240,9 +240,6 @@ sub _new_harness {
             if ( $opt =~ /^j(\d*)$/ ) {
                 $args->{jobs} = $1 || 9;
             }
-            elsif ( $opt eq 'f' ) {
-                $args->{fork} = 1;
-            }
             elsif ( $opt eq 'c' ) {
                 $args->{color} = 1;
             }
