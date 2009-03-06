@@ -38,11 +38,17 @@ Returns a new C<TAP::Parser::Scheduler::Job> object.
 
 =cut
 
+# We go inside-out for any coderefs so that we can be serialised.
+
+my %on_finish = ();
+my $seq       = 1;
+
 sub new {
     my ( $class, $name, $desc, @ctx ) = @_;
     return bless {
         filename    => $name,
         description => $desc,
+        seq         => $seq++,
         @ctx ? ( context => \@ctx ) : (),
     }, $class;
 }
@@ -55,7 +61,7 @@ Register a closure to be called when this job is destroyed.
 
 sub on_finish {
     my ( $self, $cb ) = @_;
-    $self->{on_finish} = $cb;
+    $on_finish{ $self->{seq} } = $cb;
 }
 
 =head3 C<finish>
@@ -66,9 +72,14 @@ Called when a job is complete to unlock it.
 
 sub finish {
     my $self = shift;
-    if ( my $cb = $self->{on_finish} ) {
+    if ( my $cb = $on_finish{ $self->{seq} } ) {
         $cb->($self);
     }
+}
+
+sub DESTROY {
+    my $self = shift;
+    delete $on_finish{ $self->{seq} };
 }
 
 =head3 C<filename>
