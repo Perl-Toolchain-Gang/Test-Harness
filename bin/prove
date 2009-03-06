@@ -254,6 +254,15 @@ The C<--state> switch may be used more than once.
 
     $ prove -b --state=hot --state=all,save
 
+=head2 @INC
+
+prove introduces a separation between "options passed to the perl which
+runs prove" and "options passed to the perl which runs tests"; this
+distinction is by design. Thus the perl which is running a test starts
+with the default C<@INC>. Additional library directories can be added
+via the C<PERL5LIB> environment variable, via -Ifoo in C<PERL5OPT> or
+via the C<-Ilib> option to F<prove>.
+
 =head2 Taint Mode
 
 Normally when a Perl program is run in taint mode the contents of the
