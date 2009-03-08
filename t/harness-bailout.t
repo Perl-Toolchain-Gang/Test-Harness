@@ -34,7 +34,16 @@ for my $test (@jobs) {
         open STDOUT, ">$devnull" or die $!;
 
         $harness->runtests(
-            File::Spec->catfile( 't', 'sample-tests', 'bailout' ) );
+            File::Spec->catfile(
+                (   $ENV{PERL_CORE}
+                    ? ( File::Spec->updir, 'ext', 'Test-Harness' )
+                    : ()
+                ),
+                't',
+                'sample-tests',
+                'bailout'
+            )
+        );
 
         open STDERR, '>&OLDERR' or die $!;
         open STDOUT, '>&OLDOUT' or die $!;
