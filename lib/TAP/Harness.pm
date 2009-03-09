@@ -221,6 +221,9 @@ TAP::Harness will fall back on executing the test script in Perl:
           if $test_file =~ /[.]rb$/;
       }
 
+If the subroutine returns a scalar with a newline or a filehandle, it
+will be interpreted as raw TAP or as a TAP stream, respectively.
+
 =item * C<merge>
 
 If C<merge> is true the harness will create parsers that merge STDOUT
@@ -702,7 +705,11 @@ sub _get_parser_args {
           = ref $exec eq 'CODE'
           ? $exec->( $self, $test_prog )
           : [ @$exec, $test_prog ];
-        $args{source} = $test_prog unless $args{exec};
+        if (not defined $args{exec}) {
+            $args{source} = $test_prog;
+        } elsif ((ref($args{exec})||"") ne "ARRAY") {
+            $args{source} = delete $args{exec};
+        }
     }
     else {
         $args{source} = $test_prog;

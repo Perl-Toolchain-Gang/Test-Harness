@@ -24,7 +24,7 @@ my $source_tests
 my $sample_tests
   = $ENV{PERL_CORE} ? '../ext/Test-Harness/t/sample-tests' : 't/sample-tests';
 
-plan tests => 113;
+plan tests => 119;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -565,6 +565,85 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             exec      => sub {undef},
+        }
+    );
+
+    _runtests( $harness, "$source_tests/harness" );
+
+    my @output = tied($$capture)->dump;
+    my $status = pop @output;
+    like $status, qr{^Result: PASS$},
+      '... and the status line should be correct';
+    pop @output;    # get rid of summary line
+    my $answer = pop @output;
+    is( $answer, "All tests successful.\n", 'cat meows' );
+}
+
+# Exec with a coderef that returns an arrayref
+{
+    my $cat = '/bin/cat';
+    unless ( -e $cat ) {
+        skip "no '$cat'", 2;
+    }
+
+    my $capture = IO::c55Capture->new_handle;
+    my $harness = TAP::Harness->new(
+        {   verbosity => -2,
+            stdout    => $capture,
+            exec      => sub {
+                return [ $cat,
+                    $ENV{PERL_CORE}
+                    ? '../ext/Test-Harness/t/data/catme.1'
+                    : 't/data/catme.1' ];
+            },
+        }
+    );
+
+    _runtests( $harness, "$source_tests/harness" );
+
+    my @output = tied($$capture)->dump;
+    my $status = pop @output;
+    like $status, qr{^Result: PASS$},
+      '... and the status line should be correct';
+    pop @output;    # get rid of summary line
+    my $answer = pop @output;
+    is( $answer, "All tests successful.\n", 'cat meows' );
+}
+
+# Exec with a coderef that returns raw TAP
+{
+    my $capture = IO::c55Capture->new_handle;
+    my $harness = TAP::Harness->new(
+        {   verbosity => -2,
+            stdout    => $capture,
+            exec      => sub {
+                return "1..1\nok 1 - raw TAP\n";
+            },
+        }
+    );
+
+    _runtests( $harness, "$source_tests/harness" );
+
+    my @output = tied($$capture)->dump;
+    my $status = pop @output;
+    like $status, qr{^Result: PASS$},
+      '... and the status line should be correct';
+    pop @output;    # get rid of summary line
+    my $answer = pop @output;
+    is( $answer, "All tests successful.\n", 'cat meows' );
+}
+
+# Exec with a coderef that returns a filehandle
+{
+    my $capture = IO::c55Capture->new_handle;
+    my $harness = TAP::Harness->new(
+        {   verbosity => -2,
+            stdout    => $capture,
+            exec      => sub {
+                my $str = "1..1\nok 1 - TAP from a filehandle\n";
+                open my $fh, "<", \$str;
+                return $fh;
+            },
         }
     );
 
