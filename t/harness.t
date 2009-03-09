@@ -640,8 +640,10 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             exec      => sub {
-                my $str = "1..1\nok 1 - TAP from a filehandle\n";
-                open my $fh, "<", \$str;
+                open my $fh,
+                    $ENV{PERL_CORE}
+                    ? '../ext/Test-Harness/t/data/catme.1'
+                    : 't/data/catme.1';
                 return $fh;
             },
         }
