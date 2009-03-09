@@ -454,7 +454,9 @@ is(scalar @results, 2, "Got two lines of TAP");
 
 # Check source => $filehandle
 can_ok $PARSER, 'new';
-open my $fh, "<", \"1..1\nok 1\n";
+open my $fh, $ENV{PERL_CORE}
+    ? '../ext/Test-Harness/t/data/catme.1'
+    : 't/data/catme.1';
 $parser = $PARSER->new( { source => $fh } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 ok @results = _get_results($parser), 'The parser should return results';
