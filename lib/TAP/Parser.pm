@@ -448,7 +448,9 @@ sub _iterator_for_source {
             $stream = $source->get_stream($self);
         }
         elsif ($source) {
-            if ( ref $source ) {
+            if ($source =~ /\n/) {
+                $stream = $self->_iterator_for_source( [ split "\n" => $source ] );
+            } elsif ( ref $source ) {
                 $stream = $self->_iterator_for_source($source);
             }
             elsif ( -e $source ) {
