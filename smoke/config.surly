@@ -40,7 +40,7 @@ tasks:
           - tapx-commit@hexten.net
           - tapx-dev@hexten.net
         filter: summary
-    name: TAP::Parser
+    name: Test::Harness
     script:
       - yes n | %PERL% Makefile.PL
       - make

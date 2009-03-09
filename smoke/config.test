@@ -16,7 +16,7 @@ tasks:
         verbose: 1
       - email: andy@hexten.net
         filter: summary
-    name: TAP::Parser
+    name: Test::Harness
     script:
       - yes n | %PERL% Build.PL
       - ./Build

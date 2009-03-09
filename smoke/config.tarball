@@ -12,7 +12,7 @@ tasks:
       - email: andy@hexten.net
         filter: failed
         verbose: 1
-    name: TAP::Parser
+    name: Test::Harness
     script:
       - yes n | %PERL% Build.PL
       - ./Build

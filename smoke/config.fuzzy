@@ -20,7 +20,7 @@ tasks:
       - email: tapx-dev@hexten.net
         filter: failed
         verbose: 1
-    name: TAP::Parser
+    name: Test::Harness
     script:
       - yes n | %PERL% Makefile.PL
       - make
