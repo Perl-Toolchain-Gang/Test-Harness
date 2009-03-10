@@ -29,7 +29,7 @@ global:
   rsync: /usr/bin/rsync
   shell: /bin/bash
   work: /home/andy/.smoke-work
-  description: Ubuntu Fiesty box with Test::Harness 3.06
+  description: Ubuntu box
 tasks:
   - mailto:
       - email:
