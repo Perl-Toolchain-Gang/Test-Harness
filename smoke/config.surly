@@ -1,7 +1,7 @@
 ---
 global:
   perls:
-    - /home/andy/Works/Perl/versions/5.0.5/bin/perl
+    - /home/andy/Works/Perl/versions/5.6.0/bin/perl
     - /home/andy/Works/Perl/versions/5.6.1/bin/perl
     - /home/andy/Works/Perl/versions/5.6.2/bin/perl
     - /home/andy/Works/Perl/versions/5.8.0/bin/perl
@@ -15,6 +15,7 @@ global:
     - /home/andy/Works/Perl/versions/5.8.6/bin/perl
     - /home/andy/Works/Perl/versions/5.8.7/bin/perl
     - /usr/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.9/bin/perl
     - /home/andy/Works/Perl/versions/5.9.0/bin/perl
     - /home/andy/Works/Perl/versions/5.9.1/bin/perl
     - /home/andy/Works/Perl/versions/5.9.2/bin/perl

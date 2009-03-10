@@ -1,4 +1,6 @@
-#!/usr/bin/perl -w
+#!perl
+
+require 5.006;
 
 # This Makefile.PL is provided for installation compatibility.
 # Extra developer actions are in the Build.PL.

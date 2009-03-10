@@ -1,6 +1,9 @@
+#!perl
+
+require 5.006;
+
 use strict;
 use Module::Build;
-use 5.005;
 
 use File::Spec;
 use lib 'inc', File::Spec->canonpath('lib/');    # use our self to install
