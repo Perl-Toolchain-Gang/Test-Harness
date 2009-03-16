@@ -207,9 +207,10 @@ sub _new_harness {
     my $sub_args = shift || {};
 
     my ( @lib, @switches );
-    for my $opt ( split_shell( $Switches, $ENV{HARNESS_PERL_SWITCHES} ) ) {
+    my @opt = split_shell( $Switches, $ENV{HARNESS_PERL_SWITCHES} );
+    while ( my $opt = shift @opt ) {
         if ( $opt =~ /^ -I (.*) $ /x ) {
-            push @lib, $1;
+            push @lib, length($1) ? $1 : shift @opt;
         }
         else {
             push @switches, $opt;
