@@ -6,6 +6,8 @@ Revision history for Test-Harness
         - Added the 'comments' option, most useful when used in conjunction
           with the 'failures' option.
         - Deprecated support for Perls earlier than 5.6.0.
+        - Allow '-I lib' as well as '-Ilib' in $Test::Harness::Switches
+          (regression).
 
 3.16    2009-02-19
         - Fix path splicing on platforms where the path separator
