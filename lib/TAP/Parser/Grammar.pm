@@ -105,7 +105,7 @@ my %language_for;
                     $skip = 'SKIP';
 
                     # If we can't match # SKIP the directive should be undef.
-                    ($explanation) = $tail =~ /^#\s*SKIP\s+(.*)/i;
+                    ($explanation) = $tail =~ /^#\s*SKIP\S*\s+(.*)/i;
                 }
                 elsif ( $tail !~ /^\s*$/ ) {
                     return $self->_make_unknown_token($line);
