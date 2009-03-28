@@ -65,6 +65,7 @@ sub _initialize {
     my ( $self, $args ) = @_;
     $self->{stream} = $args->{stream};    # TODO: accessor
     $self->{parser} = $args->{parser};    # TODO: accessor
+    $self->{stack}  = [];
     $self->set_version( $args->{version} || 12 );
     return $self;
 }
@@ -81,7 +82,7 @@ my %language_for;
         version => {
             syntax  => qr/^TAP\s+version\s+(\d+)\s*\z/i,
             handler => sub {
-                my ( $self, $line ) = @_;
+                my ( $self, $line, $delta ) = @_;
                 my $version = $1;
                 return $self->_make_version_token( $line, $version, );
             },
@@ -89,7 +90,7 @@ my %language_for;
         plan => {
             syntax  => qr/^1\.\.(\d+)\s*(.*)\z/,
             handler => sub {
-                my ( $self, $line ) = @_;
+                my ( $self, $line, $delta ) = @_;
                 my ( $tests_planned, $tail ) = ( $1, $2 );
                 my $explanation = undef;
                 my $skip        = '';
@@ -126,7 +127,7 @@ my %language_for;
         simple_test => {
             syntax  => qr/^($ok) \ ($num) (?:\ ([^#]+))? \z/x,
             handler => sub {
-                my ( $self, $line ) = @_;
+                my ( $self, $line, $delta ) = @_;
                 my ( $ok, $num, $desc ) = ( $1, $2, $3 );
 
                 return $self->_make_test_token(
@@ -138,7 +139,7 @@ my %language_for;
         test => {
             syntax  => qr/^($ok) \s* ($num)? \s* (.*) \z/x,
             handler => sub {
-                my ( $self, $line ) = @_;
+                my ( $self, $line, $delta ) = @_;
                 my ( $ok, $num, $desc ) = ( $1, $2, $3 );
                 my ( $dir, $explanation ) = ( '', '' );
                 if ($desc =~ m/^ ( [^\\\#]* (?: \\. [^\\\#]* )* )
@@ -156,7 +157,7 @@ my %language_for;
         comment => {
             syntax  => qr/^#(.*)/,
             handler => sub {
-                my ( $self, $line ) = @_;
+                my ( $self, $line, $delta ) = @_;
                 my $comment = $1;
                 return $self->_make_comment_token( $line, $comment );
             },
@@ -164,7 +165,7 @@ my %language_for;
         bailout => {
             syntax  => qr/^Bail out!\s*(.*)/,
             handler => sub {
-                my ( $self, $line ) = @_;
+                my ( $self, $line, $delta ) = @_;
                 my $explanation = $1;
                 return $self->_make_bailout_token(
                     $line,
@@ -179,7 +180,7 @@ my %language_for;
         plan => {
             syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\b(.*))?\z/i,
             handler => sub {
-                my ( $self, $line ) = @_;
+                my ( $self, $line, $delta ) = @_;
                 my ( $tests_planned, $explanation ) = ( $1, $2 );
                 my $skip
                   = ( 0 == $tests_planned || defined $explanation )
@@ -195,7 +196,7 @@ my %language_for;
         yaml => {
             syntax  => qr/^ (\s+) (---.*) $/x,
             handler => sub {
-                my ( $self, $line ) = @_;
+                my ( $self, $line, $delta ) = @_;
                 my ( $pad, $marker ) = ( $1, $2 );
                 return $self->_make_yaml_token( $pad, $marker );
             },
@@ -204,22 +205,59 @@ my %language_for;
             syntax =>
               qr/^ pragma \s+ ( [-+] \w+ \s* (?: , \s* [-+] \w+ \s* )* ) $/x,
             handler => sub {
-                my ( $self, $line ) = @_;
+                my ( $self, $line, $delta ) = @_;
                 my $pragmas = $1;
                 return $self->_make_pragma_token( $line, $pragmas );
             },
         },
     );
 
+    my %v14 = (
+        %v13,
+    );
+
+    my $setup_v13 = sub {
+        shift->{stream}->handle_unicode;
+    };
+
+    my $toker_v12 = sub {
+        my ( $self, $raw_line, $line, $delta ) = @_;
+        for my $token_data ( @{ $self->{ordered_tokens} } ) {
+            if ( $raw_line =~ $token_data->{syntax} ) {
+                my $handler = $token_data->{handler};
+                return $self->$handler( $raw_line, $delta );
+            }
+        }
+
+        return $self->_make_unknown_token($raw_line);
+    };
+
+    my $toker_v14 = sub {
+        my ( $self, $raw_line, $line, $delta ) = @_;
+        for my $token_data ( @{ $self->{ordered_tokens} } ) {
+            if ( $raw_line =~ $token_data->{syntax} ) {
+                my $handler = $token_data->{handler};
+                return $self->$handler( $raw_line, $delta );
+            }
+        }
+
+        return $self->_make_unknown_token($raw_line);
+    };
+
     %language_for = (
         '12' => {
             tokens => \%v12,
+            toker  => $toker_v12,
         },
         '13' => {
             tokens => \%v13,
-            setup  => sub {
-                shift->{stream}->handle_unicode;
-            },
+            setup  => $setup_v13,
+            toker  => $toker_v12,
+        },
+        '14' => {
+            tokens => \%v14,
+            setup  => $setup_v13,
+            toker  => $toker_v14,
         },
     );
 }
@@ -245,6 +283,7 @@ sub set_version {
     if ( my $language = $language_for{$version} ) {
         $self->{version} = $version;
         $self->{tokens}  = $language->{tokens};
+        $self->{toker}   = $language->{toker};
 
         if ( my $setup = $language->{setup} ) {
             $self->$setup();
@@ -283,25 +322,30 @@ current line of TAP.
 
 sub tokenize {
     my $self = shift;
-
-    my $line = $self->{stream}->next;
-    unless ( defined $line ) {
+    my $line = my $raw_line = $self->{stream}->next;
+    unless ( defined $raw_line ) {
         delete $self->{parser};    # break circular ref
+        delete $self->{toker};
         return;
     }
 
-    my $token;
-
-    foreach my $token_data ( @{ $self->{ordered_tokens} } ) {
-        if ( $line =~ $token_data->{syntax} ) {
-            my $handler = $token_data->{handler};
-            $token = $self->$handler($line);
-            last;
+    my $depth = @{ $self->{stack} };
+    my $tos = $self->{stack}[-1] || '';
+    if ( $line =~ s/^$tos// ) {
+        if ( $line =~ s/^(\s+)// ) {
+            push @{ $self->{stack} }, $tos . $1;
         }
     }
+    else {
+        while ( @{ $self->{stack} } ) {
+            pop @{ $self->{stack} };
+            my $tos = $self->{stack}[-1] || '';
+            last if $line =~ s/^$tos//;
+        }
+    }
+    my $delta = @{ $self->{stack} } - $depth;
 
-    $token = $self->_make_unknown_token($line) unless $token;
-
+    my $token = $self->{toker}( $self, $raw_line, $line, $delta );
     return $self->{parser}->make_result($token);
 }
 

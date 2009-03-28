@@ -27,7 +27,7 @@ Version 3.17
 $VERSION = '3.17';
 
 my $DEFAULT_TAP_VERSION = 12;
-my $MAX_TAP_VERSION     = 13;
+my $MAX_TAP_VERSION     = 14;
 
 $ENV{TAP_VERSION} = $MAX_TAP_VERSION;
 
@@ -448,9 +448,11 @@ sub _iterator_for_source {
             $stream = $source->get_stream($self);
         }
         elsif ($source) {
-            if ($source =~ /\n/) {
-                $stream = $self->_iterator_for_source( [ split "\n" => $source ] );
-            } elsif ( ref $source ) {
+            if ( $source =~ /\n/ ) {
+                $stream
+                  = $self->_iterator_for_source( [ split "\n" => $source ] );
+            }
+            elsif ( ref $source ) {
                 $stream = $self->_iterator_for_source($source);
             }
             elsif ( -e $source ) {
