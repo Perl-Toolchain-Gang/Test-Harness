@@ -27,22 +27,22 @@ not ok 8
 1..8
 EOT
         expect => [
-            { nesting => 0, type => 'version', version       => '14', },
-            { nesting => 0, type => 'test',    number        => '1', },
-            { nesting => 0, type => 'test',    number        => '2', },
-            { nesting => 0, type => 'test',    number        => '3', },
+            { nesting => 0, type => 'version', version       => 14, },
+            { nesting => 0, type => 'test',    number        => 1, },
+            { nesting => 0, type => 'test',    number        => 2, },
+            { nesting => 0, type => 'test',    number        => 3, },
             { nesting => 1, type => 'plan',    tests_planned => 3, },
-            { nesting => 1, type => 'test',    number        => '1', },
-            { nesting => 1, type => 'test',    number        => '2', },
-            { nesting => 1, type => 'test',    number        => '3', },
+            { nesting => 1, type => 'test',    number        => 1, },
+            { nesting => 1, type => 'test',    number        => 2, },
+            { nesting => 1, type => 'test',    number        => 3, },
 
             # FIXME should be PASS
             { nesting => 1, type => 'unknown', },
-            { nesting => 0, type => 'test', number => '4', },
-            { nesting => 0, type => 'test', number => '5', },
-            { nesting => 0, type => 'test', number => '6', },
-            { nesting => 0, type => 'test', number => '7', },
-            { nesting => 0, type => 'test', number => '8', },
+            { nesting => 0, type => 'test', number => 4, },
+            { nesting => 0, type => 'test', number => 5, },
+            { nesting => 0, type => 'test', number => 6, },
+            { nesting => 0, type => 'test', number => 7, },
+            { nesting => 0, type => 'test', number => 8, },
             { nesting => 0, type => 'plan', tests_planned => 8, }
         ]
     },
@@ -78,24 +78,24 @@ not ok 8
 1..8
 EOT
         expect => [
-            { nesting => 0, type => 'version', version       => '14', },
-            { nesting => 0, type => 'test',    number        => '1', },
-            { nesting => 0, type => 'test',    number        => '2', },
-            { nesting => 0, type => 'test',    number        => '3', },
+            { nesting => 0, type => 'version', version       => 14, },
+            { nesting => 0, type => 'test',    number        => 1, },
+            { nesting => 0, type => 'test',    number        => 2, },
+            { nesting => 0, type => 'test',    number        => 3, },
             { nesting => 1, type => 'plan',    tests_planned => 3, },
-            { nesting => 1, type => 'test',    number        => '1', },
+            { nesting => 1, type => 'test',    number        => 1, },
             { nesting => 1, type => 'yaml', },
-            { nesting => 1, type => 'test',    number        => '2', },
-            { nesting => 1, type => 'test',    number        => '3', },
+            { nesting => 1, type => 'test',    number        => 2, },
+            { nesting => 1, type => 'test',    number        => 3, },
 
             # FIXME should be PASS
             { nesting => 1, type => 'unknown', },
-            { nesting => 0, type => 'test', number => '4', },
+            { nesting => 0, type => 'test', number => 4, },
             { nesting => 0, type => 'yaml', },
-            { nesting => 0, type => 'test', number => '5', },
-            { nesting => 0, type => 'test', number => '6', },
-            { nesting => 0, type => 'test', number => '7', },
-            { nesting => 0, type => 'test', number => '8', },
+            { nesting => 0, type => 'test', number => 5, },
+            { nesting => 0, type => 'test', number => 6, },
+            { nesting => 0, type => 'test', number => 7, },
+            { nesting => 0, type => 'test', number => 8, },
             { nesting => 0, type => 'plan', tests_planned => 8, }
         ]
     },

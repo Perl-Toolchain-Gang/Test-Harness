@@ -44,6 +44,7 @@ BEGIN {    # making accessors
         qw(
           _stream
           _spool
+          _nesting
           exec
           exit
           is_good_plan
@@ -375,6 +376,7 @@ sub _iterator_for_source {
         actual_passed => [],                    # how many tests really passed
         todo_passed  => [],    # tests which unexpectedly succeed
         parse_errors => [],    # perfect TAP should have none
+        _nesting     => 0,
     );
 
     # We seem to have this list hanging around all over the place. We could
@@ -1057,7 +1059,7 @@ use this option to ignore it.
 
 =cut
 
-sub ignore_exit { shift->pragma( 'ignore_exit', @_ ) }
+sub ignore_exit { shift->pragma( ignore_exit => @_ ) }
 
 =head3 C<parse_errors>
 
@@ -1360,6 +1362,7 @@ sub _iter {
     my $stream      = $self->_stream;
     my $grammar     = $self->_grammar;
     my $spool       = $self->_spool;
+    my $nesting     = $self->_nesting;
     my $state       = 'INIT';
     my $state_table = $self->_make_state_table;
 
@@ -1392,6 +1395,15 @@ sub _iter {
         return $token;
     };
 
+    my $next_token = sub {
+        my $intok = shift;
+        if ( $intok->nesting != $nesting ) {
+#            die;
+        }
+        my $outtok = $next_state->($intok);
+        return $outtok;
+    };
+
     # Handle end of stream - which means either pop a block or finish
     my $end_handler = sub {
         $self->exit( $stream->exit );
@@ -1409,7 +1421,7 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
-                $result = $next_state->($result);
+                $result = $next_token->($result);
 
                 if ( my $code = $self->_callback_for( $result->type ) ) {
                     $_->($result) for @{$code};
@@ -1438,7 +1450,7 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
-                $result = $next_state->($result);
+                $result = $next_token->($result);
 
                 # Echo TAP to spool file
                 print {$spool} $result->raw, "\n" if $spool;

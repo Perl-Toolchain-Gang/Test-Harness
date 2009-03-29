@@ -222,16 +222,15 @@ my %language_for;
 
     my $toker_v12 = sub {
         my ( $self, $raw_line, $line, $delta ) = @_;
+        my $parser = $self->{parser};
         for my $token_data ( @{ $self->{ordered_tokens} } ) {
             if ( $raw_line =~ $token_data->{syntax} ) {
                 my $handler = $token_data->{handler};
-                return $self->{parser}
-                  ->make_result( $self->$handler($raw_line) );
+                return $parser->make_result( $self->$handler($raw_line) );
             }
         }
 
-        return $self->{parser}
-          ->make_result( $self->_make_unknown_token($raw_line) );
+        return $parser->make_result( $self->_make_unknown_token($raw_line) );
     };
 
     my $toker_v14 = sub {
@@ -328,32 +327,45 @@ current line of TAP.
 
 =cut
 
+sub _make_tokenize {
+    my $self     = shift;
+    my $stream   = $self->{stream};
+    my $stack    = $self->{stack};
+    my @pushback = ();
+
+    return sub {
+        if (@_) {
+            push @pushback, @_;
+            return;
+        }
+        return shift @pushback if @pushback;
+        my $line = my $raw_line = $stream->next;
+        unless ( defined $raw_line ) {
+            delete @{$self}{ 'parser', 'toker', 'tokenize' };    # Circular
+            return;
+        }
+        my $depth = @$stack;
+        my $tos = $stack->[-1] || '';
+        if ( $line =~ s/^$tos// ) {
+            if ( $line =~ s/^(\s+)// ) {
+                push @$stack, $tos . $1;
+            }
+        }
+        else {
+            while (@$stack) {
+                pop @$stack;
+                my $tos = $stack->[-1] || '';
+                last if $line =~ s/^$tos//;
+            }
+        }
+
+        return $self->{toker}( $self, $raw_line, $line, @$stack - $depth );
+    };
+}
+
 sub tokenize {
     my $self = shift;
-    my $line = my $raw_line = $self->{stream}->next;
-    unless ( defined $raw_line ) {
-        delete $self->{parser};    # break circular ref
-        delete $self->{toker};
-        return;
-    }
-    my $stack = $self->{stack};
-    my $depth = @$stack;
-    my $tos   = $self->{stack}[-1] || '';
-    if ( $line =~ s/^$tos// ) {
-        if ( $line =~ s/^(\s+)// ) {
-            push @{ $self->{stack} }, $tos . $1;
-        }
-    }
-    else {
-        while ( @{ $self->{stack} } ) {
-            pop @{ $self->{stack} };
-            my $tos = $self->{stack}[-1] || '';
-            last if $line =~ s/^$tos//;
-        }
-    }
-    my $delta = @$stack - $depth;
-
-    return $self->{toker}( $self, $raw_line, $line, $delta );
+    return ( $self->{tokenize} ||= $self->_make_tokenize )->(@_);
 }
 
 ##############################################################################
