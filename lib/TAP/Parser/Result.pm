@@ -257,6 +257,26 @@ sub set_directive {
     $self->{directive} = $dir;
 }
 
+=head3 C<set_nesting>
+
+Set the nesting level of this token. Used internally when parsing
+nested TAP.
+
+=cut
+
+sub set_nesting {
+    my ( $self, $depth ) = @_;
+    $self->{nesting} = $depth;
+}
+
+=head3 C<nesting>
+
+Get the nesting level of this token.
+
+=cut
+
+sub nesting { shift->{nesting} || 0 }
+
 1;
 
 =head1 SUBCLASSING
