@@ -38,7 +38,7 @@ END {
 }
 
 BEGIN {    # making accessors
-    @ISA = qw(TAP::Base);
+    @ISA = qw( TAP::Base );
 
     __PACKAGE__->mk_methods(
         qw(
@@ -1395,15 +1395,6 @@ sub _iter {
         return $token;
     };
 
-    my $next_token = sub {
-        my $intok = shift;
-        if ( $intok->nesting != $nesting ) {
-#            die;
-        }
-        my $outtok = $next_state->($intok);
-        return $outtok;
-    };
-
     # Handle end of stream - which means either pop a block or finish
     my $end_handler = sub {
         $self->exit( $stream->exit );
@@ -1421,7 +1412,7 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
-                $result = $next_token->($result);
+                $result = $next_state->($result);
 
                 if ( my $code = $self->_callback_for( $result->type ) ) {
                     $_->($result) for @{$code};
@@ -1450,7 +1441,7 @@ sub _iter {
             $self->_add_error($@) if $@;
 
             if ( defined $result ) {
-                $result = $next_token->($result);
+                $result = $next_state->($result);
 
                 # Echo TAP to spool file
                 print {$spool} $result->raw, "\n" if $spool;

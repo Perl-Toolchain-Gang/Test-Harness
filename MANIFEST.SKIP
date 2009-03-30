@@ -34,3 +34,5 @@
 ^harness_runs.db$
 ^perltags$
 ^Session\.vim$
+^\.rev$
+

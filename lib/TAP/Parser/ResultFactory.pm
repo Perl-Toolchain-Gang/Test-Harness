@@ -3,15 +3,17 @@ package TAP::Parser::ResultFactory;
 use strict;
 use vars qw($VERSION @ISA %CLASS_FOR);
 
-use TAP::Object                  ();
-use TAP::Parser::Result::Bailout ();
-use TAP::Parser::Result::Comment ();
-use TAP::Parser::Result::Plan    ();
-use TAP::Parser::Result::Pragma  ();
-use TAP::Parser::Result::Test    ();
-use TAP::Parser::Result::Unknown ();
-use TAP::Parser::Result::Version ();
-use TAP::Parser::Result::YAML    ();
+use TAP::Object                    ();
+use TAP::Parser::Result::Bailout   ();
+use TAP::Parser::Result::Comment   ();
+use TAP::Parser::Result::Nest::In  ();
+use TAP::Parser::Result::Nest::Out ();
+use TAP::Parser::Result::Plan      ();
+use TAP::Parser::Result::Pragma    ();
+use TAP::Parser::Result::Test      ();
+use TAP::Parser::Result::Unknown   ();
+use TAP::Parser::Result::Version   ();
+use TAP::Parser::Result::YAML      ();
 
 @ISA = 'TAP::Object';
 
@@ -98,14 +100,16 @@ Your custom type should then be picked up automatically by the L<TAP::Parser>.
 
 BEGIN {
     %CLASS_FOR = (
-        plan    => 'TAP::Parser::Result::Plan',
-        pragma  => 'TAP::Parser::Result::Pragma',
-        test    => 'TAP::Parser::Result::Test',
-        comment => 'TAP::Parser::Result::Comment',
-        bailout => 'TAP::Parser::Result::Bailout',
-        version => 'TAP::Parser::Result::Version',
-        unknown => 'TAP::Parser::Result::Unknown',
-        yaml    => 'TAP::Parser::Result::YAML',
+        bailout  => 'TAP::Parser::Result::Bailout',
+        comment  => 'TAP::Parser::Result::Comment',
+        nest_in  => 'TAP::Parser::Result::Nest::In',
+        nest_out => 'TAP::Parser::Result::Nest::Out',
+        plan     => 'TAP::Parser::Result::Plan',
+        pragma   => 'TAP::Parser::Result::Pragma',
+        test     => 'TAP::Parser::Result::Test',
+        unknown  => 'TAP::Parser::Result::Unknown',
+        version  => 'TAP::Parser::Result::Version',
+        yaml     => 'TAP::Parser::Result::YAML',
     );
 }
 

@@ -328,16 +328,14 @@ current line of TAP.
 =cut
 
 sub _make_tokenize {
-    my $self     = shift;
-    my $stream   = $self->{stream};
-    my $stack    = $self->{stack};
-    my @pushback = ();
+    my $self       = shift;
+    my $stream     = $self->{stream};
+    my $parser     = $self->{parser};
+    my $stack      = $self->{stack};
+    my $last_depth = 0;
+    my @pushback   = ();
 
-    return sub {
-        if (@_) {
-            push @pushback, @_;
-            return;
-        }
+    my $toker = sub {
         return shift @pushback if @pushback;
         my $line = my $raw_line = $stream->next;
         unless ( defined $raw_line ) {
@@ -359,7 +357,30 @@ sub _make_tokenize {
             }
         }
 
-        return $self->{toker}( $self, $raw_line, $line, @$stack - $depth );
+        my $token = $self->{toker}(
+            $self,
+            $raw_line, $line, @$stack - $depth
+        );
+
+        # We inject synthetic tokens when the nesting level changes.
+        if ( defined $token && $token->nesting != $last_depth ) {
+            push @pushback, $token;
+            return $parser->make_result(
+                {   nesting => $last_depth,
+                    type    => $token->nesting < $depth
+                    ? 'nest_out'
+                    : 'nest_in'
+                }
+            );
+        }
+
+        return $token;
+    };
+
+    return sub {
+        my $token = $toker->(@_);
+        $last_depth = $token ? $token->nesting : 0;
+        return $token;
     };
 }
 
