@@ -11,6 +11,8 @@ use TAP::Parser::Source          ();
 use TAP::Parser::Source::Perl    ();
 use TAP::Parser::Iterator        ();
 use TAP::Parser::IteratorFactory ();
+use TAP::Parser::SourceFactory   ();
+use TAP::Parser::SourceDetector::Perl ();
 
 use Carp qw( confess );
 
@@ -61,6 +63,7 @@ BEGIN {    # making accessors
           grammar_class
           iterator_factory_class
           result_factory_class
+          source_factory_class
           )
     );
 }    # done making accessors
@@ -203,12 +206,16 @@ the future.
 
 =item * C<source_class>
 
+I<DEPRECATED>.
+
 This option was introduced to let you easily customize which I<source> class
 the parser should use.  It defaults to L<TAP::Parser::Source>.
 
 See also L</make_source>.
 
 =item * C<perl_source_class>
+
+I<DEPRECATED>.
 
 This option was introduced to let you easily customize which I<perl source>
 class the parser should use.  It defaults to L<TAP::Parser::Source::Perl>.
@@ -238,6 +245,14 @@ L<TAP::Parser::ResultFactory>.
 
 See also L</make_result>.
 
+=item * C<source_factory_class>
+
+I<EXPERIMENTAL>.  Not yet in use.
+
+This option was introduced to let you easily customize which I<source>
+factory class the parser should use.  It defaults to
+L<TAP::Parser::SourceFactory>.
+
 =back
 
 =cut
@@ -245,11 +260,12 @@ See also L</make_result>.
 # new() implementation supplied by TAP::Base
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub _default_source_class           {'TAP::Parser::Source'}
-sub _default_perl_source_class      {'TAP::Parser::Source::Perl'}
+sub _default_source_class           {'TAP::Parser::Source'} # deprecated
+sub _default_perl_source_class      {'TAP::Parser::Source::Perl'} # deprecated
 sub _default_grammar_class          {'TAP::Parser::Grammar'}
 sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
 sub _default_result_factory_class   {'TAP::Parser::ResultFactory'}
+sub _default_source_factory_class   {'TAP::Parser::SourceFactory'}
 
 ##############################################################################
 
@@ -299,12 +315,16 @@ sub run {
 
 =head3 C<make_source>
 
+I<DEPRECATED>.
+
 Make a new L<TAP::Parser::Source> object and return it.  Passes through any
 arguments given.
 
 The C<source_class> can be customized, as described in L</new>.
 
 =head3 C<make_perl_source>
+
+I<DEPRECATED>.
 
 Make a new L<TAP::Parser::Source::Perl> object and return it.  Passes through
 any arguments given.
@@ -337,8 +357,8 @@ The C<result_factory_class> can be customized, as described in L</new>.
 =cut
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub make_source      { shift->source_class->new(@_); }
-sub make_perl_source { shift->perl_source_class->new(@_); }
+sub make_source      { shift->source_class->new(@_); } # deprecated
+sub make_perl_source { shift->perl_source_class->new(@_); } # deprecated
 sub make_grammar     { shift->grammar_class->new(@_); }
 sub make_iterator    { shift->iterator_factory_class->make_iterator(@_); }
 sub make_result      { shift->result_factory_class->make_result(@_); }
@@ -398,6 +418,7 @@ sub _iterator_for_source {
       grammar_class
       iterator_factory_class
       result_factory_class
+      source_factory_class
     );
 
     sub _initialize {
@@ -442,18 +463,25 @@ sub _iterator_for_source {
             $stream = $self->_iterator_for_source( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
+	    # TODO: use the source factory?
             my $source = $self->make_source;
             $source->source( [ @$exec, @test_args ] );
             $source->merge($merge);    # XXX should just be arguments?
             $stream = $source->get_stream($self);
         }
         elsif ($source) {
+	    my $src_factory = $self->source_factory_class->new;
+
+	    # TODO: always use source factory, unless internal case
+
             if ($source =~ /\n/) {
                 $stream = $self->_iterator_for_source( [ split "\n" => $source ] );
             } elsif ( ref $source ) {
                 $stream = $self->_iterator_for_source($source);
             }
             elsif ( -e $source ) {
+		# TODO: this breaks backwards compat: t/parser-subclass.t
+		#my $perl = $src_factory->make_source( \$source );
                 my $perl = $self->make_perl_source;
 
                 $perl->switches($switches)
