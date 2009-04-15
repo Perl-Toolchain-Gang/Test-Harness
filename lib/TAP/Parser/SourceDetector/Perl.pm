@@ -11,7 +11,7 @@ use File::Basename qw( fileparse );
 
 @ISA = qw( TAP::Parser::SourceDetector );
 
-TAP::Parser::SourceFactory->register_detector( __PACKAGE__ );
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 =head1 NAME
 
@@ -50,7 +50,7 @@ won't need to use this module directly.
 use constant source_class => 'TAP::Parser::Source::Perl';
 
 sub can_handle {
-    my ($class, $raw_source_ref) = @_;
+    my ( $class, $raw_source_ref ) = @_;
 
     return 0 unless defined $$raw_source_ref;
     return 0 if $$raw_source_ref =~ /\n/;
@@ -58,15 +58,15 @@ sub can_handle {
     my $source = $$raw_source_ref;
     return 0 unless -f $source;
 
-    my ($name, $path, $ext) = fileparse( $source );
+    my ( $name, $path, $ext ) = fileparse($source);
     if ($ext) {
-	$ext = lc( $ext );
-	return 0.8 if $ext eq 't'; # more than Executable
-	return 1   if $ext eq 'pl';
+        $ext = lc($ext);
+        return 0.8 if $ext eq 't';    # more than Executable
+        return 1   if $ext eq 'pl';
     }
 
     if ($path) {
-	return 0.75 if $path =~ /^t\b/; # more than Executable
+        return 0.75 if $path =~ /^t\b/;    # more than Executable
     }
 
     # TODO: check for shebang, eg: #!.../perl  ?
@@ -75,17 +75,16 @@ sub can_handle {
 }
 
 sub make_source {
-    my ($class, $raw_source_ref) = @_;
-    my $source = $class->source_class->new( $raw_source_ref );
+    my ( $class, $raw_source_ref ) = @_;
+    my $source = $class->source_class->new($raw_source_ref);
 
-# TODO: figure out how to pass these over:
-#    $perl->switches($switches) if $switches;
-#    $perl->merge($merge);    # XXX args to new()?
-#    $perl->source( [ $source, @test_args ] );
+    # TODO: figure out how to pass these over:
+    #    $perl->switches($switches) if $switches;
+    #    $perl->merge($merge);    # XXX args to new()?
+    #    $perl->source( [ $source, @test_args ] );
 }
 
 1;
-
 
 =head1 AUTHORS
 

@@ -5,11 +5,12 @@ use vars qw($VERSION @ISA);
 
 use TAP::Parser::SourceFactory  ();
 use TAP::Parser::SourceDetector ();
+
 #use TAP::Parser::Source::RawTAP ();
 
 @ISA = qw( TAP::Parser::SourceDetector );
 
-TAP::Parser::SourceFactory->register_detector( __PACKAGE__ );
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 =head1 NAME
 
@@ -48,23 +49,22 @@ won't need to use this module directly.
 use constant source_class => 'TAP::Parser::Source::RawTAP';
 
 sub can_handle {
-    my ($class, $raw_source_ref) = @_;
-    return 0    unless defined $$raw_source_ref;
-    return 0.75 if ($$raw_source_ref =~ /\n/);
+    my ( $class, $raw_source_ref ) = @_;
+    return 0 unless defined $$raw_source_ref;
+    return 0.75 if ( $$raw_source_ref =~ /\n/ );
     return 0;
 }
 
 sub make_source {
-    my ($class, $raw_source_ref) = @_;
-    my $source = $class->source_class->new( $raw_source_ref );
+    my ( $class, $raw_source_ref ) = @_;
+    my $source = $class->source_class->new($raw_source_ref);
 
-    # this should be returned by the source's 'get_stream'
-    #my $stream = $self->_iterator_for_source( [ split "\n" => $$raw_source_ref ] );
+# this should be returned by the source's 'get_stream'
+#my $stream = $self->_iterator_for_source( [ split "\n" => $$raw_source_ref ] );
     return $source;
 }
 
 1;
-
 
 =head1 AUTHORS
 

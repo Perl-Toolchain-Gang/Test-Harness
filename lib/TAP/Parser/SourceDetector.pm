@@ -60,11 +60,10 @@ can.
 # new() implementation provided by TAP::Object
 
 sub can_handle {
-    my ($class, $raw_source_ref) = @_;
-    confess( "'$class' has not defined a 'can_handle' method!" );
+    my ( $class, $raw_source_ref ) = @_;
+    confess("'$class' has not defined a 'can_handle' method!");
     return;
 }
-
 
 =head3 C<make_source>
 
@@ -76,11 +75,10 @@ Returns a new L<TAP::Parser::Source> object for use by the L<TAP::Parser>.
 =cut
 
 sub make_source {
-    my ($class, $raw_source_ref) = @_;
-    confess( "'$class' has not defined a 'make_source' method!" );
+    my ( $class, $raw_source_ref ) = @_;
+    confess("'$class' has not defined a 'make_source' method!");
     return;
 }
-
 
 1;
 

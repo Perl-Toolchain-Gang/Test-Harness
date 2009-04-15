@@ -11,7 +11,6 @@ use Carp qw( confess );
 
 use constant detectors => [];
 
-
 =head1 NAME
 
 TAP::Parser::SourceFactory - Internal TAP::Parser Source
@@ -48,7 +47,8 @@ Creates a new factory class.
 =cut
 
 sub _initialize {
-    my ($self, @args) = @_;
+    my ( $self, @args ) = @_;
+
     # initialize your object
     return $self;
 }
@@ -65,18 +65,17 @@ Registers a new L<TAP::Parser::SourceDetector> with this factory.
 # was thinking 'detectors' ala:
 # TAP::Parser::SourceDetector::Archive, etc...
 sub register_detector {
-    my ($class, $dclass) = @_;
+    my ( $class, $dclass ) = @_;
 
-    confess( "$dclass must inherit from TAP::Parser::SourceDetector!" )
+    confess("$dclass must inherit from TAP::Parser::SourceDetector!")
       unless UNIVERSAL::isa( $dclass, 'TAP::Parser::SourceDetector' );
 
     my $detectors = $class->detectors;
-    push @{ $detectors }, $dclass
-      unless grep { $_ eq $dclass } @{ $detectors };
+    push @{$detectors}, $dclass
+      unless grep { $_ eq $dclass } @{$detectors};
 
     return $class;
 }
-
 
 =head2 Instance Methods
 
@@ -88,22 +87,21 @@ given (see L</detect_source>).  Dies on error.
 =cut
 
 sub make_source {
-    my ($self, $raw_source_ref) = @_;
+    my ( $self, $raw_source_ref ) = @_;
 
-    confess( 'no raw source ref defined!' ) unless defined $raw_source_ref;
+    confess('no raw source ref defined!') unless defined $raw_source_ref;
 
     # is the raw source already an object?
     return $$raw_source_ref
-      if (ref( $$raw_source_ref ) &&
-	  UNIVERSAL::isa( $$raw_source_ref, 'TAP::Parser::Source' ));
+      if ( ref($$raw_source_ref)
+        && UNIVERSAL::isa( $$raw_source_ref, 'TAP::Parser::Source' ) );
 
     # figure out what kind of source it is
-    my $source_detector = $self->detect_source( $raw_source_ref );
-    my $source = $source_detector->make_source( $raw_source_ref );
+    my $source_detector = $self->detect_source($raw_source_ref);
+    my $source          = $source_detector->make_source($raw_source_ref);
 
     return $source;
 }
-
 
 =head3 C<detect_source>
 
@@ -120,33 +118,35 @@ The detection algorithm works something like this:
 =cut
 
 sub detect_source {
-    my ($self, $raw_source_ref) = @_;
+    my ( $self, $raw_source_ref ) = @_;
 
-    confess( 'no raw source ref defined!' ) unless defined $raw_source_ref;
+    confess('no raw source ref defined!') unless defined $raw_source_ref;
 
     # find a list of detectors that can handle this source:
     my %detectors;
-    foreach my $dclass (@{ $self->detectors }) {
-	my $confidence = $dclass->can_handle( $raw_source_ref );
-	$detectors{$dclass} = $confidence if $confidence;
+    foreach my $dclass ( @{ $self->detectors } ) {
+        my $confidence = $dclass->can_handle($raw_source_ref);
+        $detectors{$dclass} = $confidence if $confidence;
     }
 
-    if (! %detectors) {
-	# error: can't detect source
-	my $raw_source_short = substr( $$raw_source_ref, 0, 50 );
-	confess( "Couldn't detect source of '$raw_source_short'!" );
-	return;
+    if ( !%detectors ) {
+
+        # error: can't detect source
+        my $raw_source_short = substr( $$raw_source_ref, 0, 50 );
+        confess("Couldn't detect source of '$raw_source_short'!");
+        return;
     }
 
     # if multiple detectors can handle it, choose the most confident one
-    my @detectors = ( map { $_ }
-		      sort { $detectors{$a} cmp $detectors{$b} }
-		      keys %detectors );
+    my @detectors = (
+        map    {$_}
+          sort { $detectors{$a} cmp $detectors{$b} }
+          keys %detectors
+    );
 
     # return 1st detector
     return pop @detectors;
 }
-
 
 1;
 

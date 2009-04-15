@@ -705,9 +705,10 @@ sub _get_parser_args {
           = ref $exec eq 'CODE'
           ? $exec->( $self, $test_prog )
           : [ @$exec, $test_prog ];
-        if (not defined $args{exec}) {
+        if ( not defined $args{exec} ) {
             $args{source} = $test_prog;
-        } elsif ((ref($args{exec})||"") ne "ARRAY") {
+        }
+        elsif ( ( ref( $args{exec} ) || "" ) ne "ARRAY" ) {
             $args{source} = delete $args{exec};
         }
     }

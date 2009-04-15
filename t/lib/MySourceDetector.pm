@@ -12,7 +12,7 @@ use TAP::Parser::SourceDetector;
 
 @ISA = qw( TAP::Parser::SourceDetector MyCustom );
 
-TAP::Parser::SourceFactory->register_detector( __PACKAGE__ );
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 sub _initialize {
     my $self = shift;
@@ -23,18 +23,18 @@ sub _initialize {
 }
 
 sub can_handle {
-    my ($class, $raw_source_ref) = @_;
-    return 0   unless defined $$raw_source_ref;
-    return 0   if $$raw_source_ref =~ /\n/;
+    my ( $class, $raw_source_ref ) = @_;
+    return 0 unless defined $$raw_source_ref;
+    return 0 if $$raw_source_ref =~ /\n/;
     return 1   if $$raw_source_ref eq 'known-source';
     return 0.5 if $$raw_source_ref eq 'half-known-source';
     return 0;
 }
 
 sub make_source {
-    my ($class, $raw_source_ref) = @_;
+    my ( $class, $raw_source_ref ) = @_;
     my $source = MySource->new;
-    $source->source([ $raw_source_ref ]);
+    $source->source( [$raw_source_ref] );
     return $source;
 }
 

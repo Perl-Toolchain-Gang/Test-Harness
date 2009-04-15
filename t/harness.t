@@ -591,10 +591,12 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             exec      => sub {
-                return [ $cat,
+                return [
+                    $cat,
                     $ENV{PERL_CORE}
                     ? '../ext/Test-Harness/t/data/catme.1'
-                    : 't/data/catme.1' ];
+                    : 't/data/catme.1'
+                ];
             },
         }
     );
@@ -641,9 +643,9 @@ SKIP: {
             stdout    => $capture,
             exec      => sub {
                 open my $fh,
-                    $ENV{PERL_CORE}
-                    ? '../ext/Test-Harness/t/data/catme.1'
-                    : 't/data/catme.1';
+                  $ENV{PERL_CORE}
+                  ? '../ext/Test-Harness/t/data/catme.1'
+                  : 't/data/catme.1';
                 return $fh;
             },
         }

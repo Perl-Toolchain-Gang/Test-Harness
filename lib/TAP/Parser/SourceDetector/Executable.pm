@@ -5,12 +5,13 @@ use vars qw($VERSION @ISA);
 
 use TAP::Parser::SourceFactory  ();
 use TAP::Parser::SourceDetector ();
+
 # TODO
 #use TAP::Parser::Source::Executable ();
 
 @ISA = qw( TAP::Parser::SourceDetector );
 
-TAP::Parser::SourceFactory->register_detector( __PACKAGE__ );
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 =head1 NAME
 
@@ -49,20 +50,20 @@ won't need to use this module directly.
 use constant source_class => 'TAP::Parser::Source::Executable';
 
 sub can_handle {
-    my ($class, $raw_source_ref) = @_;
-    return 0   unless defined $$raw_source_ref;
-    return 0   if $$raw_source_ref =~ /\n/;
-    return 0.7 if -x $$raw_source_ref; # go in low so we can be out-voted
+    my ( $class, $raw_source_ref ) = @_;
+    return 0 unless defined $$raw_source_ref;
+    return 0 if $$raw_source_ref =~ /\n/;
+    return 0.7 if -x $$raw_source_ref;    # go in low so we can be out-voted
     return 0;
 }
 
 sub make_source {
-    my ($class, $raw_source_ref) = @_;
-    my $source = $class->source_class->new( $raw_source_ref );
+    my ( $class, $raw_source_ref ) = @_;
+    my $source = $class->source_class->new($raw_source_ref);
 
-# TODO: figure out how to pass these over:
-#    $source->source( [ @$exec, @test_args ] );
-#    $source->merge($merge);    # XXX should just be arguments?
+    # TODO: figure out how to pass these over:
+    #    $source->source( [ @$exec, @test_args ] );
+    #    $source->merge($merge);    # XXX should just be arguments?
 }
 
 1;
