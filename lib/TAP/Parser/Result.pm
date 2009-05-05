@@ -34,7 +34,7 @@ $VERSION = '3.17';
 
 =head1 SYNOPSIS
 
-  # abstract class - not meant to be used directly
+  # abstract class - not meany to be used directly
   # see TAP::Parser::ResultFactory for preferred usage
 
   # directly:
