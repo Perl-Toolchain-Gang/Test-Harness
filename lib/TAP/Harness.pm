@@ -133,7 +133,7 @@ BEGIN {
 
  my %args = (
     verbosity => 1,
-    lib     => [ 'lib', 'blib/lib' ],
+    lib     => [ 'lib', 'blib/lib', 'blib/arch' ],
  )
  my $harness = TAP::Harness->new( \%args );
 
