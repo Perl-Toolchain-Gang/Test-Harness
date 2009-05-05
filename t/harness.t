@@ -580,7 +580,7 @@ SKIP: {
 }
 
 # Exec with a coderef that returns an arrayref
-{
+SKIP: {
     my $cat = '/bin/cat';
     unless ( -e $cat ) {
         skip "no '$cat'", 2;
