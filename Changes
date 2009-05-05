@@ -1,6 +1,6 @@
 Revision history for Test-Harness
 
-3.17
+3.17    2009-05-05
         - Changed the 'failures' so that it is overridden by verbosity rather
           than the other way around.
         - Added the 'comments' option, most useful when used in conjunction
