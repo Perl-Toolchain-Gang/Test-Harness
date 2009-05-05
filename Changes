@@ -9,6 +9,9 @@ Revision history for Test-Harness
         - Allow '-I lib' as well as '-Ilib' in $Test::Harness::Switches
           (regression).
         - Restore old skip parsing semantics for TAP < v13. Refs #39031.
+        - Numerous small documentation fixes.
+        - Remove support for fork-based parallel testing. Multiplexed
+          parallel testing remains.
 
 3.16    2009-02-19
         - Fix path splicing on platforms where the path separator
