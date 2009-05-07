@@ -184,7 +184,7 @@ be used when invoking the perl executable.
 
  my $parser = TAP::Parser->new( {
      source   => $test_file,
-     switches => '-Ilib',
+     switches => [ '-Ilib' ],
  } );
 
 =item * C<test_args>
