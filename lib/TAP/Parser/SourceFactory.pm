@@ -6,6 +6,7 @@ use vars qw($VERSION @ISA %DETECTORS);
 use TAP::Object ();
 
 use Carp qw( confess );
+use File::Basename qw( fileparse );
 
 @ISA = qw(TAP::Object);
 
@@ -90,6 +91,7 @@ sub make_source {
     my ( $self, $raw_source_ref ) = @_;
 
     confess('no raw source ref defined!') unless defined $raw_source_ref;
+    confess('raw_source_ref is not a reference!') unless ref( $raw_source_ref );
 
     # is the raw source already an object?
     return $$raw_source_ref
@@ -124,10 +126,13 @@ sub detect_source {
 
     confess('no raw source ref defined!') unless defined $raw_source_ref;
 
+    # build up some meta-data about the source so the detectors don't have to
+    my $meta = $self->assemble_meta( $raw_source_ref );
+
     # find a list of detectors that can handle this source:
     my %detectors;
     foreach my $dclass ( @{ $self->detectors } ) {
-        my $confidence = $dclass->can_handle($raw_source_ref);
+        my $confidence = $dclass->can_handle($raw_source_ref, $meta);
         $detectors{$dclass} = $confidence if $confidence;
     }
 
@@ -148,6 +153,71 @@ sub detect_source {
 
     # return 1st detector
     return pop @detectors;
+}
+
+
+=head3 C<assemble_meta>
+
+Given a reference to the raw source, assembles some meta data about it and
+return it as a hashref.  This is done so that the individual detectors don't
+have to repeat common tests.  Currently this includes:
+
+  {
+   TODO
+  }
+
+=cut
+
+sub assemble_meta {
+    my ( $self, $raw_source_ref ) = @_;
+    my $meta = {};
+
+    if (ref( $raw_source_ref ) eq 'SCALAR' ) {
+	my $source = $$raw_source_ref;
+	$meta->{scalar} = 1;
+	$meta->{length} = length( $$raw_source_ref );
+	$meta->{has_newlines} = $$raw_source_ref =~ /\n/ ? 1 : 0;
+
+	# only do file checks if it's not huge
+	if ($meta->{length} < 1024) {
+	    my $file = {};
+	    $file->{exists} = -e $source ? 1 : 0;
+	    if ($file->{exists}) {
+		$meta->{file} = $file;
+
+		# avoid extra system calls (see `perldoc -f -X`)
+		$file->{stat}    = [ stat(_) ];
+		$file->{empty}   = -z _ ? 1 : 0;
+		$file->{size}    = -s _ ? 1 : 0;
+		$file->{text}    = -T _ ? 1 : 0;
+		$file->{binary}  = -B _ ? 1 : 0;
+		$file->{read}    = -r _ ? 1 : 0;
+		$file->{write}   = -w _ ? 1 : 0;
+		$file->{execute} = -x _ ? 1 : 0;
+		$file->{setuid}  = -u _ ? 1 : 0;
+		$file->{setgid}  = -g _ ? 1 : 0;
+		$file->{sticky}  = -k _ ? 1 : 0;
+
+		$meta->{is_file} = $file->{is_file} = -f _ ? 1 : 0;
+		$meta->{is_dir}  = $file->{is_dir}  = -d _ ? 1 : 0;
+
+		# symlink check requires another system call
+		$meta->{is_symlink} = $file->{is_symlink} = -l $source ? 1 : 0;
+		if ($file->{symlink}) {
+		    $file->{lstat}  = [ lstat(_) ];
+		}
+
+		# put together some common info about the file
+		( $file->{basename}, $file->{dir}, $file->{ext} )
+		  = map { defined $_ ? $_ : '' }
+		    fileparse( $source, qr/\.[^.]*/ );
+		$file->{lc_ext}    = lc( $file->{ext} );
+		$file->{basename} .= $file->{ext} if $file->{ext};
+	    }
+	}
+    }
+
+    return $meta;
 }
 
 1;
@@ -174,8 +244,8 @@ But in case you find the need to...
 
   # override source detection algorithm
   sub detect_source {
-    my ($self, $raw_source_ref) = @_;
-    # do detective work...
+    my ($self, $raw_source_ref, $meta) = @_;
+    # do detective work, using $meta and whatever else...
   }
 
   1;

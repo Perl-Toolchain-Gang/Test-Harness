@@ -47,8 +47,13 @@ won't need to use this module directly.
 
 =head3 C<can_handle>
 
-Takes 1 argument: C<$raw_source_ref>.  This is a reference to a scalar, as it
-may contain large amounts of data (eg: raw TAP).
+Takes 2 arguments:
+
+  my $vote = $detector->can_handle( $raw_source_ref, $meta );
+
+C<$raw_source_ref> is a reference to a scalar, as it may contain large
+amounts of data (eg: raw TAP).  C<$meta> is a hashref containing meta data
+about the source itself.
 
 Returns a number between 0 & 1 reflecting how confidently the source detector
 can handle the given source.  For example, C<0> means the detector cannot

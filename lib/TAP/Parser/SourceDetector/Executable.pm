@@ -50,10 +50,13 @@ won't need to use this module directly.
 use constant source_class => 'TAP::Parser::Source::Executable';
 
 sub can_handle {
-    my ( $class, $raw_source_ref ) = @_;
-    return 0 unless defined $$raw_source_ref;
-    return 0 if $$raw_source_ref =~ /\n/;
-    return 0.7 if -x $$raw_source_ref;    # go in low so we can be out-voted
+    my ( $class, $raw_source_ref, $meta ) = @_;
+    return 0 unless $meta->{is_file};
+    my $file = $meta->{file};
+    # Note: we go in low so we can be out-voted
+    return 0.8 if $file->{lc_ext} eq '.sh';
+    return 0.8 if $file->{lc_ext} eq '.bat';
+    return 0.7 if $file->{execute};
     return 0;
 }
 

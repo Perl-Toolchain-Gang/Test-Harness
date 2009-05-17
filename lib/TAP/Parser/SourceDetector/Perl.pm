@@ -50,27 +50,19 @@ won't need to use this module directly.
 use constant source_class => 'TAP::Parser::Source::Perl';
 
 sub can_handle {
-    my ( $class, $raw_source_ref ) = @_;
+    my ( $class, $raw_source_ref, $meta ) = @_;
 
-    return 0 unless defined $$raw_source_ref;
-    return 0 if $$raw_source_ref =~ /\n/;
+    return 0 unless $meta->{is_file};
+    my $file = $meta->{file};
 
-    my $source = $$raw_source_ref;
-    return 0 unless -f $source;
+    return 0.8 if $file->{lc_ext} eq '.t';    # vote higher than Executable
+    return 1   if $file->{lc_ext} eq '.pl';
 
-    my ( $name, $path, $ext ) = fileparse($source);
-    if ($ext) {
-        $ext = lc($ext);
-        return 0.8 if $ext eq 't';    # more than Executable
-        return 1   if $ext eq 'pl';
-    }
-
-    if ($path) {
-        return 0.75 if $path =~ /^t\b/;    # more than Executable
-    }
+    return 0.75 if $file->{dir} =~ /^t\b/;    # vote higher than Executable
 
     # TODO: check for shebang, eg: #!.../perl  ?
 
+    # backwards compat, always vote:
     return 0.5;
 }
 
