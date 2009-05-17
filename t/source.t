@@ -12,23 +12,24 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 35;
+use Test::More tests => 54;
 
 use File::Spec;
 
 use EmptyParser;
 use TAP::Parser::Source;
 use TAP::Parser::Source::Perl;
+use TAP::Parser::Source::File;
+use TAP::Parser::Source::RawTAP;
 
 my $parser = EmptyParser->new;
-my $test   = File::Spec->catfile(
+my $dir    = File::Spec->catdir(
     (   $ENV{PERL_CORE}
         ? ( File::Spec->updir(), 'ext', 'Test-Harness' )
         : ()
     ),
     't',
-    'source_tests',
-    'source'
+    'source_tests'
 );
 
 my $perl = $^X;
@@ -56,6 +57,7 @@ my $perl = $^X;
 
 # Executable source tests
 {
+    my $test   = File::Spec->catfile( $dir, 'source' );
     my $source = TAP::Parser::Source::Executable->new;
     isa_ok $source, 'TAP::Parser::Source::Executable';
 
@@ -80,7 +82,7 @@ my $perl = $^X;
 
 # Perl source tests
 {
-    can_ok 'TAP::Parser::Source::Perl', 'new';
+    my $test   = File::Spec->catfile( $dir, 'source' );
     my $source = TAP::Parser::Source::Perl->new;
     isa_ok $source, 'TAP::Parser::Source::Perl', '... and the object it returns';
 
@@ -119,5 +121,51 @@ my $perl = $^X;
 
     is @die, 1, 'coverage testing of Executable get_stream';
     like pop @die, qr/No command found!/, '...and it failed as expect';
+}
+
+
+# Raw TAP source tests
+{
+    my $source = TAP::Parser::Source::RawTAP->new;
+    isa_ok $source, 'TAP::Parser::Source::RawTAP';
+
+    can_ok $source, 'source';
+    eval { $source->source( "1..1\nok 1\n" ) };
+    ok my $error = $@, '... and calling it with a string should fail';
+    like $error, qr/^Argument to &source must be a scalar reference/,
+      '... with an appropriate error message';
+    ok $source->source( \"1..1\nok 1\n" ),
+      '... and calling it with valid args should succeed';
+
+    can_ok $source, 'get_stream';
+    my $stream = $source->get_stream($parser);
+
+    isa_ok $stream, 'TAP::Parser::Iterator::Array',
+      'get_stream returns the right object';
+    can_ok $stream, 'next';
+    is $stream->next, '1..1', '... and the first line should be correct';
+    is $stream->next, 'ok 1', '... as should the second';
+    ok !$stream->next, '... and we should have no more results';
+}
+
+# Text file TAP source tests
+{
+    my $test   = File::Spec->catfile( $dir, 'source.tap' );
+    my $source = TAP::Parser::Source::File->new;
+    isa_ok $source, 'TAP::Parser::Source::File';
+
+    can_ok $source, 'source';
+    ok $source->source( $test ),
+      '... and calling it with valid args should succeed';
+
+    can_ok $source, 'get_stream';
+    my $stream = $source->get_stream($parser);
+
+    isa_ok $stream, 'TAP::Parser::Iterator::Stream',
+      'get_stream returns the right object';
+    can_ok $stream, 'next';
+    is $stream->next, '1..1', '... and the first line should be correct';
+    is $stream->next, 'ok 1', '... as should the second';
+    ok !$stream->next, '... and we should have no more results';
 }
 

@@ -465,7 +465,6 @@ sub _iterator_for_source {
             $stream = $self->_iterator_for_source( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
-
             # TODO: use the source factory?
             my $source = $self->make_source;
             $source->source( [ @$exec, @test_args ] );
