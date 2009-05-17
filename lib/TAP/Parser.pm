@@ -441,7 +441,7 @@ sub _iterator_for_source {
 
         my $stream      = delete $args{stream};
         my $tap         = delete $args{tap};
-        my $source      = delete $args{source};
+        my $raw_source      = delete $args{source};
         my $exec        = delete $args{exec};
         my $merge       = delete $args{merge};
         my $spool       = delete $args{spool};
@@ -449,7 +449,7 @@ sub _iterator_for_source {
         my $ignore_exit = delete $args{ignore_exit};
         my @test_args   = @{ delete $args{test_args} || [] };
 
-        if ( 1 < grep {defined} $stream, $tap, $source, $exec ) {
+        if ( 1 < grep {defined} $stream, $tap, $raw_source, $exec ) {
             $self->_croak(
                 "You may only choose one of 'exec', 'stream', 'tap' or 'source'"
             );
@@ -472,32 +472,29 @@ sub _iterator_for_source {
             $source->merge($merge);    # XXX should just be arguments?
             $stream = $source->get_stream($self);
         }
-        elsif ($source) {
-
+        elsif ($raw_source) {
             # TODO: always use source factory, unless internal case
-
-            if ( $source =~ /\n/ ) {
+            if ( $raw_source =~ /\n/ ) {
                 $stream
-                  = $self->_iterator_for_source( [ split "\n" => $source ] );
+                  = $self->_iterator_for_source( [ split "\n" => $raw_source ] );
             }
-            elsif ( ref $source ) {
-                $stream = $self->_iterator_for_source($source);
+            elsif ( ref $raw_source ) {
+                $stream = $self->_iterator_for_source($raw_source);
             }
-            elsif ( -e $source ) {
+            elsif ( -e $raw_source ) {
+                my $source = $src_factory->make_source( \$raw_source );
 
-                # TODO: this breaks backwards compat: t/parser-subclass.t
-                my $perl = $src_factory->make_source( \$source );
-                #my $perl = $self->make_perl_source;
+                $source->switches($switches)
+                  if $switches && $source->isa('TAP::Parser::Source::Perl');
 
-                $perl->switches($switches)
-                  if $switches;
+		# TODO: move this into src_factory?
+                $source->merge($merge);    # XXX args to new()?
+                $source->source( [ $raw_source, @test_args ] );
 
-                $perl->merge($merge);    # XXX args to new()?
-                $perl->source( [ $source, @test_args ] );
-                $stream = $perl->get_stream($self);
+                $stream = $source->get_stream($self);
             }
             else {
-                $self->_croak("Cannot determine source for $source");
+                $self->_croak("Cannot determine source for $raw_source");
             }
         }
 
