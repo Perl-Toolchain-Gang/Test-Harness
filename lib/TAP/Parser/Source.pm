@@ -17,11 +17,11 @@ TAP::Parser::Source - Stream output from some source
 
 =head1 VERSION
 
-Version 3.17
+Version 3.18
 
 =cut
 
-$VERSION = '3.17';
+$VERSION = '3.18';
 
 =head1 SYNOPSIS
 

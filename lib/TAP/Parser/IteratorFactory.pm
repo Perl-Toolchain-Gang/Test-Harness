@@ -16,11 +16,11 @@ TAP::Parser::IteratorFactory - Internal TAP::Parser Iterator
 
 =head1 VERSION
 
-Version 3.17
+Version 3.18
 
 =cut
 
-$VERSION = '3.17';
+$VERSION = '3.18';
 
 =head1 SYNOPSIS
 

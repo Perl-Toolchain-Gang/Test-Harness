@@ -18,11 +18,11 @@ TAP::Parser::SourceDetector::RawTAP - Raw TAP source detector
 
 =head1 VERSION
 
-Version 3.17
+Version 3.18
 
 =cut
 
-$VERSION = '3.17';
+$VERSION = '3.18';
 
 =head1 SYNOPSIS
 
