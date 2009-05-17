@@ -50,10 +50,15 @@ use constant source_class => 'TAP::Parser::Source::RawTAP';
 sub can_handle {
     my ( $class, $raw_source_ref, $meta ) = @_;
     return 0 if $meta->{file};
-    return 0 unless $meta->{has_newlines};
-    return 0.9 if $$raw_source_ref =~ /\d\.\.\d/;
-    return 0.7 if $$raw_source_ref =~ /ok/;
-    return 0.6;
+    if ($meta->{scalar}) {
+	return 0 unless $meta->{has_newlines};
+	return 0.9 if $$raw_source_ref =~ /\d\.\.\d/;
+	return 0.7 if $$raw_source_ref =~ /ok/;
+	return 0.6;
+    } elsif ($meta->{array}) {
+	return 0.5;
+    }
+    return 0;
 }
 
 sub make_source {

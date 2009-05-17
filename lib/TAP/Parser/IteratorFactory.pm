@@ -70,7 +70,7 @@ sub make_iterator {
     my ( $proto, $thing ) = @_;
 
     my $ref = ref $thing;
-    if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
+    if ( $ref eq 'GLOB' || UNIVERSAL::isa( $ref, 'IO::Handle' ) ) {
         return $proto->make_stream_iterator($thing);
     }
     elsif ( $ref eq 'ARRAY' ) {

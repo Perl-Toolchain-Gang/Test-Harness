@@ -466,7 +466,7 @@ sub _iterator_for_source {
 	my $src_factory = $self->source_factory_class->new;
         if ($tap) {
 	    my $source = $src_factory->make_source( \$tap );
-	    $source->source( \$tap );
+	    $source->source( \$tap ); # TODO: move to src factory
 	    $stream = $source->get_stream( $self );
         }
         elsif ($exec) {
@@ -479,10 +479,15 @@ sub _iterator_for_source {
         elsif ($raw_source) {
             # TODO: always use source factory, unless internal case
             if ( $raw_source =~ /\n/ ) {
-                $stream
-                  = $self->_iterator_for_source( [ split "\n" => $raw_source ] );
+                my $source = $src_factory->make_source( \$raw_source );
+		$source->source( \$raw_source ); # TODO: move to src factory
+		$stream = $source->get_stream( $self );
             }
             elsif ( ref $raw_source ) {
+		# TODO: use source factory
+                #my $source = $src_factory->make_source( $raw_source );
+		#$source->source( $raw_source ); # TODO: move to src factory
+		#$stream = $source->get_stream( $self );
                 $stream = $self->_iterator_for_source($raw_source);
             }
             elsif ( -e $raw_source ) {

@@ -91,11 +91,12 @@ sub make_source {
     my ( $self, $raw_source_ref ) = @_;
 
     confess('no raw source ref defined!') unless defined $raw_source_ref;
-    confess('raw_source_ref is not a reference!') unless ref( $raw_source_ref );
+    my $ref_type = ref( $raw_source_ref );
+    confess('raw_source_ref is not a reference!') unless $ref_type;
 
     # is the raw source already an object?
     return $$raw_source_ref
-      if ( ref($$raw_source_ref)
+      if ( $ref_type eq 'SCALAR' && ref($$raw_source_ref)
         && UNIVERSAL::isa( $$raw_source_ref, 'TAP::Parser::Source' ) );
 
     # figure out what kind of source it is
@@ -172,9 +173,9 @@ sub assemble_meta {
     my ( $self, $raw_source_ref ) = @_;
     my $meta = {};
 
-    if (ref( $raw_source_ref ) eq 'SCALAR' ) {
+    $meta->{lc( ref( $raw_source_ref ) )} = 1;
+    if ($meta->{scalar}) {
 	my $source = $$raw_source_ref;
-	$meta->{scalar} = 1;
 	$meta->{length} = length( $$raw_source_ref );
 	$meta->{has_newlines} = $$raw_source_ref =~ /\n/ ? 1 : 0;
 
@@ -215,6 +216,8 @@ sub assemble_meta {
 		$file->{basename} .= $file->{ext} if $file->{ext};
 	    }
 	}
+    } elsif ($meta->{array}) {
+	$meta->{size} = $#$raw_source_ref;
     }
 
     return $meta;
