@@ -6,9 +6,9 @@ use strict;
 use vars '@ISA';
 
 use MyCustom;
-use TAP::Parser::Source;
+use TAP::Parser::Source::Executable;
 
-@ISA = qw( TAP::Parser::Source MyCustom );
+@ISA = qw( TAP::Parser::Source::Executable MyCustom );
 
 sub _initialize {
     my $self = shift;

@@ -7,10 +7,10 @@ use vars qw($VERSION @ISA);
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS => ( $^O eq 'VMS' );
 
-use TAP::Parser::Source;
+use TAP::Parser::Source::Executable ();
 use TAP::Parser::Utils qw( split_shell );
 
-@ISA = 'TAP::Parser::Source';
+@ISA = 'TAP::Parser::Source::Executable';
 
 =head1 NAME
 
@@ -322,5 +322,6 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::Source>,
+L<TAP::Parser::Source::Executable>
 
 =cut

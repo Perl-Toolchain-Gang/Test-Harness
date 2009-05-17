@@ -112,8 +112,10 @@ on error.
 The detection algorithm works something like this:
 
   for all registered detectors
-    asking them how confident they are about handling this source
+    ask them how confident they are about handling this source
   choose the most confident detector
+
+Ties are handled by choosing the first detector.
 
 =cut
 

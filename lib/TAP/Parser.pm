@@ -7,7 +7,7 @@ use TAP::Base                         ();
 use TAP::Parser::Grammar              ();
 use TAP::Parser::Result               ();
 use TAP::Parser::ResultFactory        ();
-use TAP::Parser::Source               ();
+use TAP::Parser::Source::Executable   ();
 use TAP::Parser::Source::Perl         ();
 use TAP::Parser::Iterator             ();
 use TAP::Parser::IteratorFactory      ();
@@ -134,7 +134,7 @@ The value should be the complete TAP output.
 =item * C<exec>
 
 If passed an array reference, will attempt to create the iterator by
-passing a L<TAP::Parser::Source> object to
+passing a L<TAP::Parser::Source::Executable> object to
 L<TAP::Parser::Iterator::Source>, using the array reference strings as
 the command arguments to L<IPC::Open3::open3|IPC::Open3>:
 
@@ -209,7 +209,7 @@ the future.
 I<DEPRECATED>.
 
 This option was introduced to let you easily customize which I<source> class
-the parser should use.  It defaults to L<TAP::Parser::Source>.
+the parser should use.  It defaults to L<TAP::Parser::Source::Executable>.
 
 See also L</make_source>.
 
@@ -260,7 +260,7 @@ L<TAP::Parser::SourceFactory>.
 # new() implementation supplied by TAP::Base
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub _default_source_class      {'TAP::Parser::Source'}          # deprecated
+sub _default_source_class      {'TAP::Parser::Source::Executable'}          # deprecated
 sub _default_perl_source_class {'TAP::Parser::Source::Perl'}    # deprecated
 sub _default_grammar_class     {'TAP::Parser::Grammar'}
 sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
@@ -317,7 +317,7 @@ sub run {
 
 I<DEPRECATED>.
 
-Make a new L<TAP::Parser::Source> object and return it.  Passes through any
+Make a new L<TAP::Parser::Source::Executable> object and return it.  Passes through any
 arguments given.
 
 The C<source_class> can be customized, as described in L</new>.
@@ -460,6 +460,7 @@ sub _iterator_for_source {
         }
 
         if ($tap) {
+            # TODO: use the source factory?
             $stream = $self->_iterator_for_source( [ split "\n" => $tap ] );
         }
         elsif ($exec) {
@@ -1752,8 +1753,10 @@ deprecated first, and changed in a later release.
 
 =head3 Sources
 
+TODO: this needs updating onn introducing L<TAP::Parser::SourceFactory>.
+
 A TAP parser consumes input from a I<source>.  There are currently two types
-of sources: L<TAP::Parser::Source> for general non-perl commands, and
+of sources: L<TAP::Parser::Source::Executable> for general non-perl commands, and
 L<TAP::Parser::Source::Perl>.  You can subclass both of them.  You'll need to
 customize your parser by setting the C<source_class> & C<perl_source_class>
 parameters.  See L</new> for more details.
