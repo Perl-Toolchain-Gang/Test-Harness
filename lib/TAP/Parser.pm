@@ -459,6 +459,7 @@ sub _iterator_for_source {
             $self->_croak("Unknown options: @excess");
         }
 
+	my $src_factory = $self->source_factory_class->new;
         if ($tap) {
             # TODO: use the source factory?
             $stream = $self->_iterator_for_source( [ split "\n" => $tap ] );
@@ -472,7 +473,6 @@ sub _iterator_for_source {
             $stream = $source->get_stream($self);
         }
         elsif ($source) {
-            my $src_factory = $self->source_factory_class->new;
 
             # TODO: always use source factory, unless internal case
 
@@ -486,8 +486,8 @@ sub _iterator_for_source {
             elsif ( -e $source ) {
 
                 # TODO: this breaks backwards compat: t/parser-subclass.t
-                #my $perl = $src_factory->make_source( \$source );
-                my $perl = $self->make_perl_source;
+                my $perl = $src_factory->make_source( \$source );
+                #my $perl = $self->make_perl_source;
 
                 $perl->switches($switches)
                   if $switches;
