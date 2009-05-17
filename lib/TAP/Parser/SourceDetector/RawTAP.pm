@@ -5,8 +5,7 @@ use vars qw($VERSION @ISA);
 
 use TAP::Parser::SourceFactory  ();
 use TAP::Parser::SourceDetector ();
-
-#use TAP::Parser::Source::RawTAP ();
+use TAP::Parser::Source::RawTAP ();
 
 @ISA = qw( TAP::Parser::SourceDetector );
 
@@ -49,10 +48,12 @@ won't need to use this module directly.
 use constant source_class => 'TAP::Parser::Source::RawTAP';
 
 sub can_handle {
-    my ( $class, $raw_source_ref ) = @_;
-    return 0 unless defined $$raw_source_ref;
-    return 0.75 if ( $$raw_source_ref =~ /\n/ );
-    return 0;
+    my ( $class, $raw_source_ref, $meta ) = @_;
+    return 0 if $meta->{file};
+    return 0 unless $meta->{has_newlines};
+    return 0.9 if $$raw_source_ref =~ /\d\.\.\d/;
+    return 0.7 if $$raw_source_ref =~ /ok/;
+    return 0.6;
 }
 
 sub make_source {

@@ -178,8 +178,8 @@ sub assemble_meta {
 	$meta->{length} = length( $$raw_source_ref );
 	$meta->{has_newlines} = $$raw_source_ref =~ /\n/ ? 1 : 0;
 
-	# only do file checks if it's not huge
-	if ($meta->{length} < 1024) {
+	# only do file checks if it looks like a filename
+	if (! $meta->{has_newlines} and $meta->{length} < 1024) {
 	    my $file = {};
 	    $file->{exists} = -e $source ? 1 : 0;
 	    if ($file->{exists}) {

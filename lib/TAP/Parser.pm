@@ -12,7 +12,11 @@ use TAP::Parser::Source::Perl         ();
 use TAP::Parser::Iterator             ();
 use TAP::Parser::IteratorFactory      ();
 use TAP::Parser::SourceFactory        ();
+
 use TAP::Parser::SourceDetector::Perl ();
+use TAP::Parser::SourceDetector::File ();
+use TAP::Parser::SourceDetector::Executable ();
+use TAP::Parser::SourceDetector::RawTAP ();
 
 use Carp qw( confess );
 
@@ -461,8 +465,9 @@ sub _iterator_for_source {
 
 	my $src_factory = $self->source_factory_class->new;
         if ($tap) {
-            # TODO: use the source factory?
-            $stream = $self->_iterator_for_source( [ split "\n" => $tap ] );
+	    my $source = $src_factory->make_source( \$tap );
+	    $source->source( \$tap );
+	    $stream = $source->get_stream( $self );
         }
         elsif ($exec) {
             # TODO: use the source factory?

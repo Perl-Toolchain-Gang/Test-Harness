@@ -5,9 +5,7 @@ use vars qw($VERSION @ISA);
 
 use TAP::Parser::SourceFactory  ();
 use TAP::Parser::SourceDetector ();
-
-# TODO
-#use TAP::Parser::Source::Executable ();
+use TAP::Parser::Source::Executable ();
 
 @ISA = qw( TAP::Parser::SourceDetector );
 
