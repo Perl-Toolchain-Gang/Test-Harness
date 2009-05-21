@@ -138,6 +138,8 @@ sub detect_source {
     }
 
     if ( !%detectors ) {
+	# use Data::Dump qw( pp );
+	# warn pp( $meta );
 
         # error: can't detect source
         my $raw_source_short = substr( $$raw_source_ref, 0, 50 );
@@ -151,6 +153,8 @@ sub detect_source {
           sort { $detectors{$a} cmp $detectors{$b} }
           keys %detectors
     );
+
+    # warn "votes: " . join( ', ', map { "$_: $detectors{$_}" } @detectors ) . "\n";
 
     # return 1st detector
     return pop @detectors;
@@ -172,6 +176,10 @@ have to repeat common tests.  Currently this includes:
 sub assemble_meta {
     my ( $self, $raw_source_ref ) = @_;
     my $meta = {};
+
+    # rudimentary is object test - if it's blessed it'll
+    # inherit from UNIVERSAL
+    $meta->{is_object} = UNIVERSAL::isa( $raw_source_ref, 'UNIVERSAL' ) ? 1 : 0;
 
     $meta->{lc( ref( $raw_source_ref ) )} = 1;
     if ($meta->{scalar}) {
@@ -217,7 +225,9 @@ sub assemble_meta {
 	    }
 	}
     } elsif ($meta->{array}) {
-	$meta->{size} = $#$raw_source_ref;
+	$meta->{size} = $#$raw_source_ref + 1;
+    } elsif ($meta->{hash}) {
+	; # do nothing
     }
 
     return $meta;

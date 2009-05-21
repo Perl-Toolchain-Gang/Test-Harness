@@ -17,6 +17,7 @@ use TAP::Parser::SourceDetector::Perl ();
 use TAP::Parser::SourceDetector::File ();
 use TAP::Parser::SourceDetector::Executable ();
 use TAP::Parser::SourceDetector::RawTAP ();
+use TAP::Parser::SourceDetector::Handle ();
 
 use Carp qw( confess );
 
@@ -445,7 +446,7 @@ sub _iterator_for_source {
 
         my $stream      = delete $args{stream};
         my $tap         = delete $args{tap};
-        my $raw_source      = delete $args{source};
+        my $raw_source  = delete $args{source};
         my $exec        = delete $args{exec};
         my $merge       = delete $args{merge};
         my $spool       = delete $args{spool};
@@ -464,6 +465,14 @@ sub _iterator_for_source {
         }
 
 	my $src_factory = $self->source_factory_class->new;
+	# TODO: replace this with something like:
+	# convert $tap & $exec to $raw_source equiv.
+	# my $source = $src_factory->make_source({
+	#     raw_source => ref( $raw_source ) ? $raw_source : \$raw_source,
+	#     merge      => $merge,
+	#     switches   => $switches,
+	# );
+	# my $stream = $source->get_stream;  # notice no "( $self )"
         if ($tap) {
 	    my $source = $src_factory->make_source( \$tap );
 	    $source->source( \$tap ); # TODO: move to src factory
@@ -477,18 +486,15 @@ sub _iterator_for_source {
             $stream = $source->get_stream($self);
         }
         elsif ($raw_source) {
-            # TODO: always use source factory, unless internal case
             if ( $raw_source =~ /\n/ ) {
                 my $source = $src_factory->make_source( \$raw_source );
 		$source->source( \$raw_source ); # TODO: move to src factory
 		$stream = $source->get_stream( $self );
             }
             elsif ( ref $raw_source ) {
-		# TODO: use source factory
-                #my $source = $src_factory->make_source( $raw_source );
-		#$source->source( $raw_source ); # TODO: move to src factory
-		#$stream = $source->get_stream( $self );
-                $stream = $self->_iterator_for_source($raw_source);
+                my $source = $src_factory->make_source( $raw_source );
+		$source->source( $raw_source ); # TODO: move to src factory
+		$stream = $source->get_stream( $self );
             }
             elsif ( -e $raw_source ) {
                 my $source = $src_factory->make_source( \$raw_source );
@@ -503,6 +509,7 @@ sub _iterator_for_source {
                 $stream = $source->get_stream($self);
             }
             else {
+		# TODO: this case should move to src factory
                 $self->_croak("Cannot determine source for $raw_source");
             }
         }

@@ -132,7 +132,7 @@ my $perl = $^X;
     can_ok $source, 'source';
     eval { $source->source( "1..1\nok 1\n" ) };
     ok my $error = $@, '... and calling it with a string should fail';
-    like $error, qr/^Argument to &source must be a scalar reference/,
+    like $error, qr/^Argument to &source must be a scalar or array reference/,
       '... with an appropriate error message';
     ok $source->source( \"1..1\nok 1\n" ),
       '... and calling it with valid args should succeed';

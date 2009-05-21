@@ -23,9 +23,8 @@ sub _initialize {
 }
 
 sub can_handle {
-    my ( $class, $raw_source_ref ) = @_;
-    return 0 unless defined $$raw_source_ref;
-    return 0 if $$raw_source_ref =~ /\n/;
+    my ($class, $raw_source_ref, $meta) = @_;
+    return 0 unless $meta->{scalar};
     return 1   if $$raw_source_ref eq 'known-source';
     return 0.5 if $$raw_source_ref eq 'half-known-source';
     return 0;

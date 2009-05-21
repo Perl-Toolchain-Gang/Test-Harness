@@ -1,4 +1,4 @@
-package TAP::Parser::Source::RawTAP;
+package TAP::Parser::Source::Handle;
 
 use strict;
 use vars qw($VERSION @ISA);
@@ -10,7 +10,7 @@ use TAP::Parser::IteratorFactory ();
 
 =head1 NAME
 
-TAP::Parser::Source::RawTAP - Stream output from raw TAP in a scalar ref.
+TAP::Parser::Source::Handle - Stream TAP from an IO::Handle or a GLOB.
 
 =head1 VERSION
 
@@ -22,13 +22,13 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  use TAP::Parser::Source::RawTAP;
-  my $source = TAP::Parser::Source::RawTAP->new;
-  my $stream = $source->source (\"1..1\nok 1\n" )->get_stream;
+  use TAP::Parser::Source::Handle;
+  my $source = TAP::Parser::Source::Handle->new;
+  my $stream = $source->source( \*TAP_FILE )->get_stream;
 
 =head1 DESCRIPTION
 
-Takes raw TAP and converts into an iterator.
+Takes raw TAP from the handle given and converts into an iterator.
 
 =head1 METHODS
 
@@ -36,9 +36,9 @@ Takes raw TAP and converts into an iterator.
 
 =head3 C<new>
 
- my $source = TAP::Parser::Source::RawTAP->new;
+ my $source = TAP::Parser::Source::Handle->new;
 
-Returns a new C<TAP::Parser::Source::RawTAP> object.
+Returns a new C<TAP::Parser::Source::Handle> object.
 
 =cut
 
@@ -51,9 +51,9 @@ Returns a new C<TAP::Parser::Source::RawTAP> object.
 =head3 C<source>
 
  my $source = $source->source;
- $source->source( \$raw_tap );
+ $source->source( $raw_tap );
 
-Getter/setter for the source.  C<croaks> if it doesn't get a scalar ref.
+Getter/setter for the source.  C<croaks> if it doesn't get a scalar.
 
 =cut
 
@@ -64,16 +64,12 @@ sub source {
     my $ref = ref $_[0];
     if (! defined( $ref )) {
         ; # fall through
-    } elsif ($ref eq 'SCALAR') {
-	my $scalar_ref = shift;
-	$self->{source} = [ split "\n" => $$scalar_ref ];
-	return $self;
-    } elsif ($ref eq 'ARRAY') {
+    } elsif ($ref eq 'GLOB' || UNIVERSAL::isa( $ref, 'IO::Handle' )) {
 	$self->{source} = shift;
 	return $self;
     }
 
-    $self->_croak('Argument to &source must be a scalar or array reference');
+    $self->_croak('Argument to &source must be a glob ref or an IO::Handle');
 }
 
 ##############################################################################
