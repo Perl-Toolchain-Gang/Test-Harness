@@ -24,7 +24,7 @@ my $source_tests
 my $sample_tests
   = $ENV{PERL_CORE} ? '../ext/Test-Harness/t/sample-tests' : 't/sample-tests';
 
-plan tests => 119;
+plan tests => 127;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -687,6 +687,63 @@ SKIP: {
     is( $output[-1], "All tests successful.\n",
         'No exec accumulation'
     );
+}
+
+# customize default File source
+{
+    local $TODO = 'sources not yet implemented';
+    my $capture = IO::c55Capture->new_handle;
+    my $harness = TAP::Harness->new(
+        {   verbosity => -2,
+            stdout    => $capture,
+            sources   => {
+			  File => { extensions => [ '.1' ] },
+			 },
+        }
+    );
+
+    _runtests( $harness, "$source_tests/source.1" );
+
+    my @output = tied($$capture)->dump;
+    my $status = pop @output;
+    like $status, qr{^Result: PASS$},
+      'customize default File source has correct status line';
+    pop @output;    # get rid of summary line
+    my $answer = pop @output;
+    is( $answer, "All tests successful.\n", '... all tests passed' );
+}
+
+# load a custom source
+{
+    local $TODO = 'sources not yet implemented';
+    my $capture = IO::c55Capture->new_handle;
+    my $harness = TAP::Harness->new(
+        {   verbosity => -2,
+            stdout    => $capture,
+            sources   => {
+			  MyFileSource => { extensions => [ '.1' ] },
+			 },
+        }
+    );
+
+    _runtests( $harness, "$source_tests/source.1" );
+
+    can_ok( 'MyFileSource', 'new', 'custom file source was loaded' );
+    ok( $main::INIT{MyFileSource}, '... and an obj was instantiated' );
+
+    my $source = $MyFileSource::LAST_OBJ || {};
+    isa_ok( $source, 'MyFileSource', '... and MyFileSource obj was created' );
+    is_deeply( $source->{initialized},
+	       { extensions => [ '.1' ] },
+	       '... and was initialized with correct config' );
+
+    my @output = tied($$capture)->dump;
+    my $status = pop @output;
+    like $status, qr{^Result: PASS$},
+      '... and test has correct status line';
+    pop @output;    # get rid of summary line
+    my $answer = pop @output;
+    is( $answer, "All tests successful.\n", '... all tests passed' );
 }
 
 sub trim {

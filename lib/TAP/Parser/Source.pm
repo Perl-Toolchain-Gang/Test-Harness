@@ -118,15 +118,18 @@ sub get_stream {
 
 =head1 SUBCLASSING
 
-Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview, and
-L<TAP::Parser::Source::Executable> as an example of how to sub-class.
+Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview, and any
+of the subclasses that ship with this module as an example.
 
 =head1 SEE ALSO
 
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::Source::Executable>,
-L<TAP::Parser::Source::Perl>
+L<TAP::Parser::Source::Perl>,
+L<TAP::Parser::Source::File>,
+L<TAP::Parser::Source::Handle>,
+L<TAP::Parser::Source::RawTAP>
 
 =cut
 
