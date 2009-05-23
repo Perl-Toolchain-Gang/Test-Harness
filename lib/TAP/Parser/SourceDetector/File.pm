@@ -48,22 +48,32 @@ won't need to use this module directly.
 use constant source_class => 'TAP::Parser::Source::File';
 
 sub can_handle {
-    my ( $class, $raw_source_ref, $meta ) = @_;
+    my ( $class, $raw_source_ref, $meta, $config ) = @_;
 
     return 0 unless $meta->{is_file};
     my $file = $meta->{file};
     return 1 if $file->{lc_ext} eq '.tap';
 
+    if (my $exts = $config->{extensions}) {
+	return 1 if grep {lc($_) eq $file->{lc_ext}} @$exts;
+    }
+
     return 0;
 }
 
 sub make_source {
-    my ( $class, $raw_source_ref ) = @_;
+    my ( $class, $raw_source_ref, $config ) = @_;
     my $source = $class->source_class->new($raw_source_ref);
     return $source;
 }
 
 1;
+
+=head1 CONFIGURATION
+
+  {
+   extensions => [ @list_of_exts_to_match ]
+  }
 
 =head1 AUTHORS
 

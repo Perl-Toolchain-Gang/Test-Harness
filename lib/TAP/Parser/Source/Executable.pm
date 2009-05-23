@@ -48,8 +48,12 @@ Returns a new C<TAP::Parser::Source::Executable> object.
 # new() implementation supplied by TAP::Object
 
 sub _initialize {
-    my ( $self, $args ) = @_;
+    my ( $self, @args ) = @_;
+    $self->SUPER::_initialize( @args );
+
+    # TODO: move this to Perl sub-class - not used here?
     $self->{switches} = [];
+
     _autoflush( \*STDOUT );
     _autoflush( \*STDERR );
     return $self;
@@ -76,12 +80,9 @@ it doesn't get an arrayref.
 
 sub source {
     my $self = shift;
-    return $self->{source} unless @_;
-    unless ( 'ARRAY' eq ref $_[0] ) {
-        $self->_croak('Argument to &source must be an array reference');
-    }
-    $self->{source} = shift;
-    return $self;
+    $self->_croak('Argument to &source must be an array reference')
+      if ( @_ && 'ARRAY' ne ref $_[0] );
+    return $self->SUPER::source( @_ );
 }
 
 ##############################################################################

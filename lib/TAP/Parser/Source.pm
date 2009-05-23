@@ -50,6 +50,8 @@ L<TAP::Parser::Iterator> object.
 =head3 C<new>
 
  my $source = TAP::Parser::Source->new;
+ # or:
+ my $source = TAP::Parser::Source->new( $raw_source_ref, $config );
 
 Returns a new C<TAP::Parser::Source> object.
 
@@ -57,16 +59,37 @@ Returns a new C<TAP::Parser::Source> object.
 
 # new() implementation supplied by TAP::Object
 
+sub _initialize {
+    my ($self, $raw_source_ref, $config ) = @_;
+    $self->config( $config || {} );
+    return $self;
+}
+
+
 ##############################################################################
 
 =head2 Instance Methods
 
-=head3 C<source>
+=head3 C<raw_source>
 
- my $source = $source->source;
- $source->source($some_value);
+ my $raw_source = $source->raw_source;
+ $source->raw_source( $some_value );
 
 Chaining getter/setter for the raw TAP source.
+
+=head3 C<source>
+
+I<Deprecated.>
+
+Synonym for L</raw_source>.
+
+=head3 C<config>
+
+ my $config = $source->config;
+ $source->config({ %some_value });
+
+Chaining getter/setter for the source's configuration, if any.  This defaults
+to an empty hashref.
 
 =head3 C<merge>
 
@@ -77,10 +100,22 @@ should be merged (where appropriate).
 
 =cut
 
+sub raw_source {
+    my $self = shift;
+    return $self->{raw_source} unless @_;
+    $self->{raw_source} = shift;
+    return $self;
+}
+
 sub source {
     my $self = shift;
-    return $self->{source} unless @_;
-    $self->{source} = shift;
+    return $self->raw_source(@_);
+}
+
+sub config {
+    my $self = shift;
+    return $self->{config} unless @_;
+    $self->{config} = shift;
     return $self;
 }
 

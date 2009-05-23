@@ -23,16 +23,17 @@ sub _initialize {
 }
 
 sub can_handle {
-    my ($class, $raw_source_ref, $meta) = @_;
+    my ($class, $raw_source_ref, $meta, $config) = @_;
     return 0 unless $meta->{scalar};
-    return 1   if $$raw_source_ref eq 'known-source';
-    return 0.5 if $$raw_source_ref eq 'half-known-source';
+    if (my $accept = $config->{accept}) {
+	return 1 if $$raw_source_ref eq $accept;
+    }
     return 0;
 }
 
 sub make_source {
-    my ( $class, $raw_source_ref ) = @_;
-    my $source = MySource->new;
+    my ( $class, $raw_source_ref, $config ) = @_;
+    my $source = MySource->new( $raw_source_ref, $config );
     $source->source( [$raw_source_ref] );
     return $source;
 }

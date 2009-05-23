@@ -12,7 +12,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 54;
+use Test::More tests => 68;
 
 use File::Spec;
 
@@ -40,13 +40,21 @@ my $perl = $^X;
     my $source = TAP::Parser::Source->new;
     isa_ok $source, 'TAP::Parser::Source';
 
+    can_ok $source, 'raw_source';
+    is $source->raw_source('hello'), $source, '... can set';
+    is $source->raw_source, 'hello', '... and get';
+
+    # TODO: deprecated
     can_ok $source, 'source';
-    is $source->source('hello'), $source, '... can set';
-    is $source->source, 'hello', '... and get';
+    is $source->source, 'hello', '... and get = raw_source';
 
     can_ok $source, 'merge';
     is $source->merge('hello'), $source, '... can set';
     is $source->merge, 'hello', '... and get';
+
+    can_ok $source, 'config';
+    is $source->config('hello'), $source, '... can set';
+    is $source->config, 'hello', '... and get';
 
     can_ok $source, 'get_stream';
     eval { $source->get_stream($parser) };
@@ -149,6 +157,27 @@ my $perl = $^X;
 }
 
 # Text file TAP source tests
+{
+    my $test   = File::Spec->catfile( $dir, 'source.tap' );
+    my $source = TAP::Parser::Source::File->new;
+    isa_ok $source, 'TAP::Parser::Source::File';
+
+    can_ok $source, 'source';
+    ok $source->source( $test ),
+      '... and calling it with valid args should succeed';
+
+    can_ok $source, 'get_stream';
+    my $stream = $source->get_stream($parser);
+
+    isa_ok $stream, 'TAP::Parser::Iterator::Stream',
+      'get_stream returns the right object';
+    can_ok $stream, 'next';
+    is $stream->next, '1..1', '... and the first line should be correct';
+    is $stream->next, 'ok 1', '... as should the second';
+    ok !$stream->next, '... and we should have no more results';
+}
+
+# IO::Handle TAP source tests
 {
     my $test   = File::Spec->catfile( $dir, 'source.tap' );
     my $source = TAP::Parser::Source::File->new;

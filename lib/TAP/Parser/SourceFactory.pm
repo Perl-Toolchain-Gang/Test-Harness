@@ -27,7 +27,7 @@ $VERSION = '3.18';
 =head1 SYNOPSIS
 
   use TAP::Parser::SourceFactory;
-  my $factory = TAP::Parser::SourceFactory->new;
+  my $factory = TAP::Parser::SourceFactory->new({ %config });
   my $source  = $factory->make_source( $filename );
 
 =head1 DESCRIPTION
@@ -48,9 +48,8 @@ Creates a new factory class.
 =cut
 
 sub _initialize {
-    my ( $self, @args ) = @_;
-
-    # initialize your object
+    my ($self, $config) = @_;
+    $self->config( $config || {} );
     return $self;
 }
 
@@ -78,7 +77,46 @@ sub register_detector {
     return $class;
 }
 
+
+##############################################################################
+
 =head2 Instance Methods
+
+=head3 C<config>
+
+ my $cfg = $sf->config;
+ $sf->config({ Perl => { %config } });
+
+Chaining getter/setter for the configuration of the available sources.  This is
+a hashref keyed on source class whose values contain config to be passed onto
+the sources during detection & creation.  Class names may be fully qualified
+or abbreviated, eg:
+
+  # these are equivalent
+  $sf->sources_config({ 'TAP::Parser::Source::Perl' => { %config } });
+  $sf->sources_config({ 'Perl' => { %config } });
+
+=cut
+
+sub config {
+    my $self = shift;
+    return $self->{config} unless @_;
+    unless ( 'HASH' eq ref $_[0] ) {
+        $self->_croak('Argument to &config must be a hash reference');
+    }
+    $self->{config} = shift;
+    return $self;
+}
+
+sub _config_for {
+    my ( $self, $sclass ) = @_;
+    my ($abbrv_sclass) = ($sclass =~ /(?:\:\:)?(\w+)$/);
+    my $config = $self->config->{$abbrv_sclass} || $self->config->{$sclass};
+    return $config;
+}
+
+
+##############################################################################
 
 =head3 C<make_source>
 
@@ -101,7 +139,12 @@ sub make_source {
 
     # figure out what kind of source it is
     my $source_detector = $self->detect_source($raw_source_ref);
-    my $source          = $source_detector->make_source($raw_source_ref);
+
+    # create it
+    my $config = $self->_config_for( $source_detector );
+    my $source = $source_detector->make_source($raw_source_ref, $config);
+
+    # TODO: set the $source->source( $raw_source_ref );
 
     return $source;
 }
@@ -133,7 +176,8 @@ sub detect_source {
     # find a list of detectors that can handle this source:
     my %detectors;
     foreach my $dclass ( @{ $self->detectors } ) {
-        my $confidence = $dclass->can_handle($raw_source_ref, $meta);
+	my $config     = $self->_config_for( $dclass );
+        my $confidence = $dclass->can_handle($raw_source_ref, $meta, $config);
         $detectors{$dclass} = $confidence if $confidence;
     }
 

@@ -59,12 +59,9 @@ Getter/setter for the source.  C<croaks> if it doesn't get a scalar.
 
 sub source {
     my $self = shift;
-    return $self->{source} unless @_;
-    if (ref $_[0]) {
-        $self->_croak('Argument to &source must be a scalar');
-    }
-    $self->{source} = shift;
-    return $self;
+    $self->_croak('Argument to &source must be a scalar')
+      if ( @_ && ref $_[0] );
+    return $self->SUPER::source( @_ );
 }
 
 ##############################################################################
