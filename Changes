@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Added HARNESS_SUBCLASS option to Test::Harness
+
 3.17    2009-05-05
         - Changed the 'failures' so that it is overridden by verbosity rather
           than the other way around.
