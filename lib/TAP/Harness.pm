@@ -313,10 +313,20 @@ I<This is an experimental feature and may change.>
 
 If set, C<sources> must be a hashref containing the names of the
 L<TAP::Parser::Source> subclasses you want to load and/or configure.  The
-hash values will be passed to the source class' C<detect> and C<new> methods.
+values should contain a hash of configuration that will be passed to the
+source class during source detection and creation (ie: the methods
+L<TAP::Parser::Source/can_handle> and L<TAP::Parser::Source/make_source>).
 
-For more details see L<TAP::Parser/new>, and L<TAP::Parser::SourceFactory>,
-L<TAP::Parser::Source> and their subclasses.
+For example:
+
+  sources => {
+    Perl => { exec => '/path/to/custom/perl' },
+    File => { extensions => [ '.tap', '.txt' ] },
+    MyCustom => { some => 'config' },
+  }
+
+For more details see L<TAP::Parser/new>, L<TAP::Parser::Source> & sub-classes,
+and L<TAP::Parser::SourceFactory>.
 
 =back
 

@@ -77,7 +77,7 @@ sub _initialize {
 
 I<Abstract method>.
 
-  my $vote = $source->can_handle( $raw_source_ref, $meta, $config );
+  my $vote = $class->can_handle( $raw_source_ref, $meta, $config );
   # TODO: or preferably:
   my $vote = $source->can_handle({
       raw_source_ref => $raw_source_ref,
@@ -125,6 +125,8 @@ different data types.
 
 Returns a new L<TAP::Parser::Source> object for use by the L<TAP::Parser>.
 C<croak>s on error.
+
+This is used primarily by L<TAP::Parser::SourceFactory>.
 
 =cut
 
@@ -306,6 +308,7 @@ Source detection stuff added by Steve Purkis
 
 L<TAP::Object>,
 L<TAP::Parser>,
+L<TAP::Parser::SourceFactory>,
 L<TAP::Parser::Source::Executable>,
 L<TAP::Parser::Source::Perl>,
 L<TAP::Parser::Source::File>,

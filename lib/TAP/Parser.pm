@@ -214,15 +214,17 @@ I<Experimental>.
 
 If set, C<sources> must be a hashref containing the names of the
 L<TAP::Parser::Source> subclasses you want to load and/or configure.  The
-hash values will be passed to the source class' C<detect> and C<new> methods.
+values should contain a hash of configuration that will be passed to the
+source class during source detection and creation (ie: the methods
+L<TAP::Parser::Source/can_handle> and L<TAP::Parser::Source/make_source>).
 
 For example:
 
-  $harness->sources({
+  sources => {
     Perl => { exec => '/path/to/custom/perl' },
     File => { extensions => [ '.tap', '.txt' ] },
     MyCustom => { some => 'config' },
-  });
+  }
 
 Will cause C<TAP::Parser> to pass custom configuration to two of the TAP
 sources that ship with this module - L<TAP::Parser::Source::Perl> and
@@ -237,7 +239,7 @@ more details.
 
 =item * C<source_class>
 
-I<DEPRECATED>.
+I<DEPRECATED> - no longer used.
 
 This option was introduced to let you easily customize which I<source> class
 the parser should use.  It defaults to L<TAP::Parser::Source::Executable>.
@@ -246,7 +248,7 @@ See also L</make_source>.
 
 =item * C<perl_source_class>
 
-I<DEPRECATED>.
+I<DEPRECATED> - no longer used.
 
 This option was introduced to let you easily customize which I<perl source>
 class the parser should use.  It defaults to L<TAP::Parser::Source::Perl>.
@@ -261,8 +263,6 @@ the parser should use.  It defaults to L<TAP::Parser::Grammar>.
 See also L</make_grammar>.
 
 =item * C<iterator_factory_class>
-
-I<DEPRECATED>.
 
 This option was introduced to let you easily customize which I<iterator>
 factory class the parser should use.  It defaults to
@@ -280,7 +280,7 @@ See also L</make_result>.
 
 =item * C<source_factory_class>
 
-I<EXPERIMENTAL>.  Not yet in use.
+I<NEW>.
 
 This option was introduced to let you easily customize which I<source>
 factory class the parser should use.  It defaults to
@@ -293,8 +293,8 @@ L<TAP::Parser::SourceFactory>.
 # new() implementation supplied by TAP::Base
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub _default_source_class      {'TAP::Parser::Source::Executable'}          # deprecated
-sub _default_perl_source_class {'TAP::Parser::Source::Perl'}    # deprecated
+sub _default_source_class      {'TAP::Parser::Source::Executable'} # deprecated
+sub _default_perl_source_class {'TAP::Parser::Source::Perl'}       # deprecated
 sub _default_grammar_class     {'TAP::Parser::Grammar'}
 sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
 sub _default_result_factory_class   {'TAP::Parser::ResultFactory'}
@@ -348,7 +348,7 @@ sub run {
 
 =head3 C<make_source>
 
-I<DEPRECATED>.
+I<DEPRECATED> - no longer used.
 
 Make a new L<TAP::Parser::Source::Executable> object and return it.  Passes through any
 arguments given.
@@ -357,7 +357,7 @@ The C<source_class> can be customized, as described in L</new>.
 
 =head3 C<make_perl_source>
 
-I<DEPRECATED>.
+I<DEPRECATED> - no longer used.
 
 Make a new L<TAP::Parser::Source::Perl> object and return it.  Passes through
 any arguments given.
@@ -373,8 +373,6 @@ The C<grammar_class> can be customized, as described in L</new>.
 
 =head3 C<make_iterator>
 
-I<DEPRECATED>.
-
 Make a new L<TAP::Parser::Iterator> object using the parser's
 L<TAP::Parser::IteratorFactory>, and return it.  Passes through any arguments
 given.
@@ -389,29 +387,22 @@ given.
 
 The C<result_factory_class> can be customized, as described in L</new>.
 
+=head3 C<make_source_factory>
+
+Make a new L<TAP::Parser::SourceFactory> object and return it.  Passes through
+any arguments given.
+
+C<source_factory_class> can be customized, as described in L</new>.
+
 =cut
 
 # This should make overriding behaviour of the Parser in subclasses easier:
 sub make_source      { shift->source_class->new(@_); }         # deprecated
 sub make_perl_source { shift->perl_source_class->new(@_); }    # deprecated
+sub make_source_factory { shift->source_factory_class->new(@_); }
 sub make_grammar     { shift->grammar_class->new(@_); }
-sub make_iterator { shift->iterator_factory_class->make_iterator(@_); } # deprecated
+sub make_iterator { shift->iterator_factory_class->make_iterator(@_); }
 sub make_result   { shift->result_factory_class->make_result(@_); }
-
-# deprecated
-sub _iterator_for_source {
-    my ( $self, $source ) = @_;
-
-    # If the source has a get_stream method then use it. This makes it
-    # possible to pass a pre-existing source object to the parser's
-    # constructor.
-    if ( UNIVERSAL::can( $source, 'can' ) && $source->can('get_stream') ) {
-        return $source->get_stream($self);
-    }
-    else {
-        return $self->iterator_factory_class->make_iterator($source);
-    }
-}
 
 {
 
@@ -507,7 +498,7 @@ sub _iterator_for_source {
         }
 
 	if ($raw_source_ref) {
-	    my $src_factory = $self->source_factory_class->new( $sources );
+	    my $src_factory = $self->make_source_factory( $sources );
 	    my $source = $src_factory->make_source({
 	         raw_source_ref => $raw_source_ref,
 	         merge          => $merge,
@@ -1747,16 +1738,18 @@ All C<TAP::*> objects inherit from L<TAP::Object>.
 
 =item 2
 
-Most C<TAP::*> classes have a I<SUBCLASSING> section to guide you.
+Many C<TAP::*> classes have a I<SUBCLASSING> section to guide you.
 
 =item 3
 
 Note that C<TAP::Parser> is designed to be the central 'maker' - ie: it is
-responsible for creating new objects in the C<TAP::Parser::*> namespace.
+responsible for creating most new objects in the C<TAP::Parser::*> namespace.
 
 This makes it possible for you to have a single point of configuring what
 subclasses should be used, which in turn means that in many cases you'll find
 you only need to sub-class one of the parser's components.
+
+The sole exception to this rule are I<Sources>, see below.
 
 =item 4
 
@@ -1772,27 +1765,36 @@ deprecated first, and changed in a later release.
 
 =head3 Sources
 
-TODO: this needs updating onn introducing L<TAP::Parser::SourceFactory>.
+A TAP parser consumes input from a single I<source> of TAP, which could come
+from anywhere (a file, an executable, a database, an io handle, a uri, etc..).
+A L<TAP::Parser::SourceFactory> is used to determine the type of a so-called
+'raw' source, and create L<TAP::Parser::Source> objects which then stream the
+TAP to the parser by way of L</Iterators>.
 
-A TAP parser consumes input from a I<source>.  There are currently two types
-of sources: L<TAP::Parser::Source::Executable> for general non-perl commands, and
-L<TAP::Parser::Source::Perl>.  You can subclass both of them.  You'll need to
-customize your parser by setting the C<source_class> & C<perl_source_class>
-parameters.  See L</new> for more details.
+There are quite a few I<Sources> available, 
 
-If you need to customize the objects on creation, subclass L<TAP::Parser> and
-override L</make_source> or L</make_perl_source>.
+If you simply want C<TAP::Parser> to handle a new source of TAP you probably
+don't need to subclass C<TAP::Parser> itself.  Rather, you'll need to create
+new L<TAP::Parser::Source> classes, and simply plug them into the parser (see
+L</new> for details).  To write one read L<TAP::Parser::SourceFactory> to get
+a feel for how the system works.
+
+If you find you really need to use your own source factory, set
+L</source_factory_class>.  If you need to customize the objects on creation,
+subclass L<TAP::Parser> and override L</make_source_factory>.
+
+Note that L</make_source> & L</make_perl_source> are now I<DEPRECATED>.
 
 =head3 Iterators
 
 A TAP parser uses I<iterators> to loop through the I<stream> provided by the
-parser's I<source>.  There are quite a few types of Iterators available.
-Choosing which class to use is the responsibility of the I<iterator factory>.
+parser's I<source>.  There are a few types of Iterators available, choosing
+which class to use is the responsibility of the I<iterator factory>.
 
-To create your own iterators you'll have to subclass
-L<TAP::Parser::IteratorFactory> and L<TAP::Parser::Iterator>.  Then you'll
-need to customize the class used by your parser by setting the
-C<iterator_factory_class> parameter.  See L</new> for more details.
+To create your own iterators you'll have to subclass L<TAP::Parser::Iterator>
+and L<TAP::Parser::IteratorFactory>.  Then you'll need to customize the class
+used by your parser by setting the C<iterator_factory_class> parameter.
+See L</new> for more details.
 
 If you need to customize the objects on creation, subclass L<TAP::Parser> and
 override L</make_iterator>.
