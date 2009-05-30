@@ -34,8 +34,9 @@ sub can_handle {
 }
 
 sub make_source {
-    my ( $class, $raw_source_ref, $config ) = @_;
-    my $source = MySource->new( $raw_source_ref, $config );
+    my ( $class, $args ) = @_;
+    my $raw_source_ref = $args->{raw_source_ref};
+    my $source = MySource->new( $raw_source_ref, $args->{config} );
     $source->custom;
     $source->source( [$raw_source_ref] );
     return $source;

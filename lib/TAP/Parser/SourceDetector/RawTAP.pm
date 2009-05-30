@@ -62,8 +62,11 @@ sub can_handle {
 }
 
 sub make_source {
-    my ( $class, $raw_source_ref ) = @_;
-    my $source = $class->source_class->new($raw_source_ref);
+    my ( $class, $args ) = @_;
+    my $raw_source_ref = $args->{raw_source_ref};
+    my $source = $class->source_class->new;
+    # ignore merge
+    $source->raw_source( $raw_source_ref );
     return $source;
 }
 

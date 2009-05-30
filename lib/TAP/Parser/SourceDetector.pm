@@ -51,9 +51,9 @@ Takes 2 arguments:
 
   my $vote = $detector->can_handle( $raw_source_ref, $meta );
 
-C<$raw_source_ref> is a reference to a scalar, as it may contain large
-amounts of data (eg: raw TAP).  C<$meta> is a hashref containing meta data
-about the source itself.
+C<$raw_source_ref> is a reference as it may contain large amounts of data
+(eg: raw TAP), not to mention different data types.  C<$meta> is a hashref
+containing meta data about the source itself.
 
 Returns a number between 0 & 1 reflecting how confidently the source detector
 can handle the given source.  For example, C<0> means the detector cannot
@@ -65,22 +65,36 @@ can.
 # new() implementation provided by TAP::Object
 
 sub can_handle {
-    my ( $class, $raw_source_ref ) = @_;
+    my ( $class, $raw_source_ref, $meta ) = @_;
     confess("'$class' has not defined a 'can_handle' method!");
     return;
 }
 
 =head3 C<make_source>
 
-Takes 1 argument: C<$raw_source_ref>.  This is a reference to a scalar, as it
-may contain large amounts of data (eg: raw TAP output).
+Takes a hashref as an argument:
+
+  my $source = $source_detector->make_source({
+      raw_source_ref => $raw_source_ref,
+      config         => { %config },
+      merge          => $bool,
+      perl_test_args => [ ... ],
+      switches       => [ ... ],
+      meta           => { %meta },
+      ...
+  });
+
+At the very least, C<raw_source_ref> is I<required>.  This is a reference as
+it may contain large amounts of data (eg: raw TAP output), not to mention
+different data types.
 
 Returns a new L<TAP::Parser::Source> object for use by the L<TAP::Parser>.
+C<croak>s on error.
 
 =cut
 
 sub make_source {
-    my ( $class, $raw_source_ref ) = @_;
+    my ( $class, $args ) = @_;
     confess("'$class' has not defined a 'make_source' method!");
     return;
 }
@@ -92,7 +106,8 @@ sub make_source {
 Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 Remember: if you want your subclass to be automatically used by the parser,
-you'll have to register it with L<TAP::Parser::SourceFactory/register_detector>.
+you'll have to and make sure it gets loaded, and register it with
+L<TAP::Parser::SourceFactory/register_detector>.
 
 =head2 Example
 
@@ -110,18 +125,24 @@ you'll have to register it with L<TAP::Parser::SourceFactory/register_detector>.
   TAP::Parser::SourceFactory->register_detector( __PACKAGE__ );
 
   sub can_handle {
-      my ($class, $raw_source_ref) = @_;
-      return 0   unless defined $$raw_source_ref;
-      return 0   if $$raw_source_ref =~ /\n/;
-      return 1   if $$raw_source_ref eq 'absolutely sure';
-      return 0.5 if $$raw_source_ref eq 'not really sure';
+      my ($class, $raw_source_ref, $meta) = @_;
+      if (my $file = $meta->{file}) {
+          return 1 if $file->{lc_ext} eq '.tap';
+      } elsif ($meta->{scalar}) {
+          return 0 unless $meta->{has_newlines};
+          return 0.9 if $$raw_source_ref =~ /\d\.\.\d/;
+      } elsif ($meta->{array}) {
+          return 0.5;
+      } elsif ($meta->{hash}) {
+          return 0.2;
+      }
       return 0;
   }
 
   sub make_source {
-      my ($class, $raw_source_ref) = @_;
-      my $source = MySource->new;
-      $source->source([ $raw_source_ref ]);
+      my ($class, $args) = @_;
+      my $source = MySource->new( $args->{raw_source_ref} );
+      $source->merge( $args->{merge} );
       return $source;
   }
 

@@ -67,13 +67,17 @@ sub can_handle {
 }
 
 sub make_source {
-    my ( $class, $raw_source_ref ) = @_;
-    my $source = $class->source_class->new($raw_source_ref);
+    my ( $class, $args ) = @_;
+    my $raw_source_ref = $args->{raw_source_ref};
+    my $perl_script    = $$raw_source_ref;
+    my $test_args      = $args->{test_args} || [];
 
-    # TODO: figure out how to pass these over:
-    #    $perl->switches($switches) if $switches;
-    #    $perl->merge($merge);    # XXX args to new()?
-    #    $perl->source( [ $source, @test_args ] );
+    my $source = $class->source_class->new( $raw_source_ref );
+    $source->merge( $args->{merge} );
+    $source->switches( $args->{switches} ) if $args->{switches};
+    $source->raw_source([ $perl_script, @$test_args ]);
+
+    return $source;
 }
 
 1;

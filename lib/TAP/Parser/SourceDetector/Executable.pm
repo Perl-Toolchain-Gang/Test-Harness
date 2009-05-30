@@ -64,12 +64,23 @@ sub can_handle {
 }
 
 sub make_source {
-    my ( $class, $raw_source_ref ) = @_;
-    my $source = $class->source_class->new($raw_source_ref);
+    my ( $class, $args ) = @_;
+    my $raw_source_ref = $args->{raw_source_ref};
+    my $meta   = $args->{meta};
+    my $source = $class->source_class->new;
 
-    # TODO: figure out how to pass these over:
-    #    $source->source( [ @$exec, @test_args ] );
-    #    $source->merge($merge);    # XXX should just be arguments?
+    $source->merge( $args->{merge} );
+
+    # TODO: pass meta in here too!
+    if ($meta->{hash}) {
+	$source->raw_source( $raw_source_ref->{exec} );
+    } elsif ($meta->{is_file}) {
+	$source->raw_source([ $raw_source_ref ]);
+    } else {
+	$source->raw_source( $raw_source_ref );
+    }
+
+    return $source;
 }
 
 1;

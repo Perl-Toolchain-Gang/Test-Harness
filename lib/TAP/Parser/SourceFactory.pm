@@ -180,7 +180,8 @@ given (see L</detect_source>).  Dies on error.
 =cut
 
 sub make_source {
-    my ( $self, $raw_source_ref ) = @_;
+    my ( $self, $args ) = @_;
+    my $raw_source_ref  = $args->{raw_source_ref};
 
     $self->_croak('no raw source ref defined!') unless defined $raw_source_ref;
     my $ref_type = ref( $raw_source_ref );
@@ -192,13 +193,16 @@ sub make_source {
         && UNIVERSAL::isa( $$raw_source_ref, 'TAP::Parser::Source' ) );
 
     # figure out what kind of source it is
-    my $source_detector = $self->detect_source($raw_source_ref);
+    my ($sd_class, $meta) = $self->detect_source($raw_source_ref);
 
     # create it
-    my $config = $self->_config_for( $source_detector );
-    my $source = $source_detector->make_source($raw_source_ref, $config);
-
-    # TODO: set the $source->source( $raw_source_ref );
+    my $config = $self->_config_for( $sd_class );
+    my $source = $sd_class->make_source({
+        %$args,
+        raw_source_ref => $raw_source_ref,
+        config         => $config,
+        meta           => $meta,
+    });
 
     return $source;
 }
@@ -256,7 +260,7 @@ sub detect_source {
     #warn "votes: " . join( ', ', map { "$_: $detectors{$_}" } @detectors ) . "\n";
 
     # return 1st detector
-    return pop @detectors;
+    return pop @detectors, $meta;
 }
 
 

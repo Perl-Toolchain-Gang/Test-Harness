@@ -50,7 +50,7 @@ use TAP::Parser::SourceFactory;
     # Known source should pass
     {
 	my $source;
-	eval { $source = $sf->make_source( \"known-source" ) };
+	eval { $source = $sf->make_source({ raw_source_ref => \"known-source" }) };
 	my $error = $@;
 	ok( !$error, 'make_source with known source doesnt fail' );
 	diag($error) if $error;
@@ -64,7 +64,7 @@ use TAP::Parser::SourceFactory;
     # No known source should fail
     {
 	my $source;
-	eval { $source = $sf->make_source( \"unknown-source" ) };
+	eval { $source = $sf->make_source({ raw_source_ref => \"unknown-source" }) };
 	my $error = $@;
 	ok( $error, 'make_source with unknown source fails' );
 	like $error, qr/^Cannot detect source of 'unknown-source'/,
@@ -153,7 +153,7 @@ foreach my $test (@sources) {
     my $source;
     eval {
 	my $ref = ref( $raw_source ) ? $raw_source : \$raw_source;
-	$source = $sf->make_source( $ref )
+	$source = $sf->make_source({ raw_source_ref => $ref })
     };
     my $error = $@;
     ok( !$error, "$name: no error on make_source" );
