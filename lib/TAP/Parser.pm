@@ -494,34 +494,27 @@ sub _iterator_for_source {
             $self->_croak("Unknown options: @excess");
         }
 
-	my $src_factory = $self->source_factory_class->new( $sources );
-	my $source;
-	# TODO: replace this with something like:
+
 	# convert $tap & $exec to $raw_source equiv.
-	# my $raw_src_ref = ref( $raw_source ) ? $raw_source : \$raw_source;
-	# my $source = $src_factory->make_source({
-	#     raw_source => $raw_source_ref,
-	#     merge      => $merge,
-	#     switches   => $switches,
-	#     test_args  => $test_args;
-	# );
-	# my $stream = $source->get_stream;  # notice no "( $self )"
 	my $raw_source_ref;
         if ($tap) {
 	    $raw_source_ref = \$tap;
-	    my $source = $src_factory->make_source( $raw_source_ref );
-	    $source->raw_source( $raw_source_ref ); # TODO: move to src factory
-	    $stream = $source->get_stream( $self );
-        }
-        elsif ($exec) {
+        } elsif ($exec) {
 	    $raw_source_ref = { exec => [ @$exec, @$test_args ] };
-	    my $source = $src_factory->make_source( $raw_source_ref );
-            $source->raw_source( $raw_source_ref );
-            $source->merge($merge);    # XXX should just be arguments?
-            $stream = $source->get_stream($self);
-        }
-        elsif ($raw_source) {
+        } elsif ($raw_source) {
 	    $raw_source_ref = ref( $raw_source ) ? $raw_source : \$raw_source;
+        }
+
+	if ($raw_source_ref) {
+	    my $src_factory = $self->source_factory_class->new( $sources );
+	    # TODO: replace this with something like:
+	    # my $source = $src_factory->make_source({
+	    #     raw_source => $raw_source_ref,
+	    #     merge      => $merge,
+	    #     switches   => $switches,
+	    #     test_args  => $test_args;
+	    # );
+	    # my $stream = $source->get_stream;  # notice no "( $self )"
 	    my $source = $src_factory->make_source( $raw_source_ref );
 
 	    # TODO: move to src factory:
@@ -534,7 +527,7 @@ sub _iterator_for_source {
 	    }
 
 	    $stream = $source->get_stream($self);
-        }
+	}
 
         unless ($stream) {
             $self->_croak('PANIC: could not determine stream');
