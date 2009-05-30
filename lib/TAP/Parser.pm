@@ -506,25 +506,15 @@ sub _iterator_for_source {
 
 	if ($raw_source_ref) {
 	    my $src_factory = $self->source_factory_class->new( $sources );
-	    # TODO: replace this with something like:
 	    my $source = $src_factory->make_source({
 	         raw_source_ref => $raw_source_ref,
 	         merge          => $merge,
 	         switches       => $switches,
 	         test_args      => $test_args
 	    });
+
+	    # TODO: replace this with something like:
 	    # my $stream = $source->get_stream;  # notice no "( $self )"
-	    #my $source = $src_factory->make_source( $raw_source_ref );
-
-	    # TODO: move to src factory:
-	    #$source->merge( $merge );
-	    if ($source->isa('TAP::Parser::Source::Perl')) {
-		#$source->raw_source([ $raw_source, @$test_args ]);
-		#$source->switches( $switches ) if $switches;
-	    } else {
-		#$source->raw_source( $raw_source_ref );
-	    }
-
 	    $stream = $source->get_stream($self);
 	}
 
