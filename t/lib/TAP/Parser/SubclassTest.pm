@@ -13,10 +13,6 @@ use MyPerlSource;
 use MyGrammar;
 use MyIteratorFactory;
 use MyResultFactory;
-use MySourceDetector;
-use MyPerlSourceDetector;
-
-$MySourceDetector::ACCEPT_ALL = 1;
 
 @ISA = qw( TAP::Parser MyCustom );
 

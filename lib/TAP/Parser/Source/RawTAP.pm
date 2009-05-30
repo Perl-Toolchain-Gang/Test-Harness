@@ -4,13 +4,16 @@ use strict;
 use vars qw($VERSION @ISA);
 
 use TAP::Parser::Source ();
+use TAP::Parser::SourceFactory ();
 use TAP::Parser::IteratorFactory ();
 
 @ISA = qw(TAP::Parser::Source);
 
+TAP::Parser::SourceFactory->register_source(__PACKAGE__);
+
 =head1 NAME
 
-TAP::Parser::Source::RawTAP - Stream output from raw TAP in a scalar ref.
+TAP::Parser::Source::RawTAP - Stream output from raw TAP in a scalar/array ref.
 
 =head1 VERSION
 
@@ -24,11 +27,19 @@ $VERSION = '3.18';
 
   use TAP::Parser::Source::RawTAP;
   my $source = TAP::Parser::Source::RawTAP->new;
-  my $stream = $source->source (\"1..1\nok 1\n" )->get_stream;
+  my $stream = $source->source( \"1..1\nok 1\n" )->get_stream;
 
 =head1 DESCRIPTION
 
-Takes raw TAP and converts into an iterator.
+This is a I<raw TAP output> L<TAP::Parser::Source> - it has 2 jobs:
+
+1. Figure out if the I<raw> source it's given is actually just TAP output.
+See L<TAP::Parser::SourceFactory> for more details.
+
+2. Takes raw TAP and converts into an iterator.
+
+Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
+won't need to use this module directly.
 
 =head1 METHODS
 
@@ -43,6 +54,29 @@ Returns a new C<TAP::Parser::Source::RawTAP> object.
 =cut
 
 # new() implementation supplied by parent class
+
+sub can_handle {
+    my ( $class, $raw_source_ref, $meta ) = @_;
+    return 0 if $meta->{file};
+    if ($meta->{scalar}) {
+	return 0 unless $meta->{has_newlines};
+	return 0.9 if $$raw_source_ref =~ /\d\.\.\d/;
+	return 0.7 if $$raw_source_ref =~ /ok/;
+	return 0.6;
+    } elsif ($meta->{array}) {
+	return 0.5;
+    }
+    return 0;
+}
+
+sub make_source {
+    my ( $class, $args ) = @_;
+    my $raw_source_ref = $args->{raw_source_ref};
+    my $source = $class->new;
+    $source->raw_source( $raw_source_ref );
+    return $source;
+}
+
 
 ##############################################################################
 

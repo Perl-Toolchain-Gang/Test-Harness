@@ -22,26 +22,33 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
+  # abstract class - don't use directly!
   # see TAP::Parser::SourceFactory for general usage
 
   # must be sub-classed for use
   package MySource;
-  use vars '@ISA';
-  use TAP::Parser::Source ();
-  @ISA = qw( TAP::Parser::Source MyCustom );
-  sub get_stream {
-    my ( $self, $factory ) = @_;
-    # make an iterator, maybe using $factory
-  }
+  use base qw( TAP::Parser::Source );
+  sub can_handle  { return $confidence_level }
+  sub make_source { return $new_source }
+  sub get_stream  { return $iterator }
+
+  # see example below for more details
 
 =head1 DESCRIPTION
 
 This is the base class for a TAP I<source>, i.e. something that produces a
 stream of TAP for the parser to consume, such as an executable file, a text
-file, an archive, a database, etc.  A C<TAP::Parser::Source> exists as a
-wrapper around the I<raw> TAP source to do whatever is necessary to capture
-the stream of TAP produced, and make it available to the Parser through a
-L<TAP::Parser::Iterator> object.
+file, an archive, an IO handle, a database, etc.  A C<TAP::Parser::Source>
+is a wrapper around the I<raw> TAP source that does whatever is necessary to
+capture the stream of TAP produced, and make it available to the Parser
+through a L<TAP::Parser::Iterator> object.
+
+C<Sources> must also implement the I<source detection> interface used by
+L<TAP::Parser::SourceFactory> to determine how to get TAP out of a given
+I<raw> source.  See L</can_handle> and L</make_source> for that.
+
+Unless you're writing a new L<TAP::Parser::Source>, a plugin or subclassing
+L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head1 METHODS
 
@@ -50,8 +57,6 @@ L<TAP::Parser::Iterator> object.
 =head3 C<new>
 
  my $source = TAP::Parser::Source->new;
- # or:
- my $source = TAP::Parser::Source->new( $raw_source_ref, $config );
 
 Returns a new C<TAP::Parser::Source> object.
 
@@ -60,9 +65,73 @@ Returns a new C<TAP::Parser::Source> object.
 # new() implementation supplied by TAP::Object
 
 sub _initialize {
-    my ($self, $raw_source_ref, $config ) = @_;
-    $self->config( $config || {} );
+    my ($self) = @_;
+    $self->config( {} );
     return $self;
+}
+
+
+##############################################################################
+
+=head3 C<can_handle>
+
+I<Abstract method>.
+
+  my $vote = $source->can_handle( $raw_source_ref, $meta, $config );
+  # TODO: or preferably:
+  my $vote = $source->can_handle({
+      raw_source_ref => $raw_source_ref,
+      meta           => { %meta },
+      $config        => { %config },
+  });
+
+C<$raw_source_ref> is a reference as it may contain large amounts of data
+(eg: raw TAP), not to mention different data types.  C<$meta> is a hashref
+containing meta data about the source itself (see
+L<TAP::Parser::SourceFactory/assemble_meta>).  C<$config> is a hashref
+containing any configuration given by the user (how it's used is up to you).
+
+Returns a number between C<0> & C<1> reflecting how confidently the raw source
+can be handled.  For example, C<0> means the source cannot handle it, C<0.5>
+means it may be able to, and C<1> means it definitely can.  See
+L<TAP::Parser::SourceFactory/detect_source> for details on how this is used.
+
+=cut
+
+sub can_handle {
+    my ( $class, $args ) = @_;
+    confess("'$class' has not defined a 'can_handle' method!");
+    return;
+}
+
+
+=head3 C<make_source>
+
+I<Abstract method>.  Takes a hashref as an argument:
+
+  my $source = $class->make_source({
+      raw_source_ref => $raw_source_ref,
+      config         => { %config },
+      merge          => $bool,
+      perl_test_args => [ ... ],
+      switches       => [ ... ],
+      meta           => { %meta },
+      ...
+  });
+
+At the very least, C<raw_source_ref> is I<required>.  This is a reference as
+it may contain large amounts of data (eg: raw TAP output), not to mention
+different data types.
+
+Returns a new L<TAP::Parser::Source> object for use by the L<TAP::Parser>.
+C<croak>s on error.
+
+=cut
+
+sub make_source {
+    my ( $class, $args ) = @_;
+    confess("'$class' has not defined a 'make_source' method!");
+    return;
 }
 
 
@@ -130,7 +199,7 @@ sub merge {
 
 =head3 C<get_stream>
 
-B<Note:> this method is abstract and should be overridden.
+I<Abstract method>.
 
  my $stream = $source->get_stream( $iterator_maker );
 
@@ -151,10 +220,87 @@ sub get_stream {
 
 1;
 
+__END__
+
 =head1 SUBCLASSING
 
 Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview, and any
-of the subclasses that ship with this module as an example.
+of the subclasses that ship with this module as an example.  What follows is
+a quick overview.
+
+Start by familiarizing yourself with L<TAP::Parser::SourceFactory>, and
+L<TAP::Parser::IteratorFactory>.
+
+It's important to point out that if you want your subclass to be automatically
+used by L<TAP::Parser> you'll have to and make sure it gets loaded somehow.
+If you're using L<prove> you can write an L<App::Prove> plugin.  If you're
+using L<TAP::Parser> or L<TAP::Harness> directly (eg. through a custom script,
+or even L<Module::Build>) you can use the C<config> option which will cause
+L<TAP::Parser::SourceFactory/load_sources> to load your subclass).
+
+Don't forget to register your class with
+L<TAP::Parser::SourceFactory/register_source>.
+
+=head2 Example
+
+  package MySource;
+
+  use strict;
+  use vars '@ISA'; # compat with older perls
+
+  use MySource; # see TAP::Parser::Source
+  use TAP::Parser::SourceFactory;
+
+  @ISA = qw( TAP::Parser::Source );
+
+  TAP::Parser::SourceFactory->register_source( __PACKAGE__ );
+
+  sub can_handle {
+      my ($class, $raw_source_ref, $meta, $config) = @_;
+
+      if ($config->{accept_all}) {
+          return 1.0;
+      } elsif (my $file = $meta->{file}) {
+          return 0.0 unless $file->{exists};
+          return 1.0 if $file->{lc_ext} eq '.tap';
+          return 0.9 if $file->{text};
+          return 0.1 if $file->{binary};
+      } elsif ($meta->{scalar}) {
+          return 0.9 if $meta->{has_newlines};
+          return 0.8 if $$raw_source_ref =~ /\d\.\.\d/;
+      } elsif ($meta->{array}) {
+          return 0.8 if $meta->{size} < 5;
+          return 0.6 if $raw_source_ref->[0] =~ /foo/;
+          return 0.5;
+      } elsif ($meta->{hash}) {
+          return 0.6 if $raw_source_ref->{foo};
+          return 0.2;
+      }
+
+      return 0;
+  }
+
+  sub make_source {
+      my ($class, $args) = @_;
+      my $source = MySource->new;
+      # do anything special here...
+      $source->merge( $args->{merge} );
+             ->raw_source( $args->{raw_source_ref} );
+      return $source;
+  }
+
+  sub get_stream {
+      my ($self, $factory) = @_;
+      return $factory->make_iterator( $self->source );
+  }
+
+  1;
+
+=head1 AUTHORS
+
+TAPx Developers.
+
+Source detection stuff added by Steve Purkis
 
 =head1 SEE ALSO
 

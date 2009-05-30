@@ -715,7 +715,6 @@ SKIP: {
 
 # load a custom source
 {
-    local $TODO = 'load sources not yet implemented';
     my $capture = IO::c55Capture->new_handle;
     my $harness = TAP::Harness->new(
         {   verbosity => -2,
@@ -726,19 +725,18 @@ SKIP: {
         }
     );
 
+    my $source_test = "$source_tests/source.1";
     eval { _runtests( $harness, "$source_tests/source.1" ); };
     my $e = $@;
     ok( !$e, 'no error on load custom source' ) || diag( $e );
 
     no warnings 'once';
-    can_ok( 'MyFileSource', 'new', 'custom file source was loaded' );
+    can_ok( 'MyFileSource', 'new' );
     ok( $main::INIT{MyFileSource}, '... and an obj was instantiated' );
 
     my $source = $MyFileSource::LAST_OBJ || {};
     isa_ok( $source, 'MyFileSource', '... and MyFileSource obj was created' );
-    is_deeply( $source->{initialized},
-	       { extensions => [ '.1' ] },
-	       '... and was initialized with correct config' );
+    is( $source->raw_source, $source_test, '... and has the right raw_source' );
 
     my @output = tied($$capture)->dump;
     my $status = pop( @output ) || '';

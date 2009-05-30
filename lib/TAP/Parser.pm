@@ -9,15 +9,12 @@ use TAP::Parser::Result               ();
 use TAP::Parser::ResultFactory        ();
 use TAP::Parser::Source::Executable   ();
 use TAP::Parser::Source::Perl         ();
+use TAP::Parser::Source::File         ();
+use TAP::Parser::Source::RawTAP       ();
+use TAP::Parser::Source::Handle       ();
 use TAP::Parser::Iterator             ();
 use TAP::Parser::IteratorFactory      ();
 use TAP::Parser::SourceFactory        ();
-
-use TAP::Parser::SourceDetector::Perl ();
-use TAP::Parser::SourceDetector::File ();
-use TAP::Parser::SourceDetector::Executable ();
-use TAP::Parser::SourceDetector::RawTAP ();
-use TAP::Parser::SourceDetector::Handle ();
 
 use Carp qw( confess );
 
@@ -265,6 +262,8 @@ See also L</make_grammar>.
 
 =item * C<iterator_factory_class>
 
+I<DEPRECATED>.
+
 This option was introduced to let you easily customize which I<iterator>
 factory class the parser should use.  It defaults to
 L<TAP::Parser::IteratorFactory>.
@@ -374,6 +373,8 @@ The C<grammar_class> can be customized, as described in L</new>.
 
 =head3 C<make_iterator>
 
+I<DEPRECATED>.
+
 Make a new L<TAP::Parser::Iterator> object using the parser's
 L<TAP::Parser::IteratorFactory>, and return it.  Passes through any arguments
 given.
@@ -394,9 +395,10 @@ The C<result_factory_class> can be customized, as described in L</new>.
 sub make_source      { shift->source_class->new(@_); }         # deprecated
 sub make_perl_source { shift->perl_source_class->new(@_); }    # deprecated
 sub make_grammar     { shift->grammar_class->new(@_); }
-sub make_iterator { shift->iterator_factory_class->make_iterator(@_); }
+sub make_iterator { shift->iterator_factory_class->make_iterator(@_); } # deprecated
 sub make_result   { shift->result_factory_class->make_result(@_); }
 
+# deprecated
 sub _iterator_for_source {
     my ( $self, $source ) = @_;
 

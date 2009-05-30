@@ -4,9 +4,12 @@ use strict;
 use vars qw($VERSION @ISA);
 
 use TAP::Parser::Source ();
+use TAP::Parser::SourceFactory ();
 use TAP::Parser::IteratorFactory ();
 
 @ISA = qw(TAP::Parser::Source);
+
+TAP::Parser::SourceFactory->register_source(__PACKAGE__);
 
 =head1 NAME
 
@@ -28,7 +31,16 @@ $VERSION = '3.18';
 
 =head1 DESCRIPTION
 
-Takes raw TAP from the handle given and converts into an iterator.
+This is a I<raw TAP stored in an IO Handle> L<TAP::Parser::Source> class.  It
+has 2 jobs:
+
+1. Figure out if the I<raw> source it's given is an L<IO::Handle> or GLOB
+containing raw TAP output.  See L<TAP::Parser::SourceFactory> for more details.
+
+2. Takes raw TAP from the handle/GLOB given and converts into an iterator.
+
+Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
+won't need to use this module directly.
 
 =head1 METHODS
 
@@ -44,6 +56,26 @@ Returns a new C<TAP::Parser::Source::Handle> object.
 
 # new() implementation supplied by parent class
 
+sub can_handle {
+    my ( $class, $raw_source_ref, $meta ) = @_;
+
+    return 0.9 if $meta->{is_object}
+      && UNIVERSAL::isa( $raw_source_ref, 'IO::Handle' );
+
+    return 0.8 if $meta->{glob};
+
+    return 0;
+}
+
+sub make_source {
+    my ( $class, $args ) = @_;
+    my $raw_source_ref = $args->{raw_source_ref};
+    my $source = $class->new;
+    $source->raw_source( $raw_source_ref );
+    return $source;
+}
+
+
 ##############################################################################
 
 =head2 Instance Methods
@@ -53,7 +85,8 @@ Returns a new C<TAP::Parser::Source::Handle> object.
  my $raw_source = $source->raw_source;
  $source->raw_source( $raw_tap );
 
-Getter/setter for the raw_source.  C<croaks> if it doesn't get a scalar.
+Getter/setter for the raw_source.  C<croaks> if it doesn't get a scalar or
+L<IO::Handle> object.
 
 =cut
 

@@ -87,7 +87,7 @@ SKIP: {    # non-perl source
     my $file = catfile( @t_path, 't', 'data', 'catme.1' );
     my $p = TAP::Parser::SubclassTest->new({
         exec => [ $cat => $file ],
-        sources => { MySourceDetector => { accept_all => 1 } },
+        sources => { MySource => { accept_all => 1 } },
     });
 
     is( $INIT{MySource},     1, 'initialized MySource subclass' );

@@ -23,23 +23,24 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  # abstract class - not meant to be used directly
+  # abstract interface class - don't use directly!
   # see TAP::Parser::SourceFactory for preferred usage
 
   # provides API for subclasses:
   package MySourceDetector;
+  use base qw( TAP::Parser::SourceDetector );
   # see example below for more details
   sub can_handle  { return $confidence_level }
   sub make_source { return $new_source }
 
 =head1 DESCRIPTION
 
-This is a simple base class for I<source detectors> to inherit from.  It
-defines the API used by L<TAP::Parser::SourceFactory> to determine how to get
-TAP out of a given source.
+This is a simple base class that defines ths I<source detector> interface used
+by L<TAP::Parser::SourceFactory> to determine how to get TAP out of a given
+I<raw> source.
 
-Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
-won't need to use this module directly.
+Unless you're writing a new L<TAP::Parser::Source>, a plugin or subclassing
+L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head1 METHODS
 

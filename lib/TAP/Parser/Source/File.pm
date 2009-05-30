@@ -4,9 +4,12 @@ use strict;
 use vars qw($VERSION @ISA);
 
 use TAP::Parser::Source ();
+use TAP::Parser::SourceFactory ();
 use TAP::Parser::IteratorFactory ();
 
 @ISA = qw(TAP::Parser::Source);
+
+TAP::Parser::SourceFactory->register_source(__PACKAGE__);
 
 =head1 NAME
 
@@ -28,7 +31,15 @@ $VERSION = '3.18';
 
 =head1 DESCRIPTION
 
-Takes raw TAP from the text file given, and converts into an iterator.
+This is a I<raw TAP stored in a file> L<TAP::Parser::Source> - it has 2 jobs:
+
+1. Figure out if the I<raw> source it's given is a file containing raw TAP
+output.  See L<TAP::Parser::SourceFactory> for more details.
+
+2. Takes raw TAP from the text file given, and converts into an iterator.
+
+Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
+won't need to use this module directly.
 
 =head1 METHODS
 
@@ -43,6 +54,29 @@ Returns a new C<TAP::Parser::Source::File> object.
 =cut
 
 # new() implementation supplied by parent class
+
+sub can_handle {
+    my ( $class, $raw_source_ref, $meta, $config ) = @_;
+
+    return 0 unless $meta->{is_file};
+    my $file = $meta->{file};
+    return 1 if $file->{lc_ext} eq '.tap';
+
+    if (my $exts = $config->{extensions}) {
+	return 1 if grep {lc($_) eq $file->{lc_ext}} @$exts;
+    }
+
+    return 0;
+}
+
+sub make_source {
+    my ( $class, $args ) = @_;
+    my $raw_source_ref = $args->{raw_source_ref};
+    my $source = $class->new;
+    $source->raw_source( $raw_source_ref );
+    return $source;
+}
+
 
 ##############################################################################
 
@@ -91,6 +125,14 @@ sub get_stream {
 }
 
 1;
+
+__END__
+
+=head1 CONFIGURATION
+
+  {
+   extensions => [ @list_of_exts_to_match ]
+  }
 
 =head1 SUBCLASSING
 

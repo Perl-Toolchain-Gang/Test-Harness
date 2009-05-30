@@ -8,13 +8,16 @@ use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS => ( $^O eq 'VMS' );
 
 use TAP::Parser::Source::Executable ();
+use TAP::Parser::SourceFactory ();
 use TAP::Parser::Utils qw( split_shell );
 
 @ISA = 'TAP::Parser::Source::Executable';
 
+TAP::Parser::SourceFactory->register_source(__PACKAGE__);
+
 =head1 NAME
 
-TAP::Parser::Source::Perl - Stream Perl output
+TAP::Parser::Source::Perl - Stream TAP from a Perl executable
 
 =head1 VERSION
 
@@ -32,11 +35,15 @@ $VERSION = '3.18';
 
 =head1 DESCRIPTION
 
-Takes a filename and hopefully returns a stream from it.  The filename should
-be the name of a Perl program.
+This is a I<Perl> L<TAP::Parser::Source> - it has 2 jobs:
 
-Note that this is a subclass of L<TAP::Parser::Source>.  See that module for
-more methods.
+1. Figure out if the I<raw> source it's given is actually a Perl script.  See
+L<TAP::Parser::SourceFactory> for more details.
+
+2. Takes a Perl script and creates an iterator from it.
+
+Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
+won't need to use this module directly.
 
 =head1 METHODS
 
@@ -47,6 +54,40 @@ more methods.
  my $perl = TAP::Parser::Source::Perl->new;
 
 Returns a new C<TAP::Parser::Source::Perl> object.
+
+=cut
+
+sub can_handle {
+    my ( $class, $raw_source_ref, $meta, $config ) = @_;
+
+    return 0 unless $meta->{is_file};
+    my $file = $meta->{file};
+
+    return 0.8 if $file->{lc_ext} eq '.t';    # vote higher than Executable
+    return 1   if $file->{lc_ext} eq '.pl';
+
+    return 0.75 if $file->{dir} =~ /^t\b/;    # vote higher than Executable
+
+    # TODO: check for shebang, eg: #!.../perl  ?
+
+    # backwards compat, always vote:
+    return 0.5;
+}
+
+sub make_source {
+    my ( $class, $args ) = @_;
+    my $raw_source_ref = $args->{raw_source_ref};
+    my $perl_script    = $$raw_source_ref;
+    my $test_args      = $args->{test_args} || [];
+
+    my $source = $class->new( $raw_source_ref );
+    $source->merge( $args->{merge} );
+    $source->switches( $args->{switches} ) if $args->{switches};
+    $source->raw_source([ $perl_script, @$test_args ]);
+
+    return $source;
+}
+
 
 =head2 Instance Methods
 
@@ -201,6 +242,7 @@ May be called as a class method
 
 =cut
 
+# TODO: move this to TAP::Parser::SourceFactory
 {
 
     # Global shebang cache.
@@ -281,6 +323,8 @@ sub _get_perl {
 }
 
 1;
+
+__END__
 
 =head1 SUBCLASSING
 

@@ -15,7 +15,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 43;
+use Test::More tests => 44;
 
 use IO::File;
 use File::Spec;
@@ -27,9 +27,10 @@ use TAP::Parser::SourceFactory;
     my $sf = TAP::Parser::SourceFactory->new;
     isa_ok $sf, 'TAP::Parser::SourceFactory';
     can_ok $sf, 'config';
+    can_ok $sf, 'sources';
     can_ok $sf, 'detect_source';
     can_ok $sf, 'make_source';
-    can_ok $sf, 'register_detector';
+    can_ok $sf, 'register_source';
 
     # Set config
     eval { $sf->config( 'bad config' ) };
@@ -37,15 +38,15 @@ use TAP::Parser::SourceFactory;
     like $e, qr/\QArgument to &config must be a hash reference/,
       '... and calling config with bad config should fail';
 
-    my $config = { MySourceDetector => { foo => 'bar' } };
+    my $config = { MySource => { foo => 'bar' } };
     is( $sf->config( $config ), $sf, '... and set config works' );
 
-    # Load/Register a detector
+    # Load/Register a source
     $sf = TAP::Parser::SourceFactory->new({
-	MySourceDetector => { accept => 'known-source' }
+	MySource => { accept => 'known-source' }
     });
-    can_ok('MySourceDetector', 'can_handle' );
-    is_deeply( $sf->detectors, ['MySourceDetector'], '... was registered' );
+    can_ok('MySource', 'can_handle' );
+    is_deeply( $sf->sources, ['MySource'], '... was registered' );
 
     # Known source should pass
     {
@@ -73,11 +74,11 @@ use TAP::Parser::SourceFactory;
 }
 
 # Source detection
-use_ok('TAP::Parser::SourceDetector::Executable');
-use_ok('TAP::Parser::SourceDetector::Perl');
-use_ok('TAP::Parser::SourceDetector::File');
-use_ok('TAP::Parser::SourceDetector::RawTAP');
-use_ok('TAP::Parser::SourceDetector::Handle');
+use_ok('TAP::Parser::Source::Executable');
+use_ok('TAP::Parser::Source::Perl');
+use_ok('TAP::Parser::Source::File');
+use_ok('TAP::Parser::Source::RawTAP');
+use_ok('TAP::Parser::Source::Handle');
 
 my $test_dir = File::Spec->catdir(
     (   $ENV{PERL_CORE}

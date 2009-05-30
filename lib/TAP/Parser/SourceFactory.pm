@@ -1,7 +1,7 @@
 package TAP::Parser::SourceFactory;
 
 use strict;
-use vars qw($VERSION @ISA %DETECTORS);
+use vars qw($VERSION @ISA);
 
 use TAP::Object ();
 
@@ -10,11 +10,11 @@ use File::Basename qw( fileparse );
 
 @ISA = qw(TAP::Object);
 
-use constant detectors => [];
+use constant sources => [];
 
 =head1 NAME
 
-TAP::Parser::SourceFactory - Internal TAP::Parser Source
+TAP::Parser::SourceFactory - Figures out which Source objects to create from 'raw' sources
 
 =head1 VERSION
 
@@ -32,10 +32,11 @@ $VERSION = '3.18';
 
 =head1 DESCRIPTION
 
-This is a factory class for different types of TAP sources.  If you're reading
-this, you're likely either a plugin author who will be interested in how to
-L</register_detector>s, or you're just interested in how a TAP source's type
-is determined (see L</detect_source>);
+This is a factory class that, given a 'raw' source of TAP, figures out what
+type of source it is and creates an appropriate L<TAP::Parser::Source> object.
+
+If you're a plugin author, you'll be interested in how to L</register_source>s,
+how L</detect_source> works, and how we L</assemble_meta> data.
 
 =head1 METHODS
 
@@ -43,7 +44,11 @@ is determined (see L</detect_source>);
 
 =head3 C<new>
 
-Creates a new factory class.
+Creates a new factory class:
+
+  my $sf = TAP::Parser::SourceFactory->new( $config );
+
+C<$config> is optional.  If given, sets L</config> and calls L</load_sources>.
 
 =cut
 
@@ -54,26 +59,23 @@ sub _initialize {
     return $self;
 }
 
-=head3 C<register_detector>
+=head3 C<register_source>
 
-Registers a new L<TAP::Parser::SourceDetector> with this factory.
+Registers a new L<TAP::Parser::Source> with this factory.
 
-  __PACKAGE__->register_detector( $detector_class );
+  __PACKAGE__->register_source( $source_class );
 
 =cut
 
-# either 'registry' approach, or scan @INC & load plugins.
-# was thinking 'detectors' ala:
-# TAP::Parser::SourceDetector::Archive, etc...
-sub register_detector {
+sub register_source {
     my ( $class, $dclass ) = @_;
 
-    confess("$dclass must inherit from TAP::Parser::SourceDetector!")
-      unless UNIVERSAL::isa( $dclass, 'TAP::Parser::SourceDetector' );
+    confess("$dclass must inherit from TAP::Parser::Source!")
+      unless UNIVERSAL::isa( $dclass, 'TAP::Parser::Source' );
 
-    my $detectors = $class->detectors;
-    push @{$detectors}, $dclass
-      unless grep { $_ eq $dclass } @{$detectors};
+    my $sources = $class->sources;
+    push @{$sources}, $dclass
+      unless grep { $_ eq $dclass } @{$sources};
 
     return $class;
 }
@@ -123,9 +125,7 @@ sub _config_for {
 
  $sf->load_sources;
 
-Loads the source classes defined in L</config>. C<croak>s on error.
-
-For example, given a config:
+Loads the source classes defined in L</config>.  For example, given a config:
 
   $sf->config({
     MySource => { some => 'config' },
@@ -137,8 +137,7 @@ C<@INC> for it in this order:
   TAP::Parser::Source::MySource
   MySource
 
-See L<TAP::Parser::SourceFactory>, L<TAP::Parser::Source> and subclasses for
-more details.
+C<croak>s on error.
 
 =cut
 
@@ -148,21 +147,22 @@ sub load_sources {
 	my $sclass = $self->_load_source( $source );
 	# TODO: store which class we loaded anywhere?
     }
+    return $self;
 }
 
 sub _load_source {
     my ($self, $source) = @_;
 
     my @errors;
-    foreach my $sclass ("TAP::Parser::SourceDetector::$source", $source) {
-	return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::SourceDetector' );
+    foreach my $sclass ("TAP::Parser::Source::$source", $source) {
+	return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::Source' );
 	eval "use $sclass";
 	if (my $e = $@) {
 	    push @errors, $e;
 	    next;
 	}
-	return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::SourceDetector' );
-	push @errors, "source '$sclass' is not a TAP::Parser::SourceDetector"
+	return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::Source' );
+	push @errors, "source '$sclass' is not a TAP::Parser::Source"
     }
 
     $self->_croak( "Cannot load source '$source': " . join("\n", @errors) );
@@ -210,16 +210,18 @@ sub make_source {
 =head3 C<detect_source>
 
 Given a reference to the raw source, detects what kind of source it is and
-returns I<one> L<TAP::Parser::SourceDetector> (the most confident one).  Dies
+returns I<one> L<TAP::Parser::Source> (the most confident one).  Dies
 on error.
 
 The detection algorithm works something like this:
 
-  for all registered detectors
-    ask them how confident they are about handling this source
-  choose the most confident detector
+  for (@registered_sources) {
+    # ask them how confident they are about handling this source
+    $confidence{$source} = $source->can_handle( $source )
+  }
+  # choose the most confident source
 
-Ties are handled by choosing the first detector.
+Ties are handled by choosing the first source.
 
 =cut
 
@@ -228,19 +230,19 @@ sub detect_source {
 
     confess('no raw source ref defined!') unless defined $raw_source_ref;
 
-    # build up some meta-data about the source so the detectors don't have to
+    # build up some meta-data about the source so the sources don't have to
     my $meta = $self->assemble_meta( $raw_source_ref );
 
-    # find a list of detectors that can handle this source:
-    my %detectors;
-    foreach my $dclass ( @{ $self->detectors } ) {
+    # find a list of sources that can handle this source:
+    my %sources;
+    foreach my $dclass ( @{ $self->sources } ) {
 	my $config     = $self->_config_for( $dclass );
         my $confidence = $dclass->can_handle($raw_source_ref, $meta, $config);
-	# warn "detector: $dclass: $confidence\n";
-        $detectors{$dclass} = $confidence if $confidence;
+	# warn "source: $dclass: $confidence\n";
+        $sources{$dclass} = $confidence if $confidence;
     }
 
-    if ( !%detectors ) {
+    if ( !%sources ) {
 	# use Data::Dump qw( pp );
 	# warn pp( $meta );
 
@@ -250,24 +252,29 @@ sub detect_source {
         return;
     }
 
-    # if multiple detectors can handle it, choose the most confident one
-    my @detectors = (
+    # if multiple sources can handle it, choose the most confident one
+    my @sources = (
         map    {$_}
-          sort { $detectors{$a} cmp $detectors{$b} }
-          keys %detectors
+          sort { $sources{$a} cmp $sources{$b} }
+          keys %sources
     );
 
-    #warn "votes: " . join( ', ', map { "$_: $detectors{$_}" } @detectors ) . "\n";
+    # this is really useful for debugging sources:
+    if ($ENV{TAP_HARNESS_SOURCE_FACTORY_VOTES}) {
+	warn ( "votes: ",
+	       join( ', ', map { "$_: $sources{$_}" } @sources ),
+	       "\n" );
+    }
 
-    # return 1st detector
-    return pop @detectors, $meta;
+    # return 1st source
+    return pop @sources, $meta;
 }
 
 
 =head3 C<assemble_meta>
 
 Given a reference to the raw source, assembles some meta data about it and
-return it as a hashref.  This is done so that the individual detectors don't
+return it as a hashref.  This is done so that the individual sources don't
 have to repeat common tests.  Currently this includes:
 
   {
@@ -325,6 +332,8 @@ sub assemble_meta {
 		    fileparse( $source, qr/\.[^.]*/ );
 		$file->{lc_ext}    = lc( $file->{ext} );
 		$file->{basename} .= $file->{ext} if $file->{ext};
+
+		# TODO: move shebang check from TAP::Parser::SourceFactory
 	    }
 	}
     } elsif ($meta->{array}) {
@@ -346,8 +355,8 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 =head2 Example
 
-If I've done things right, you'll probably want to write a new detector,
-rather than sub-classing this (see L<TAP::Parser::SourceDetector> for that).
+If we've done things right, you'll probably want to write a new source,
+rather than sub-classing this (see L<TAP::Parser::Source> for that).
 
 But in case you find the need to...
 
@@ -377,17 +386,17 @@ Steve Purkis
 Originally ripped off from L<Test::Harness>.
 
 Moved out of L<TAP::Parser> & converted to a factory class to support
-extensible TAP source detective work.
+extensible TAP source detective work by Steve Purkis.
 
 =head1 SEE ALSO
 
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::Source>,
-L<TAP::Parser::SourceDetector>,
-L<TAP::Parser::SourceDetector::Perl>,
-L<TAP::Parser::SourceDetector::RawTAP>,
-L<TAP::Parser::SourceDetector::Executable>
+L<TAP::Parser::Source>,
+L<TAP::Parser::Source::Perl>,
+L<TAP::Parser::Source::RawTAP>,
+L<TAP::Parser::Source::Executable>
 
 =cut
 
