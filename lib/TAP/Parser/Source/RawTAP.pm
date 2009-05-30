@@ -48,32 +48,31 @@ Returns a new C<TAP::Parser::Source::RawTAP> object.
 
 =head2 Instance Methods
 
-=head3 C<source>
+=head3 C<raw_source>
 
- my $source = $source->source;
- $source->source( \$raw_tap );
+ my $raw_source = $source->raw_source;
+ $source->raw_source( \$raw_tap );
 
-Getter/setter for the source.  C<croaks> if it doesn't get a scalar ref.
+Getter/setter for the raw_source.  C<croaks> if it doesn't get a scalar or
+array ref.
 
 =cut
 
-sub source {
+sub raw_source {
     my $self = shift;
-    return $self->{source} unless @_;
-
-    my $ref = ref $_[0];
-    if (! defined( $ref )) {
-        ; # fall through
-    } elsif ($ref eq 'SCALAR') {
-	my $scalar_ref = shift;
-	$self->{source} = [ split "\n" => $$scalar_ref ];
-	return $self;
-    } elsif ($ref eq 'ARRAY') {
-	$self->{source} = shift;
-	return $self;
+    if ( @_ ) {
+	my $ref = ref $_[0];
+	if (! defined( $ref )) {
+	    ; # fall through
+	} elsif ($ref eq 'SCALAR') {
+	    my $scalar_ref = shift;
+	    return $self->SUPER::raw_source([ split "\n" => $$scalar_ref ]);
+	} elsif ($ref eq 'ARRAY') {
+	    return $self->SUPER::raw_source( shift );
+	}
+	$self->_croak('Argument to &raw_source must be a scalar or array reference');
     }
-
-    $self->_croak('Argument to &source must be a scalar or array reference');
+    return $self->SUPER::raw_source;
 }
 
 ##############################################################################
@@ -88,7 +87,7 @@ Returns a L<TAP::Parser::Iterator> for this TAP stream.
 
 sub get_stream {
     my ( $self, $factory ) = @_;
-    return $factory->make_iterator( $self->source );
+    return $factory->make_iterator( $self->raw_source );
 }
 
 1;

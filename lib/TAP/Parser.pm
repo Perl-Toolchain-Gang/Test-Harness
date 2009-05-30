@@ -113,6 +113,8 @@ The arguments should be a hashref with I<one> of the following keys:
 
 =item * C<source>
 
+I<TODO:> rewrite this when L<TAP::Parser::SourceFactory> is finished.
+
 This is the preferred method of passing arguments to the constructor.  To
 determine how to handle the source, the following steps are taken.
 
@@ -208,6 +210,33 @@ allow exact synchronization.
 
 Subtleties of this behavior may be platform-dependent and may change in
 the future.
+
+=item * C<sources>
+
+I<Experimental>.
+
+If set, C<sources> must be a hashref containing the names of the
+L<TAP::Parser::Source> subclasses you want to load and/or configure.  The
+hash values will be passed to the source class' C<detect> and C<new> methods.
+
+For example:
+
+  $harness->sources({
+    Perl => { exec => '/path/to/custom/perl' },
+    File => { extensions => [ '.tap', '.txt' ] },
+    MyCustom => { some => 'config' },
+  });
+
+Will cause C<TAP::Parser> to pass custom configuration to two of the TAP
+sources that ship with this module - L<TAP::Parser::Source::Perl> and
+L<TAP::Parser::Source::File>.  It will also attempt to load the C<MyCustom>
+class by looking in C<@INC> for it in this order:
+
+  TAP::Parser::Source::MyCustom
+  MyCustom
+
+See L<TAP::Parser::SourceFactory>, L<TAP::Parser::Source> and subclasses for
+more details.
 
 =item * C<source_class>
 
@@ -447,12 +476,13 @@ sub _iterator_for_source {
         my $stream      = delete $args{stream};
         my $tap         = delete $args{tap};
         my $raw_source  = delete $args{source};
+        my $sources     = delete $args{sources};
         my $exec        = delete $args{exec};
         my $merge       = delete $args{merge};
         my $spool       = delete $args{spool};
         my $switches    = delete $args{switches};
         my $ignore_exit = delete $args{ignore_exit};
-        my @test_args   = @{ delete $args{test_args} || [] };
+        my $test_args   = delete $args{test_args} || [];
 
         if ( 1 < grep {defined} $stream, $tap, $raw_source, $exec ) {
             $self->_croak(
@@ -464,13 +494,15 @@ sub _iterator_for_source {
             $self->_croak("Unknown options: @excess");
         }
 
-	my $src_factory = $self->source_factory_class->new;
+	my $src_factory = $self->source_factory_class->new( $sources );
 	# TODO: replace this with something like:
 	# convert $tap & $exec to $raw_source equiv.
+	# my $raw_src_ref = ref( $raw_source ) ? $raw_source : \$raw_source;
 	# my $source = $src_factory->make_source({
-	#     raw_source => ref( $raw_source ) ? $raw_source : \$raw_source,
+	#     raw_source => $raw_source_ref,
 	#     merge      => $merge,
 	#     switches   => $switches,
+	#     test_args  => $test_args;
 	# );
 	# my $stream = $source->get_stream;  # notice no "( $self )"
         if ($tap) {
@@ -481,7 +513,7 @@ sub _iterator_for_source {
         elsif ($exec) {
             # TODO: use the source factory?
             my $source = $self->make_source;
-            $source->source( [ @$exec, @test_args ] );
+            $source->source( [ @$exec, @$test_args ] );
             $source->merge($merge);    # XXX should just be arguments?
             $stream = $source->get_stream($self);
         }
@@ -499,12 +531,14 @@ sub _iterator_for_source {
             elsif ( -e $raw_source ) {
                 my $source = $src_factory->make_source( \$raw_source );
 
-                $source->switches($switches)
-                  if $switches && $source->isa('TAP::Parser::Source::Perl');
-
 		# TODO: move this into src_factory?
-                $source->merge($merge);    # XXX args to new()?
-                $source->source( [ $raw_source, @test_args ] );
+		$source->merge($merge);    # XXX args to new()?
+		if ($source->isa('TAP::Parser::Source::Perl')) {
+		    $source->raw_source( [ $raw_source, @$test_args ] );
+		    $source->switches( $switches ) if $switches;
+		} else {
+		    $source->raw_source( \$raw_source );
+		}
 
                 $stream = $source->get_stream($self);
             }

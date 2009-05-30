@@ -31,18 +31,21 @@ use TAP::Parser::SourceFactory;
     can_ok $sf, 'make_source';
     can_ok $sf, 'register_detector';
 
-    # Register a detector
-    use_ok('MySourceDetector');
-    is_deeply( $sf->detectors, ['MySourceDetector'], '... was registered' );
-
     # Set config
     eval { $sf->config( 'bad config' ) };
     my $e = $@;
     like $e, qr/\QArgument to &config must be a hash reference/,
       '... and calling config with bad config should fail';
 
-    my $config = { MySourceDetector => { accept => 'known-source' } };
+    my $config = { MySourceDetector => { foo => 'bar' } };
     is( $sf->config( $config ), $sf, '... and set config works' );
+
+    # Load/Register a detector
+    $sf = TAP::Parser::SourceFactory->new({
+	MySourceDetector => { accept => 'known-source' }
+    });
+    can_ok('MySourceDetector', 'can_handle' );
+    is_deeply( $sf->detectors, ['MySourceDetector'], '... was registered' );
 
     # Known source should pass
     {

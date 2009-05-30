@@ -72,7 +72,7 @@ my $perl = $^X;
     can_ok $source, 'source';
     eval { $source->source("$perl -It/lib $test") };
     ok my $error = $@, '... and calling it with a string should fail';
-    like $error, qr/^Argument to &source must be an array reference/,
+    like $error, qr/^Argument to &raw_source must be an array reference/,
       '... with an appropriate error message';
     ok $source->source( [ $perl, '-It/lib', '-T', $test ] ),
       '... and calling it with valid args should succeed';
@@ -137,12 +137,12 @@ my $perl = $^X;
     my $source = TAP::Parser::Source::RawTAP->new;
     isa_ok $source, 'TAP::Parser::Source::RawTAP';
 
-    can_ok $source, 'source';
-    eval { $source->source( "1..1\nok 1\n" ) };
+    can_ok $source, 'raw_source';
+    eval { $source->raw_source( "1..1\nok 1\n" ) };
     ok my $error = $@, '... and calling it with a string should fail';
-    like $error, qr/^Argument to &source must be a scalar or array reference/,
+    like $error, qr/^Argument to &raw_source must be a scalar or array reference/,
       '... with an appropriate error message';
-    ok $source->source( \"1..1\nok 1\n" ),
+    ok $source->raw_source( \"1..1\nok 1\n" ),
       '... and calling it with valid args should succeed';
 
     can_ok $source, 'get_stream';
@@ -162,8 +162,8 @@ my $perl = $^X;
     my $source = TAP::Parser::Source::File->new;
     isa_ok $source, 'TAP::Parser::Source::File';
 
-    can_ok $source, 'source';
-    ok $source->source( $test ),
+    can_ok $source, 'raw_source';
+    ok $source->raw_source( \$test ),
       '... and calling it with valid args should succeed';
 
     can_ok $source, 'get_stream';
@@ -183,8 +183,8 @@ my $perl = $^X;
     my $source = TAP::Parser::Source::File->new;
     isa_ok $source, 'TAP::Parser::Source::File';
 
-    can_ok $source, 'source';
-    ok $source->source( $test ),
+    can_ok $source, 'raw_source';
+    ok $source->raw_source( \$test ),
       '... and calling it with valid args should succeed';
 
     can_ok $source, 'get_stream';

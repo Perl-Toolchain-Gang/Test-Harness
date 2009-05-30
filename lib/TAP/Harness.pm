@@ -313,28 +313,10 @@ I<This is an experimental feature and may change.>
 
 If set, C<sources> must be a hashref containing the names of the
 L<TAP::Parser::Source> subclasses you want to load and/or configure.  The
-hash values will be passed to the object's C<detect> and constructor methods
-(see L<TAP::Parser::SourceFactory> and L<TAP::Parser::Source> and subclasses
-for more details).
+hash values will be passed to the source class' C<detect> and C<new> methods.
 
-For example:
-
-  $harness->sources({
-    Perl => { exec => '/path/to/custom/perl' },
-    File => { extensions => [ '.tap', '.txt' ] },
-    MyCustom => { some => 'config' },
-  });
-
-Will cause C<TAP::Harness> to pass custom configuration to two of the TAP
-sources that ship with this module - L<TAP::Parser::Source::Perl> and
-L<TAP::Parser::Source::File>.  It will also attempt to load the C<MyCustom>
-class by looking in C<@INC> for it in this order:
-
-  TAP::Parser::Source::MyCustom
-  MyCustom
-
-If you would like to create your own source, see
-L<TAP::Parser::Source/SUBCLASSING>.
+For more details see L<TAP::Parser/new>, and L<TAP::Parser::SourceFactory>,
+L<TAP::Parser::Source> and their subclasses.
 
 =back
 
@@ -722,6 +704,9 @@ sub _get_parser_args {
     my ( $self, $job ) = @_;
     my $test_prog = $job->filename;
     my %args      = ();
+
+    $args{sources} = $self->sources if $self->sources;
+
     my @switches;
     @switches = $self->lib if $self->lib;
     push @switches => $self->switches if $self->switches;

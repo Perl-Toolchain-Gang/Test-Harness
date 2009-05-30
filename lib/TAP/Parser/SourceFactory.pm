@@ -49,7 +49,8 @@ Creates a new factory class.
 
 sub _initialize {
     my ($self, $config) = @_;
-    $self->config( $config || {} );
+    $self->config( $config || {} )
+         ->load_sources;
     return $self;
 }
 
@@ -118,6 +119,59 @@ sub _config_for {
 
 ##############################################################################
 
+=head3 C<load_sources>
+
+ $sf->load_sources;
+
+Loads the source classes defined in L</config>. C<croak>s on error.
+
+For example, given a config:
+
+  $sf->config({
+    MySource => { some => 'config' },
+  });
+
+C<load_sources> will attempt to load the C<MySource> class by looking in
+C<@INC> for it in this order:
+
+  TAP::Parser::Source::MySource
+  MySource
+
+See L<TAP::Parser::SourceFactory>, L<TAP::Parser::Source> and subclasses for
+more details.
+
+=cut
+
+sub load_sources {
+    my ($self) = @_;
+    foreach my $source (keys %{ $self->config }) {
+	my $sclass = $self->_load_source( $source );
+	# TODO: store which class we loaded anywhere?
+    }
+}
+
+sub _load_source {
+    my ($self, $source) = @_;
+
+    my @errors;
+    foreach my $sclass ("TAP::Parser::SourceDetector::$source", $source) {
+	return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::SourceDetector' );
+	eval "use $sclass";
+	if (my $e = $@) {
+	    push @errors, $e;
+	    next;
+	}
+	return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::SourceDetector' );
+	push @errors, "source '$sclass' is not a TAP::Parser::SourceDetector"
+    }
+
+    $self->_croak( "couldn't load source '$source': " . join("\n", @errors) );
+}
+
+
+
+##############################################################################
+
 =head3 C<make_source>
 
 Detects and creates a new L<TAP::Parser::Source> for the C<$raw_source_ref>
@@ -128,9 +182,9 @@ given (see L</detect_source>).  Dies on error.
 sub make_source {
     my ( $self, $raw_source_ref ) = @_;
 
-    confess('no raw source ref defined!') unless defined $raw_source_ref;
+    $self->_croak('no raw source ref defined!') unless defined $raw_source_ref;
     my $ref_type = ref( $raw_source_ref );
-    confess('raw_source_ref is not a reference!') unless $ref_type;
+    $self->_croak('raw_source_ref is not a reference!') unless $ref_type;
 
     # is the raw source already an object?
     return $$raw_source_ref
@@ -198,7 +252,7 @@ sub detect_source {
           keys %detectors
     );
 
-    # warn "votes: " . join( ', ', map { "$_: $detectors{$_}" } @detectors ) . "\n";
+    #warn "votes: " . join( ', ', map { "$_: $detectors{$_}" } @detectors ) . "\n";
 
     # return 1st detector
     return pop @detectors;
@@ -278,6 +332,8 @@ sub assemble_meta {
 }
 
 1;
+
+__END__
 
 =head1 SUBCLASSING
 

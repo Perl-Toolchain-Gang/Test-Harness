@@ -24,11 +24,12 @@ my $source_tests
 my $sample_tests
   = $ENV{PERL_CORE} ? '../ext/Test-Harness/t/sample-tests' : 't/sample-tests';
 
-plan tests => 127;
+plan tests => 128;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
 ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
+
 
 #### For color tests ####
 
@@ -691,7 +692,6 @@ SKIP: {
 
 # customize default File source
 {
-    local $TODO = 'sources not yet implemented';
     my $capture = IO::c55Capture->new_handle;
     my $harness = TAP::Harness->new(
         {   verbosity => -2,
@@ -707,7 +707,7 @@ SKIP: {
     my @output = tied($$capture)->dump;
     my $status = pop @output;
     like $status, qr{^Result: PASS$},
-      'customize default File source has correct status line';
+      'customized File source has correct status line';
     pop @output;    # get rid of summary line
     my $answer = pop @output;
     is( $answer, "All tests successful.\n", '... all tests passed' );
@@ -715,7 +715,7 @@ SKIP: {
 
 # load a custom source
 {
-    local $TODO = 'sources not yet implemented';
+    local $TODO = 'load sources not yet implemented';
     my $capture = IO::c55Capture->new_handle;
     my $harness = TAP::Harness->new(
         {   verbosity => -2,
@@ -726,8 +726,11 @@ SKIP: {
         }
     );
 
-    _runtests( $harness, "$source_tests/source.1" );
+    eval { _runtests( $harness, "$source_tests/source.1" ); };
+    my $e = $@;
+    ok( !$e, 'no error on load custom source' ) || diag( $e );
 
+    no warnings 'once';
     can_ok( 'MyFileSource', 'new', 'custom file source was loaded' );
     ok( $main::INIT{MyFileSource}, '... and an obj was instantiated' );
 
@@ -738,7 +741,7 @@ SKIP: {
 	       '... and was initialized with correct config' );
 
     my @output = tied($$capture)->dump;
-    my $status = pop @output;
+    my $status = pop( @output ) || '';
     like $status, qr{^Result: PASS$},
       '... and test has correct status line';
     pop @output;    # get rid of summary line

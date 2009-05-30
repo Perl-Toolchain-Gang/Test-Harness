@@ -48,20 +48,27 @@ Returns a new C<TAP::Parser::Source::File> object.
 
 =head2 Instance Methods
 
-=head3 C<source>
+=head3 C<raw_source>
 
  my $source = $source->source;
  $source->source( $raw_tap );
 
-Getter/setter for the source.  C<croaks> if it doesn't get a scalar.
+Getter/setter for the raw source.  C<croaks> if it doesn't get a scalar.
 
 =cut
 
-sub source {
+sub raw_source {
     my $self = shift;
-    $self->_croak('Argument to &source must be a scalar')
-      if ( @_ && ref $_[0] );
-    return $self->SUPER::source( @_ );
+    return $self->SUPER::raw_source unless @_;
+
+    my $ref = ref $_[0];
+    if (! defined( $ref )) {
+        return $self->SUPER::raw_source( $_[0] );
+    } elsif ($ref eq 'SCALAR') {
+        return $self->SUPER::raw_source( ${ $_[0] } );
+    }
+
+    $self->_croak('Argument to &raw_source must be a scalar or scalar ref');
 }
 
 ##############################################################################
@@ -76,9 +83,10 @@ Returns a L<TAP::Parser::Iterator> for this TAP stream.
 
 sub get_stream {
     my ( $self, $factory ) = @_;
+    my $file = $self->raw_source;
     my $fh;
-    open( $fh, '<', $self->source )
-      or $self->_croak( "error opening TAP source file @{[ $self->source ]}: $!" );
+    open( $fh, '<', $file )
+      or $self->_croak( "error opening TAP source file '$file': $!" );
     return $factory->make_iterator( $fh );
 }
 

@@ -24,7 +24,7 @@ $VERSION = '3.18';
 
   use TAP::Parser::Source::Handle;
   my $source = TAP::Parser::Source::Handle->new;
-  my $stream = $source->source( \*TAP_FILE )->get_stream;
+  my $stream = $source->raw_source( \*TAP_FILE )->get_stream;
 
 =head1 DESCRIPTION
 
@@ -48,25 +48,24 @@ Returns a new C<TAP::Parser::Source::Handle> object.
 
 =head2 Instance Methods
 
-=head3 C<source>
+=head3 C<raw_source>
 
- my $source = $source->source;
- $source->source( $raw_tap );
+ my $raw_source = $source->raw_source;
+ $source->raw_source( $raw_tap );
 
-Getter/setter for the source.  C<croaks> if it doesn't get a scalar.
+Getter/setter for the raw_source.  C<croaks> if it doesn't get a scalar.
 
 =cut
 
-sub source {
+sub raw_source {
     my $self = shift;
-    return $self->{source} unless @_;
+    return $self->SUPER::raw_source unless @_;
 
     my $ref = ref $_[0];
     if (! defined( $ref )) {
         ; # fall through
     } elsif ($ref eq 'GLOB' || UNIVERSAL::isa( $ref, 'IO::Handle' )) {
-	$self->{source} = shift;
-	return $self;
+	return $self->SUPER::raw_source( shift );
     }
 
     $self->_croak('Argument to &source must be a glob ref or an IO::Handle');
