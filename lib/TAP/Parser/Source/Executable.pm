@@ -80,9 +80,20 @@ it doesn't get an arrayref.
 
 sub raw_source {
     my $self = shift;
-    $self->_croak('Argument to &raw_source must be an array reference')
-      if ( @_ && 'ARRAY' ne ref $_[0] );
-    return $self->SUPER::raw_source( @_ );
+
+    return $self->SUPER::raw_source unless @_;
+
+    my $ref = ref $_[0];
+    if (! defined( $ref )) {
+        ; # fall through
+    } elsif ($ref eq 'ARRAY') {
+        return $self->SUPER::raw_source( $_[0] );
+    } elsif ($ref eq 'HASH') {
+	my $exec = $_[0]->{exec};
+        return $self->SUPER::raw_source( $exec );
+    }
+
+    $self->_croak('Argument to &raw_source must be an array reference or hash reference');
 }
 
 ##############################################################################

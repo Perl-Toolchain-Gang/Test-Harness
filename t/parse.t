@@ -619,7 +619,7 @@ END_TAP
 
     is @die, 1, 'uncategorisable source';
 
-    like pop @die, qr/Cannot determine source for nosuchfile/,
+    like pop @die, qr/Cannot detect source of 'nosuchfile'/,
       '... and we died as expected';
 }
 

@@ -49,10 +49,16 @@ my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 
     # make sure overrided make_* methods work...
     %CUSTOM = ();
-    $p->make_source;
-    is( $CUSTOM{MySource}, 1, 'make custom source' );
-    $p->make_perl_source;
-    is( $CUSTOM{MyPerlSource}, 1, 'make custom perl source' );
+
+    # DEPRECATED
+    TODO: {
+	  local $TODO = 'deprecated';
+	  $p->make_source;
+	  is( $CUSTOM{MySource}, 1, 'make custom source' );
+	  $p->make_perl_source;
+	  is( $CUSTOM{MyPerlSource}, 1, 'make custom perl source' );
+      }
+
     $p->make_grammar;
     is( $CUSTOM{MyGrammar}, 1, 'make custom grammar' );
     $p->make_iterator;
@@ -79,7 +85,10 @@ SKIP: {    # non-perl source
         skip "no '$cat'", 4;
     }
     my $file = catfile( @t_path, 't', 'data', 'catme.1' );
-    my $p = TAP::Parser::SubclassTest->new( { exec => [ $cat => $file ] } );
+    my $p = TAP::Parser::SubclassTest->new({
+        exec => [ $cat => $file ],
+        sources => { MySourceDetector => { accept_all => 1 } },
+    });
 
     is( $INIT{MySource},     1, 'initialized MySource subclass' );
     is( $CUSTOM{MySource},   1, '... and it was customized' );

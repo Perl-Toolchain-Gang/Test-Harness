@@ -165,7 +165,7 @@ sub _load_source {
 	push @errors, "source '$sclass' is not a TAP::Parser::SourceDetector"
     }
 
-    $self->_croak( "couldn't load source '$source': " . join("\n", @errors) );
+    $self->_croak( "Cannot load source '$source': " . join("\n", @errors) );
 }
 
 
@@ -232,6 +232,7 @@ sub detect_source {
     foreach my $dclass ( @{ $self->detectors } ) {
 	my $config     = $self->_config_for( $dclass );
         my $confidence = $dclass->can_handle($raw_source_ref, $meta, $config);
+	# warn "detector: $dclass: $confidence\n";
         $detectors{$dclass} = $confidence if $confidence;
     }
 
@@ -241,7 +242,7 @@ sub detect_source {
 
         # error: can't detect source
         my $raw_source_short = substr( $$raw_source_ref, 0, 50 );
-        confess("Couldn't detect source of '$raw_source_short'!");
+        confess("Cannot detect source of '$raw_source_short'!");
         return;
     }
 

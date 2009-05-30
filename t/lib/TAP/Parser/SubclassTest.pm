@@ -13,7 +13,10 @@ use MyPerlSource;
 use MyGrammar;
 use MyIteratorFactory;
 use MyResultFactory;
+use MySourceDetector;
 use MyPerlSourceDetector;
+
+$MySourceDetector::ACCEPT_ALL = 1;
 
 @ISA = qw( TAP::Parser MyCustom );
 
@@ -23,7 +26,7 @@ sub _default_grammar_class          {'MyGrammar'}
 sub _default_iterator_factory_class {'MyIteratorFactory'}
 sub _default_result_factory_class   {'MyResultFactory'}
 
-sub make_source      { shift->SUPER::make_source(@_)->custom }
+sub make_source      { shift->SUPER::make_source(@_)->custom } # deprecated
 sub make_perl_source { shift->SUPER::make_perl_source(@_)->custom } # deprecated
 sub make_grammar     { shift->SUPER::make_grammar(@_)->custom }
 sub make_iterator    { shift->SUPER::make_iterator(@_)->custom }

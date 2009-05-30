@@ -67,7 +67,7 @@ use TAP::Parser::SourceFactory;
 	eval { $source = $sf->make_source( \"unknown-source" ) };
 	my $error = $@;
 	ok( $error, 'make_source with unknown source fails' );
-	like $error, qr/^Couldn't detect source of 'unknown-source'/,
+	like $error, qr/^Cannot detect source of 'unknown-source'/,
 	  '... with an appropriate error message';
     }
 }

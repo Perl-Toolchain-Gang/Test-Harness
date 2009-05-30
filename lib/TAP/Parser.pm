@@ -495,6 +495,7 @@ sub _iterator_for_source {
         }
 
 	my $src_factory = $self->source_factory_class->new( $sources );
+	my $source;
 	# TODO: replace this with something like:
 	# convert $tap & $exec to $raw_source equiv.
 	# my $raw_src_ref = ref( $raw_source ) ? $raw_source : \$raw_source;
@@ -505,47 +506,34 @@ sub _iterator_for_source {
 	#     test_args  => $test_args;
 	# );
 	# my $stream = $source->get_stream;  # notice no "( $self )"
+	my $raw_source_ref;
         if ($tap) {
-	    my $source = $src_factory->make_source( \$tap );
-	    $source->source( \$tap ); # TODO: move to src factory
+	    $raw_source_ref = \$tap;
+	    my $source = $src_factory->make_source( $raw_source_ref );
+	    $source->raw_source( $raw_source_ref ); # TODO: move to src factory
 	    $stream = $source->get_stream( $self );
         }
         elsif ($exec) {
-            # TODO: use the source factory?
-            my $source = $self->make_source;
-            $source->source( [ @$exec, @$test_args ] );
+	    $raw_source_ref = { exec => [ @$exec, @$test_args ] };
+	    my $source = $src_factory->make_source( $raw_source_ref );
+            $source->raw_source( $raw_source_ref );
             $source->merge($merge);    # XXX should just be arguments?
             $stream = $source->get_stream($self);
         }
         elsif ($raw_source) {
-            if ( $raw_source =~ /\n/ ) {
-                my $source = $src_factory->make_source( \$raw_source );
-		$source->source( \$raw_source ); # TODO: move to src factory
-		$stream = $source->get_stream( $self );
-            }
-            elsif ( ref $raw_source ) {
-                my $source = $src_factory->make_source( $raw_source );
-		$source->source( $raw_source ); # TODO: move to src factory
-		$stream = $source->get_stream( $self );
-            }
-            elsif ( -e $raw_source ) {
-                my $source = $src_factory->make_source( \$raw_source );
+	    $raw_source_ref = ref( $raw_source ) ? $raw_source : \$raw_source;
+	    my $source = $src_factory->make_source( $raw_source_ref );
 
-		# TODO: move this into src_factory?
-		$source->merge($merge);    # XXX args to new()?
-		if ($source->isa('TAP::Parser::Source::Perl')) {
-		    $source->raw_source( [ $raw_source, @$test_args ] );
-		    $source->switches( $switches ) if $switches;
-		} else {
-		    $source->raw_source( \$raw_source );
-		}
+	    # TODO: move to src factory:
+	    $source->merge( $merge );
+	    if ($source->isa('TAP::Parser::Source::Perl')) {
+		$source->raw_source( [ $raw_source, @$test_args ] );
+		$source->switches( $switches ) if $switches;
+	    } else {
+		$source->raw_source( $raw_source_ref );
+	    }
 
-                $stream = $source->get_stream($self);
-            }
-            else {
-		# TODO: this case should move to src factory
-                $self->_croak("Cannot determine source for $raw_source");
-            }
+	    $stream = $source->get_stream($self);
         }
 
         unless ($stream) {

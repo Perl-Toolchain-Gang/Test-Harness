@@ -49,12 +49,17 @@ use constant source_class => 'TAP::Parser::Source::Executable';
 
 sub can_handle {
     my ( $class, $raw_source_ref, $meta ) = @_;
-    return 0 unless $meta->{is_file};
-    my $file = $meta->{file};
-    # Note: we go in low so we can be out-voted
-    return 0.8 if $file->{lc_ext} eq '.sh';
-    return 0.8 if $file->{lc_ext} eq '.bat';
-    return 0.7 if $file->{execute};
+
+    if ($meta->{is_file}) {
+	my $file = $meta->{file};
+	# Note: we go in low so we can be out-voted
+	return 0.8 if $file->{lc_ext} eq '.sh';
+	return 0.8 if $file->{lc_ext} eq '.bat';
+	return 0.7 if $file->{execute};
+    } elsif ($meta->{hash}) {
+	return 0.99 if $raw_source_ref->{exec};
+    }
+
     return 0;
 }
 

@@ -3,7 +3,7 @@
 package MySourceDetector;
 
 use strict;
-use vars '@ISA';
+use vars qw( @ISA );
 
 use MyCustom;
 use MySource;
@@ -24,8 +24,10 @@ sub _initialize {
 
 sub can_handle {
     my ($class, $raw_source_ref, $meta, $config) = @_;
-    return 0 unless $meta->{scalar};
-    if (my $accept = $config->{accept}) {
+    if ($config->{accept_all}) {
+	return 1;
+    } elsif (my $accept = $config->{accept}) {
+	return 0 unless $meta->{scalar};
 	return 1 if $$raw_source_ref eq $accept;
     }
     return 0;
@@ -34,6 +36,7 @@ sub can_handle {
 sub make_source {
     my ( $class, $raw_source_ref, $config ) = @_;
     my $source = MySource->new( $raw_source_ref, $config );
+    $source->custom;
     $source->source( [$raw_source_ref] );
     return $source;
 }
