@@ -13,5 +13,5 @@ petdance = Andy Lester <andy@petdance.com>
 root = Andy Armstrong <andy@hexten.net>
 schwern = Michael Schwern <schwern@pobox.com>
 spurkis = Steve Purkis <steve@purkis.ca>
-theory = David Wheeler <david@kineticode.com>
+theory = David E. Wheeler <david@justatheory.com>
 
