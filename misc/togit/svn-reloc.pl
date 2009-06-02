@@ -8,21 +8,10 @@ use Data::Dumper;
 use List::Util qw( min );
 use Storable qw( dclone );
 
-my %tag_alias = (
-  'TAP-Formatter-TextMate' => 'tft-',
-  'TAP-Harness-Archive'    => 'tha-',
-  'Test-Harness'           => '',
-  'Test-More-Diagnostic'   => 'tmd-',
-  'tap-tests'              => 'tt-',
-);
-
 {
-  my $notroot = join '|', map quotemeta, keys %tag_alias;
-
   my $fix_tags = sub {
     my ( $proj, $type, $name ) = @_;
-    my $prefix = $tag_alias{$proj} // ( lc( $proj ) . '-' );
-    return "$type/$prefix$name/$proj";
+    return "$type/$proj-$name/$proj";
   };
 
   relocate(
@@ -31,7 +20,8 @@ my %tag_alias = (
 
       # General relocations
       $name =~ s{^trunk\b}{trunk/Test-Harness};
-      $name =~ s{^(tags|branches)/([^/]+)}{$1/$2/Test-Harness};
+      $name =~ s{^(tags|branches)/([^/]+)}
+                  {$1/Test-Harness-$2/Test-Harness};
       $name =~ s{^([^/]+)/trunk\b}{trunk/$1};
       $name =~ s{^([^/]+)/(tags|branches)/([^/]+)}
                   {$fix_tags->($1,$2,$3)}e;
@@ -45,19 +35,23 @@ my %tag_alias = (
 
       # Adjust copies of trunk -> tag|branches/foo so that the whole
       # tree is copied rather than just the individual subproject
-      if ( ( $rec->{'Node-kind'} || '' ) eq 'dir' ) {
-        my $action = $rec->{'Node-action'};
-        my $path   = $rec->{'Node-path'};
-        my $cfpath = $rec->{'Node-copyfrom-path'};
+      my $kind   = $rec->{'Node-kind'}   // '';
+      my $action = $rec->{'Node-action'} // '';
+      my $path   = $rec->{'Node-path'}   // '';
+      my $cfpath = $rec->{'Node-copyfrom-path'};
 
-        if ( defined $action
-          && defined $cfpath
-          && $action eq 'add'
-          && $path =~ m{^(branches|tags)/([^/]+)/([^/]+)$} ) {
-          my ( $type, $name, $proj ) = ( $1, $2, $3 );
-          $rec->{'Node-copyfrom-path'} =~ s{^trunk/\Q$proj\E$}{trunk};
-          $rec->{'Node-path'} = "$type/$name";
-        }
+      if ( $action eq 'add'
+        && $kind eq 'dir'
+        && defined $cfpath
+        && $path =~ m{^(branches|tags)/([^/]+)/([^/]+)$} ) {
+        my ( $type, $name, $proj ) = ( $1, $2, $3 );
+        $rec->{'Node-copyfrom-path'} =~ s{^trunk/\Q$proj\E$}{trunk};
+        $rec->{'Node-path'} = "$type/$name";
+      }
+      elsif ( $action eq 'delete'
+        && $path =~ m{^(branches|tags)/([^/]+)/([^/]+)$} ) {
+        my ( $type, $name, $proj ) = ( $1, $2, $3 );
+        $rec->{'Node-path'} = "$type/$name";
       }
     },
   );

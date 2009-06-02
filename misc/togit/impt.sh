@@ -21,6 +21,15 @@ else
   git config color.ui auto
   git svn fetch
   perl ../b2t.pl
+  for b in `git branch -a`; do
+    if [ $b != '* master' ]; then
+      echo "Making $b local"
+      git checkout $b
+      git checkout -b $b
+      git branch -rd $b
+    fi
+  done
+  git checkout master
 fi
 
 # vim:ts=2:sw=2:sts=2:et:ft=sh
