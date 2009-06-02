@@ -1,4 +1,6 @@
+adrianh = Adrian Howard <adrianh@quietstars.com>
 alexmv = Alex Vandiver <alexmv@MIT.EDU>
+andreas = Andreas König <andreas.koenig@anima.de>
 andy = Andy Armstrong <andy@hexten.net>
 aristotle = Aristotle Pagaltzis <pagaltzis@gmx.de>
 bricas = Brian Cassidy <bricas@cpan.org>
@@ -14,4 +16,3 @@ root = Andy Armstrong <andy@hexten.net>
 schwern = Michael Schwern <schwern@pobox.com>
 spurkis = Steve Purkis <steve@purkis.ca>
 theory = David E. Wheeler <david@justatheory.com>
-

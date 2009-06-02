@@ -38,8 +38,6 @@ my %tag_alias = (
 
       # tap-tests has no trunk/tags/branches
       $name =~ s{^tap-tests}{trunk/tap-tests};
-      # Redirect spurious dir creation
-#      $name =~ s{^($notroot)\b}{misc/$1};
       return $name;
     },
     sub {
