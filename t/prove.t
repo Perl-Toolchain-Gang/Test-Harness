@@ -1014,7 +1014,7 @@ BEGIN {    # START PLAN
             args => {
                 argv => [qw( one two three )],
             },
-            proverc  => 't/proverc/emptyexec',
+            proverc  => $ENV{PERL_CORE} ? '../ext/Test-Harness/t/proverc/emptyexec' : 't/proverc/emptyexec',
             switches => [$dummy_test],
             expect   => { exec => '' },
             runlog   => [
