@@ -148,8 +148,10 @@ output TAP. There are TAP based testing libraries for C, C++, PHP,
 Python and many others. If I can't find a TAP library for my language
 of choice it's easy to generate valid TAP. It looks like this:
 
-  1..3 ok 1 - init OK ok 2 - opened file not ok 3 - appended to
-  file
+  1..3 
+  ok 1 - init OK 
+  ok 2 - opened file 
+  not ok 3 - appended to file
 
 The first line is the plan - it specifies the number of tests I'm
 going to run so that it's easy to check that the test script didn't
@@ -237,8 +239,9 @@ The important code in prove is just:
 
   use App::Prove;
 
-  my $app = App::Prove->new; $app->process_args(@ARGV); exit(
-  $app->run ? 0 : 1 );
+  my $app = App::Prove->new; 
+  $app->process_args(@ARGV); 
+  exit( $app->run ? 0 : 1 );
 
 If I write a subclass of App::Prove I can customise any aspect of
 the test runner while inheriting all of prove's behaviour. Here's
