@@ -30,6 +30,7 @@ lib/TAP/Formatter/File.pm
 lib/TAP/Formatter/File/Session.pm
 lib/TAP/Formatter/Session.pm
 lib/TAP/Harness.pm
+lib/TAP/Harness/Beyond.pod
 lib/TAP/Object.pm
 lib/TAP/Parser.pm
 lib/TAP/Parser/Aggregator.pm
@@ -75,6 +76,7 @@ t/compat/inc-propagation.t
 t/compat/inc_taint.t
 t/compat/nonumbers.t
 t/compat/regression.t
+t/compat/subclass.t
 t/compat/switches.t
 t/compat/test-harness-compat.t
 t/compat/version.t
@@ -106,6 +108,7 @@ t/lib/MyResultFactory.pm
 t/lib/MySource.pm
 t/lib/NoFork.pm
 t/lib/NOP.pm
+t/lib/TAP/Harness/TestSubclass.pm
 t/lib/TAP/Parser/SubclassTest.pm
 t/lib/Test/Builder.pm
 t/lib/Test/Builder/Module.pm
