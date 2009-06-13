@@ -43,7 +43,7 @@ BEGIN {
 
 =head1 NAME
 
-TAP::Formatter::Console - Harness output delegate for default console output
+TAP::Formatter::Base - Base class for harness output delegates
 
 =head1 VERSION
 
