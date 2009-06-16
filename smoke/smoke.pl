@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Path;
+use File::chdir;
 use Fcntl ':flock';
 
 use IPC::Run qw( run );
@@ -63,7 +64,21 @@ sub mention {
     print join( '', @_ ), "\n";
 }
 
-sub get_revision {
+sub git_get_revision {
+    my $task = shift;
+    my @cmd  = ( $Config->{global}->{git}, 'ls-remote', $task, 'HEAD' );
+    my $cmd  = join( ' ', @cmd );
+    my $rev  = undef;
+    open my $git, '-|', @cmd or die "Can't $cmd ($!)\n";
+    LINE: while (<$git>) {
+        chomp;
+        ( $rev, undef ) = split /\s+/;
+    }
+    close $git or die "Can't $cmd ($!)\n";
+    return $rev;
+}
+
+sub svn_get_revision {
     my $task = shift;
     my @cmd  = ( $Config->{global}->{svn}, 'info', $task );
     my $cmd  = join( ' ', @cmd );
@@ -108,8 +123,6 @@ sub make_msg {
 
 sub boilerplate {
     my ( $fh, $task, $cur_rev ) = @_;
-    print $fh "To obtain this release use the following command:\n\n";
-    print $fh "  svn checkout -r$cur_rev $task->{svn}\n\n";
 
     if ( my $desc = $Config->{global}->{description} ) {
         print $fh sprintf(
@@ -192,9 +205,19 @@ sub test_and_report {
     my $name   = $task->{name};
     my $Status = $Status->{$name} ||= {};
 
+    my $type
+      = exists $task->{svn} ? 'svn'
+      : exists $task->{git} ? 'git'
+      :   die "Can't figure out task type (missing git or svn key\n";
+
+    my ( $get_revision, $checkout ) = do {
+        no strict 'refs';
+        ( *{"${type}_get_revision"}, *{"${type}_checkout"} );
+    };
+
     mention("Checking $name");
 
-    my $cur_rev = get_revision( $task->{svn} );
+    my $cur_rev = $get_revision->( $task->{$type} );
 
     mention( "Last tested: ", $Status->{revision} )
       if exists $Status->{revision};
@@ -203,7 +226,7 @@ sub test_and_report {
     return
       if !$FORCE
           && exists $Status->{revision}
-          && $Status->{revision} == $cur_rev;
+          && $Status->{revision} eq $cur_rev;
 
     mention("Checking for updates");
 
@@ -211,7 +234,7 @@ sub test_and_report {
     my $co_dir = checkout_dir($task);
     mkpath($co_dir);
     chdir($co_dir);
-    if ( checkout( $task, $cur_rev ) || $FORCE ) {
+    if ( $checkout->( $task, $cur_rev ) || $FORCE ) {
         my @summary    = ();
         my $sum_failed = 0;
         for my $perl ( @{ $Config->{global}->{perls} } ) {
@@ -266,7 +289,28 @@ sub work_dir {
     );
 }
 
-sub checkout {
+sub git_checkout {
+    my ( $task, $rev ) = @_;
+    my $subdir = $task->{subdir};
+    my $sig = File::Spec->catfile( $subdir, '.git' );
+    if ( -d $subdir && -d $sig ) {
+        local $CWD = $subdir;
+        system $Config->{global}->{git}, 'pull', $task->{git}
+          and die "git pull failed: $?\n";
+    }
+    else {
+        system $Config->{global}->{git}, 'clone', $task->{git}
+          and die "git clone faied: $?\n";
+    }
+    if ( defined $rev ) {
+        local $CWD = $subdir;
+        system $Config->{global}->{git}, 'checkout', $rev
+          and die "git checkout faied: $?\n";
+    }
+    return 1;
+}
+
+sub svn_checkout {
     my $task = shift;
     my $rev  = shift;
     my @svn  = (

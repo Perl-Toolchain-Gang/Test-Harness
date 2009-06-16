@@ -1,27 +1,34 @@
 ---
 global:
   perls:
+    - /Users/andy/Works/Perl/versions/5.8.9/bin/perl
+    - /Users/andy/Works/Perl/versions/5.10.0/bin/perl
     - /alt/local/bin/perl
-    - /usr/bin/perl
-  status: /Users/andy/.smoke-tapx
-  svn: /usr/bin/svn
-  rsync: /usr/bin/rsync
+  status: /tmp/smoke-tapx
+  git: /alt/local/bin/git
+  rsync: /opt/local/bin/rsync
   shell: /bin/bash
-  work: /Users/andy/.smoke-work
-  description: MacBook Pro
+  work: /tmp/smoke-work
+  description: Testing
 tasks:
   - mailto:
-      - email: andy@hexten.net
+      - email:
+          - andy@hexten.net
         filter: failed
         verbose: 1
-      - email: andy@hexten.net
+      - email:
+          - andy@hexten.net
         filter: summary
     name: Test::Harness
     script:
+      - yes n | %PERL% Makefile.PL
+      - make
+      - make test
+      - make distclean
       - yes n | %PERL% Build.PL
       - ./Build
-      - ./Build test
+      - ./Build testauthor
       - ./Build testprove
       - ./Build distclean
-    subdir: trunk
-    svn: http://svn.hexten.net/tapx/trunk
+    subdir: Test-Harness
+    git: git://github.com/AndyA/Test-Harness.git
