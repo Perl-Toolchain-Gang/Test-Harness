@@ -608,19 +608,23 @@ END_TAP
 
     isa_ok $parser->_stream, 'TAP::Parser::Iterator::Array';
 
-    # uncategorisable argument to source
-    my @die;
+    SKIP: {
+        skip 'Segfaults Perl 5.6.0' => 2 if $] <= 5.006000;
 
-    eval {
-        local $SIG{__DIE__} = sub { push @die, @_ };
+        # uncategorisable argument to source
+        my @die;
 
-        $parser = TAP::Parser->new( { source => 'nosuchfile' } );
-    };
+        eval {
+            local $SIG{__DIE__} = sub { push @die, @_ };
 
-    is @die, 1, 'uncategorisable source';
+            $parser = TAP::Parser->new( { source => 'nosuchfile' } );
+        };
 
-    like pop @die, qr/Cannot detect source of 'nosuchfile'/,
-      '... and we died as expected';
+        is @die, 1, 'uncategorisable source';
+
+        like pop @die, qr/Cannot detect source of 'nosuchfile'/,
+          '... and we died as expected';
+    }
 }
 
 {
