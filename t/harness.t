@@ -736,7 +736,8 @@ SKIP: {
     my $source = $MyFileSource::LAST_OBJ || {};
     isa_ok( $source, 'MyFileSource', '... and MyFileSource obj was created' );
     is( $source->raw_source, $source_test,
-        '... and has the right raw_source' );
+        '... and has the right raw_source'
+    );
 
     my @output = tied($$capture)->dump;
     my $status = pop(@output) || '';
