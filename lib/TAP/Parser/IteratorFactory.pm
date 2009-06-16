@@ -16,11 +16,11 @@ TAP::Parser::IteratorFactory - Internal TAP::Parser Iterator
 
 =head1 VERSION
 
-Version 3.17
+Version 3.18
 
 =cut
 
-$VERSION = '3.17';
+$VERSION = '3.18';
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ sub make_iterator {
     my ( $proto, $thing ) = @_;
 
     my $ref = ref $thing;
-    if ( $ref eq 'GLOB' || $ref eq 'IO::Handle' ) {
+    if ( $ref eq 'GLOB' || UNIVERSAL::isa( $ref, 'IO::Handle' ) ) {
         return $proto->make_stream_iterator($thing);
     }
     elsif ( $ref eq 'ARRAY' ) {

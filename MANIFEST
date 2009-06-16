@@ -30,6 +30,7 @@ lib/TAP/Formatter/File.pm
 lib/TAP/Formatter/File/Session.pm
 lib/TAP/Formatter/Session.pm
 lib/TAP/Harness.pm
+lib/TAP/Harness/Beyond.pod
 lib/TAP/Object.pm
 lib/TAP/Parser.pm
 lib/TAP/Parser/Aggregator.pm
@@ -56,7 +57,12 @@ lib/TAP/Parser/Scheduler.pm
 lib/TAP/Parser/Scheduler/Job.pm
 lib/TAP/Parser/Scheduler/Spinner.pm
 lib/TAP/Parser/Source.pm
+lib/TAP/Parser/Source/Executable.pm
+lib/TAP/Parser/Source/File.pm
+lib/TAP/Parser/Source/Handle.pm
 lib/TAP/Parser/Source/Perl.pm
+lib/TAP/Parser/Source/RawTAP.pm
+lib/TAP/Parser/SourceFactory.pm
 lib/TAP/Parser/Utils.pm
 lib/TAP/Parser/YAMLish/Reader.pm
 lib/TAP/Parser/YAMLish/Writer.pm
@@ -77,6 +83,7 @@ t/compat/inc-propagation.t
 t/compat/inc_taint.t
 t/compat/nonumbers.t
 t/compat/regression.t
+t/compat/subclass.t
 t/compat/switches.t
 t/compat/test-harness-compat.t
 t/compat/version.t
@@ -99,6 +106,7 @@ t/lib/EmptyParser.pm
 t/lib/if.pm
 t/lib/IO/c55Capture.pm
 t/lib/MyCustom.pm
+t/lib/MyFileSource.pm
 t/lib/MyGrammar.pm
 t/lib/MyIterator.pm
 t/lib/MyIteratorFactory.pm
@@ -108,6 +116,7 @@ t/lib/MyResultFactory.pm
 t/lib/MySource.pm
 t/lib/NoFork.pm
 t/lib/NOP.pm
+t/lib/TAP/Harness/TestSubclass.pm
 t/lib/TAP/Parser/SubclassTest.pm
 t/lib/Test/Builder.pm
 t/lib/Test/Builder/Module.pm
@@ -188,12 +197,19 @@ t/sample-tests/with_comments
 t/sample-tests/zero_valid
 t/scheduler.t
 t/source.t
+t/source_factory.t
 t/source_tests/harness
 t/source_tests/harness_badtap
 t/source_tests/harness_complain
 t/source_tests/harness_directives
 t/source_tests/harness_failure
 t/source_tests/source
+t/source_tests/source.1
+t/source_tests/source.bat
+t/source_tests/source.pl
+t/source_tests/source.sh
+t/source_tests/source.t
+t/source_tests/source.tap
 t/spool.t
 t/state.t
 t/state_results.t

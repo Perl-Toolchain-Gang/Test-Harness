@@ -443,25 +443,24 @@ can_ok $PARSER, 'new';
 $parser = $PARSER->new( { source => "1..1\nok 1\n" } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 ok @results = _get_results($parser), 'The parser should return results';
-is(scalar @results, 2, "Got two lines of TAP");
+is( scalar @results, 2, "Got two lines of TAP" );
 
 # Check source => [array]
 can_ok $PARSER, 'new';
-$parser = $PARSER->new( { source => ["1..1","ok 1"] } );
+$parser = $PARSER->new( { source => [ "1..1", "ok 1" ] } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 ok @results = _get_results($parser), 'The parser should return results';
-is(scalar @results, 2, "Got two lines of TAP");
+is( scalar @results, 2, "Got two lines of TAP" );
 
 # Check source => $filehandle
 can_ok $PARSER, 'new';
 open my $fh, $ENV{PERL_CORE}
-    ? '../ext/Test-Harness/t/data/catme.1'
-    : 't/data/catme.1';
+  ? '../ext/Test-Harness/t/data/catme.1'
+  : 't/data/catme.1';
 $parser = $PARSER->new( { source => $fh } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 ok @results = _get_results($parser), 'The parser should return results';
-is(scalar @results, 2, "Got two lines of TAP");
-
+is( scalar @results, 2, "Got two lines of TAP" );
 
 {
 
@@ -620,7 +619,7 @@ END_TAP
 
     is @die, 1, 'uncategorisable source';
 
-    like pop @die, qr/Cannot determine source for nosuchfile/,
+    like pop @die, qr/Cannot detect source of 'nosuchfile'/,
       '... and we died as expected';
 }
 

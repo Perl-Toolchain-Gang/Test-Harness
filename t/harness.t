@@ -24,7 +24,7 @@ my $source_tests
 my $sample_tests
   = $ENV{PERL_CORE} ? '../ext/Test-Harness/t/sample-tests' : 't/sample-tests';
 
-plan tests => 119;
+plan tests => 128;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -580,7 +580,7 @@ SKIP: {
 }
 
 # Exec with a coderef that returns an arrayref
-{
+SKIP: {
     my $cat = '/bin/cat';
     unless ( -e $cat ) {
         skip "no '$cat'", 2;
@@ -591,10 +591,12 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             exec      => sub {
-                return [ $cat,
+                return [
+                    $cat,
                     $ENV{PERL_CORE}
                     ? '../ext/Test-Harness/t/data/catme.1'
-                    : 't/data/catme.1' ];
+                    : 't/data/catme.1'
+                ];
             },
         }
     );
@@ -641,9 +643,9 @@ SKIP: {
             stdout    => $capture,
             exec      => sub {
                 open my $fh,
-                    $ENV{PERL_CORE}
-                    ? '../ext/Test-Harness/t/data/catme.1'
-                    : 't/data/catme.1';
+                  $ENV{PERL_CORE}
+                  ? '../ext/Test-Harness/t/data/catme.1'
+                  : 't/data/catme.1';
                 return $fh;
             },
         }
@@ -685,6 +687,64 @@ SKIP: {
     is( $output[-1], "All tests successful.\n",
         'No exec accumulation'
     );
+}
+
+# customize default File source
+{
+    my $capture = IO::c55Capture->new_handle;
+    my $harness = TAP::Harness->new(
+        {   verbosity => -2,
+            stdout    => $capture,
+            sources   => {
+                File => { extensions => ['.1'] },
+            },
+        }
+    );
+
+    _runtests( $harness, "$source_tests/source.1" );
+
+    my @output = tied($$capture)->dump;
+    my $status = pop @output;
+    like $status, qr{^Result: PASS$},
+      'customized File source has correct status line';
+    pop @output;    # get rid of summary line
+    my $answer = pop @output;
+    is( $answer, "All tests successful.\n", '... all tests passed' );
+}
+
+# load a custom source
+{
+    my $capture = IO::c55Capture->new_handle;
+    my $harness = TAP::Harness->new(
+        {   verbosity => -2,
+            stdout    => $capture,
+            sources   => {
+                MyFileSource => { extensions => ['.1'] },
+            },
+        }
+    );
+
+    my $source_test = "$source_tests/source.1";
+    eval { _runtests( $harness, "$source_tests/source.1" ); };
+    my $e = $@;
+    ok( !$e, 'no error on load custom source' ) || diag($e);
+
+    no warnings 'once';
+    can_ok( 'MyFileSource', 'new' );
+    ok( $main::INIT{MyFileSource}, '... and an obj was instantiated' );
+
+    my $source = $MyFileSource::LAST_OBJ || {};
+    isa_ok( $source, 'MyFileSource', '... and MyFileSource obj was created' );
+    is( $source->raw_source, $source_test,
+        '... and has the right raw_source'
+    );
+
+    my @output = tied($$capture)->dump;
+    my $status = pop(@output) || '';
+    like $status, qr{^Result: PASS$}, '... and test has correct status line';
+    pop @output;    # get rid of summary line
+    my $answer = pop @output;
+    is( $answer, "All tests successful.\n", '... all tests passed' );
 }
 
 sub trim {

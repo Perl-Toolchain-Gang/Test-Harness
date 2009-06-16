@@ -19,11 +19,11 @@ TAP::Harness - Run test scripts with statistics
 
 =head1 VERSION
 
-Version 3.17
+Version 3.18
 
 =cut
 
-$VERSION = '3.17';
+$VERSION = '3.18';
 
 $ENV{HARNESS_ACTIVE}  = 1;
 $ENV{HARNESS_VERSION} = $VERSION;
@@ -84,6 +84,7 @@ BEGIN {
         test_args         => sub { shift; shift },
         ignore_exit       => sub { shift; shift },
         rules             => sub { shift; shift },
+        sources           => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -133,7 +134,7 @@ BEGIN {
 
  my %args = (
     verbosity => 1,
-    lib     => [ 'lib', 'blib/lib' ],
+    lib     => [ 'lib', 'blib/lib', 'blib/arch' ],
  )
  my $harness = TAP::Harness->new( \%args );
 
@@ -305,6 +306,27 @@ interface may change.
 =item * C<stdout>
 
 A filehandle for catching standard output.
+
+=item * C<sources>
+
+I<This is an experimental feature and may change.>
+
+If set, C<sources> must be a hashref containing the names of the
+L<TAP::Parser::Source> subclasses you want to load and/or configure.  The
+values should contain a hash of configuration that will be passed to the
+source class during source detection and creation (ie: the methods
+L<TAP::Parser::Source/can_handle> and L<TAP::Parser::Source/make_source>).
+
+For example:
+
+  sources => {
+    Perl => { exec => '/path/to/custom/perl' },
+    File => { extensions => [ '.tap', '.txt' ] },
+    MyCustom => { some => 'config' },
+  }
+
+For more details see L<TAP::Parser/new>, L<TAP::Parser::Source> & sub-classes,
+and L<TAP::Parser::SourceFactory>.
 
 =back
 
@@ -692,6 +714,9 @@ sub _get_parser_args {
     my ( $self, $job ) = @_;
     my $test_prog = $job->filename;
     my %args      = ();
+
+    $args{sources} = $self->sources if $self->sources;
+
     my @switches;
     @switches = $self->lib if $self->lib;
     push @switches => $self->switches if $self->switches;
@@ -705,9 +730,10 @@ sub _get_parser_args {
           = ref $exec eq 'CODE'
           ? $exec->( $self, $test_prog )
           : [ @$exec, $test_prog ];
-        if (not defined $args{exec}) {
+        if ( not defined $args{exec} ) {
             $args{source} = $test_prog;
-        } elsif ((ref($args{exec})||"") ne "ARRAY") {
+        }
+        elsif ( ( ref( $args{exec} ) || "" ) ne "ARRAY" ) {
             $args{source} = delete $args{exec};
         }
     }

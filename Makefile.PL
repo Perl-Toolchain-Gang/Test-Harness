@@ -19,7 +19,7 @@ my %mm_args = (
     'PL_FILES'    => {},
     'test'        => { 'TESTS' => 't/*.t t/compat/*.t' },
 
-    # The core autogenerates a Makefile.PL, and finds prove with utils/prove.PL
+   # The core autogenerates a Makefile.PL, and finds prove with utils/prove.PL
     'EXE_FILES' => ['bin/prove'],
 );
 

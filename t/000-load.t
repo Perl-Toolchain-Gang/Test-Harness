@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 78;
+use Test::More tests => 88;
 
 BEGIN {
 
@@ -42,8 +42,13 @@ BEGIN {
       TAP::Parser::Scheduler
       TAP::Parser::Scheduler::Job
       TAP::Parser::Scheduler::Spinner
-      TAP::Parser::Source::Perl
       TAP::Parser::Source
+      TAP::Parser::SourceFactory
+      TAP::Parser::Source::Executable
+      TAP::Parser::Source::Perl
+      TAP::Parser::Source::File
+      TAP::Parser::Source::Handle
+      TAP::Parser::Source::RawTAP
       TAP::Parser::YAMLish::Reader
       TAP::Parser::YAMLish::Writer
       TAP::Parser::Utils

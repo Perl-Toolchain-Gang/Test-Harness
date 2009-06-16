@@ -27,6 +27,7 @@ use vars qw(
   $Directives
   $Timer
   $Strap
+  $HarnessSubclass
   $has_time_hires
   $IgnoreExit
 );
@@ -44,11 +45,11 @@ Test::Harness - Run Perl standard test scripts with statistics
 
 =head1 VERSION
 
-Version 3.17
+Version 3.18
 
 =cut
 
-$VERSION = '3.17';
+$VERSION = '3.18';
 
 # Backwards compatibility for exportable variable names.
 *verbose  = *Verbose;
@@ -250,7 +251,8 @@ sub _new_harness {
         }
     }
 
-    return TAP::Harness->new($args);
+    my $class = $ENV{HARNESS_SUBCLASS} || 'TAP::Harness';
+    return TAP::Harness->_construct( $class, $args );
 }
 
 # Get the parts of @INC which are changed from the stock list AND
@@ -537,6 +539,10 @@ Use forked parallelism.
 Multiple options may be separated by colons:
 
     HARNESS_OPTIONS=j9:f make test
+
+=item C<HARNESS_SUBCLASS>
+
+Specifies a TAP::Harness subclass to be used in place of TAP::Harness.
 
 =back
 
