@@ -53,9 +53,8 @@ C<$config> is optional.  If given, sets L</config> and calls L</load_sources>.
 =cut
 
 sub _initialize {
-    my ($self, $config) = @_;
-    $self->config( $config || {} )
-         ->load_sources;
+    my ( $self, $config ) = @_;
+    $self->config( $config || {} )->load_sources;
     return $self;
 }
 
@@ -79,7 +78,6 @@ sub register_source {
 
     return $class;
 }
-
 
 ##############################################################################
 
@@ -113,11 +111,10 @@ sub config {
 
 sub _config_for {
     my ( $self, $sclass ) = @_;
-    my ($abbrv_sclass) = ($sclass =~ /(?:\:\:)?(\w+)$/);
+    my ($abbrv_sclass) = ( $sclass =~ /(?:\:\:)?(\w+)$/ );
     my $config = $self->config->{$abbrv_sclass} || $self->config->{$sclass};
     return $config;
 }
-
 
 ##############################################################################
 
@@ -143,32 +140,31 @@ C<croak>s on error.
 
 sub load_sources {
     my ($self) = @_;
-    foreach my $source (keys %{ $self->config }) {
-	my $sclass = $self->_load_source( $source );
-	# TODO: store which class we loaded anywhere?
+    foreach my $source ( keys %{ $self->config } ) {
+        my $sclass = $self->_load_source($source);
+
+        # TODO: store which class we loaded anywhere?
     }
     return $self;
 }
 
 sub _load_source {
-    my ($self, $source) = @_;
+    my ( $self, $source ) = @_;
 
     my @errors;
-    foreach my $sclass ("TAP::Parser::Source::$source", $source) {
-	return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::Source' );
-	eval "use $sclass";
-	if (my $e = $@) {
-	    push @errors, $e;
-	    next;
-	}
-	return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::Source' );
-	push @errors, "source '$sclass' is not a TAP::Parser::Source"
+    foreach my $sclass ( "TAP::Parser::Source::$source", $source ) {
+        return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::Source' );
+        eval "use $sclass";
+        if ( my $e = $@ ) {
+            push @errors, $e;
+            next;
+        }
+        return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::Source' );
+        push @errors, "source '$sclass' is not a TAP::Parser::Source";
     }
 
-    $self->_croak( "Cannot load source '$source': " . join("\n", @errors) );
+    $self->_croak( "Cannot load source '$source': " . join( "\n", @errors ) );
 }
-
-
 
 ##############################################################################
 
@@ -181,28 +177,31 @@ given (see L</detect_source>).  Dies on error.
 
 sub make_source {
     my ( $self, $args ) = @_;
-    my $raw_source_ref  = $args->{raw_source_ref};
+    my $raw_source_ref = $args->{raw_source_ref};
 
-    $self->_croak('no raw source ref defined!') unless defined $raw_source_ref;
-    my $ref_type = ref( $raw_source_ref );
+    $self->_croak('no raw source ref defined!')
+      unless defined $raw_source_ref;
+    my $ref_type = ref($raw_source_ref);
     $self->_croak('raw_source_ref is not a reference!') unless $ref_type;
 
     # is the raw source already an object?
     return $$raw_source_ref
-      if ( $ref_type eq 'SCALAR' && ref($$raw_source_ref)
+      if ( $ref_type eq 'SCALAR'
+        && ref($$raw_source_ref)
         && UNIVERSAL::isa( $$raw_source_ref, 'TAP::Parser::Source' ) );
 
     # figure out what kind of source it is
-    my ($sd_class, $meta) = $self->detect_source($raw_source_ref);
+    my ( $sd_class, $meta ) = $self->detect_source($raw_source_ref);
 
     # create it
-    my $config = $self->_config_for( $sd_class );
-    my $source = $sd_class->make_source({
-        %$args,
-        raw_source_ref => $raw_source_ref,
-        config         => $config,
-        meta           => $meta,
-    });
+    my $config = $self->_config_for($sd_class);
+    my $source = $sd_class->make_source(
+        {   %$args,
+            raw_source_ref => $raw_source_ref,
+            config         => $config,
+            meta           => $meta,
+        }
+    );
 
     return $source;
 }
@@ -231,20 +230,23 @@ sub detect_source {
     confess('no raw source ref defined!') unless defined $raw_source_ref;
 
     # build up some meta-data about the source so the sources don't have to
-    my $meta = $self->assemble_meta( $raw_source_ref );
+    my $meta = $self->assemble_meta($raw_source_ref);
 
     # find a list of sources that can handle this source:
     my %sources;
     foreach my $dclass ( @{ $self->sources } ) {
-	my $config     = $self->_config_for( $dclass );
-        my $confidence = $dclass->can_handle($raw_source_ref, $meta, $config);
-	# warn "source: $dclass: $confidence\n";
+        my $config = $self->_config_for($dclass);
+        my $confidence
+          = $dclass->can_handle( $raw_source_ref, $meta, $config );
+
+        # warn "source: $dclass: $confidence\n";
         $sources{$dclass} = $confidence if $confidence;
     }
 
     if ( !%sources ) {
-	# use Data::Dump qw( pp );
-	# warn pp( $meta );
+
+        # use Data::Dump qw( pp );
+        # warn pp( $meta );
 
         # error: can't detect source
         my $raw_source_short = substr( $$raw_source_ref, 0, 50 );
@@ -260,16 +262,17 @@ sub detect_source {
     );
 
     # this is really useful for debugging sources:
-    if ($ENV{TAP_HARNESS_SOURCE_FACTORY_VOTES}) {
-	warn ( "votes: ",
-	       join( ', ', map { "$_: $sources{$_}" } @sources ),
-	       "\n" );
+    if ( $ENV{TAP_HARNESS_SOURCE_FACTORY_VOTES} ) {
+        warn(
+            "votes: ",
+            join( ', ', map {"$_: $sources{$_}"} @sources ),
+            "\n"
+        );
     }
 
     # return 1st source
     return pop @sources, $meta;
 }
-
 
 =head3 C<assemble_meta>
 
@@ -289,57 +292,61 @@ sub assemble_meta {
 
     # rudimentary is object test - if it's blessed it'll
     # inherit from UNIVERSAL
-    $meta->{is_object} = UNIVERSAL::isa( $raw_source_ref, 'UNIVERSAL' ) ? 1 : 0;
+    $meta->{is_object}
+      = UNIVERSAL::isa( $raw_source_ref, 'UNIVERSAL' ) ? 1 : 0;
 
-    $meta->{lc( ref( $raw_source_ref ) )} = 1;
-    if ($meta->{scalar}) {
-	my $source = $$raw_source_ref;
-	$meta->{length} = length( $$raw_source_ref );
-	$meta->{has_newlines} = $$raw_source_ref =~ /\n/ ? 1 : 0;
+    $meta->{ lc( ref($raw_source_ref) ) } = 1;
+    if ( $meta->{scalar} ) {
+        my $source = $$raw_source_ref;
+        $meta->{length} = length($$raw_source_ref);
+        $meta->{has_newlines} = $$raw_source_ref =~ /\n/ ? 1 : 0;
 
-	# only do file checks if it looks like a filename
-	if (! $meta->{has_newlines} and $meta->{length} < 1024) {
-	    my $file = {};
-	    $file->{exists} = -e $source ? 1 : 0;
-	    if ($file->{exists}) {
-		$meta->{file} = $file;
+        # only do file checks if it looks like a filename
+        if ( !$meta->{has_newlines} and $meta->{length} < 1024 ) {
+            my $file = {};
+            $file->{exists} = -e $source ? 1 : 0;
+            if ( $file->{exists} ) {
+                $meta->{file} = $file;
 
-		# avoid extra system calls (see `perldoc -f -X`)
-		$file->{stat}    = [ stat(_) ];
-		$file->{empty}   = -z _ ? 1 : 0;
-		$file->{size}    = -s _ ? 1 : 0;
-		$file->{text}    = -T _ ? 1 : 0;
-		$file->{binary}  = -B _ ? 1 : 0;
-		$file->{read}    = -r _ ? 1 : 0;
-		$file->{write}   = -w _ ? 1 : 0;
-		$file->{execute} = -x _ ? 1 : 0;
-		$file->{setuid}  = -u _ ? 1 : 0;
-		$file->{setgid}  = -g _ ? 1 : 0;
-		$file->{sticky}  = -k _ ? 1 : 0;
+                # avoid extra system calls (see `perldoc -f -X`)
+                $file->{stat}    = [ stat(_) ];
+                $file->{empty}   = -z _ ? 1 : 0;
+                $file->{size}    = -s _ ? 1 : 0;
+                $file->{text}    = -T _ ? 1 : 0;
+                $file->{binary}  = -B _ ? 1 : 0;
+                $file->{read}    = -r _ ? 1 : 0;
+                $file->{write}   = -w _ ? 1 : 0;
+                $file->{execute} = -x _ ? 1 : 0;
+                $file->{setuid}  = -u _ ? 1 : 0;
+                $file->{setgid}  = -g _ ? 1 : 0;
+                $file->{sticky}  = -k _ ? 1 : 0;
 
-		$meta->{is_file} = $file->{is_file} = -f _ ? 1 : 0;
-		$meta->{is_dir}  = $file->{is_dir}  = -d _ ? 1 : 0;
+                $meta->{is_file} = $file->{is_file} = -f _ ? 1 : 0;
+                $meta->{is_dir}  = $file->{is_dir}  = -d _ ? 1 : 0;
 
-		# symlink check requires another system call
-		$meta->{is_symlink} = $file->{is_symlink} = -l $source ? 1 : 0;
-		if ($file->{symlink}) {
-		    $file->{lstat}  = [ lstat(_) ];
-		}
+                # symlink check requires another system call
+                $meta->{is_symlink} = $file->{is_symlink}
+                  = -l $source ? 1 : 0;
+                if ( $file->{symlink} ) {
+                    $file->{lstat} = [ lstat(_) ];
+                }
 
-		# put together some common info about the file
-		( $file->{basename}, $file->{dir}, $file->{ext} )
-		  = map { defined $_ ? $_ : '' }
-		    fileparse( $source, qr/\.[^.]*/ );
-		$file->{lc_ext}    = lc( $file->{ext} );
-		$file->{basename} .= $file->{ext} if $file->{ext};
+                # put together some common info about the file
+                ( $file->{basename}, $file->{dir}, $file->{ext} )
+                  = map { defined $_ ? $_ : '' }
+                  fileparse( $source, qr/\.[^.]*/ );
+                $file->{lc_ext} = lc( $file->{ext} );
+                $file->{basename} .= $file->{ext} if $file->{ext};
 
-		# TODO: move shebang check from TAP::Parser::SourceFactory
-	    }
-	}
-    } elsif ($meta->{array}) {
-	$meta->{size} = $#$raw_source_ref + 1;
-    } elsif ($meta->{hash}) {
-	; # do nothing
+                # TODO: move shebang check from TAP::Parser::SourceFactory
+            }
+        }
+    }
+    elsif ( $meta->{array} ) {
+        $meta->{size} = $#$raw_source_ref + 1;
+    }
+    elsif ( $meta->{hash} ) {
+        ;    # do nothing
     }
 
     return $meta;

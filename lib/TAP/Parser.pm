@@ -3,18 +3,18 @@ package TAP::Parser;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Base                         ();
-use TAP::Parser::Grammar              ();
-use TAP::Parser::Result               ();
-use TAP::Parser::ResultFactory        ();
-use TAP::Parser::Source::Executable   ();
-use TAP::Parser::Source::Perl         ();
-use TAP::Parser::Source::File         ();
-use TAP::Parser::Source::RawTAP       ();
-use TAP::Parser::Source::Handle       ();
-use TAP::Parser::Iterator             ();
-use TAP::Parser::IteratorFactory      ();
-use TAP::Parser::SourceFactory        ();
+use TAP::Base                       ();
+use TAP::Parser::Grammar            ();
+use TAP::Parser::Result             ();
+use TAP::Parser::ResultFactory      ();
+use TAP::Parser::Source::Executable ();
+use TAP::Parser::Source::Perl       ();
+use TAP::Parser::Source::File       ();
+use TAP::Parser::Source::RawTAP     ();
+use TAP::Parser::Source::Handle     ();
+use TAP::Parser::Iterator           ();
+use TAP::Parser::IteratorFactory    ();
+use TAP::Parser::SourceFactory      ();
 
 use Carp qw( confess );
 
@@ -293,8 +293,8 @@ L<TAP::Parser::SourceFactory>.
 # new() implementation supplied by TAP::Base
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub _default_source_class      {'TAP::Parser::Source::Executable'} # deprecated
-sub _default_perl_source_class {'TAP::Parser::Source::Perl'}       # deprecated
+sub _default_source_class {'TAP::Parser::Source::Executable'}    # deprecated
+sub _default_perl_source_class {'TAP::Parser::Source::Perl'}     # deprecated
 sub _default_grammar_class     {'TAP::Parser::Grammar'}
 sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
 sub _default_result_factory_class   {'TAP::Parser::ResultFactory'}
@@ -397,10 +397,10 @@ C<source_factory_class> can be customized, as described in L</new>.
 =cut
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub make_source      { shift->source_class->new(@_); }         # deprecated
-sub make_perl_source { shift->perl_source_class->new(@_); }    # deprecated
+sub make_source         { shift->source_class->new(@_); }         # deprecated
+sub make_perl_source    { shift->perl_source_class->new(@_); }    # deprecated
 sub make_source_factory { shift->source_factory_class->new(@_); }
-sub make_grammar     { shift->grammar_class->new(@_); }
+sub make_grammar        { shift->grammar_class->new(@_); }
 sub make_iterator { shift->iterator_factory_class->make_iterator(@_); }
 sub make_result   { shift->result_factory_class->make_result(@_); }
 
@@ -487,29 +487,32 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
             $self->_croak("Unknown options: @excess");
         }
 
-	# convert $tap & $exec to $raw_source equiv.
-	my $raw_source_ref;
+        # convert $tap & $exec to $raw_source equiv.
+        my $raw_source_ref;
         if ($tap) {
-	    $raw_source_ref = \$tap;
-        } elsif ($exec) {
-	    $raw_source_ref = { exec => [ @$exec, @$test_args ] };
-        } elsif ($raw_source) {
-	    $raw_source_ref = ref( $raw_source ) ? $raw_source : \$raw_source;
+            $raw_source_ref = \$tap;
+        }
+        elsif ($exec) {
+            $raw_source_ref = { exec => [ @$exec, @$test_args ] };
+        }
+        elsif ($raw_source) {
+            $raw_source_ref = ref($raw_source) ? $raw_source : \$raw_source;
         }
 
-	if ($raw_source_ref) {
-	    my $src_factory = $self->make_source_factory( $sources );
-	    my $source = $src_factory->make_source({
-	         raw_source_ref => $raw_source_ref,
-	         merge          => $merge,
-	         switches       => $switches,
-	         test_args      => $test_args
-	    });
+        if ($raw_source_ref) {
+            my $src_factory = $self->make_source_factory($sources);
+            my $source      = $src_factory->make_source(
+                {   raw_source_ref => $raw_source_ref,
+                    merge          => $merge,
+                    switches       => $switches,
+                    test_args      => $test_args
+                }
+            );
 
-	    # TODO: replace this with something like:
-	    # my $stream = $source->get_stream;  # notice no "( $self )"
-	    $stream = $source->get_stream($self);
-	}
+            # TODO: replace this with something like:
+            # my $stream = $source->get_stream;  # notice no "( $self )"
+            $stream = $source->get_stream($self);
+        }
 
         unless ($stream) {
             $self->_croak('PANIC: could not determine stream');

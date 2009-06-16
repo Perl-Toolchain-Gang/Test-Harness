@@ -16,7 +16,7 @@ TAP::Parser::SourceFactory->register_source(__PACKAGE__);
 sub can_handle {
     my $class = shift;
     my $vote  = $class->SUPER::can_handle(@_);
-    $vote    += 0.1 if $vote > 0; # steal the Perl detector's vote
+    $vote += 0.1 if $vote > 0;    # steal the Perl detector's vote
     return $vote;
 }
 

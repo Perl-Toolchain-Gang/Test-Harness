@@ -30,7 +30,6 @@ plan tests => 128;
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
 ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
-
 #### For color tests ####
 
 package Colorizer;
@@ -697,8 +696,8 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             sources   => {
-			  File => { extensions => [ '.1' ] },
-			 },
+                File => { extensions => ['.1'] },
+            },
         }
     );
 
@@ -720,15 +719,15 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             sources   => {
-			  MyFileSource => { extensions => [ '.1' ] },
-			 },
+                MyFileSource => { extensions => ['.1'] },
+            },
         }
     );
 
     my $source_test = "$source_tests/source.1";
     eval { _runtests( $harness, "$source_tests/source.1" ); };
     my $e = $@;
-    ok( !$e, 'no error on load custom source' ) || diag( $e );
+    ok( !$e, 'no error on load custom source' ) || diag($e);
 
     no warnings 'once';
     can_ok( 'MyFileSource', 'new' );
@@ -736,12 +735,12 @@ SKIP: {
 
     my $source = $MyFileSource::LAST_OBJ || {};
     isa_ok( $source, 'MyFileSource', '... and MyFileSource obj was created' );
-    is( $source->raw_source, $source_test, '... and has the right raw_source' );
+    is( $source->raw_source, $source_test,
+        '... and has the right raw_source' );
 
     my @output = tied($$capture)->dump;
-    my $status = pop( @output ) || '';
-    like $status, qr{^Result: PASS$},
-      '... and test has correct status line';
+    my $status = pop(@output) || '';
+    like $status, qr{^Result: PASS$}, '... and test has correct status line';
     pop @output;    # get rid of summary line
     my $answer = pop @output;
     is( $answer, "All tests successful.\n", '... all tests passed' );

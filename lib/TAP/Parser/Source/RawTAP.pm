@@ -3,8 +3,8 @@ package TAP::Parser::Source::RawTAP;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::Source ();
-use TAP::Parser::SourceFactory ();
+use TAP::Parser::Source          ();
+use TAP::Parser::SourceFactory   ();
 use TAP::Parser::IteratorFactory ();
 
 @ISA = qw(TAP::Parser::Source);
@@ -58,13 +58,14 @@ Returns a new C<TAP::Parser::Source::RawTAP> object.
 sub can_handle {
     my ( $class, $raw_source_ref, $meta ) = @_;
     return 0 if $meta->{file};
-    if ($meta->{scalar}) {
-	return 0 unless $meta->{has_newlines};
-	return 0.9 if $$raw_source_ref =~ /\d\.\.\d/;
-	return 0.7 if $$raw_source_ref =~ /ok/;
-	return 0.6;
-    } elsif ($meta->{array}) {
-	return 0.5;
+    if ( $meta->{scalar} ) {
+        return 0 unless $meta->{has_newlines};
+        return 0.9 if $$raw_source_ref =~ /\d\.\.\d/;
+        return 0.7 if $$raw_source_ref =~ /ok/;
+        return 0.6;
+    }
+    elsif ( $meta->{array} ) {
+        return 0.5;
     }
     return 0;
 }
@@ -72,11 +73,10 @@ sub can_handle {
 sub make_source {
     my ( $class, $args ) = @_;
     my $raw_source_ref = $args->{raw_source_ref};
-    my $source = $class->new;
-    $source->raw_source( $raw_source_ref );
+    my $source         = $class->new;
+    $source->raw_source($raw_source_ref);
     return $source;
 }
-
 
 ##############################################################################
 
@@ -94,17 +94,20 @@ array ref.
 
 sub raw_source {
     my $self = shift;
-    if ( @_ ) {
-	my $ref = ref $_[0];
-	if (! defined( $ref )) {
-	    ; # fall through
-	} elsif ($ref eq 'SCALAR') {
-	    my $scalar_ref = shift;
-	    return $self->SUPER::raw_source([ split "\n" => $$scalar_ref ]);
-	} elsif ($ref eq 'ARRAY') {
-	    return $self->SUPER::raw_source( shift );
-	}
-	$self->_croak('Argument to &raw_source must be a scalar or array reference');
+    if (@_) {
+        my $ref = ref $_[0];
+        if ( !defined($ref) ) {
+            ;    # fall through
+        }
+        elsif ( $ref eq 'SCALAR' ) {
+            my $scalar_ref = shift;
+            return $self->SUPER::raw_source( [ split "\n" => $$scalar_ref ] );
+        }
+        elsif ( $ref eq 'ARRAY' ) {
+            return $self->SUPER::raw_source(shift);
+        }
+        $self->_croak(
+            'Argument to &raw_source must be a scalar or array reference');
     }
     return $self->SUPER::raw_source;
 }

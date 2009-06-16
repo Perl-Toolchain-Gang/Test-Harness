@@ -8,7 +8,7 @@ use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS => ( $^O eq 'VMS' );
 
 use TAP::Parser::Source::Executable ();
-use TAP::Parser::SourceFactory ();
+use TAP::Parser::SourceFactory      ();
 use TAP::Parser::Utils qw( split_shell );
 
 @ISA = 'TAP::Parser::Source::Executable';
@@ -80,14 +80,13 @@ sub make_source {
     my $perl_script    = $$raw_source_ref;
     my $test_args      = $args->{test_args} || [];
 
-    my $source = $class->new( $raw_source_ref );
+    my $source = $class->new($raw_source_ref);
     $source->merge( $args->{merge} );
     $source->switches( $args->{switches} ) if $args->{switches};
-    $source->raw_source([ $perl_script, @$test_args ]);
+    $source->raw_source( [ $perl_script, @$test_args ] );
 
     return $source;
 }
-
 
 =head2 Instance Methods
 

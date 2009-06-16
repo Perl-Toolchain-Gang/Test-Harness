@@ -3,8 +3,8 @@ package TAP::Parser::Source::File;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::Source ();
-use TAP::Parser::SourceFactory ();
+use TAP::Parser::Source          ();
+use TAP::Parser::SourceFactory   ();
 use TAP::Parser::IteratorFactory ();
 
 @ISA = qw(TAP::Parser::Source);
@@ -62,8 +62,8 @@ sub can_handle {
     my $file = $meta->{file};
     return 1 if $file->{lc_ext} eq '.tap';
 
-    if (my $exts = $config->{extensions}) {
-	return 1 if grep {lc($_) eq $file->{lc_ext}} @$exts;
+    if ( my $exts = $config->{extensions} ) {
+        return 1 if grep { lc($_) eq $file->{lc_ext} } @$exts;
     }
 
     return 0;
@@ -72,11 +72,10 @@ sub can_handle {
 sub make_source {
     my ( $class, $args ) = @_;
     my $raw_source_ref = $args->{raw_source_ref};
-    my $source = $class->new;
-    $source->raw_source( $raw_source_ref );
+    my $source         = $class->new;
+    $source->raw_source($raw_source_ref);
     return $source;
 }
-
 
 ##############################################################################
 
@@ -96,9 +95,10 @@ sub raw_source {
     return $self->SUPER::raw_source unless @_;
 
     my $ref = ref $_[0];
-    if (! defined( $ref )) {
+    if ( !defined($ref) ) {
         return $self->SUPER::raw_source( $_[0] );
-    } elsif ($ref eq 'SCALAR') {
+    }
+    elsif ( $ref eq 'SCALAR' ) {
         return $self->SUPER::raw_source( ${ $_[0] } );
     }
 
@@ -120,8 +120,8 @@ sub get_stream {
     my $file = $self->raw_source;
     my $fh;
     open( $fh, '<', $file )
-      or $self->_croak( "error opening TAP source file '$file': $!" );
-    return $factory->make_iterator( $fh );
+      or $self->_croak("error opening TAP source file '$file': $!");
+    return $factory->make_iterator($fh);
 }
 
 1;

@@ -33,43 +33,52 @@ use TAP::Parser::SourceFactory;
     can_ok $sf, 'register_source';
 
     # Set config
-    eval { $sf->config( 'bad config' ) };
+    eval { $sf->config('bad config') };
     my $e = $@;
     like $e, qr/\QArgument to &config must be a hash reference/,
       '... and calling config with bad config should fail';
 
     my $config = { MySource => { foo => 'bar' } };
-    is( $sf->config( $config ), $sf, '... and set config works' );
+    is( $sf->config($config), $sf, '... and set config works' );
 
     # Load/Register a source
-    $sf = TAP::Parser::SourceFactory->new({
-	MySource => { accept => 'known-source' }
-    });
-    can_ok('MySource', 'can_handle' );
+    $sf = TAP::Parser::SourceFactory->new(
+        { MySource => { accept => 'known-source' } } );
+    can_ok( 'MySource', 'can_handle' );
     is_deeply( $sf->sources, ['MySource'], '... was registered' );
 
     # Known source should pass
     {
-	my $source;
-	eval { $source = $sf->make_source({ raw_source_ref => \"known-source" }) };
-	my $error = $@;
-	ok( !$error, 'make_source with known source doesnt fail' );
-	diag($error) if $error;
-	isa_ok( $source, 'MySource', '... and source class' );
-	is_deeply( $source->raw_source, [ \"known-source" ],
-		   '... and raw_source as expected' );
-	is_deeply( $source->config, { accept => 'known-source' },
-		   '... and source config as expected' );
+        my $source;
+        eval {
+            $source
+              = $sf->make_source( { raw_source_ref => \"known-source" } );
+        };
+        my $error = $@;
+        ok( !$error, 'make_source with known source doesnt fail' );
+        diag($error) if $error;
+        isa_ok( $source, 'MySource', '... and source class' );
+        is_deeply(
+            $source->raw_source, [ \"known-source" ],
+            '... and raw_source as expected'
+        );
+        is_deeply(
+            $source->config, { accept => 'known-source' },
+            '... and source config as expected'
+        );
     }
 
     # No known source should fail
     {
-	my $source;
-	eval { $source = $sf->make_source({ raw_source_ref => \"unknown-source" }) };
-	my $error = $@;
-	ok( $error, 'make_source with unknown source fails' );
-	like $error, qr/^Cannot detect source of 'unknown-source'/,
-	  '... with an appropriate error message';
+        my $source;
+        eval {
+            $source
+              = $sf->make_source( { raw_source_ref => \"unknown-source" } );
+        };
+        my $error = $@;
+        ok( $error, 'make_source with unknown source fails' );
+        like $error, qr/^Cannot detect source of 'unknown-source'/,
+          '... with an appropriate error message';
     }
 }
 
@@ -89,79 +98,66 @@ my $test_dir = File::Spec->catdir(
     'source_tests'
 );
 
-my @sources =
-  (
-   {
-    file  => 'source.tap',
-    class => 'TAP::Parser::Source::File',
-   },
-   {
-    file   => 'source.1',
-    class  => 'TAP::Parser::Source::File',
-    config => { File => { extensions => [ '.1' ] } },
-   },
-   {
-    file  => 'source.pl',
-    class => 'TAP::Parser::Source::Perl',
-   },
-   {
-    file  => 'source.t',
-    class => 'TAP::Parser::Source::Perl',
-   },
-   {
-    file  => 'source',
-    class => 'TAP::Parser::Source::Perl',
-   },
-   {
-    file  => 'source.sh',
-    class => 'TAP::Parser::Source::Executable',
-   },
-   {
-    file  => 'source.bat',
-    class => 'TAP::Parser::Source::Executable',
-   },
-   {
-    name   => 'raw tap string',
-    source => "0..1\nok 1 - raw tap\n",
-    class  => 'TAP::Parser::Source::RawTAP',
-   },
-   {
-    name   => 'raw tap array',
-    source => ["0..1\n", "ok 1 - raw tap\n"],
-    class  => 'TAP::Parser::Source::RawTAP',
-   },
-   {
-    source => \*__DATA__,
-    class  => 'TAP::Parser::Source::Handle',
-   },
-   {
-    source => IO::File->new('-'),
-    class  => 'TAP::Parser::Source::Handle',
-   },
-  );
+my @sources = (
+    {   file  => 'source.tap',
+        class => 'TAP::Parser::Source::File',
+    },
+    {   file   => 'source.1',
+        class  => 'TAP::Parser::Source::File',
+        config => { File => { extensions => ['.1'] } },
+    },
+    {   file  => 'source.pl',
+        class => 'TAP::Parser::Source::Perl',
+    },
+    {   file  => 'source.t',
+        class => 'TAP::Parser::Source::Perl',
+    },
+    {   file  => 'source',
+        class => 'TAP::Parser::Source::Perl',
+    },
+    {   file  => 'source.sh',
+        class => 'TAP::Parser::Source::Executable',
+    },
+    {   file  => 'source.bat',
+        class => 'TAP::Parser::Source::Executable',
+    },
+    {   name   => 'raw tap string',
+        source => "0..1\nok 1 - raw tap\n",
+        class  => 'TAP::Parser::Source::RawTAP',
+    },
+    {   name   => 'raw tap array',
+        source => [ "0..1\n", "ok 1 - raw tap\n" ],
+        class  => 'TAP::Parser::Source::RawTAP',
+    },
+    {   source => \*__DATA__,
+        class  => 'TAP::Parser::Source::Handle',
+    },
+    {   source => IO::File->new('-'),
+        class  => 'TAP::Parser::Source::Handle',
+    },
+);
 
 foreach my $test (@sources) {
     local $TODO = $test->{TODO};
-    if ($test->{file}) {
-	$test->{name}   = $test->{file};
-	$test->{source} = File::Spec->catfile( $test_dir, $test->{file} );
+    if ( $test->{file} ) {
+        $test->{name} = $test->{file};
+        $test->{source} = File::Spec->catfile( $test_dir, $test->{file} );
     }
 
     my $name = $test->{name} || substr( $test->{source}, 0, 10 );
-    my $sf   = TAP::Parser::SourceFactory->new( $test->{config} );
+    my $sf = TAP::Parser::SourceFactory->new( $test->{config} );
 
     my $raw_source = $test->{source};
     my $source;
     eval {
-	my $ref = ref( $raw_source ) ? $raw_source : \$raw_source;
-	$source = $sf->make_source({ raw_source_ref => $ref })
+        my $ref = ref($raw_source) ? $raw_source : \$raw_source;
+        $source = $sf->make_source( { raw_source_ref => $ref } );
     };
     my $error = $@;
     ok( !$error, "$name: no error on make_source" );
-    diag( $error ) if $error;
+    diag($error) if $error;
     isa_ok( $source, $test->{class}, $name );
 }
-
 
 __END__
 0..1

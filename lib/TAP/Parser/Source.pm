@@ -70,7 +70,6 @@ sub _initialize {
     return $self;
 }
 
-
 ##############################################################################
 
 =head3 C<can_handle>
@@ -104,7 +103,6 @@ sub can_handle {
     return;
 }
 
-
 =head3 C<make_source>
 
 I<Abstract method>.  Takes a hashref as an argument:
@@ -135,7 +133,6 @@ sub make_source {
     confess("'$class' has not defined a 'make_source' method!");
     return;
 }
-
 
 ##############################################################################
 

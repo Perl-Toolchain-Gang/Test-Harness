@@ -3,8 +3,8 @@ package TAP::Parser::Source::Executable;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::Source ();
-use TAP::Parser::SourceFactory ();
+use TAP::Parser::Source          ();
+use TAP::Parser::SourceFactory   ();
 use TAP::Parser::IteratorFactory ();
 
 @ISA = qw(TAP::Parser::Source);
@@ -60,7 +60,7 @@ Returns a new C<TAP::Parser::Source::Executable> object.
 
 sub _initialize {
     my ( $self, @args ) = @_;
-    $self->SUPER::_initialize( @args );
+    $self->SUPER::_initialize(@args);
 
     # TODO: move this to Perl sub-class - not used here?
     $self->{switches} = [];
@@ -75,14 +75,16 @@ sub _initialize {
 sub can_handle {
     my ( $class, $raw_source_ref, $meta ) = @_;
 
-    if ($meta->{is_file}) {
-	my $file = $meta->{file};
-	# Note: we go in low so we can be out-voted
-	return 0.8 if $file->{lc_ext} eq '.sh';
-	return 0.8 if $file->{lc_ext} eq '.bat';
-	return 0.7 if $file->{execute};
-    } elsif ($meta->{hash}) {
-	return 0.99 if $raw_source_ref->{exec};
+    if ( $meta->{is_file} ) {
+        my $file = $meta->{file};
+
+        # Note: we go in low so we can be out-voted
+        return 0.8 if $file->{lc_ext} eq '.sh';
+        return 0.8 if $file->{lc_ext} eq '.bat';
+        return 0.7 if $file->{execute};
+    }
+    elsif ( $meta->{hash} ) {
+        return 0.99 if $raw_source_ref->{exec};
     }
 
     return 0;
@@ -91,22 +93,23 @@ sub can_handle {
 sub make_source {
     my ( $class, $args ) = @_;
     my $raw_source_ref = $args->{raw_source_ref};
-    my $meta   = $args->{meta};
-    my $source = $class->new;
+    my $meta           = $args->{meta};
+    my $source         = $class->new;
 
     $source->merge( $args->{merge} );
 
-    if ($meta->{hash}) {
-	$source->raw_source( $raw_source_ref->{exec} );
-    } elsif ($meta->{is_file}) {
-	$source->raw_source([ $raw_source_ref ]);
-    } else {
-	$source->raw_source( $raw_source_ref );
+    if ( $meta->{hash} ) {
+        $source->raw_source( $raw_source_ref->{exec} );
+    }
+    elsif ( $meta->{is_file} ) {
+        $source->raw_source( [$raw_source_ref] );
+    }
+    else {
+        $source->raw_source($raw_source_ref);
     }
 
     return $source;
 }
-
 
 ##############################################################################
 
@@ -133,16 +136,20 @@ sub raw_source {
     return $self->SUPER::raw_source unless @_;
 
     my $ref = ref $_[0];
-    if (! defined( $ref )) {
-        ; # fall through
-    } elsif ($ref eq 'ARRAY') {
+    if ( !defined($ref) ) {
+        ;    # fall through
+    }
+    elsif ( $ref eq 'ARRAY' ) {
         return $self->SUPER::raw_source( $_[0] );
-    } elsif ($ref eq 'HASH') {
-	my $exec = $_[0]->{exec};
-        return $self->SUPER::raw_source( $exec );
+    }
+    elsif ( $ref eq 'HASH' ) {
+        my $exec = $_[0]->{exec};
+        return $self->SUPER::raw_source($exec);
     }
 
-    $self->_croak('Argument to &raw_source must be an array reference or hash reference');
+    $self->_croak(
+        'Argument to &raw_source must be an array reference or hash reference'
+    );
 }
 
 ##############################################################################

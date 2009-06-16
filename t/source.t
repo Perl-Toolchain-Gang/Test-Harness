@@ -65,7 +65,7 @@ my $perl = $^X;
 
 # Executable source tests
 {
-    my $test   = File::Spec->catfile( $dir, 'source' );
+    my $test = File::Spec->catfile( $dir, 'source' );
     my $source = TAP::Parser::Source::Executable->new;
     isa_ok $source, 'TAP::Parser::Source::Executable';
 
@@ -90,9 +90,10 @@ my $perl = $^X;
 
 # Perl source tests
 {
-    my $test   = File::Spec->catfile( $dir, 'source' );
+    my $test = File::Spec->catfile( $dir, 'source' );
     my $source = TAP::Parser::Source::Perl->new;
-    isa_ok $source, 'TAP::Parser::Source::Perl', '... and the object it returns';
+    isa_ok $source, 'TAP::Parser::Source::Perl',
+      '... and the object it returns';
 
     can_ok $source, 'source';
     ok $source->source( [$test] ),
@@ -111,15 +112,17 @@ my $perl = $^X;
     # internals tests!
     can_ok $source, '_switches';
     ok( grep( $_ =~ /^['"]?-T['"]?$/, $source->_switches ),
-	'... and it should find the taint switch'
-      );
+        '... and it should find the taint switch'
+    );
 }
 
 # coverage test for TAP::Parser::Source::Executable
 
 {
+
     # coverage for method get_steam
-    my $source = TAP::Parser::Source::Executable->new( { parser => $parser } );
+    my $source
+      = TAP::Parser::Source::Executable->new( { parser => $parser } );
 
     my @die;
     eval {
@@ -131,16 +134,16 @@ my $perl = $^X;
     like pop @die, qr/No command found!/, '...and it failed as expect';
 }
 
-
 # Raw TAP source tests
 {
     my $source = TAP::Parser::Source::RawTAP->new;
     isa_ok $source, 'TAP::Parser::Source::RawTAP';
 
     can_ok $source, 'raw_source';
-    eval { $source->raw_source( "1..1\nok 1\n" ) };
+    eval { $source->raw_source("1..1\nok 1\n") };
     ok my $error = $@, '... and calling it with a string should fail';
-    like $error, qr/^Argument to &raw_source must be a scalar or array reference/,
+    like $error,
+      qr/^Argument to &raw_source must be a scalar or array reference/,
       '... with an appropriate error message';
     ok $source->raw_source( \"1..1\nok 1\n" ),
       '... and calling it with valid args should succeed';
@@ -158,7 +161,7 @@ my $perl = $^X;
 
 # Text file TAP source tests
 {
-    my $test   = File::Spec->catfile( $dir, 'source.tap' );
+    my $test = File::Spec->catfile( $dir, 'source.tap' );
     my $source = TAP::Parser::Source::File->new;
     isa_ok $source, 'TAP::Parser::Source::File';
 
@@ -179,7 +182,7 @@ my $perl = $^X;
 
 # IO::Handle TAP source tests
 {
-    my $test   = File::Spec->catfile( $dir, 'source.tap' );
+    my $test = File::Spec->catfile( $dir, 'source.tap' );
     my $source = TAP::Parser::Source::File->new;
     isa_ok $source, 'TAP::Parser::Source::File';
 

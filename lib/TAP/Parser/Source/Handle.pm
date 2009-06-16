@@ -3,8 +3,8 @@ package TAP::Parser::Source::Handle;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::Source ();
-use TAP::Parser::SourceFactory ();
+use TAP::Parser::Source          ();
+use TAP::Parser::SourceFactory   ();
 use TAP::Parser::IteratorFactory ();
 
 @ISA = qw(TAP::Parser::Source);
@@ -59,8 +59,9 @@ Returns a new C<TAP::Parser::Source::Handle> object.
 sub can_handle {
     my ( $class, $raw_source_ref, $meta ) = @_;
 
-    return 0.9 if $meta->{is_object}
-      && UNIVERSAL::isa( $raw_source_ref, 'IO::Handle' );
+    return 0.9
+      if $meta->{is_object}
+          && UNIVERSAL::isa( $raw_source_ref, 'IO::Handle' );
 
     return 0.8 if $meta->{glob};
 
@@ -70,11 +71,10 @@ sub can_handle {
 sub make_source {
     my ( $class, $args ) = @_;
     my $raw_source_ref = $args->{raw_source_ref};
-    my $source = $class->new;
-    $source->raw_source( $raw_source_ref );
+    my $source         = $class->new;
+    $source->raw_source($raw_source_ref);
     return $source;
 }
-
 
 ##############################################################################
 
@@ -95,10 +95,11 @@ sub raw_source {
     return $self->SUPER::raw_source unless @_;
 
     my $ref = ref $_[0];
-    if (! defined( $ref )) {
-        ; # fall through
-    } elsif ($ref eq 'GLOB' || UNIVERSAL::isa( $ref, 'IO::Handle' )) {
-	return $self->SUPER::raw_source( shift );
+    if ( !defined($ref) ) {
+        ;    # fall through
+    }
+    elsif ( $ref eq 'GLOB' || UNIVERSAL::isa( $ref, 'IO::Handle' ) ) {
+        return $self->SUPER::raw_source(shift);
     }
 
     $self->_croak('Argument to &source must be a glob ref or an IO::Handle');
