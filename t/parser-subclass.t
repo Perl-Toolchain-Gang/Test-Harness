@@ -13,7 +13,7 @@ BEGIN {
 use strict;
 use vars qw(%INIT %CUSTOM);
 
-use Test::More tests => 24;
+use Test::More tests => 22;
 use File::Spec::Functions qw( catfile updir );
 
 use_ok('TAP::Parser::SubclassTest');
@@ -49,15 +49,6 @@ my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 
     # make sure overrided make_* methods work...
     %CUSTOM = ();
-
-    # DEPRECATED
-    TODO: {
-        local $TODO = 'deprecated';
-        $p->make_source;
-        is( $CUSTOM{MySource}, 1, 'make custom source' );
-        $p->make_perl_source;
-        is( $CUSTOM{MyPerlSource}, 1, 'make custom perl source' );
-    }
 
     $p->make_grammar;
     is( $CUSTOM{MyGrammar}, 1, 'make custom grammar' );
