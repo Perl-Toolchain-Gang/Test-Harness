@@ -56,6 +56,10 @@ Returns a new C<TAP::Parser::Source::Handle> object.
 
 # new() implementation supplied by parent class
 
+=head3 C<can_handle>
+
+=cut
+
 sub can_handle {
     my ( $class, $raw_source_ref, $meta ) = @_;
 
@@ -67,6 +71,10 @@ sub can_handle {
 
     return 0;
 }
+
+=head3 C<make_source>
+
+=cut
 
 sub make_source {
     my ( $class, $args ) = @_;

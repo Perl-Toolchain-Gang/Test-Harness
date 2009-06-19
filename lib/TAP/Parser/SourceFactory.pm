@@ -352,6 +352,12 @@ sub assemble_meta {
     return $meta;
 }
 
+=head3 C<sources>
+
+TODO
+
+=cut
+
 1;
 
 __END__

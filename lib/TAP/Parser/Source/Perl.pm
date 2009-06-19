@@ -57,6 +57,10 @@ Returns a new C<TAP::Parser::Source::Perl> object.
 
 =cut
 
+=head3 C<can_handle>
+
+=cut
+
 sub can_handle {
     my ( $class, $raw_source_ref, $meta, $config ) = @_;
 
@@ -73,6 +77,10 @@ sub can_handle {
     # backwards compat, always vote:
     return 0.5;
 }
+
+=head3 C<make_source>
+
+=cut
 
 sub make_source {
     my ( $class, $args ) = @_;
