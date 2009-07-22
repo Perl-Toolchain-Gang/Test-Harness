@@ -1,10 +1,10 @@
 Source Detector Todo
 --------------------
 
-Move Source --> SourceDetector
+y   Move Source --> SourceDetector
 	All sub-classes too
 
-Create a new 'Source' class
+   Create a new 'Source' class
 	structure:
 		the raw source
 		params (merge, switches, test_args)
