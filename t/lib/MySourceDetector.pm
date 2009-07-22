@@ -1,6 +1,6 @@
 # subclass for testing customizing & subclassing
 
-package MySource;
+package MySourceDetector;
 
 use strict;
 use vars '@ISA';
@@ -8,10 +8,10 @@ use vars '@ISA';
 use MyCustom;
 use TAP::Parser::SourceFactory;
 
-#use TAP::Parser::Source::Executable;
-use TAP::Parser::Source;
+#use TAP::Parser::SourceDetector::Executable;
+use TAP::Parser::SourceDetector;
 
-@ISA = qw( TAP::Parser::Source MyCustom );
+@ISA = qw( TAP::Parser::SourceDetector MyCustom );
 
 TAP::Parser::SourceFactory->register_source(__PACKAGE__);
 

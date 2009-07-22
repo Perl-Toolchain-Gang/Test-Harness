@@ -7,11 +7,11 @@ use TAP::Base                       ();
 use TAP::Parser::Grammar            ();
 use TAP::Parser::Result             ();
 use TAP::Parser::ResultFactory      ();
-use TAP::Parser::Source::Executable ();
-use TAP::Parser::Source::Perl       ();
-use TAP::Parser::Source::File       ();
-use TAP::Parser::Source::RawTAP     ();
-use TAP::Parser::Source::Handle     ();
+use TAP::Parser::SourceDetector::Executable ();
+use TAP::Parser::SourceDetector::Perl       ();
+use TAP::Parser::SourceDetector::File       ();
+use TAP::Parser::SourceDetector::RawTAP     ();
+use TAP::Parser::SourceDetector::Handle     ();
 use TAP::Parser::Iterator           ();
 use TAP::Parser::IteratorFactory    ();
 use TAP::Parser::SourceFactory      ();
@@ -138,7 +138,7 @@ The value should be the complete TAP output.
 =item * C<exec>
 
 If passed an array reference, will attempt to create the iterator by
-passing a L<TAP::Parser::Source::Executable> object to
+passing a L<TAP::Parser::SourceDetector::Executable> object to
 L<TAP::Parser::Iterator::Source>, using the array reference strings as
 the command arguments to L<IPC::Open3::open3|IPC::Open3>:
 
@@ -213,10 +213,10 @@ the future.
 I<Experimental>.
 
 If set, C<sources> must be a hashref containing the names of the
-L<TAP::Parser::Source> subclasses you want to load and/or configure.  The
+L<TAP::Parser::SourceDetector> subclasses you want to load and/or configure.  The
 values should contain a hash of configuration that will be passed to the
 source class during source detection and creation (ie: the methods
-L<TAP::Parser::Source/can_handle> and L<TAP::Parser::Source/make_source>).
+L<TAP::Parser::SourceDetector/can_handle> and L<TAP::Parser::SourceDetector/make_source>).
 
 For example:
 
@@ -227,14 +227,14 @@ For example:
   }
 
 Will cause C<TAP::Parser> to pass custom configuration to two of the TAP
-sources that ship with this module - L<TAP::Parser::Source::Perl> and
-L<TAP::Parser::Source::File>.  It will also attempt to load the C<MyCustom>
+sources that ship with this module - L<TAP::Parser::SourceDetector::Perl> and
+L<TAP::Parser::SourceDetector::File>.  It will also attempt to load the C<MyCustom>
 class by looking in C<@INC> for it in this order:
 
-  TAP::Parser::Source::MyCustom
+  TAP::Parser::SourceDetector::MyCustom
   MyCustom
 
-See L<TAP::Parser::SourceFactory>, L<TAP::Parser::Source> and subclasses for
+See L<TAP::Parser::SourceFactory>, L<TAP::Parser::SourceDetector> and subclasses for
 more details.
 
 =item * C<source_class>
@@ -242,7 +242,7 @@ more details.
 I<DEPRECATED> - no longer used.
 
 This option was introduced to let you easily customize which I<source> class
-the parser should use.  It defaults to L<TAP::Parser::Source::Executable>.
+the parser should use.  It defaults to L<TAP::Parser::SourceDetector::Executable>.
 
 See also L</make_source>.
 
@@ -251,7 +251,7 @@ See also L</make_source>.
 I<DEPRECATED> - no longer used.
 
 This option was introduced to let you easily customize which I<perl source>
-class the parser should use.  It defaults to L<TAP::Parser::Source::Perl>.
+class the parser should use.  It defaults to L<TAP::Parser::SourceDetector::Perl>.
 
 See also L</make_perl_source>.
 
@@ -293,8 +293,8 @@ L<TAP::Parser::SourceFactory>.
 # new() implementation supplied by TAP::Base
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub _default_source_class {'TAP::Parser::Source::Executable'}    # deprecated
-sub _default_perl_source_class {'TAP::Parser::Source::Perl'}     # deprecated
+sub _default_source_class {'TAP::Parser::SourceDetector::Executable'}    # deprecated
+sub _default_perl_source_class {'TAP::Parser::SourceDetector::Perl'}     # deprecated
 sub _default_grammar_class     {'TAP::Parser::Grammar'}
 sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
 sub _default_result_factory_class   {'TAP::Parser::ResultFactory'}
@@ -350,7 +350,7 @@ sub run {
 
 I<DEPRECATED> - no longer used.
 
-Make a new L<TAP::Parser::Source::Executable> object and return it.  Passes through any
+Make a new L<TAP::Parser::SourceDetector::Executable> object and return it.  Passes through any
 arguments given.
 
 The C<source_class> can be customized, as described in L</new>.
@@ -359,7 +359,7 @@ The C<source_class> can be customized, as described in L</new>.
 
 I<DEPRECATED> - no longer used.
 
-Make a new L<TAP::Parser::Source::Perl> object and return it.  Passes through
+Make a new L<TAP::Parser::SourceDetector::Perl> object and return it.  Passes through
 any arguments given.
 
 The C<perl_source_class> can be customized, as described in L</new>.
@@ -1752,7 +1752,7 @@ This makes it possible for you to have a single point of configuring what
 subclasses should be used, which in turn means that in many cases you'll find
 you only need to sub-class one of the parser's components.
 
-The sole exception to this rule are I<Sources>, see below.
+The sole exception to this rule are I<SourceDetectors>, see below.
 
 =item 4
 
@@ -1771,14 +1771,14 @@ deprecated first, and changed in a later release.
 A TAP parser consumes input from a single I<source> of TAP, which could come
 from anywhere (a file, an executable, a database, an io handle, a uri, etc..).
 A L<TAP::Parser::SourceFactory> is used to determine the type of a so-called
-'raw' source, and create L<TAP::Parser::Source> objects which then stream the
+'raw' source, and create L<TAP::Parser::SourceDetector> objects which then stream the
 TAP to the parser by way of L</Iterators>.
 
-There are quite a few I<Sources> available, 
+There are quite a few I<SourceDetectors> available, 
 
 If you simply want C<TAP::Parser> to handle a new source of TAP you probably
 don't need to subclass C<TAP::Parser> itself.  Rather, you'll need to create
-new L<TAP::Parser::Source> classes, and simply plug them into the parser (see
+new L<TAP::Parser::SourceDetector> classes, and simply plug them into the parser (see
 L</new> for details).  To write one read L<TAP::Parser::SourceFactory> to get
 a feel for how the system works.
 

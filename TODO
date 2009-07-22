@@ -1,3 +1,53 @@
+Source Detector Todo
+--------------------
+
+Move Source --> SourceDetector
+	All sub-classes too
+
+Create a new 'Source' class
+	structure:
+		the raw source
+		params (merge, switches, test_args)
+		meta (assembles it too)
+		(note to self: include shebang for Perl source)
+		config?
+	move meta data assembling from SourceFactory
+	could have different sub-classes for internal cases
+
+Refactor SourceDetectors
+	whittle down to 2 methods:
+		can_handle( source [, config? ] )
+		make_iterator( source )
+
+Refactor Iterators
+	remove shebang detection
+	other tasks?
+	Exec iterator should be really easy to use
+
+Phase out current IteratorFactory
+	source detectors should instantiate appropriate iterator
+
+Move SourceFactory --> IteratorFactory
+	given a Source (+ config?)
+	auto-loads source detectors from config
+	chooses best detector to use, handing over:
+		Source
+		source-specific config?
+	returns an iterator
+
+Refactor the Parser
+	creates a Source object
+	uses IteratorFactory to create an iterator
+
+Replace all instances of 'stream' with 'iterator'
+	or vice-versa?
+
+Refactor App::Prove to open access to new TAP::Harness source parameters
+
+
+Update docs
+
+
 TODO:
 
     - Associate YAML diagnostic with the preceding test. Currently it's

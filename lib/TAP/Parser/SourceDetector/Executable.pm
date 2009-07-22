@@ -1,13 +1,13 @@
-package TAP::Parser::Source::Executable;
+package TAP::Parser::SourceDetector::Executable;
 
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::Source          ();
+use TAP::Parser::SourceDetector          ();
 use TAP::Parser::SourceFactory   ();
 use TAP::Parser::IteratorFactory ();
 
-@ISA = qw(TAP::Parser::Source);
+@ISA = qw(TAP::Parser::SourceDetector);
 
 # Causes problem on MacOS and shouldn't be necessary anyway
 #$SIG{CHLD} = sub { wait };
@@ -16,7 +16,7 @@ TAP::Parser::SourceFactory->register_source(__PACKAGE__);
 
 =head1 NAME
 
-TAP::Parser::Source::Executable - Stream output from an executable TAP source
+TAP::Parser::SourceDetector::Executable - Stream output from an executable TAP source
 
 =head1 VERSION
 
@@ -28,13 +28,13 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  use TAP::Parser::Source::Executable;
-  my $source = TAP::Parser::Source::Executable->new;
+  use TAP::Parser::SourceDetector::Executable;
+  my $source = TAP::Parser::SourceDetector::Executable->new;
   my $stream = $source->raw_source(['/usr/bin/ruby', 'mytest.rb'])->get_stream;
 
 =head1 DESCRIPTION
 
-This is an I<executable> L<TAP::Parser::Source> class.  It has 2 jobs:
+This is an I<executable> L<TAP::Parser::SourceDetector> class.  It has 2 jobs:
 
 1. Figure out if the I<raw> source it's given is actually an executable file.
 See L<TAP::Parser::SourceFactory> for more details.
@@ -50,9 +50,9 @@ won't need to use this module directly.
 
 =head3 C<new>
 
- my $source = TAP::Parser::Source::Executable->new;
+ my $source = TAP::Parser::SourceDetector::Executable->new;
 
-Returns a new C<TAP::Parser::Source::Executable> object.
+Returns a new C<TAP::Parser::SourceDetector::Executable> object.
 
 =cut
 
@@ -204,15 +204,15 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 =head2 Example
 
-  package MyRubySource;
+  package MyRubySourceDetector;
 
   use strict;
   use vars '@ISA';
 
   use Carp qw( croak );
-  use TAP::Parser::Source::Executable;
+  use TAP::Parser::SourceDetector::Executable;
 
-  @ISA = qw( TAP::Parser::Source::Executable );
+  @ISA = qw( TAP::Parser::SourceDetector::Executable );
 
   # expect $source->(['mytest.rb', 'cmdline', 'args']);
   sub raw_source {
@@ -226,7 +226,10 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::Source>,
-L<TAP::Parser::Source::Perl>
+L<TAP::Parser::SourceDetector>,
+L<TAP::Parser::SourceDetector::Perl>,
+L<TAP::Parser::SourceDetector::File>,
+L<TAP::Parser::SourceDetector::Handle>,
+L<TAP::Parser::SourceDetector::RawTAP>
 
 =cut

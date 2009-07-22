@@ -1,15 +1,15 @@
 # subclass for testing customizing & subclassing
 
-package MyPerlSource;
+package MyPerlSourceDetector;
 
 use strict;
 use vars '@ISA';
 
 use MyCustom;
-use TAP::Parser::Source::Perl;
+use TAP::Parser::SourceDetector::Perl;
 use TAP::Parser::SourceFactory;
 
-@ISA = qw( TAP::Parser::Source::Perl MyCustom );
+@ISA = qw( TAP::Parser::SourceDetector::Perl MyCustom );
 
 TAP::Parser::SourceFactory->register_source(__PACKAGE__);
 

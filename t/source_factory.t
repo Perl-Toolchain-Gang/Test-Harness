@@ -38,14 +38,14 @@ use TAP::Parser::SourceFactory;
     like $e, qr/\QArgument to &config must be a hash reference/,
       '... and calling config with bad config should fail';
 
-    my $config = { MySource => { foo => 'bar' } };
+    my $config = { MySourceDetector => { foo => 'bar' } };
     is( $sf->config($config), $sf, '... and set config works' );
 
     # Load/Register a source
     $sf = TAP::Parser::SourceFactory->new(
-        { MySource => { accept => 'known-source' } } );
-    can_ok( 'MySource', 'can_handle' );
-    is_deeply( $sf->sources, ['MySource'], '... was registered' );
+        { MySourceDetector => { accept => 'known-source' } } );
+    can_ok( 'MySourceDetector', 'can_handle' );
+    is_deeply( $sf->sources, ['MySourceDetector'], '... was registered' );
 
     # Known source should pass
     {
@@ -57,7 +57,7 @@ use TAP::Parser::SourceFactory;
         my $error = $@;
         ok( !$error, 'make_source with known source doesnt fail' );
         diag($error) if $error;
-        isa_ok( $source, 'MySource', '... and source class' );
+        isa_ok( $source, 'MySourceDetector', '... and source class' );
         is_deeply(
             $source->raw_source, [ \"known-source" ],
             '... and raw_source as expected'
@@ -83,11 +83,11 @@ use TAP::Parser::SourceFactory;
 }
 
 # Source detection
-use_ok('TAP::Parser::Source::Executable');
-use_ok('TAP::Parser::Source::Perl');
-use_ok('TAP::Parser::Source::File');
-use_ok('TAP::Parser::Source::RawTAP');
-use_ok('TAP::Parser::Source::Handle');
+use_ok('TAP::Parser::SourceDetector::Executable');
+use_ok('TAP::Parser::SourceDetector::Perl');
+use_ok('TAP::Parser::SourceDetector::File');
+use_ok('TAP::Parser::SourceDetector::RawTAP');
+use_ok('TAP::Parser::SourceDetector::Handle');
 
 my $test_dir = File::Spec->catdir(
     (   $ENV{PERL_CORE}
@@ -100,40 +100,40 @@ my $test_dir = File::Spec->catdir(
 
 my @sources = (
     {   file  => 'source.tap',
-        class => 'TAP::Parser::Source::File',
+        class => 'TAP::Parser::SourceDetector::File',
     },
     {   file   => 'source.1',
-        class  => 'TAP::Parser::Source::File',
+        class  => 'TAP::Parser::SourceDetector::File',
         config => { File => { extensions => ['.1'] } },
     },
     {   file  => 'source.pl',
-        class => 'TAP::Parser::Source::Perl',
+        class => 'TAP::Parser::SourceDetector::Perl',
     },
     {   file  => 'source.t',
-        class => 'TAP::Parser::Source::Perl',
+        class => 'TAP::Parser::SourceDetector::Perl',
     },
     {   file  => 'source',
-        class => 'TAP::Parser::Source::Perl',
+        class => 'TAP::Parser::SourceDetector::Perl',
     },
     {   file  => 'source.sh',
-        class => 'TAP::Parser::Source::Executable',
+        class => 'TAP::Parser::SourceDetector::Executable',
     },
     {   file  => 'source.bat',
-        class => 'TAP::Parser::Source::Executable',
+        class => 'TAP::Parser::SourceDetector::Executable',
     },
     {   name   => 'raw tap string',
         source => "0..1\nok 1 - raw tap\n",
-        class  => 'TAP::Parser::Source::RawTAP',
+        class  => 'TAP::Parser::SourceDetector::RawTAP',
     },
     {   name   => 'raw tap array',
         source => [ "0..1\n", "ok 1 - raw tap\n" ],
-        class  => 'TAP::Parser::Source::RawTAP',
+        class  => 'TAP::Parser::SourceDetector::RawTAP',
     },
     {   source => \*__DATA__,
-        class  => 'TAP::Parser::Source::Handle',
+        class  => 'TAP::Parser::SourceDetector::Handle',
     },
     {   source => IO::File->new('-'),
-        class  => 'TAP::Parser::Source::Handle',
+        class  => 'TAP::Parser::SourceDetector::Handle',
     },
 );
 

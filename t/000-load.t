@@ -42,13 +42,13 @@ BEGIN {
       TAP::Parser::Scheduler
       TAP::Parser::Scheduler::Job
       TAP::Parser::Scheduler::Spinner
-      TAP::Parser::Source
+      TAP::Parser::SourceDetector
       TAP::Parser::SourceFactory
-      TAP::Parser::Source::Executable
-      TAP::Parser::Source::Perl
-      TAP::Parser::Source::File
-      TAP::Parser::Source::Handle
-      TAP::Parser::Source::RawTAP
+      TAP::Parser::SourceDetector::Executable
+      TAP::Parser::SourceDetector::Perl
+      TAP::Parser::SourceDetector::File
+      TAP::Parser::SourceDetector::Handle
+      TAP::Parser::SourceDetector::RawTAP
       TAP::Parser::YAMLish::Reader
       TAP::Parser::YAMLish::Writer
       TAP::Parser::Utils

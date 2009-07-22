@@ -14,7 +14,7 @@ use constant sources => [];
 
 =head1 NAME
 
-TAP::Parser::SourceFactory - Figures out which Source objects to create from 'raw' sources
+TAP::Parser::SourceFactory - Figures out which SourceDetector objects to create from 'raw' sources
 
 =head1 VERSION
 
@@ -33,7 +33,7 @@ $VERSION = '3.18';
 =head1 DESCRIPTION
 
 This is a factory class that, given a 'raw' source of TAP, figures out what
-type of source it is and creates an appropriate L<TAP::Parser::Source> object.
+type of source it is and creates an appropriate L<TAP::Parser::SourceDetector> object.
 
 If you're a plugin author, you'll be interested in how to L</register_source>s,
 how L</detect_source> works, and how we L</assemble_meta> data.
@@ -60,7 +60,7 @@ sub _initialize {
 
 =head3 C<register_source>
 
-Registers a new L<TAP::Parser::Source> with this factory.
+Registers a new L<TAP::Parser::SourceDetector> with this factory.
 
   __PACKAGE__->register_source( $source_class );
 
@@ -69,8 +69,8 @@ Registers a new L<TAP::Parser::Source> with this factory.
 sub register_source {
     my ( $class, $dclass ) = @_;
 
-    confess("$dclass must inherit from TAP::Parser::Source!")
-      unless UNIVERSAL::isa( $dclass, 'TAP::Parser::Source' );
+    confess("$dclass must inherit from TAP::Parser::SourceDetector!")
+      unless UNIVERSAL::isa( $dclass, 'TAP::Parser::SourceDetector' );
 
     my $sources = $class->sources;
     push @{$sources}, $dclass
@@ -94,7 +94,7 @@ the sources during detection & creation.  Class names may be fully qualified
 or abbreviated, eg:
 
   # these are equivalent
-  $sf->sources_config({ 'TAP::Parser::Source::Perl' => { %config } });
+  $sf->sources_config({ 'TAP::Parser::SourceDetector::Perl' => { %config } });
   $sf->sources_config({ 'Perl' => { %config } });
 
 =cut
@@ -125,14 +125,14 @@ sub _config_for {
 Loads the source classes defined in L</config>.  For example, given a config:
 
   $sf->config({
-    MySource => { some => 'config' },
+    MySourceDetector => { some => 'config' },
   });
 
-C<load_sources> will attempt to load the C<MySource> class by looking in
+C<load_sources> will attempt to load the C<MySourceDetector> class by looking in
 C<@INC> for it in this order:
 
-  TAP::Parser::Source::MySource
-  MySource
+  TAP::Parser::SourceDetector::MySourceDetector
+  MySourceDetector
 
 C<croak>s on error.
 
@@ -152,15 +152,15 @@ sub _load_source {
     my ( $self, $source ) = @_;
 
     my @errors;
-    foreach my $sclass ( "TAP::Parser::Source::$source", $source ) {
-        return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::Source' );
+    foreach my $sclass ( "TAP::Parser::SourceDetector::$source", $source ) {
+        return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::SourceDetector' );
         eval "use $sclass";
         if ( my $e = $@ ) {
             push @errors, $e;
             next;
         }
-        return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::Source' );
-        push @errors, "source '$sclass' is not a TAP::Parser::Source";
+        return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::SourceDetector' );
+        push @errors, "source '$sclass' is not a TAP::Parser::SourceDetector";
     }
 
     $self->_croak( "Cannot load source '$source': " . join( "\n", @errors ) );
@@ -170,7 +170,7 @@ sub _load_source {
 
 =head3 C<make_source>
 
-Detects and creates a new L<TAP::Parser::Source> for the C<$raw_source_ref>
+Detects and creates a new L<TAP::Parser::SourceDetector> for the C<$raw_source_ref>
 given (see L</detect_source>).  Dies on error.
 
 =cut
@@ -188,7 +188,7 @@ sub make_source {
     return $$raw_source_ref
       if ( $ref_type eq 'SCALAR'
         && ref($$raw_source_ref)
-        && UNIVERSAL::isa( $$raw_source_ref, 'TAP::Parser::Source' ) );
+        && UNIVERSAL::isa( $$raw_source_ref, 'TAP::Parser::SourceDetector' ) );
 
     # figure out what kind of source it is
     my ( $sd_class, $meta ) = $self->detect_source($raw_source_ref);
@@ -209,7 +209,7 @@ sub make_source {
 =head3 C<detect_source>
 
 Given a reference to the raw source, detects what kind of source it is and
-returns I<one> L<TAP::Parser::Source> (the most confident one).  Dies
+returns I<one> L<TAP::Parser::SourceDetector> (the most confident one).  Dies
 on error.
 
 The detection algorithm works something like this:
@@ -369,7 +369,7 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 =head2 Example
 
 If we've done things right, you'll probably want to write a new source,
-rather than sub-classing this (see L<TAP::Parser::Source> for that).
+rather than sub-classing this (see L<TAP::Parser::SourceDetector> for that).
 
 But in case you find the need to...
 
@@ -405,11 +405,10 @@ extensible TAP source detective work by Steve Purkis.
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::Source>,
-L<TAP::Parser::Source>,
-L<TAP::Parser::Source::Perl>,
-L<TAP::Parser::Source::RawTAP>,
-L<TAP::Parser::Source::Executable>
+L<TAP::Parser::SourceDetector>,
+L<TAP::Parser::SourceDetector::Perl>,
+L<TAP::Parser::SourceDetector::RawTAP>,
+L<TAP::Parser::SourceDetector::Executable>
 
 =cut
 

@@ -1,4 +1,4 @@
-package TAP::Parser::Source;
+package TAP::Parser::SourceDetector;
 
 use strict;
 use vars qw($VERSION @ISA);
@@ -10,7 +10,7 @@ use TAP::Parser::IteratorFactory ();
 
 =head1 NAME
 
-TAP::Parser::Source - Base class for different TAP sources
+TAP::Parser::SourceDetector - Base class for different TAP source detectors
 
 =head1 VERSION
 
@@ -26,8 +26,8 @@ $VERSION = '3.18';
   # see TAP::Parser::SourceFactory for general usage
 
   # must be sub-classed for use
-  package MySource;
-  use base qw( TAP::Parser::Source );
+  package MySourceDetector;
+  use base qw( TAP::Parser::SourceDetector );
   sub can_handle  { return $confidence_level }
   sub make_source { return $new_source }
   sub get_stream  { return $iterator }
@@ -38,16 +38,16 @@ $VERSION = '3.18';
 
 This is the base class for a TAP I<source>, i.e. something that produces a
 stream of TAP for the parser to consume, such as an executable file, a text
-file, an archive, an IO handle, a database, etc.  A C<TAP::Parser::Source>
+file, an archive, an IO handle, a database, etc.  A C<TAP::Parser::SourceDetector>
 is a wrapper around the I<raw> TAP source that does whatever is necessary to
 capture the stream of TAP produced, and make it available to the Parser
 through a L<TAP::Parser::Iterator> object.
 
-C<Sources> must also implement the I<source detection> interface used by
+C<SourceDetectors> must also implement the I<source detection> interface used by
 L<TAP::Parser::SourceFactory> to determine how to get TAP out of a given
 I<raw> source.  See L</can_handle> and L</make_source> for that.
 
-Unless you're writing a new L<TAP::Parser::Source>, a plugin or subclassing
+Unless you're writing a new L<TAP::Parser::SourceDetector>, a plugin or subclassing
 L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head1 METHODS
@@ -56,9 +56,9 @@ L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head3 C<new>
 
- my $source = TAP::Parser::Source->new;
+ my $source = TAP::Parser::SourceDetector->new;
 
-Returns a new C<TAP::Parser::Source> object.
+Returns a new C<TAP::Parser::SourceDetector> object.
 
 =cut
 
@@ -121,7 +121,7 @@ At the very least, C<raw_source_ref> is I<required>.  This is a reference as
 it may contain large amounts of data (eg: raw TAP output), not to mention
 different data types.
 
-Returns a new L<TAP::Parser::Source> object for use by the L<TAP::Parser>.
+Returns a new L<TAP::Parser::SourceDetector> object for use by the L<TAP::Parser>.
 C<croak>s on error.
 
 This is used primarily by L<TAP::Parser::SourceFactory>.
@@ -242,15 +242,15 @@ L<TAP::Parser::SourceFactory/register_source>.
 
 =head2 Example
 
-  package MySource;
+  package MySourceDetector;
 
   use strict;
   use vars '@ISA'; # compat with older perls
 
-  use MySource; # see TAP::Parser::Source
+  use MySourceDetector; # see TAP::Parser::SourceDetector
   use TAP::Parser::SourceFactory;
 
-  @ISA = qw( TAP::Parser::Source );
+  @ISA = qw( TAP::Parser::SourceDetector );
 
   TAP::Parser::SourceFactory->register_source( __PACKAGE__ );
 
@@ -281,7 +281,7 @@ L<TAP::Parser::SourceFactory/register_source>.
 
   sub make_source {
       my ($class, $args) = @_;
-      my $source = MySource->new;
+      my $source = MySourceDetector->new;
       # do anything special here...
       $source->merge( $args->{merge} );
              ->raw_source( $args->{raw_source_ref} );
@@ -306,11 +306,11 @@ Source detection stuff added by Steve Purkis
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::SourceFactory>,
-L<TAP::Parser::Source::Executable>,
-L<TAP::Parser::Source::Perl>,
-L<TAP::Parser::Source::File>,
-L<TAP::Parser::Source::Handle>,
-L<TAP::Parser::Source::RawTAP>
+L<TAP::Parser::SourceDetector::Executable>,
+L<TAP::Parser::SourceDetector::Perl>,
+L<TAP::Parser::SourceDetector::File>,
+L<TAP::Parser::SourceDetector::Handle>,
+L<TAP::Parser::SourceDetector::RawTAP>
 
 =cut
 

@@ -1,14 +1,14 @@
 # subclass for testing TAP::Harness custom sources
 
-package MyFileSource;
+package MyFileSourceDetector;
 
 use strict;
 use vars qw( @ISA $LAST_OBJ );
 
 use MyCustom;
-use TAP::Parser::Source::File;
+use TAP::Parser::SourceDetector::File;
 
-@ISA      = qw( TAP::Parser::Source::File MyCustom );
+@ISA      = qw( TAP::Parser::SourceDetector::File MyCustom );
 $LAST_OBJ = undef;
 
 TAP::Parser::SourceFactory->register_source(__PACKAGE__);

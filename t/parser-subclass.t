@@ -32,8 +32,8 @@ my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 
     ok( $p->{initialized}, 'new subclassed parser' );
 
-    is( $p->source_class      => 'MySource',     'source_class' );
-    is( $p->perl_source_class => 'MyPerlSource', 'perl_source_class' );
+    is( $p->source_class      => 'MySourceDetector',     'source_class' );
+    is( $p->perl_source_class => 'MyPerlSourceDetector', 'perl_source_class' );
     is( $p->grammar_class     => 'MyGrammar',    'grammar_class' );
     is( $p->iterator_factory_class => 'MyIteratorFactory',
         'iterator_factory_class'
@@ -42,8 +42,8 @@ my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
         'result_factory_class'
     );
 
-    is( $INIT{MyPerlSource},   1, 'initialized MyPerlSource' );
-    is( $CUSTOM{MyPerlSource}, 1, '... and it was customized' );
+    is( $INIT{MyPerlSourceDetector},   1, 'initialized MyPerlSourceDetector' );
+    is( $CUSTOM{MyPerlSourceDetector}, 1, '... and it was customized' );
     is( $INIT{MyGrammar},      1, 'initialized MyGrammar' );
     is( $CUSTOM{MyGrammar},    1, '... and it was customized' );
 
@@ -78,12 +78,12 @@ SKIP: {    # non-perl source
     my $file = catfile( @t_path, 't', 'data', 'catme.1' );
     my $p = TAP::Parser::SubclassTest->new(
         {   exec => [ $cat => $file ],
-            sources => { MySource => { accept_all => 1 } },
+            sources => { MySourceDetector => { accept_all => 1 } },
         }
     );
 
-    is( $INIT{MySource},     1, 'initialized MySource subclass' );
-    is( $CUSTOM{MySource},   1, '... and it was customized' );
+    is( $INIT{MySourceDetector},     1, 'initialized MySourceDetector subclass' );
+    is( $CUSTOM{MySourceDetector},   1, '... and it was customized' );
     is( $INIT{MyIterator},   1, 'initialized MyIterator subclass' );
     is( $CUSTOM{MyIterator}, 1, '... and it was customized' );
 }

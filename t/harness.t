@@ -719,7 +719,7 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             sources   => {
-                MyFileSource => { extensions => ['.1'] },
+                MyFileSourceDetector => { extensions => ['.1'] },
             },
         }
     );
@@ -730,11 +730,11 @@ SKIP: {
     ok( !$e, 'no error on load custom source' ) || diag($e);
 
     no warnings 'once';
-    can_ok( 'MyFileSource', 'new' );
-    ok( $main::INIT{MyFileSource}, '... and an obj was instantiated' );
+    can_ok( 'MyFileSourceDetector', 'new' );
+    ok( $main::INIT{MyFileSourceDetector}, '... and an obj was instantiated' );
 
-    my $source = $MyFileSource::LAST_OBJ || {};
-    isa_ok( $source, 'MyFileSource', '... and MyFileSource obj was created' );
+    my $source = $MyFileSourceDetector::LAST_OBJ || {};
+    isa_ok( $source, 'MyFileSourceDetector', '... and MyFileSourceDetector obj was created' );
     is( $source->raw_source, $source_test,
         '... and has the right raw_source'
     );

@@ -17,10 +17,10 @@ use Test::More tests => 68;
 use File::Spec;
 
 use EmptyParser;
-use TAP::Parser::Source;
-use TAP::Parser::Source::Perl;
-use TAP::Parser::Source::File;
-use TAP::Parser::Source::RawTAP;
+use TAP::Parser::SourceDetector;
+use TAP::Parser::SourceDetector::Perl;
+use TAP::Parser::SourceDetector::File;
+use TAP::Parser::SourceDetector::RawTAP;
 
 my $parser = EmptyParser->new;
 my $dir    = File::Spec->catdir(
@@ -36,9 +36,9 @@ my $perl = $^X;
 
 # Abstract base class tests
 {
-    can_ok 'TAP::Parser::Source', 'new';
-    my $source = TAP::Parser::Source->new;
-    isa_ok $source, 'TAP::Parser::Source';
+    can_ok 'TAP::Parser::SourceDetector', 'new';
+    my $source = TAP::Parser::SourceDetector->new;
+    isa_ok $source, 'TAP::Parser::SourceDetector';
 
     can_ok $source, 'raw_source';
     is $source->raw_source('hello'), $source, '... can set';
@@ -66,8 +66,8 @@ my $perl = $^X;
 # Executable source tests
 {
     my $test = File::Spec->catfile( $dir, 'source' );
-    my $source = TAP::Parser::Source::Executable->new;
-    isa_ok $source, 'TAP::Parser::Source::Executable';
+    my $source = TAP::Parser::SourceDetector::Executable->new;
+    isa_ok $source, 'TAP::Parser::SourceDetector::Executable';
 
     can_ok $source, 'source';
     eval { $source->source("$perl -It/lib $test") };
@@ -91,8 +91,8 @@ my $perl = $^X;
 # Perl source tests
 {
     my $test = File::Spec->catfile( $dir, 'source' );
-    my $source = TAP::Parser::Source::Perl->new;
-    isa_ok $source, 'TAP::Parser::Source::Perl',
+    my $source = TAP::Parser::SourceDetector::Perl->new;
+    isa_ok $source, 'TAP::Parser::SourceDetector::Perl',
       '... and the object it returns';
 
     can_ok $source, 'source';
@@ -116,13 +116,13 @@ my $perl = $^X;
     );
 }
 
-# coverage test for TAP::Parser::Source::Executable
+# coverage test for TAP::Parser::SourceDetector::Executable
 
 {
 
     # coverage for method get_steam
     my $source
-      = TAP::Parser::Source::Executable->new( { parser => $parser } );
+      = TAP::Parser::SourceDetector::Executable->new( { parser => $parser } );
 
     my @die;
     eval {
@@ -136,8 +136,8 @@ my $perl = $^X;
 
 # Raw TAP source tests
 {
-    my $source = TAP::Parser::Source::RawTAP->new;
-    isa_ok $source, 'TAP::Parser::Source::RawTAP';
+    my $source = TAP::Parser::SourceDetector::RawTAP->new;
+    isa_ok $source, 'TAP::Parser::SourceDetector::RawTAP';
 
     can_ok $source, 'raw_source';
     eval { $source->raw_source("1..1\nok 1\n") };
@@ -162,8 +162,8 @@ my $perl = $^X;
 # Text file TAP source tests
 {
     my $test = File::Spec->catfile( $dir, 'source.tap' );
-    my $source = TAP::Parser::Source::File->new;
-    isa_ok $source, 'TAP::Parser::Source::File';
+    my $source = TAP::Parser::SourceDetector::File->new;
+    isa_ok $source, 'TAP::Parser::SourceDetector::File';
 
     can_ok $source, 'raw_source';
     ok $source->raw_source( \$test ),
@@ -183,8 +183,8 @@ my $perl = $^X;
 # IO::Handle TAP source tests
 {
     my $test = File::Spec->catfile( $dir, 'source.tap' );
-    my $source = TAP::Parser::Source::File->new;
-    isa_ok $source, 'TAP::Parser::Source::File';
+    my $source = TAP::Parser::SourceDetector::File->new;
+    isa_ok $source, 'TAP::Parser::SourceDetector::File';
 
     can_ok $source, 'raw_source';
     ok $source->raw_source( \$test ),

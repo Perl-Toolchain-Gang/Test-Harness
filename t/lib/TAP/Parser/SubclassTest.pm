@@ -8,16 +8,16 @@ use vars qw(@ISA);
 use TAP::Parser;
 
 use MyCustom;
-use MySource;
-use MyPerlSource;
+use MySourceDetector;
+use MyPerlSourceDetector;
 use MyGrammar;
 use MyIteratorFactory;
 use MyResultFactory;
 
 @ISA = qw( TAP::Parser MyCustom );
 
-sub _default_source_class           {'MySource'}            # deprecated
-sub _default_perl_source_class      {'MyPerlSource'}        # deprecated
+sub _default_source_class           {'MySourceDetector'}            # deprecated
+sub _default_perl_source_class      {'MyPerlSourceDetector'}        # deprecated
 sub _default_grammar_class          {'MyGrammar'}
 sub _default_iterator_factory_class {'MyIteratorFactory'}
 sub _default_result_factory_class   {'MyResultFactory'}

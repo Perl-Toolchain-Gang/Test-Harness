@@ -17,8 +17,8 @@ use Test::More tests => 11;
 use File::Spec::Functions qw( catfile updir );
 use TAP::Parser;
 
-use_ok('MySource');
-use_ok('MyPerlSource');
+use_ok('MySourceDetector');
+use_ok('MyPerlSourceDetector');
 use_ok('MyGrammar');
 use_ok('MyIteratorFactory');
 use_ok('MyResultFactory');
@@ -26,8 +26,8 @@ use_ok('MyResultFactory');
 my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 my $source = catfile( @t_path, 't', 'source_tests', 'source' );
 my %customize = (
-    source_class           => 'MySource',
-    perl_source_class      => 'MyPerlSource',
+    source_class           => 'MySourceDetector',
+    perl_source_class      => 'MyPerlSourceDetector',
     grammar_class          => 'MyGrammar',
     iterator_factory_class => 'MyIteratorFactory',
     result_factory_class   => 'MyResultFactory',

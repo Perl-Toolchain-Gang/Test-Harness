@@ -1,19 +1,19 @@
-package TAP::Parser::Source::File;
+package TAP::Parser::SourceDetector::File;
 
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::Source          ();
+use TAP::Parser::SourceDetector          ();
 use TAP::Parser::SourceFactory   ();
 use TAP::Parser::IteratorFactory ();
 
-@ISA = qw(TAP::Parser::Source);
+@ISA = qw(TAP::Parser::SourceDetector);
 
 TAP::Parser::SourceFactory->register_source(__PACKAGE__);
 
 =head1 NAME
 
-TAP::Parser::Source::File - Stream TAP from a text file.
+TAP::Parser::SourceDetector::File - Stream TAP from a text file.
 
 =head1 VERSION
 
@@ -25,13 +25,13 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  use TAP::Parser::Source::File;
-  my $source = TAP::Parser::Source::File->new;
+  use TAP::Parser::SourceDetector::File;
+  my $source = TAP::Parser::SourceDetector::File->new;
   my $stream = $source->source (\"1..1\nok 1\n" )->get_stream;
 
 =head1 DESCRIPTION
 
-This is a I<raw TAP stored in a file> L<TAP::Parser::Source> - it has 2 jobs:
+This is a I<raw TAP stored in a file> L<TAP::Parser::SourceDetector> - it has 2 jobs:
 
 1. Figure out if the I<raw> source it's given is a file containing raw TAP
 output.  See L<TAP::Parser::SourceFactory> for more details.
@@ -47,9 +47,9 @@ won't need to use this module directly.
 
 =head3 C<new>
 
- my $source = TAP::Parser::Source::File->new;
+ my $source = TAP::Parser::SourceDetector::File->new;
 
-Returns a new C<TAP::Parser::Source::File> object.
+Returns a new C<TAP::Parser::SourceDetector::File> object.
 
 =cut
 
@@ -150,8 +150,10 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::Source>,
-L<TAP::Parser::Source::Executable>,
-L<TAP::Parser::Source::Perl>
+L<TAP::Parser::SourceDetector>,
+L<TAP::Parser::SourceDetector::Executable>,
+L<TAP::Parser::SourceDetector::Perl>,
+L<TAP::Parser::SourceDetector::Handle>,
+L<TAP::Parser::SourceDetector::RawTAP>
 
 =cut

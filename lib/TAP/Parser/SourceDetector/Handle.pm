@@ -1,19 +1,19 @@
-package TAP::Parser::Source::Handle;
+package TAP::Parser::SourceDetector::Handle;
 
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::Source          ();
+use TAP::Parser::SourceDetector          ();
 use TAP::Parser::SourceFactory   ();
 use TAP::Parser::IteratorFactory ();
 
-@ISA = qw(TAP::Parser::Source);
+@ISA = qw(TAP::Parser::SourceDetector);
 
 TAP::Parser::SourceFactory->register_source(__PACKAGE__);
 
 =head1 NAME
 
-TAP::Parser::Source::Handle - Stream TAP from an IO::Handle or a GLOB.
+TAP::Parser::SourceDetector::Handle - Stream TAP from an IO::Handle or a GLOB.
 
 =head1 VERSION
 
@@ -25,13 +25,13 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  use TAP::Parser::Source::Handle;
-  my $source = TAP::Parser::Source::Handle->new;
+  use TAP::Parser::SourceDetector::Handle;
+  my $source = TAP::Parser::SourceDetector::Handle->new;
   my $stream = $source->raw_source( \*TAP_FILE )->get_stream;
 
 =head1 DESCRIPTION
 
-This is a I<raw TAP stored in an IO Handle> L<TAP::Parser::Source> class.  It
+This is a I<raw TAP stored in an IO Handle> L<TAP::Parser::SourceDetector> class.  It
 has 2 jobs:
 
 1. Figure out if the I<raw> source it's given is an L<IO::Handle> or GLOB
@@ -48,9 +48,9 @@ won't need to use this module directly.
 
 =head3 C<new>
 
- my $source = TAP::Parser::Source::Handle->new;
+ my $source = TAP::Parser::SourceDetector::Handle->new;
 
-Returns a new C<TAP::Parser::Source::Handle> object.
+Returns a new C<TAP::Parser::SourceDetector::Handle> object.
 
 =cut
 
@@ -138,8 +138,10 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::Source>,
-L<TAP::Parser::Source::Executable>,
-L<TAP::Parser::Source::Perl>
+L<TAP::Parser::SourceDetector>,
+L<TAP::Parser::SourceDetector::Executable>,
+L<TAP::Parser::SourceDetector::Perl>,
+L<TAP::Parser::SourceDetector::File>,
+L<TAP::Parser::SourceDetector::RawTAP>
 
 =cut

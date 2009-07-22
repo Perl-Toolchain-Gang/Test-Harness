@@ -1,4 +1,4 @@
-package TAP::Parser::Source::Perl;
+package TAP::Parser::SourceDetector::Perl;
 
 use strict;
 use Config;
@@ -7,17 +7,17 @@ use vars qw($VERSION @ISA);
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS => ( $^O eq 'VMS' );
 
-use TAP::Parser::Source::Executable ();
+use TAP::Parser::SourceDetector::Executable ();
 use TAP::Parser::SourceFactory      ();
 use TAP::Parser::Utils qw( split_shell );
 
-@ISA = 'TAP::Parser::Source::Executable';
+@ISA = 'TAP::Parser::SourceDetector::Executable';
 
 TAP::Parser::SourceFactory->register_source(__PACKAGE__);
 
 =head1 NAME
 
-TAP::Parser::Source::Perl - Stream TAP from a Perl executable
+TAP::Parser::SourceDetector::Perl - Stream TAP from a Perl executable
 
 =head1 VERSION
 
@@ -29,13 +29,13 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  use TAP::Parser::Source::Perl;
-  my $perl = TAP::Parser::Source::Perl->new;
+  use TAP::Parser::SourceDetector::Perl;
+  my $perl = TAP::Parser::SourceDetector::Perl->new;
   my $stream = $perl->raw_source( [ $filename, @args ] )->get_stream;
 
 =head1 DESCRIPTION
 
-This is a I<Perl> L<TAP::Parser::Source> - it has 2 jobs:
+This is a I<Perl> L<TAP::Parser::SourceDetector> - it has 2 jobs:
 
 1. Figure out if the I<raw> source it's given is actually a Perl script.  See
 L<TAP::Parser::SourceFactory> for more details.
@@ -51,9 +51,9 @@ won't need to use this module directly.
 
 =head3 C<new>
 
- my $perl = TAP::Parser::Source::Perl->new;
+ my $perl = TAP::Parser::SourceDetector::Perl->new;
 
-Returns a new C<TAP::Parser::Source::Perl> object.
+Returns a new C<TAP::Parser::SourceDetector::Perl> object.
 
 =cut
 
@@ -243,7 +243,7 @@ sub _libs2switches {
 
 Get the shebang line for a script file.
 
-  my $shebang = TAP::Parser::Source::Perl->shebang( $some_script );
+  my $shebang = TAP::Parser::SourceDetector::Perl->shebang( $some_script );
 
 May be called as a class method
 
@@ -283,10 +283,10 @@ May be called as a class method
 Decode any taint switches from a Perl shebang line.
 
   # $taint will be 't'
-  my $taint = TAP::Parser::Source::Perl->get_taint( '#!/usr/bin/perl -t' );
+  my $taint = TAP::Parser::SourceDetector::Perl->get_taint( '#!/usr/bin/perl -t' );
 
   # $untaint will be undefined
-  my $untaint = TAP::Parser::Source::Perl->get_taint( '#!/usr/bin/perl' );
+  my $untaint = TAP::Parser::SourceDetector::Perl->get_taint( '#!/usr/bin/perl' );
 
 =cut
 
@@ -339,15 +339,15 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 =head2 Example
 
-  package MyPerlSource;
+  package MyPerlSourceDetector;
 
   use strict;
   use vars '@ISA';
 
   use Carp qw( croak );
-  use TAP::Parser::Source::Perl;
+  use TAP::Parser::SourceDetector::Perl;
 
-  @ISA = qw( TAP::Parser::Source::Perl );
+  @ISA = qw( TAP::Parser::SourceDetector::Perl );
 
   sub raw_source {
       my ($self, $args) = @_;
@@ -372,7 +372,10 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::Source>,
-L<TAP::Parser::Source::Executable>
+L<TAP::Parser::SourceDetector>,
+L<TAP::Parser::SourceDetector::Executable>,
+L<TAP::Parser::SourceDetector::File>,
+L<TAP::Parser::SourceDetector::Handle>,
+L<TAP::Parser::SourceDetector::RawTAP>
 
 =cut
