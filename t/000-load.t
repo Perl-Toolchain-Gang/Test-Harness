@@ -42,6 +42,7 @@ BEGIN {
       TAP::Parser::Scheduler
       TAP::Parser::Scheduler::Job
       TAP::Parser::Scheduler::Spinner
+      TAP::Parser::Source
       TAP::Parser::SourceDetector
       TAP::Parser::SourceFactory
       TAP::Parser::SourceDetector::Executable
