@@ -762,9 +762,8 @@ sub _get_parser_args {
                  $self->_croak( "TAP::Harness Can't find test_args for " . $job->description );
              }
         }
-        else {
-             $args{test_args} = $test_args;
-        }
+
+        $args{test_args} = $test_args;
     }
 
     return \%args;
