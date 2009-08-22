@@ -3,7 +3,7 @@
 use strict;
 use lib 't/lib';
 
-use Test::More tests => 88;
+use Test::More tests => 90;
 
 BEGIN {
 
