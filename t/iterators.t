@@ -7,7 +7,7 @@ use Test::More tests => 76;
 
 use File::Spec;
 use TAP::Parser;
-use TAP::Parser::IteratorFactory;
+use TAP::Parser::Iterator::Array;
 use Config;
 
 sub array_ref_from {
@@ -86,7 +86,6 @@ sub _can_open3 {
     return $Config{d_fork};
 }
 
-my $factory = TAP::Parser::IteratorFactory->new;
 for my $test (@schedule) {
     SKIP: {
         my $name       = $test->{name};
@@ -98,7 +97,8 @@ for my $test (@schedule) {
         my $iter
           = $class
           ? $class->new($source)
-          : $factory->make_iterator($source);
+          : make_iterator($source);
+
         ok $iter,     "$name: We should be able to create a new iterator";
         isa_ok $iter, 'TAP::Parser::Iterator',
           '... and the object it returns';
@@ -137,7 +137,7 @@ for my $test (@schedule) {
 
     # coverage tests for the ctor
 
-    my $stream = $factory->make_iterator( IO::Handle->new );
+    my $stream = make_iterator( IO::Handle->new );
 
     isa_ok $stream, 'TAP::Parser::Iterator::Stream';
 
@@ -145,8 +145,7 @@ for my $test (@schedule) {
 
     eval {
         local $SIG{__DIE__} = sub { push @die, @_ };
-
-        $factory->make_iterator( \1 );    # a ref to a scalar
+        make_iterator( \1 );    # a ref to a scalar
     };
 
     is @die, 1, 'coverage of error case';
@@ -159,7 +158,7 @@ for my $test (@schedule) {
 
     # coverage test for VMS case
 
-    my $stream = $factory->make_iterator(
+    my $stream = make_iterator(
         [   'not ',
             'ok 1 - I hate VMS',
         ]
@@ -170,7 +169,7 @@ for my $test (@schedule) {
 
     # coverage test for VMS case - nothing after 'not'
 
-    $stream = $factory->make_iterator(
+    $stream = make_iterator(
         [   'not ',
         ]
     );
@@ -187,8 +186,7 @@ SKIP: {
 
     eval {
         local $SIG{__DIE__} = sub { push @die, @_ };
-
-        $factory->make_iterator( {} );
+        make_iterator( {} );
     };
 
     is @die, 1, 'coverage testing for TPI::Process';
@@ -196,7 +194,7 @@ SKIP: {
     like pop @die, qr/Must supply a command to execute/,
       '...and we died as expected';
 
-    my $parser = $factory->make_iterator(
+    my $parser = make_iterator(
         {   command => [
                 $^X,
                 File::Spec->catfile( 't', 'sample-tests', 'out_err_mix' )
@@ -212,6 +210,25 @@ SKIP: {
     # bug which frequently throws an error here otherwise.
     $parser->next;
 }
+
+sub make_iterator {
+    my $thing = shift;
+    my $ref = ref $thing;
+    if ( $ref eq 'GLOB' || UNIVERSAL::isa( $ref, 'IO::Handle' ) ) {
+	return TAP::Parser::Iterator::Stream->new( $thing );
+    }
+    elsif ( $ref eq 'ARRAY' ) {
+	return TAP::Parser::Iterator::Array->new( $thing );
+    }
+    elsif ( $ref eq 'HASH' ) {
+	return TAP::Parser::Iterator::Process->new( $thing );
+    }
+    else {
+        die "Can't iterate with a $ref";
+    }
+}
+
+
 __DATA__
 one
 two

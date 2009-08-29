@@ -8,14 +8,13 @@ use TAP::Parser::Grammar            ();
 use TAP::Parser::Result             ();
 use TAP::Parser::ResultFactory      ();
 use TAP::Parser::Source             ();
+use TAP::Parser::Iterator           ();
+use TAP::Parser::SourceFactory      ();
 use TAP::Parser::SourceDetector::Executable ();
 use TAP::Parser::SourceDetector::Perl       ();
 use TAP::Parser::SourceDetector::File       ();
 use TAP::Parser::SourceDetector::RawTAP     ();
 use TAP::Parser::SourceDetector::Handle     ();
-use TAP::Parser::Iterator           ();
-use TAP::Parser::IteratorFactory    ();
-use TAP::Parser::SourceFactory      ();
 
 use Carp qw( confess );
 
@@ -61,10 +60,7 @@ BEGIN {    # making accessors
           start_time
           end_time
           skip_all
-          source_class
-          perl_source_class
           grammar_class
-          iterator_factory_class
           result_factory_class
           source_factory_class
           )
@@ -243,38 +239,12 @@ class by looking in C<@INC> for it in this order:
 See L<TAP::Parser::SourceFactory>, L<TAP::Parser::SourceDetector> and subclasses for
 more details.
 
-=item * C<source_class>
-
-I<DEPRECATED> - no longer used.
-
-This option was introduced to let you easily customize which I<source> class
-the parser should use.  It defaults to L<TAP::Parser::SourceDetector::Executable>.
-
-See also L</make_source>.
-
-=item * C<perl_source_class>
-
-I<DEPRECATED> - no longer used.
-
-This option was introduced to let you easily customize which I<perl source>
-class the parser should use.  It defaults to L<TAP::Parser::SourceDetector::Perl>.
-
-See also L</make_perl_source>.
-
 =item * C<grammar_class>
 
 This option was introduced to let you easily customize which I<grammar> class
 the parser should use.  It defaults to L<TAP::Parser::Grammar>.
 
 See also L</make_grammar>.
-
-=item * C<iterator_factory_class>
-
-This option was introduced to let you easily customize which I<iterator>
-factory class the parser should use.  It defaults to
-L<TAP::Parser::IteratorFactory>.
-
-See also L</make_iterator>.
 
 =item * C<result_factory_class>
 
@@ -299,10 +269,7 @@ L<TAP::Parser::SourceFactory>.
 # new() implementation supplied by TAP::Base
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub _default_source_class {'TAP::Parser::SourceDetector::Executable'}    # deprecated
-sub _default_perl_source_class {'TAP::Parser::SourceDetector::Perl'}     # deprecated
 sub _default_grammar_class     {'TAP::Parser::Grammar'}
-sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
 sub _default_result_factory_class   {'TAP::Parser::ResultFactory'}
 sub _default_source_factory_class   {'TAP::Parser::SourceFactory'}
 
@@ -352,38 +319,12 @@ sub run {
 
 ##############################################################################
 
-=head3 C<make_source>
-
-I<DEPRECATED> - no longer used.
-
-Make a new L<TAP::Parser::SourceDetector::Executable> object and return it.  Passes through any
-arguments given.
-
-The C<source_class> can be customized, as described in L</new>.
-
-=head3 C<make_perl_source>
-
-I<DEPRECATED> - no longer used.
-
-Make a new L<TAP::Parser::SourceDetector::Perl> object and return it.  Passes through
-any arguments given.
-
-The C<perl_source_class> can be customized, as described in L</new>.
-
 =head3 C<make_grammar>
 
 Make a new L<TAP::Parser::Grammar> object and return it.  Passes through any
 arguments given.
 
 The C<grammar_class> can be customized, as described in L</new>.
-
-=head3 C<make_iterator>
-
-Make a new L<TAP::Parser::Iterator> object using the parser's
-L<TAP::Parser::IteratorFactory>, and return it.  Passes through any arguments
-given.
-
-The C<iterator_factory_class> can be customized, as described in L</new>.
 
 =head3 C<make_result>
 
@@ -403,11 +344,8 @@ C<source_factory_class> can be customized, as described in L</new>.
 =cut
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub make_source         { shift->source_class->new(@_); }         # deprecated
-sub make_perl_source    { shift->perl_source_class->new(@_); }    # deprecated
 sub make_source_factory { shift->source_factory_class->new(@_); }
 sub make_grammar        { shift->grammar_class->new(@_); }
-sub make_iterator { shift->iterator_factory_class->make_iterator(@_); }
 sub make_result   { shift->result_factory_class->make_result(@_); }
 
 {
@@ -446,10 +384,7 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
     );
 
     my @class_overrides = qw(
-      source_class
-      perl_source_class
       grammar_class
-      iterator_factory_class
       result_factory_class
       source_factory_class
     );

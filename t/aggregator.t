@@ -6,7 +6,7 @@ use lib 't/lib';
 use Test::More tests => 81;
 
 use TAP::Parser;
-use TAP::Parser::IteratorFactory;
+use TAP::Parser::Iterator::Array;
 use TAP::Parser::Aggregator;
 
 my $tap = <<'END_TAP';
@@ -20,8 +20,7 @@ not ok 4 - this is a real failure
 ok 5 # skip we have no description
 END_TAP
 
-my $factory = TAP::Parser::IteratorFactory->new;
-my $stream = $factory->make_iterator( [ split /\n/ => $tap ] );
+my $stream = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
 isa_ok $stream, 'TAP::Parser::Iterator';
 
 my $parser1 = TAP::Parser->new( { stream => $stream } );

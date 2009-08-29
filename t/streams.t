@@ -6,15 +6,15 @@ use lib 't/lib';
 use Test::More tests => 49;
 
 use TAP::Parser;
-use TAP::Parser::IteratorFactory;
+use TAP::Parser::Iterator::Array;
+use TAP::Parser::Iterator::Stream;
 
 my $STREAMED   = 'TAP::Parser';
 my $ITER       = 'TAP::Parser::Iterator';
 my $ITER_FH    = "${ITER}::Stream";
 my $ITER_ARRAY = "${ITER}::Array";
 
-my $factory = TAP::Parser::IteratorFactory->new;
-my $iterator  = $factory->make_iterator( \*DATA );
+my $iterator  = $ITER_FH->new( \*DATA );
 isa_ok $iterator, 'TAP::Parser::Iterator';
 my $parser = TAP::Parser->new( { stream => $iterator } );
 isa_ok $parser, 'TAP::Parser',
@@ -60,7 +60,7 @@ ok 5 # skip we have no description
 1..5
 END_TAP
 
-$iterator = $factory->make_iterator( [ split /\n/ => $tap ] );
+$iterator = $ITER_ARRAY->new( [ split /\n/ => $tap ] );
 ok $parser = TAP::Parser->new( { stream => $iterator } ),
   'Now we create a parser with the plan at the end';
 isa_ok $parser->_iterator, $ITER_ARRAY,
@@ -98,7 +98,7 @@ not ok 4 - this is a real failure
 ok 5 # skip we have no description
 END_TAP
 
-$iterator = $factory->make_iterator( [ split /\n/ => $tap ] );
+$iterator = $ITER_ARRAY->new( [ split /\n/ => $tap ] );
 
 ok $parser = TAP::Parser->new( { stream => $iterator } ),
   'Now we create a parser with a plan as the second line';
@@ -136,7 +136,7 @@ not ok 4 - this is a real failure
 ok 5 # skip we have no description
 END_TAP
 
-$iterator = $factory->make_iterator( [ split /\n/ => $tap ] );
+$iterator = $ITER_ARRAY->new( [ split /\n/ => $tap ] );
 
 ok $parser = TAP::Parser->new( { stream => $iterator } ),
   'Now we create a parser with the plan as the second to last line';

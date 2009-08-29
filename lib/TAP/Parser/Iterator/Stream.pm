@@ -9,7 +9,7 @@ use TAP::Parser::Iterator ();
 
 =head1 NAME
 
-TAP::Parser::Iterator::Stream - Internal TAP::Parser Iterator
+TAP::Parser::Iterator::Stream - Iterator for filehandle-based TAP sources
 
 =head1 VERSION
 
@@ -21,9 +21,6 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  # see TAP::Parser::IteratorFactory for preferred usage
-
-  # to use directly:
   use TAP::Parser::Iterator::Stream;
   open( TEST, 'test.tap' );
   my $it   = TAP::Parser::Iterator::Stream->new(\*TEST);
@@ -106,7 +103,6 @@ Originally ripped off from L<Test::Harness>.
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::Iterator>,
-L<TAP::Parser::IteratorFactory>,
 
 =cut
 

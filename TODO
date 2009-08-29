@@ -18,10 +18,24 @@ y   Refactory SourceFactory
 	use new Source class from Parser
 	remove assemble_meta
 
+y   Phase out current IteratorFactory & old Source
+	source detectors should instantiate appropriate iterator
+	in Parser:
+	   iterator_factory_class
+	   make_iterator
+	   _default_iterator_factory_class
+	   _default_source_class
+	   _default_perl_source_class
+	   source_class
+	   perl_source_class
+	   make_source
+	   make_perl_source
+
     Refactor SourceDetectors
 	whittle down to 2 methods:
 	   y	can_handle( source [, config? ] )
 	   y	make_iterator( source )
+	factor out get_stream & instance methods
 	TAP::Parser::SourceDetector::Perl
 	   !	remove shebang detection
 
@@ -42,8 +56,7 @@ y   Refactory SourceFactory
 	other tasks?
 	Exec iterator should be really easy to use
 
-    Phase out current IteratorFactory
-	source detectors should instantiate appropriate iterator
+    Phase out source
 
     Move SourceFactory --> IteratorFactory
 	given a Source (+ config?)
@@ -53,7 +66,7 @@ y   Refactory SourceFactory
 		source-specific config?
 	returns an iterator
 
-    Refactor the Parser
+y   Refactor the Parser
 	creates a Source object
 	uses IteratorFactory to create an iterator
 

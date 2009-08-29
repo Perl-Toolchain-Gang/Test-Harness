@@ -13,23 +13,17 @@ BEGIN {
 use strict;
 use vars qw(%INIT %CUSTOM);
 
-use Test::More tests => 11;
+use Test::More tests => 5;
 use File::Spec::Functions qw( catfile updir );
 use TAP::Parser;
 
-use_ok('MySourceDetector');
-use_ok('MyPerlSourceDetector');
 use_ok('MyGrammar');
-use_ok('MyIteratorFactory');
 use_ok('MyResultFactory');
 
 my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 my $source = catfile( @t_path, 't', 'source_tests', 'source' );
 my %customize = (
-    source_class           => 'MySourceDetector',
-    perl_source_class      => 'MyPerlSourceDetector',
     grammar_class          => 'MyGrammar',
-    iterator_factory_class => 'MyIteratorFactory',
     result_factory_class   => 'MyResultFactory',
 );
 my $p = TAP::Parser->new(

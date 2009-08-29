@@ -3,8 +3,8 @@ package TAP::Parser::SourceDetector;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Object                  ();
-use TAP::Parser::IteratorFactory ();
+use TAP::Object ();
+use TAP::Parser::Iterator ();
 
 @ISA = qw(TAP::Object);
 
@@ -174,7 +174,7 @@ sub merge {
 
 =head3 C<get_stream>
 
-I<Abstract method>.
+I<Deprecated.>  I<Abstract method>.
 
  my $stream = $source->get_stream( $iterator_maker );
 
@@ -183,7 +183,7 @@ raw TAP C<source>.
 
 The C<$iterator_maker> given must be an object that implements a
 C<make_iterator> method to capture the TAP stream.  Typically this is a
-L<TAP::Parser> instance, rather than a L<TAP::Parser::IteratorFactory>.
+L<TAP::Parser> instance.
 
 =cut
 

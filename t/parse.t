@@ -18,7 +18,7 @@ use IO::c55Capture;
 use File::Spec;
 
 use TAP::Parser;
-use TAP::Parser::IteratorFactory;
+use TAP::Parser::Iterator::Array;
 
 sub _get_results {
     my $parser = shift;
@@ -40,8 +40,6 @@ my ( $PARSER, $PLAN, $PRAGMA, $TEST, $COMMENT, $BAILOUT, $UNKNOWN, $YAML, $VERSI
   TAP::Parser::Result::YAML
   TAP::Parser::Result::Version
 );
-
-my $factory = TAP::Parser::IteratorFactory->new;
 
 my $tap = <<'END_TAP';
 TAP version 13
@@ -351,7 +349,7 @@ END_TAP
 my $aref = [ split /\n/ => $tap ];
 
 can_ok $PARSER, 'new';
-$parser = $PARSER->new( { stream => $factory->make_iterator($aref) } );
+$parser = $PARSER->new( { stream => TAP::Parser::Iterator::Array->new( $aref ) } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 
 # results() is sane?

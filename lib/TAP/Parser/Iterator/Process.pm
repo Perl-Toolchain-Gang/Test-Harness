@@ -13,7 +13,7 @@ my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
 
 =head1 NAME
 
-TAP::Parser::Iterator::Process - Internal TAP::Parser Iterator
+TAP::Parser::Iterator::Process - Iterator for proccess-based TAP sources
 
 =head1 VERSION
 
@@ -25,9 +25,6 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  # see TAP::Parser::IteratorFactory for preferred usage
-
-  # to use directly:
   use TAP::Parser::Iterator::Process;
   my %args = (
    command  => ['python', 'setup.py', 'test'],
@@ -371,7 +368,6 @@ Originally ripped off from L<Test::Harness>.
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::Iterator>,
-L<TAP::Parser::IteratorFactory>,
 
 =cut
 

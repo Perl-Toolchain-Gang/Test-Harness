@@ -9,7 +9,7 @@ use TAP::Parser::Iterator ();
 
 =head1 NAME
 
-TAP::Parser::Iterator::Array - Internal TAP::Parser array Iterator
+TAP::Parser::Iterator::Array - Iterator for array-based TAP sources
 
 =head1 VERSION
 
@@ -21,9 +21,6 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  # see TAP::Parser::IteratorFactory for preferred usage
-
-  # to use directly:
   use TAP::Parser::Iterator::Array;
   my @data = ('foo', 'bar', baz');
   my $it   = TAP::Parser::Iterator::Array->new(\@data);
@@ -100,7 +97,6 @@ Originally ripped off from L<Test::Harness>.
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::Iterator>,
-L<TAP::Parser::IteratorFactory>,
 
 =cut
 
