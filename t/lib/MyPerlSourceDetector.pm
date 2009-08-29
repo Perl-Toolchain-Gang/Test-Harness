@@ -11,7 +11,7 @@ use TAP::Parser::SourceFactory;
 
 @ISA = qw( TAP::Parser::SourceDetector::Perl MyCustom );
 
-TAP::Parser::SourceFactory->register_source(__PACKAGE__);
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 sub can_handle {
     my $class = shift;

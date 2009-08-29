@@ -9,7 +9,7 @@ use TAP::Parser::IteratorFactory ();
 
 @ISA = qw(TAP::Parser::SourceDetector);
 
-TAP::Parser::SourceFactory->register_source(__PACKAGE__);
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 =head1 NAME
 
@@ -60,12 +60,14 @@ Returns a new C<TAP::Parser::SourceDetector::RawTAP> object.
 =cut
 
 sub can_handle {
-    my ( $class, $raw_source_ref, $meta ) = @_;
+    my ( $class, $src, $config ) = @_;
+    my $meta = $src->meta;
+
     return 0 if $meta->{file};
     if ( $meta->{is_scalar} ) {
         return 0 unless $meta->{has_newlines};
-        return 0.9 if $$raw_source_ref =~ /\d\.\.\d/;
-        return 0.7 if $$raw_source_ref =~ /ok/;
+        return 0.9 if ${ $src->raw } =~ /\d\.\.\d/;
+        return 0.7 if ${ $src->raw } =~ /ok/;
         return 0.6;
     }
     elsif ( $meta->{is_array} ) {
@@ -79,10 +81,9 @@ sub can_handle {
 =cut
 
 sub make_source {
-    my ( $class, $args ) = @_;
-    my $raw_source_ref = $args->{raw_source_ref};
-    my $source         = $class->new;
-    $source->raw_source($raw_source_ref);
+    my ( $class, $src, $config ) = @_;
+    my $source = $class->new;
+    $source->raw_source( $src->raw );
     return $source;
 }
 

@@ -9,7 +9,7 @@ use TAP::Parser::IteratorFactory ();
 
 @ISA = qw(TAP::Parser::SourceDetector);
 
-TAP::Parser::SourceFactory->register_source(__PACKAGE__);
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 =head1 NAME
 
@@ -61,11 +61,12 @@ Returns a new C<TAP::Parser::SourceDetector::Handle> object.
 =cut
 
 sub can_handle {
-    my ( $class, $raw_source_ref, $meta ) = @_;
+    my ( $class, $src, $config ) = @_;
+    my $meta = $src->meta;
 
     return 0.9
       if $meta->{is_object}
-          && UNIVERSAL::isa( $raw_source_ref, 'IO::Handle' );
+          && UNIVERSAL::isa( $src->raw, 'IO::Handle' );
 
     return 0.8 if $meta->{is_glob};
 
@@ -77,10 +78,9 @@ sub can_handle {
 =cut
 
 sub make_source {
-    my ( $class, $args ) = @_;
-    my $raw_source_ref = $args->{raw_source_ref};
-    my $source         = $class->new;
-    $source->raw_source($raw_source_ref);
+    my ( $class, $src, $config ) = @_;
+    my $source = $class->new;
+    $source->raw_source( $src->raw );
     return $source;
 }
 

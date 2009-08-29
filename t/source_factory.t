@@ -28,10 +28,10 @@ use TAP::Parser::SourceFactory;
     my $sf = TAP::Parser::SourceFactory->new;
     isa_ok $sf, 'TAP::Parser::SourceFactory';
     can_ok $sf, 'config';
-    can_ok $sf, 'sources';
+    can_ok $sf, 'detectors';
     can_ok $sf, 'detect_source';
-    can_ok $sf, 'make_source';
-    can_ok $sf, 'register_source';
+    can_ok $sf, 'make_detector';
+    can_ok $sf, 'register_detector';
 
     # Set config
     eval { $sf->config('bad config') };
@@ -42,36 +42,36 @@ use TAP::Parser::SourceFactory;
     my $config = { MySourceDetector => { foo => 'bar' } };
     is( $sf->config($config), $sf, '... and set config works' );
 
-    # Load/Register a source
+    # Load/Register a detector
     $sf = TAP::Parser::SourceFactory->new(
         { MySourceDetector => { accept => 'known-source' } } );
     can_ok( 'MySourceDetector', 'can_handle' );
-    is_deeply( $sf->sources, ['MySourceDetector'], '... was registered' );
+    is_deeply( $sf->detectors, ['MySourceDetector'], '... was registered' );
 
     # Known source should pass
     {
 	my $source = TAP::Parser::Source->new->raw( \'known-source' );
-        my $dsource = eval { $sf->make_source( $source ) };
+        my $detector = eval { $sf->make_detector( $source ) };
         my $error = $@;
-        ok( !$error, 'make_source with known source doesnt fail' );
+        ok( !$error, 'make_detector with known source doesnt fail' );
         diag($error) if $error;
-        isa_ok( $dsource, 'MySourceDetector', '... and source class' );
+        isa_ok( $detector, 'MySourceDetector', '... and detector class' );
         is_deeply(
-            $dsource->raw_source, [ \"known-source" ],
+            $detector->raw_source, [ \"known-source" ],
             '... and raw_source as expected'
         );
         is_deeply(
-            $dsource->config, { accept => 'known-source' },
-            '... and source config as expected'
+            $detector->config, { accept => 'known-source' },
+            '... and detector config as expected'
         );
     }
 
     # No known source should fail
     {
 	my $source = TAP::Parser::Source->new->raw( \'unknown-source' );
-        my $dsource = eval { $sf->make_source( $source ) };
+        my $detector = eval { $sf->make_detector( $source ) };
         my $error = $@;
-        ok( $error, 'make_source with unknown source fails' );
+        ok( $error, 'make_detector with unknown source fails' );
         like $error, qr/^Cannot detect source of 'unknown-source'/,
           '... with an appropriate error message';
     }
@@ -144,11 +144,11 @@ foreach my $test (@sources) {
 
     my $raw     = $test->{source};
     my $source  = TAP::Parser::Source->new->raw( ref($raw) ? $raw : \$raw );
-    my $dsource = eval { $sf->make_source( $source ) };
+    my $detector = eval { $sf->make_detector( $source ) };
     my $error   = $@;
-    ok( !$error, "$name: no error on make_source" );
+    ok( !$error, "$name: no error on make_detector" );
     diag($error) if $error;
-    isa_ok( $dsource, $test->{class}, $name );
+    isa_ok( $detector, $test->{class}, $name );
 }
 
 __END__

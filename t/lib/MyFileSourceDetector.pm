@@ -11,7 +11,7 @@ use TAP::Parser::SourceDetector::File;
 @ISA      = qw( TAP::Parser::SourceDetector::File MyCustom );
 $LAST_OBJ = undef;
 
-TAP::Parser::SourceFactory->register_source(__PACKAGE__);
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 sub _initialize {
     my $self = shift;

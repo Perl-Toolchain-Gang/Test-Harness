@@ -13,7 +13,7 @@ use TAP::Parser::Utils qw( split_shell );
 
 @ISA = 'TAP::Parser::SourceDetector::Executable';
 
-TAP::Parser::SourceFactory->register_source(__PACKAGE__);
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 =head1 NAME
 
@@ -57,22 +57,33 @@ Returns a new C<TAP::Parser::SourceDetector::Perl> object.
 
 =cut
 
+sub _initialize {
+    my ( $self, @args ) = @_;
+    $self->SUPER::_initialize(@args);
+    $self->{switches} = [];
+    return $self;
+}
+
+
 =head3 C<can_handle>
 
 =cut
 
 sub can_handle {
-    my ( $class, $raw_source_ref, $meta, $config ) = @_;
+    my ( $class, $src, $config ) = @_;
+    my $meta = $src->meta;
 
     return 0 unless $meta->{is_file};
     my $file = $meta->{file};
+
+    if (my $shebang = $file->{shebang}) {
+	return 0.99 if $shebang =~ /^#!.*\bperl/;
+    }
 
     return 0.8 if $file->{lc_ext} eq '.t';    # vote higher than Executable
     return 1   if $file->{lc_ext} eq '.pl';
 
     return 0.75 if $file->{dir} =~ /^t\b/;    # vote higher than Executable
-
-    # TODO: check for shebang, eg: #!.../perl  ?
 
     # backwards compat, always vote:
     return 0.5;
@@ -83,14 +94,14 @@ sub can_handle {
 =cut
 
 sub make_source {
-    my ( $class, $args ) = @_;
-    my $raw_source_ref = $args->{raw_source_ref};
-    my $perl_script    = $$raw_source_ref;
-    my $test_args      = $args->{test_args} || [];
+    my ( $class, $src, $config ) = @_;
+    my $meta = $src->meta;
+    my $perl_script = ${ $src->raw };
+    my $test_args   = $src->test_args || [];
 
-    my $source = $class->new($raw_source_ref);
-    $source->merge( $args->{merge} );
-    $source->switches( $args->{switches} ) if $args->{switches};
+    my $source = $class->new( $src->raw );
+    $source->merge( $src->merge );
+    $source->switches( $src->switches ) if $src->switches;
     $source->raw_source( [ $perl_script, @$test_args ] );
 
     return $source;

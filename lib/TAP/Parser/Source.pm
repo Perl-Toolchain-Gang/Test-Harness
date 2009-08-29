@@ -212,8 +212,8 @@ sub assemble_meta {
 
     return $self->meta if $self->has_meta;
 
-    my $meta   = $self->meta;
-    my $raw = $self->raw;
+    my $meta = $self->meta;
+    my $raw  = $self->raw;
 
     # rudimentary is object test - if it's blessed it'll
     # inherit from UNIVERSAL

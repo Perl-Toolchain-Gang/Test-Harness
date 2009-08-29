@@ -13,25 +13,26 @@ use TAP::Parser::SourceDetector;
 
 @ISA = qw( TAP::Parser::SourceDetector MyCustom );
 
-TAP::Parser::SourceFactory->register_source(__PACKAGE__);
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 sub can_handle {
-    my ( $class, $raw_source_ref, $meta, $config ) = @_;
+    my ( $class, $src, $config ) = @_;
+    my $meta = $src->meta;
+
     if ( $config->{accept_all} ) {
         return 1;
     }
     elsif ( my $accept = $config->{accept} ) {
         return 0 unless $meta->{is_scalar};
-        return 1 if $$raw_source_ref eq $accept;
+        return 1 if ${ $src->raw } eq $accept;
     }
     return 0;
 }
 
 sub make_source {
-    my ( $class, $args ) = @_;
-    my $raw_source_ref = $args->{raw_source_ref};
-    my $source         = $class->new;
-    $source->config( $args->{config} )->source( [$raw_source_ref] )->custom;
+    my ( $class, $src, $config ) = @_;
+    my $source = $class->new;
+    $source->config( $config )->source([ $src->raw ])->custom;
     return $source;
 }
 

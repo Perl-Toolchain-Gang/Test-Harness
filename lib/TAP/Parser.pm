@@ -504,11 +504,11 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
         if ($source->raw) {
             my $src_factory = $self->make_source_factory($sources);
 	    $source->merge( $merge )->switches( $switches )->test_args( $test_args );
-            my $dsource = $src_factory->make_source( $source );
+            my $detector = $src_factory->make_detector( $source );
 
             # TODO: replace this with something like:
             # my $stream = $source->get_stream;  # notice no "( $self )"
-            $stream = $dsource->get_stream($self);
+            $stream = $detector->get_stream($self);
         }
 
         unless ($stream) {

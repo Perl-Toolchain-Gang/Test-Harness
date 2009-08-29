@@ -12,7 +12,7 @@ use TAP::Parser::IteratorFactory ();
 # Causes problem on MacOS and shouldn't be necessary anyway
 #$SIG{CHLD} = sub { wait };
 
-TAP::Parser::SourceFactory->register_source(__PACKAGE__);
+TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 =head1 NAME
 
@@ -62,9 +62,6 @@ sub _initialize {
     my ( $self, @args ) = @_;
     $self->SUPER::_initialize(@args);
 
-    # TODO: move this to Perl sub-class - not used here?
-    $self->{switches} = [];
-
     # TODO: does this really need to be done here?
     _autoflush( \*STDOUT );
     _autoflush( \*STDERR );
@@ -77,7 +74,8 @@ sub _initialize {
 =cut
 
 sub can_handle {
-    my ( $class, $raw_source_ref, $meta ) = @_;
+    my ( $class, $src, $config ) = @_;
+    my $meta = $src->meta;
 
     if ( $meta->{is_file} ) {
         my $file = $meta->{file};
@@ -88,7 +86,7 @@ sub can_handle {
         return 0.7 if $file->{execute};
     }
     elsif ( $meta->{is_hash} ) {
-        return 0.99 if $raw_source_ref->{exec};
+        return 0.99 if $src->raw->{exec};
     }
 
     return 0;
@@ -99,21 +97,20 @@ sub can_handle {
 =cut
 
 sub make_source {
-    my ( $class, $args ) = @_;
-    my $raw_source_ref = $args->{raw_source_ref};
-    my $meta           = $args->{meta};
-    my $source         = $class->new;
+    my ( $class, $src, $config ) = @_;
+    my $meta   = $src->meta;
+    my $source = $class->new;
 
-    $source->merge( $args->{merge} );
+    $source->merge( $src->merge );
 
     if ( $meta->{is_hash} ) {
-        $source->raw_source( $raw_source_ref->{exec} );
+        $source->raw_source( $src->raw->{exec} );
     }
     elsif ( $meta->{is_file} ) {
-        $source->raw_source( [$raw_source_ref] );
+        $source->raw_source([ $src->raw ]);
     }
     else {
-        $source->raw_source($raw_source_ref);
+        $source->raw_source( $src->raw );
     }
 
     return $source;
