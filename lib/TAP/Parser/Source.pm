@@ -4,6 +4,7 @@ use strict;
 use vars qw($VERSION @ISA);
 
 use TAP::Object ();
+use File::Basename qw( fileparse );
 
 @ISA = qw(TAP::Object);
 
@@ -120,6 +121,10 @@ sub meta {
     return $self;
 }
 
+sub has_meta {
+    return scalar %{ shift->meta } ? 1 : 0;
+}
+
 sub config {
     my $self = shift;
     return $self->{config} unless @_;
@@ -153,17 +158,22 @@ sub test_args {
 
   my $meta = $source->assemble_meta;
 
-Gathers meta data about the L</raw> and returns it as a hashref.  This
-is done so that the individual L<TAP::Parser::SourceDetector>s don't have to
-repeat common checks.  Currently this includes:
+Gathers meta data about the L</raw> source, stashes it in L</meta> and returns
+it as a hashref.  This is done so that the L<TAP::Parser::SourceDetector>s don't
+have to repeat common checks.  Currently this includes:
 
-    scalar => $bool,
-    hash   => $bool,
-    array  => $bool,
+    is_scalar => $bool,
+    is_hash   => $bool,
+    is_array  => $bool,
 
     # for scalars:
     length => $n
     has_newlines => $bool
+
+    # only done if the scalar looks like a filename
+    is_file => $bool,
+    is_dir  => $bool,
+    is_symlink => $bool,
     file => {
         # only done if the scalar looks like a filename
         basename => $string, # including ext
@@ -188,13 +198,9 @@ repeat common checks.  Currently this includes:
         is_symlink => $bool,
         # only done if the file's a symlink
         lstat      => [ ... ], # perldoc -f lstat
+        # only done if the file's a readable text file
+        shebang => $first_line,
     }
-    # only done if the scalar looks like a filename
-    is_file => $bool,
-    is_dir  => $bool,
-    is_symlink => $bool,
-
-    # TODO: move shebang check from TAP::Parser::SourceFactory
 
   # for arrays:
   size => $n,
@@ -203,7 +209,10 @@ repeat common checks.  Currently this includes:
 
 sub assemble_meta {
     my ($self) = @_;
-    my $meta   = {};
+
+    return $self->meta if $self->has_meta;
+
+    my $meta   = $self->meta;
     my $raw_ref = $self->raw;
 
     # rudimentary is object test - if it's blessed it'll
@@ -211,8 +220,9 @@ sub assemble_meta {
     $meta->{is_object}
       = UNIVERSAL::isa( $raw_ref, 'UNIVERSAL' ) ? 1 : 0;
 
-    $meta->{ lc( ref($raw_ref) ) } = 1;
-    if ( $meta->{scalar} ) {
+    my $ref = lc( ref($raw_ref) );
+    $meta->{"is_$ref"} = 1;
+    if ( $meta->{is_scalar} ) {
         my $source = $$raw_ref;
         $meta->{length} = length($$raw_ref);
         $meta->{has_newlines} = $$raw_ref =~ /\n/ ? 1 : 0;
@@ -250,32 +260,43 @@ sub assemble_meta {
                 # put together some common info about the file
                 ( $file->{basename}, $file->{dir}, $file->{ext} )
                   = map { defined $_ ? $_ : '' }
-                  fileparse( $source, qr/\.[^.]*/ );
+		    fileparse( $source, qr/\.[^.]*/ );
                 $file->{lc_ext} = lc( $file->{ext} );
                 $file->{basename} .= $file->{ext} if $file->{ext};
 
-                # TODO: move shebang check from TAP::Parser::SourceFactory
+		if ( $file->{text} and $file->{read} ) {
+		    eval {
+			$file->{shebang} = $self->_read_shebang( $$raw_ref );
+		    };
+		    if (my $e = $@) {
+			warn $e;
+		    }
+		}
             }
         }
     }
-    elsif ( $meta->{array} ) {
+    elsif ( $meta->{is_array} ) {
         $meta->{size} = $#$raw_ref + 1;
     }
-    elsif ( $meta->{hash} ) {
+    elsif ( $meta->{is_hash} ) {
         ;    # do nothing
     }
 
     return $meta;
 }
 
-
-=cut
-
-sub assemble_meta {
-    my $self = shift;
-    return $self->{meta} unless @_;
-    $self->{meta} = shift;
-    return $self;
+sub _read_shebang {
+    my ($self, $file) = @_;
+    my $shebang;
+    local *TEST;
+    if ( open( TEST, $file ) ) {
+	$shebang = <TEST>;
+	chomp $shebang;
+	close(TEST) or die "Can't close $file. $!\n";
+    } else {
+	die "Can't open $file. $!\n";
+    }
+    return $shebang;
 }
 
 1;
