@@ -28,27 +28,25 @@ $VERSION = '3.18';
   # must be sub-classed for use
   package MySourceDetector;
   use base qw( TAP::Parser::SourceDetector );
-  sub can_handle  { return $confidence_level }
-  sub make_source { return $new_source }
-  sub get_stream  { return $iterator }
+  sub can_handle    { return $confidence_level }
+  sub make_iterator { return $iterator }
 
   # see example below for more details
 
 =head1 DESCRIPTION
 
-This is the base class for a TAP I<source>, i.e. something that produces a
-stream of TAP for the parser to consume, such as an executable file, a text
-file, an archive, an IO handle, a database, etc.  A C<TAP::Parser::SourceDetector>
-is a wrapper around the I<raw> TAP source that does whatever is necessary to
-capture the stream of TAP produced, and make it available to the Parser
-through a L<TAP::Parser::Iterator> object.
+This is an abstract base class for L<TAP::Parser::Source> detectors / handlers.
 
-C<SourceDetectors> must also implement the I<source detection> interface used by
-L<TAP::Parser::SourceFactory> to determine how to get TAP out of a given
-I<raw> source.  See L</can_handle> and L</make_source> for that.
+A C<TAP::Parser::SourceDetector> does whatever is necessary to produce & capture
+a stream of TAP from the I<raw> source, and package it up in a
+L<TAP::Parser::Iterator> for the parser to consume.
 
-Unless you're writing a new L<TAP::Parser::SourceDetector>, a plugin or subclassing
-L<TAP::Parser>, you probably won't need to use this module directly.
+C<SourceDetectors> must implement the I<source detection & handling> interface
+used by L<TAP::Parser::SourceFactory>.  At 2 methods, the interface is pretty
+simple: L</can_handle> and L</make_source>.
+
+Unless you're writing a new L<TAP::Parser::SourceDetector>, a plugin, or
+subclassing L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head1 METHODS
 
@@ -76,19 +74,9 @@ sub _initialize {
 
 I<Abstract method>.
 
-  my $vote = $class->can_handle( $raw_source_ref, $meta, $config );
-  # TODO: or preferably:
-  my $vote = $source->can_handle({
-      raw_source_ref => $raw_source_ref,
-      meta           => { %meta },
-      $config        => { %config },
-  });
+  my $vote = $class->can_handle( $source );
 
-C<$raw_source_ref> is a reference as it may contain large amounts of data
-(eg: raw TAP), not to mention different data types.  C<$meta> is a hashref
-containing meta data about the source itself (see
-L<TAP::Parser::SourceFactory/assemble_meta>).  C<$config> is a hashref
-containing any configuration given by the user (how it's used is up to you).
+C<$source> is a L<TAP::Parser::Source>.
 
 Returns a number between C<0> & C<1> reflecting how confidently the raw source
 can be handled.  For example, C<0> means the source cannot handle it, C<0.5>
@@ -99,38 +87,26 @@ L<TAP::Parser::SourceFactory/detect_source> for details on how this is used.
 
 sub can_handle {
     my ( $class, $args ) = @_;
-    confess("'$class' has not defined a 'can_handle' method!");
+    $class->_confess("'$class' has not defined a 'can_handle' method!");
     return;
 }
 
-=head3 C<make_source>
+=head3 C<make_iterator>
 
-I<Abstract method>.  Takes a hashref as an argument:
+I<Abstract method>.
 
-  my $source = $class->make_source({
-      raw_source_ref => $raw_source_ref,
-      config         => { %config },
-      merge          => $bool,
-      perl_test_args => [ ... ],
-      switches       => [ ... ],
-      meta           => { %meta },
-      ...
-  });
+  my $iterator = $class->make_iterator( $source );
 
-At the very least, C<raw_source_ref> is I<required>.  This is a reference as
-it may contain large amounts of data (eg: raw TAP output), not to mention
-different data types.
+C<$source> is a L<TAP::Parser::Source>.
 
-Returns a new L<TAP::Parser::SourceDetector> object for use by the L<TAP::Parser>.
+Returns a new L<TAP::Parser::Iterator> object for use by the L<TAP::Parser>.
 C<croak>s on error.
-
-This is used primarily by L<TAP::Parser::SourceFactory>.
 
 =cut
 
-sub make_source {
+sub make_iterator {
     my ( $class, $args ) = @_;
-    confess("'$class' has not defined a 'make_source' method!");
+    $class->_confess("'$class' has not defined a 'make_iterator' method!");
     return;
 }
 
@@ -227,18 +203,19 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview, and any
 of the subclasses that ship with this module as an example.  What follows is
 a quick overview.
 
-Start by familiarizing yourself with L<TAP::Parser::SourceFactory>, and
-L<TAP::Parser::IteratorFactory>.
+Start by familiarizing yourself with L<TAP::Parser::Source> and
+L<TAP::Parser::SourceFactory>.
 
 It's important to point out that if you want your subclass to be automatically
 used by L<TAP::Parser> you'll have to and make sure it gets loaded somehow.
 If you're using L<prove> you can write an L<App::Prove> plugin.  If you're
 using L<TAP::Parser> or L<TAP::Harness> directly (eg. through a custom script,
-or even L<Module::Build>) you can use the C<config> option which will cause
-L<TAP::Parser::SourceFactory/load_sources> to load your subclass).
+L<ExtUtils::MakeMaker>, or L<Module::Build>) you can use the C<config> option
+which will cause L<TAP::Parser::SourceFactory/load_sources> to load your
+subclass).
 
 Don't forget to register your class with
-L<TAP::Parser::SourceFactory/register_source>.
+L<TAP::Parser::SourceFactory/register_detector>.
 
 =head2 Example
 
@@ -252,21 +229,24 @@ L<TAP::Parser::SourceFactory/register_source>.
 
   @ISA = qw( TAP::Parser::SourceDetector );
 
-  TAP::Parser::SourceFactory->register_source( __PACKAGE__ );
+  TAP::Parser::SourceFactory->register_detector( __PACKAGE__ );
 
   sub can_handle {
-      my ($class, $raw_source_ref, $meta, $config) = @_;
+      my ( $class, $src ) = @_;
+      my $meta   = $src->meta;
+      my $config = $src->config_for( $class );
 
       if ($config->{accept_all}) {
           return 1.0;
       } elsif (my $file = $meta->{file}) {
           return 0.0 unless $file->{exists};
           return 1.0 if $file->{lc_ext} eq '.tap';
-          return 0.9 if $file->{text};
+          return 0.9 if $file->{shebang} && $file->{shebang} =~ /^#!.+tap/;
+          return 0.5 if $file->{text};
           return 0.1 if $file->{binary};
       } elsif ($meta->{scalar}) {
-          return 0.9 if $meta->{has_newlines};
           return 0.8 if $$raw_source_ref =~ /\d\.\.\d/;
+          return 0.6 if $meta->{has_newlines};
       } elsif ($meta->{array}) {
           return 0.8 if $meta->{size} < 5;
           return 0.6 if $raw_source_ref->[0] =~ /foo/;
@@ -279,18 +259,13 @@ L<TAP::Parser::SourceFactory/register_source>.
       return 0;
   }
 
-  sub make_source {
-      my ($class, $args) = @_;
-      my $source = MySourceDetector->new;
-      # do anything special here...
-      $source->merge( $args->{merge} );
-             ->raw_source( $args->{raw_source_ref} );
-      return $source;
-  }
-
-  sub get_stream {
-      my ($self, $factory) = @_;
-      return $factory->make_iterator( $self->source );
+  sub make_iterator {
+      my ($class, $source) = @_;
+      # this is where you manipulate the source and
+      # capture the stream of TAP in an iterator
+      # either pick a TAP::Parser::Iterator::* or write your own...
+      my $iterator = TAP::Parser::Iterator::Array->new([ 'foo', 'bar' ]);
+      return $iterator;
   }
 
   1;
@@ -305,6 +280,8 @@ Source detection stuff added by Steve Purkis
 
 L<TAP::Object>,
 L<TAP::Parser>,
+L<TAP::Parser::Source>,
+L<TAP::Parser::Iterator>,
 L<TAP::Parser::SourceFactory>,
 L<TAP::Parser::SourceDetector::Executable>,
 L<TAP::Parser::SourceDetector::Perl>,

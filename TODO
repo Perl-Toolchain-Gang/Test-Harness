@@ -15,15 +15,27 @@ y  Create a new 'Source' class
   ?	could have different sub-classes for internal cases
 
 y   Refactory SourceFactory
-	use new Source class
+	use new Source class from Parser
 	remove assemble_meta
 
     Refactor SourceDetectors
 	whittle down to 2 methods:
 	   y	can_handle( source [, config? ] )
-		make_iterator( source )
+	   y	make_iterator( source )
 	TAP::Parser::SourceDetector::Perl
-	   y	remove shebang detection
+	   !	remove shebang detection
+
+    Move SourceDetector --> SourceHandler?
+	more descriptive of their function
+
+    Clean up 'stream' vs 'iterator' usage
+	in TAP::Parser
+	   y	$stream
+	   y	_stream
+	   	->new( stream => ... )
+	in TAP::Grammar
+	   	$stream
+	   	->new( stream => ... )
 
     Refactor Iterators
 	remove shebang detection

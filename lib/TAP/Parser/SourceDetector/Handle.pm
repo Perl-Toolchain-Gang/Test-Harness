@@ -3,9 +3,9 @@ package TAP::Parser::SourceDetector::Handle;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::SourceDetector          ();
-use TAP::Parser::SourceFactory   ();
-use TAP::Parser::IteratorFactory ();
+use TAP::Parser::SourceDetector   ();
+use TAP::Parser::SourceFactory    ();
+use TAP::Parser::Iterator::Stream ();
 
 @ISA = qw(TAP::Parser::SourceDetector);
 
@@ -73,15 +73,15 @@ sub can_handle {
     return 0;
 }
 
-=head3 C<make_source>
+=head3 C<make_iterator>
 
 =cut
 
-sub make_source {
+sub make_iterator {
     my ( $class, $src ) = @_;
     my $source = $class->new;
     $source->raw_source( $src->raw );
-    return $source;
+    return $source->get_stream;
 }
 
 ##############################################################################
@@ -125,7 +125,7 @@ Returns a L<TAP::Parser::Iterator> for this TAP stream.
 
 sub get_stream {
     my ( $self, $factory ) = @_;
-    return $factory->make_iterator( $self->source );
+    return TAP::Parser::Iterator::Stream->new( $self->raw_source );
 }
 
 1;

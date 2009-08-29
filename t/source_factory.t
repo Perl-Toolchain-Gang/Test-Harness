@@ -15,7 +15,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 44;
+use Test::More tests => 42;
 
 use IO::File;
 use File::Spec;
@@ -30,7 +30,7 @@ use TAP::Parser::SourceFactory;
     can_ok $sf, 'config';
     can_ok $sf, 'detectors';
     can_ok $sf, 'detect_source';
-    can_ok $sf, 'make_detector';
+    can_ok $sf, 'make_iterator';
     can_ok $sf, 'register_detector';
 
     # Set config
@@ -51,27 +51,19 @@ use TAP::Parser::SourceFactory;
     # Known source should pass
     {
 	my $source = TAP::Parser::Source->new->raw( \'known-source' );
-        my $detector = eval { $sf->make_detector( $source ) };
+        my $iterator = eval { $sf->make_iterator( $source ) };
         my $error = $@;
-        ok( !$error, 'make_detector with known source doesnt fail' );
+        ok( !$error, 'make_iterator with known source doesnt fail' );
         diag($error) if $error;
-        isa_ok( $detector, 'MySourceDetector', '... and detector class' );
-        is_deeply(
-            $detector->raw_source, [ \"known-source" ],
-            '... and raw_source as expected'
-        );
-        is_deeply(
-            $detector->config, { accept => 'known-source' },
-            '... and detector config as expected'
-        );
+        isa_ok( $iterator, 'MyIterator', '... and iterator class' );
     }
 
     # No known source should fail
     {
 	my $source = TAP::Parser::Source->new->raw( \'unknown-source' );
-        my $detector = eval { $sf->make_detector( $source ) };
+        my $iterator = eval { $sf->make_iterator( $source ) };
         my $error = $@;
-        ok( $error, 'make_detector with unknown source fails' );
+        ok( $error, 'make_iterator with unknown source fails' );
         like $error, qr/^Cannot detect source of 'unknown-source'/,
           '... with an appropriate error message';
     }
@@ -95,40 +87,51 @@ my $test_dir = File::Spec->catdir(
 
 my @sources = (
     {   file  => 'source.tap',
-        class => 'TAP::Parser::SourceDetector::File',
+        detector => 'TAP::Parser::SourceDetector::File',
+        iterator => 'TAP::Parser::Iterator::Stream',
     },
     {   file   => 'source.1',
-        class  => 'TAP::Parser::SourceDetector::File',
+        detector  => 'TAP::Parser::SourceDetector::File',
         config => { File => { extensions => ['.1'] } },
+        iterator => 'TAP::Parser::Iterator::Stream',
     },
     {   file  => 'source.pl',
-        class => 'TAP::Parser::SourceDetector::Perl',
+        detector => 'TAP::Parser::SourceDetector::Perl',
+        iterator => 'TAP::Parser::Iterator::Process',
     },
     {   file  => 'source.t',
-        class => 'TAP::Parser::SourceDetector::Perl',
+        detector => 'TAP::Parser::SourceDetector::Perl',
+        iterator => 'TAP::Parser::Iterator::Process',
     },
     {   file  => 'source',
-        class => 'TAP::Parser::SourceDetector::Perl',
+        detector => 'TAP::Parser::SourceDetector::Perl',
+        iterator => 'TAP::Parser::Iterator::Process',
     },
     {   file  => 'source.sh',
-        class => 'TAP::Parser::SourceDetector::Executable',
+        detector => 'TAP::Parser::SourceDetector::Executable',
+        iterator => 'TAP::Parser::Iterator::Process',
     },
     {   file  => 'source.bat',
-        class => 'TAP::Parser::SourceDetector::Executable',
+        detector => 'TAP::Parser::SourceDetector::Executable',
+        iterator => 'TAP::Parser::Iterator::Process',
     },
     {   name   => 'raw tap string',
         source => "0..1\nok 1 - raw tap\n",
-        class  => 'TAP::Parser::SourceDetector::RawTAP',
+        detector  => 'TAP::Parser::SourceDetector::RawTAP',
+        iterator => 'TAP::Parser::Iterator::Array',
     },
     {   name   => 'raw tap array',
         source => [ "0..1\n", "ok 1 - raw tap\n" ],
-        class  => 'TAP::Parser::SourceDetector::RawTAP',
+        detector  => 'TAP::Parser::SourceDetector::RawTAP',
+        iterator => 'TAP::Parser::Iterator::Array',
     },
     {   source => \*__DATA__,
-        class  => 'TAP::Parser::SourceDetector::Handle',
+        detector  => 'TAP::Parser::SourceDetector::Handle',
+        iterator => 'TAP::Parser::Iterator::Stream',
     },
     {   source => IO::File->new('-'),
-        class  => 'TAP::Parser::SourceDetector::Handle',
+        detector  => 'TAP::Parser::SourceDetector::Handle',
+        iterator => 'TAP::Parser::Iterator::Stream',
     },
 );
 
@@ -140,15 +143,16 @@ foreach my $test (@sources) {
     }
 
     my $name = $test->{name} || substr( $test->{source}, 0, 10 );
-    my $sf = TAP::Parser::SourceFactory->new( $test->{config} );
+    my $sf = TAP::Parser::SourceFactory->new( $test->{config} )->_testing( 1 );
 
     my $raw     = $test->{source};
     my $source  = TAP::Parser::Source->new->raw( ref($raw) ? $raw : \$raw );
-    my $detector = eval { $sf->make_detector( $source ) };
+    my $iterator = eval { $sf->make_iterator( $source ) };
     my $error   = $@;
-    ok( !$error, "$name: no error on make_detector" );
+    ok( !$error, "$name: no error on make_iterator" );
     diag($error) if $error;
-    isa_ok( $detector, $test->{class}, $name );
+#    isa_ok( $iterator, $test->{iterator}, $name );
+    is( $sf->_last_detector, $test->{detector}, $name );
 }
 
 __END__

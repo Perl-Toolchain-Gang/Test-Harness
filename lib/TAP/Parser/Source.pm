@@ -36,8 +36,13 @@ $VERSION = '3.18';
 
 =head1 DESCRIPTION
 
-This is a data object used by L<TAP::Parser::SourceFactory> to pass a TAP
-I<source> and meta data about it to L<TAP::Parser::SourceDetector>s.
+A TAP I<source> is something that produces a stream of TAP for the parser to
+consume, such as an executable file, a text file, an archive, an IO handle, a
+database, etc.  C<TAP::Parser::Source>s encapsulate these I<raw> sources, and
+provide some useful meta data about them.  They are used by
+L<TAP::Parser::SourceDetector>s, which do whatever is required to produce &
+capture a stream of TAP from the I<raw> source, and package it up in a
+L<TAP::Parser::Iterator> for the parser to consume.
 
 Unless you're writing a new L<TAP::Parser::SourceDetector>, a plugin or
 subclassing L<TAP::Parser>, you probably won't need to use this module directly.
@@ -73,7 +78,8 @@ sub _initialize {
   my $raw = $source->raw;
   $source->raw( $some_value );
 
-Chaining getter/setter for the raw TAP source.
+Chaining getter/setter for the raw TAP source.  This is a reference, as it may
+contain large amounts of data (eg: raw TAP).
 
 =head3 C<meta>
 
@@ -81,15 +87,16 @@ Chaining getter/setter for the raw TAP source.
   $source->meta({ %some_value });
 
 Chaining getter/setter for meta data about the source.  This defaults to an
-empty hashref.
+empty hashref.  See L</assemble_meta> for more info.
 
 =head3 C<config>
 
   my $config = $source->config;
   $source->config({ %some_value });
 
-Chaining getter/setter for the source's configuration, if any.  This defaults
-to an empty hashref.
+Chaining getter/setter for the source's configuration, if any has been provided
+by the user.  How it's used is up to you.  This defaults to an empty hashref.
+See L</config_for> for more info.
 
 =head3 C<merge>
 
@@ -319,7 +326,7 @@ sub _read_shebang {
 
   my $config = $source->config_for( $class );
 
-Returns config for the $class given.  Class names may be fully qualified
+Returns L</config> for the $class given.  Class names may be fully qualified
 or abbreviated, eg:
 
   # these are equivalent

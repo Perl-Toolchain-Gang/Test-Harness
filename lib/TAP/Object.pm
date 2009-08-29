@@ -93,6 +93,25 @@ sub _croak {
     return;
 }
 
+=head3 C<_confess>
+
+Raise an exception using C<confess> from L<Carp>, eg:
+
+    $self->_confess( 'why me?', 'aaarrgh!' );
+
+May also be called as a I<class> method.
+
+    $class->_confess( 'this works too' );
+
+=cut
+
+sub _confess {
+    my $proto = shift;
+    require Carp;
+    Carp::confess(@_);
+    return;
+}
+
 =head3 C<_construct>
 
 Create a new instance of the specified class.

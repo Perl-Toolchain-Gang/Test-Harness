@@ -32,18 +32,21 @@ my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 
     ok( $p->{initialized}, 'new subclassed parser' );
 
-    is( $p->source_class      => 'MySourceDetector',     'source_class' );
-    is( $p->perl_source_class => 'MyPerlSourceDetector', 'perl_source_class' );
+    is( $p->source_class      => 'MySourceDetector',     'source_class' ); # deprecated
+    is( $p->perl_source_class => 'MyPerlSourceDetector', 'perl_source_class' ); # deprecated
     is( $p->grammar_class     => 'MyGrammar',    'grammar_class' );
-    is( $p->iterator_factory_class => 'MyIteratorFactory',
+    is( $p->iterator_factory_class => 'MyIteratorFactory', # deprecated
         'iterator_factory_class'
     );
     is( $p->result_factory_class => 'MyResultFactory',
         'result_factory_class'
     );
 
-    is( $INIT{MyPerlSourceDetector},   1, 'initialized MyPerlSourceDetector' );
-    is( $CUSTOM{MyPerlSourceDetector}, 1, '... and it was customized' );
+    {
+	local $TODO = 'deprecated';
+	is( $INIT{MyPerlSourceDetector},   1, 'initialized MyPerlSourceDetector' );
+	is( $CUSTOM{MyPerlSourceDetector}, 1, '... and it was customized' );
+    }
     is( $INIT{MyGrammar},      1, 'initialized MyGrammar' );
     is( $CUSTOM{MyGrammar},    1, '... and it was customized' );
 
@@ -52,8 +55,11 @@ my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 
     $p->make_grammar;
     is( $CUSTOM{MyGrammar}, 1, 'make custom grammar' );
-    $p->make_iterator;
-    is( $CUSTOM{MyIterator}, 1, 'make custom iterator' );
+    {
+	local $TODO = 'deprecated';
+	$p->make_iterator;
+	is( $CUSTOM{MyIterator}, 1, 'make custom iterator' );
+    }
     $p->make_result;
     is( $CUSTOM{MyResult}, 1, 'make custom result' );
 
@@ -82,8 +88,11 @@ SKIP: {    # non-perl source
         }
     );
 
-    is( $INIT{MySourceDetector},     1, 'initialized MySourceDetector subclass' );
-    is( $CUSTOM{MySourceDetector},   1, '... and it was customized' );
-    is( $INIT{MyIterator},   1, 'initialized MyIterator subclass' );
-    is( $CUSTOM{MyIterator}, 1, '... and it was customized' );
+    {
+	local $TODO = 'deprecated';
+	is( $INIT{MySourceDetector},     1, 'initialized MySourceDetector subclass' );
+	is( $CUSTOM{MySourceDetector},   1, '... and it was customized' );
+	is( $INIT{MyIterator},   1, 'initialized MyIterator subclass' );
+	is( $CUSTOM{MyIterator}, 1, '... and it was customized' );
+    }
 }

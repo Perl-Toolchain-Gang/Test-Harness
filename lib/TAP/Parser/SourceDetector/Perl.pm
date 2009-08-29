@@ -5,10 +5,11 @@ use Config;
 use vars qw($VERSION @ISA);
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
-use constant IS_VMS => ( $^O eq 'VMS' );
+use constant IS_VMS   => ( $^O eq 'VMS' );
 
 use TAP::Parser::SourceDetector::Executable ();
-use TAP::Parser::SourceFactory      ();
+use TAP::Parser::SourceFactory              ();
+use TAP::Parser::Iterator::Process          ();
 use TAP::Parser::Utils qw( split_shell );
 
 @ISA = 'TAP::Parser::SourceDetector::Executable';
@@ -89,11 +90,11 @@ sub can_handle {
     return 0.5;
 }
 
-=head3 C<make_source>
+=head3 C<make_iterator>
 
 =cut
 
-sub make_source {
+sub make_iterator {
     my ( $class, $src ) = @_;
     my $meta = $src->meta;
     my $perl_script = ${ $src->raw };
@@ -104,7 +105,7 @@ sub make_source {
     $source->switches( $src->switches ) if $src->switches;
     $source->raw_source( [ $perl_script, @$test_args ] );
 
-    return $source;
+    return $source->get_stream;
 }
 
 =head2 Instance Methods
@@ -219,7 +220,7 @@ sub get_stream {
     my @command = $self->_get_command_for_switches(@switches)
       or $self->_croak("No command found!");
 
-    return $factory->make_iterator(
+    return TAP::Parser::Iterator::Process->new(
         {   command  => \@command,
             merge    => $self->merge,
             setup    => $setup,

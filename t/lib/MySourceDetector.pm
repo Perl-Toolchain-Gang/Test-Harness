@@ -7,9 +7,8 @@ use vars '@ISA';
 
 use MyCustom;
 use TAP::Parser::SourceFactory;
-
-#use TAP::Parser::SourceDetector::Executable;
 use TAP::Parser::SourceDetector;
+use TAP::Parser::Iterator::Array;
 
 @ISA = qw( TAP::Parser::SourceDetector MyCustom );
 
@@ -30,13 +29,13 @@ sub can_handle {
     return 0;
 }
 
-sub make_source {
+sub make_iterator {
     my ( $class, $src ) = @_;
     my $meta   = $src->meta;
     my $config = $src->config_for( $class );
     my $source = $class->new;
     $source->config( $config )->source([ $src->raw ])->custom;
-    return $source;
+    return $source->get_stream;
 }
 
 sub _initialize {
@@ -54,10 +53,7 @@ sub source {
 
 sub get_stream {
     my ( $self, $factory ) = @_;
-    my $iter = $factory->make_iterator( $self->raw_source );
-
-    #    my $stream = $self->SUPER::get_stream(@_);
-
+    my $iter = TAP::Parser::Iterator::Array->new( $self->raw_source );
     # re-bless it:
     bless $iter, 'MyIterator';
 }

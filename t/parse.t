@@ -606,7 +606,7 @@ END_TAP
 
     isa_ok $parser, 'TAP::Parser';
 
-    isa_ok $parser->_stream, 'TAP::Parser::Iterator::Array';
+    isa_ok $parser->_iterator, 'TAP::Parser::Iterator::Array';
 
     SKIP: {
         skip 'Segfaults Perl 5.6.0' => 2 if $] <= 5.006000;
@@ -646,7 +646,7 @@ END_TAP
 
     isa_ok $parser, 'TAP::Parser';
 
-    isa_ok $parser->_stream, 'TAP::Parser::Iterator::Process';
+    isa_ok $parser->_iterator, 'TAP::Parser::Iterator::Process';
 
     # Workaround for Mac OS X problem wrt closing the iterator without
     # reading from it.
@@ -841,15 +841,15 @@ END_TAP
         my $parser = TAP::Parser->new( { tap => $tap } );
 
         # build a dying stream
-        my $stream = TAP::Parser::Iterator::Dies->new;
+        my $iterator = TAP::Parser::Iterator::Dies->new;
 
         # now replace the stream - we're forced to us an T::P intenal
         # method for this
-        $parser->_stream($stream);
+        $parser->_iterator($iterator);
 
         # build a new grammar
         my $grammar = TAP::Parser::Grammar->new(
-            {   stream => $stream,
+            {   stream => $iterator,
                 parser => $parser
             }
         );
@@ -877,15 +877,15 @@ END_TAP
         $parser->callback( 'ALL', sub { } );
 
         # build a dying stream
-        my $stream = TAP::Parser::Iterator::Dies->new;
+        my $iterator = TAP::Parser::Iterator::Dies->new;
 
         # now replace the stream - we're forced to us an T::P intenal
         # method for this
-        $parser->_stream($stream);
+        $parser->_iterator($iterator);
 
         # build a new grammar
         my $grammar = TAP::Parser::Grammar->new(
-            {   stream => $stream,
+            {   stream => $iterator,
                 parser => $parser
             }
         );

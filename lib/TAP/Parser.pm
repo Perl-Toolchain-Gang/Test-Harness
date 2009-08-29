@@ -47,7 +47,7 @@ BEGIN {    # making accessors
 
     __PACKAGE__->mk_methods(
         qw(
-          _stream
+          _iterator
           _spool
           exec
           exit
@@ -69,6 +69,11 @@ BEGIN {    # making accessors
           source_factory_class
           )
     );
+
+    sub _stream {    # deprecated
+	my $self = shift;
+	$self->_iterator( @_ );
+    }
 }    # done making accessors
 
 =head1 SYNOPSIS
@@ -453,7 +458,7 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
         my ( $self, $arg_for ) = @_;
 
         # everything here is basically designed to convert any TAP source to a
-        # stream.
+        # TAP::Parser::Iterator.
 
         # Shallow copy
         my %args = %{ $arg_for || {} };
@@ -467,7 +472,7 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
             $self->$key($val);
         }
 
-        my $stream      = delete $args{stream};
+        my $iterator    = delete $args{stream};
         my $tap         = delete $args{tap};
         my $raw_source  = delete $args{source};
         my $sources     = delete $args{sources};
@@ -478,7 +483,7 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
         my $ignore_exit = delete $args{ignore_exit};
         my $test_args   = delete $args{test_args} || [];
 
-        if ( 1 < grep {defined} $stream, $tap, $raw_source, $exec ) {
+        if ( 1 < grep {defined} $iterator, $tap, $raw_source, $exec ) {
             $self->_croak(
                 "You may only choose one of 'exec', 'stream', 'tap' or 'source'"
             );
@@ -504,14 +509,10 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
         if ($source->raw) {
             my $src_factory = $self->make_source_factory($sources);
 	    $source->merge( $merge )->switches( $switches )->test_args( $test_args );
-            my $detector = $src_factory->make_detector( $source );
-
-            # TODO: replace this with something like:
-            # my $stream = $source->get_stream;  # notice no "( $self )"
-            $stream = $detector->get_stream($self);
+	    $iterator = $src_factory->make_iterator( $source );
         }
 
-        unless ($stream) {
+        unless ($iterator) {
             $self->_croak('PANIC: could not determine stream');
         }
 
@@ -519,7 +520,7 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
             $self->{$k} = 'ARRAY' eq ref $v ? [] : $v;
         }
 
-        $self->_stream($stream);
+        $self->_iterator($iterator);
         $self->_spool($spool);
         $self->ignore_exit($ignore_exit);
 
@@ -1382,14 +1383,14 @@ determine the readiness of this parser.
 
 =cut
 
-sub get_select_handles { shift->_stream->get_select_handles }
+sub get_select_handles { shift->_iterator->get_select_handles }
 
 sub _grammar {
     my $self = shift;
     return $self->{_grammar} = shift if @_;
 
     return $self->{_grammar} ||= $self->make_grammar(
-        {   stream  => $self->_stream,
+        {   stream  => $self->_iterator,
             parser  => $self,
             version => $self->version
         }
@@ -1398,7 +1399,7 @@ sub _grammar {
 
 sub _iter {
     my $self        = shift;
-    my $stream      = $self->_stream;
+    my $iterator    = $self->_iterator;
     my $grammar     = $self->_grammar;
     my $spool       = $self->_spool;
     my $state       = 'INIT';
@@ -1435,8 +1436,8 @@ sub _iter {
 
     # Handle end of stream - which means either pop a block or finish
     my $end_handler = sub {
-        $self->exit( $stream->exit );
-        $self->wait( $stream->wait );
+        $self->exit( $iterator->exit );
+        $self->wait( $iterator->wait );
         $self->_finish;
         return;
     };
@@ -1499,7 +1500,7 @@ sub _finish {
     $self->end_time( $self->get_time );
 
     # Avoid leaks
-    $self->_stream(undef);
+    $self->_iterator(undef);
     $self->_grammar(undef);
 
     # If we just delete the iter we won't get a fault if it's recreated.

@@ -3,9 +3,9 @@ package TAP::Parser::SourceDetector::Executable;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::SourceDetector          ();
-use TAP::Parser::SourceFactory   ();
-use TAP::Parser::IteratorFactory ();
+use TAP::Parser::SourceDetector    ();
+use TAP::Parser::SourceFactory     ();
+use TAP::Parser::Iterator::Process ();
 
 @ISA = qw(TAP::Parser::SourceDetector);
 
@@ -92,11 +92,11 @@ sub can_handle {
     return 0;
 }
 
-=head3 C<make_source>
+=head3 C<make_iterator>
 
 =cut
 
-sub make_source {
+sub make_iterator {
     my ( $class, $src ) = @_;
     my $meta   = $src->meta;
     my $source = $class->new;
@@ -113,7 +113,7 @@ sub make_source {
         $source->raw_source( $src->raw );
     }
 
-    return $source;
+    return $source->get_stream;
 }
 
 ##############################################################################
@@ -176,7 +176,7 @@ sub get_stream {
     my @command = $self->_get_command
       or $self->_croak('No command found!');
 
-    return $factory->make_iterator(
+    return TAP::Parser::Iterator::Process->new(
         {   command => \@command,
             merge   => $self->merge
         }

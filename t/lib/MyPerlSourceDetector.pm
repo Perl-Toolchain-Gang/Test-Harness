@@ -23,7 +23,6 @@ sub can_handle {
 sub make_source {
     my $class  = shift;
     my $source = $class->SUPER::make_source(@_);
-    return $source->custom;
 }
 
 sub _initialize {

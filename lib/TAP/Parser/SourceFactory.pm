@@ -29,7 +29,7 @@ $VERSION = '3.18';
 
   use TAP::Parser::SourceFactory;
   my $factory = TAP::Parser::SourceFactory->new({ %config });
-  my $detector  = $factory->make_detector( $filename );
+  my $iterator  = $factory->make_iterator( $filename );
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ sub _initialize {
 Registers a new L<TAP::Parser::SourceDetector> with this factory.
 
   __PACKAGE__->register_detector( $detector_class );
+
+=head3 C<detectors>
+
+List of detectors that have been registered.
 
 =cut
 
@@ -117,6 +121,21 @@ sub _config_for {
     return $config;
 }
 
+sub _last_detector {
+    my $self = shift;
+    return $self->{last_detector} unless @_;
+    $self->{last_detector} = shift;
+    return $self;
+}
+
+sub _testing {
+    my $self = shift;
+    return $self->{testing} unless @_;
+    $self->{testing} = shift;
+    return $self;
+}
+
+
 ##############################################################################
 
 =head3 C<load_detectors>
@@ -169,14 +188,16 @@ sub _load_detector {
 
 ##############################################################################
 
-=head3 C<make_detector>
+=head3 C<make_iterator>
 
-Detects and creates a new L<TAP::Parser::SourceDetector> for the L<TAP::Parser::Source>
-given (see L</detect_source>).  Dies on error.
+  my $iterator = $src_factory->make_iterator( $source );
+
+Given a L<TAP::Parser::Source>, finds the most suitable L<TAP::Parser::SourceDetector>
+to use to create a L<TAP::Parser::Iterator> (see L</detect_source>).  Dies on error.
 
 =cut
 
-sub make_detector {
+sub make_iterator {
     my ( $self, $source ) = @_;
 
     $self->_croak('no raw source defined!') unless defined $source->raw;
@@ -191,11 +212,14 @@ sub make_detector {
 
     # figure out what kind of source it is
     my $sd_class = $self->detect_source( $source );
+    $self->_last_detector( $sd_class );
+
+    return if $self->_testing;
 
     # create it
-    my $detector = $sd_class->make_source( $source );
+    my $iterator = $sd_class->make_iterator( $source );
 
-    return $detector;
+    return $iterator;
 }
 
 
@@ -262,11 +286,6 @@ sub detect_source {
 }
 
 
-=head3 C<detectors>
-
-TODO
-
-=cut
 
 1;
 

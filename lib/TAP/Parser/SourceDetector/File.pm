@@ -3,9 +3,9 @@ package TAP::Parser::SourceDetector::File;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::SourceDetector          ();
-use TAP::Parser::SourceFactory   ();
-use TAP::Parser::IteratorFactory ();
+use TAP::Parser::SourceDetector   ();
+use TAP::Parser::SourceFactory    ();
+use TAP::Parser::Iterator::Stream ();
 
 @ISA = qw(TAP::Parser::SourceDetector);
 
@@ -75,15 +75,15 @@ sub can_handle {
     return 0;
 }
 
-=head3 C<make_source>
+=head3 C<make_iterator>
 
 =cut
 
-sub make_source {
+sub make_iterator {
     my ( $class, $src ) = @_;
     my $source = $class->new;
     $source->raw_source( $src->raw );
-    return $source;
+    return $source->get_stream;
 }
 
 ##############################################################################
@@ -130,7 +130,7 @@ sub get_stream {
     my $fh;
     open( $fh, '<', $file )
       or $self->_croak("error opening TAP source file '$file': $!");
-    return $factory->make_iterator($fh);
+    return TAP::Parser::Iterator::Stream->new( $fh );
 }
 
 1;
