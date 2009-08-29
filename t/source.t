@@ -12,7 +12,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 30;
+use Test::More tests => 32;
 use File::Spec;
 
 my $dir = File::Spec->catdir(
@@ -78,6 +78,28 @@ use_ok( 'TAP::Parser::Source' );
     is_deeply( $meta, {
 		       is_hash      => 1,
 		       is_object    => 0,
+		      }, 'assemble_meta for array' );
+}
+
+# glob check
+{
+    my $source = TAP::Parser::Source->new;
+    $source->raw( \*__DATA__ );
+    my $meta = $source->assemble_meta;
+    is_deeply( $meta, {
+		       is_glob      => 1,
+		       is_object    => 0,
+		      }, 'assemble_meta for array' );
+}
+
+# object check
+{
+    my $source = TAP::Parser::Source->new;
+    $source->raw( bless {}, 'Foo::Bar' );
+    my $meta = $source->assemble_meta;
+    is_deeply( $meta, {
+		       is_object    => 1,
+		       class        => 'Foo::Bar',
 		      }, 'assemble_meta for array' );
 }
 

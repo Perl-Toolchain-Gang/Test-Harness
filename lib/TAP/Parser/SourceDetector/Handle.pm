@@ -67,7 +67,7 @@ sub can_handle {
       if $meta->{is_object}
           && UNIVERSAL::isa( $raw_source_ref, 'IO::Handle' );
 
-    return 0.8 if $meta->{glob};
+    return 0.8 if $meta->{is_glob};
 
     return 0;
 }

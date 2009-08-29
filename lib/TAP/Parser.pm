@@ -7,6 +7,7 @@ use TAP::Base                       ();
 use TAP::Parser::Grammar            ();
 use TAP::Parser::Result             ();
 use TAP::Parser::ResultFactory      ();
+use TAP::Parser::Source             ();
 use TAP::Parser::SourceDetector::Executable ();
 use TAP::Parser::SourceDetector::Perl       ();
 use TAP::Parser::SourceDetector::File       ();
@@ -488,30 +489,26 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
         }
 
         # convert $tap & $exec to $raw_source equiv.
+	my $source = TAP::Parser::Source->new;
         my $raw_source_ref;
         if ($tap) {
-            $raw_source_ref = \$tap;
+	    $source->raw( \$tap );
         }
         elsif ($exec) {
-            $raw_source_ref = { exec => [ @$exec, @$test_args ] };
+            $source->raw({ exec => [ @$exec, @$test_args ] });
         }
         elsif ($raw_source) {
-            $raw_source_ref = ref($raw_source) ? $raw_source : \$raw_source;
+            $source->raw( ref($raw_source) ? $raw_source : \$raw_source );
         }
 
-        if ($raw_source_ref) {
+        if ($source->raw) {
             my $src_factory = $self->make_source_factory($sources);
-            my $source      = $src_factory->make_source(
-                {   raw_source_ref => $raw_source_ref,
-                    merge          => $merge,
-                    switches       => $switches,
-                    test_args      => $test_args
-                }
-            );
+	    $source->merge( $merge )->switches( $switches )->test_args( $test_args );
+            my $dsource = $src_factory->make_source( $source );
 
             # TODO: replace this with something like:
             # my $stream = $source->get_stream;  # notice no "( $self )"
-            $stream = $source->get_stream($self);
+            $stream = $dsource->get_stream($self);
         }
 
         unless ($stream) {

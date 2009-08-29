@@ -87,7 +87,7 @@ sub can_handle {
         return 0.8 if $file->{lc_ext} eq '.bat';
         return 0.7 if $file->{execute};
     }
-    elsif ( $meta->{hash} ) {
+    elsif ( $meta->{is_hash} ) {
         return 0.99 if $raw_source_ref->{exec};
     }
 
@@ -106,7 +106,7 @@ sub make_source {
 
     $source->merge( $args->{merge} );
 
-    if ( $meta->{hash} ) {
+    if ( $meta->{is_hash} ) {
         $source->raw_source( $raw_source_ref->{exec} );
     }
     elsif ( $meta->{is_file} ) {

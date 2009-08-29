@@ -213,19 +213,24 @@ sub assemble_meta {
     return $self->meta if $self->has_meta;
 
     my $meta   = $self->meta;
-    my $raw_ref = $self->raw;
+    my $raw = $self->raw;
 
     # rudimentary is object test - if it's blessed it'll
     # inherit from UNIVERSAL
     $meta->{is_object}
-      = UNIVERSAL::isa( $raw_ref, 'UNIVERSAL' ) ? 1 : 0;
+      = UNIVERSAL::isa( $raw, 'UNIVERSAL' ) ? 1 : 0;
 
-    my $ref = lc( ref($raw_ref) );
-    $meta->{"is_$ref"} = 1;
+    if ($meta->{is_object}) {
+	$meta->{class} = ref( $raw );
+    } else {
+	my $ref = lc( ref($raw) );
+	$meta->{"is_$ref"} = 1;
+    }
+
     if ( $meta->{is_scalar} ) {
-        my $source = $$raw_ref;
-        $meta->{length} = length($$raw_ref);
-        $meta->{has_newlines} = $$raw_ref =~ /\n/ ? 1 : 0;
+        my $source = $$raw;
+        $meta->{length} = length($$raw);
+        $meta->{has_newlines} = $$raw =~ /\n/ ? 1 : 0;
 
         # only do file checks if it looks like a filename
         if ( !$meta->{has_newlines} and $meta->{length} < 1024 ) {
@@ -266,7 +271,7 @@ sub assemble_meta {
 
 		if ( $file->{text} and $file->{read} ) {
 		    eval {
-			$file->{shebang} = $self->_read_shebang( $$raw_ref );
+			$file->{shebang} = $self->_read_shebang( $$raw );
 		    };
 		    if (my $e = $@) {
 			warn $e;
@@ -276,7 +281,7 @@ sub assemble_meta {
         }
     }
     elsif ( $meta->{is_array} ) {
-        $meta->{size} = $#$raw_ref + 1;
+        $meta->{size} = $#$raw + 1;
     }
     elsif ( $meta->{is_hash} ) {
         ;    # do nothing

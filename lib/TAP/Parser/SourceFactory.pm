@@ -4,6 +4,7 @@ use strict;
 use vars qw($VERSION @ISA);
 
 use TAP::Object ();
+use TAP::Parser::SourceFactory ();
 
 use Carp qw( confess );
 use File::Basename qw( fileparse );
@@ -176,34 +177,35 @@ given (see L</detect_source>).  Dies on error.
 =cut
 
 sub make_source {
-    my ( $self, $args ) = @_;
-    my $raw_source_ref = $args->{raw_source_ref};
+    my ( $self, $source ) = @_;
 
-    $self->_croak('no raw source ref defined!')
-      unless defined $raw_source_ref;
-    my $ref_type = ref($raw_source_ref);
-    $self->_croak('raw_source_ref is not a reference!') unless $ref_type;
+    $self->_croak('no raw source defined!') unless defined $source->raw;
 
+    $source->assemble_meta;
     # is the raw source already an object?
-    return $$raw_source_ref
-      if ( $ref_type eq 'SCALAR'
-        && ref($$raw_source_ref)
-        && UNIVERSAL::isa( $$raw_source_ref, 'TAP::Parser::SourceDetector' ) );
+    return $source->raw
+      if ( $source->meta->{is_object}
+	   && UNIVERSAL::isa( $source->raw, 'TAP::Parser::SourceDetector' ) );
 
     # figure out what kind of source it is
-    my ( $sd_class, $meta ) = $self->detect_source($raw_source_ref);
+    my $sd_class = $self->detect_source( $source );
 
     # create it
-    my $config = $self->_config_for($sd_class);
-    my $source = $sd_class->make_source(
-        {   %$args,
-            raw_source_ref => $raw_source_ref,
+    my $config  = $self->_config_for( $sd_class );
+    my $dsource = $sd_class->make_source(
+        {
+	    source         => $source,
             config         => $config,
-            meta           => $meta,
+	    # TODO: this is all deprecated
+            raw_source_ref => $source->raw,
+            meta           => $source->meta,
+	    merge          => $source->merge,
+	    test_args      => $source->test_args,
+	    switches       => $source->switches,
         }
     );
 
-    return $source;
+    return $dsource;
 }
 
 =head3 C<detect_source>
@@ -225,19 +227,16 @@ Ties are handled by choosing the first source.
 =cut
 
 sub detect_source {
-    my ( $self, $raw_source_ref ) = @_;
+    my ( $self, $source ) = @_;
 
-    confess('no raw source ref defined!') unless defined $raw_source_ref;
-
-    # build up some meta-data about the source so the sources don't have to
-    my $meta = $self->assemble_meta($raw_source_ref);
+    confess('no raw source ref defined!') unless defined $source->raw;
 
     # find a list of sources that can handle this source:
     my %sources;
     foreach my $dclass ( @{ $self->sources } ) {
         my $config = $self->_config_for($dclass);
         my $confidence
-          = $dclass->can_handle( $raw_source_ref, $meta, $config );
+          = $dclass->can_handle( $source->raw, $source->meta, $config );
 
         # warn "source: $dclass: $confidence\n";
         $sources{$dclass} = $confidence if $confidence;
@@ -249,7 +248,7 @@ sub detect_source {
         # warn pp( $meta );
 
         # error: can't detect source
-        my $raw_source_short = substr( $$raw_source_ref, 0, 50 );
+        my $raw_source_short = substr( ${ $source->raw }, 0, 50 );
         confess("Cannot detect source of '$raw_source_short'!");
         return;
     }
@@ -271,7 +270,7 @@ sub detect_source {
     }
 
     # return 1st source
-    return pop @sources, $meta;
+    return pop @sources;
 }
 
 =head3 C<assemble_meta>

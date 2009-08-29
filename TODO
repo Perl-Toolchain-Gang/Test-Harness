@@ -11,13 +11,18 @@ y  Create a new 'Source' class
 		meta (assembles it too)
 		(note to self: include shebang for Perl source)
 		config?
-  t	move meta data assembling from SourceFactory
+	move meta data assembling from SourceFactory
   ?	could have different sub-classes for internal cases
+
+    Refactory SourceFactory
+	use new Source class
 
     Refactor SourceDetectors
 	whittle down to 2 methods:
 		can_handle( source [, config? ] )
 		make_iterator( source )
+	TAP::Parser::SourceDetector::Perl
+		remove shebang detection
 
     Refactor Iterators
 	remove shebang detection

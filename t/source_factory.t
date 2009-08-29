@@ -19,6 +19,7 @@ use Test::More tests => 44;
 
 use IO::File;
 use File::Spec;
+use TAP::Parser::Source;
 use TAP::Parser::SourceFactory;
 
 # Test generic API...
@@ -49,32 +50,26 @@ use TAP::Parser::SourceFactory;
 
     # Known source should pass
     {
-        my $source;
-        eval {
-            $source
-              = $sf->make_source( { raw_source_ref => \"known-source" } );
-        };
+	my $source = TAP::Parser::Source->new->raw( \'known-source' );
+        my $dsource = eval { $sf->make_source( $source ) };
         my $error = $@;
         ok( !$error, 'make_source with known source doesnt fail' );
         diag($error) if $error;
-        isa_ok( $source, 'MySourceDetector', '... and source class' );
+        isa_ok( $dsource, 'MySourceDetector', '... and source class' );
         is_deeply(
-            $source->raw_source, [ \"known-source" ],
+            $dsource->raw_source, [ \"known-source" ],
             '... and raw_source as expected'
         );
         is_deeply(
-            $source->config, { accept => 'known-source' },
+            $dsource->config, { accept => 'known-source' },
             '... and source config as expected'
         );
     }
 
     # No known source should fail
     {
-        my $source;
-        eval {
-            $source
-              = $sf->make_source( { raw_source_ref => \"unknown-source" } );
-        };
+	my $source = TAP::Parser::Source->new->raw( \'unknown-source' );
+        my $dsource = eval { $sf->make_source( $source ) };
         my $error = $@;
         ok( $error, 'make_source with unknown source fails' );
         like $error, qr/^Cannot detect source of 'unknown-source'/,
@@ -147,16 +142,13 @@ foreach my $test (@sources) {
     my $name = $test->{name} || substr( $test->{source}, 0, 10 );
     my $sf = TAP::Parser::SourceFactory->new( $test->{config} );
 
-    my $raw_source = $test->{source};
-    my $source;
-    eval {
-        my $ref = ref($raw_source) ? $raw_source : \$raw_source;
-        $source = $sf->make_source( { raw_source_ref => $ref } );
-    };
-    my $error = $@;
+    my $raw     = $test->{source};
+    my $source  = TAP::Parser::Source->new->raw( ref($raw) ? $raw : \$raw );
+    my $dsource = eval { $sf->make_source( $source ) };
+    my $error   = $@;
     ok( !$error, "$name: no error on make_source" );
     diag($error) if $error;
-    isa_ok( $source, $test->{class}, $name );
+    isa_ok( $dsource, $test->{class}, $name );
 }
 
 __END__

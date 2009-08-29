@@ -21,7 +21,7 @@ sub can_handle {
         return 1;
     }
     elsif ( my $accept = $config->{accept} ) {
-        return 0 unless $meta->{scalar};
+        return 0 unless $meta->{is_scalar};
         return 1 if $$raw_source_ref eq $accept;
     }
     return 0;

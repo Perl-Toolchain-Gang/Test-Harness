@@ -62,13 +62,13 @@ Returns a new C<TAP::Parser::SourceDetector::RawTAP> object.
 sub can_handle {
     my ( $class, $raw_source_ref, $meta ) = @_;
     return 0 if $meta->{file};
-    if ( $meta->{scalar} ) {
+    if ( $meta->{is_scalar} ) {
         return 0 unless $meta->{has_newlines};
         return 0.9 if $$raw_source_ref =~ /\d\.\.\d/;
         return 0.7 if $$raw_source_ref =~ /ok/;
         return 0.6;
     }
-    elsif ( $meta->{array} ) {
+    elsif ( $meta->{is_array} ) {
         return 0.5;
     }
     return 0;
