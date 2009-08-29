@@ -61,7 +61,7 @@ Returns a new C<TAP::Parser::SourceDetector::Handle> object.
 =cut
 
 sub can_handle {
-    my ( $class, $src, $config ) = @_;
+    my ( $class, $src ) = @_;
     my $meta = $src->meta;
 
     return 0.9
@@ -78,7 +78,7 @@ sub can_handle {
 =cut
 
 sub make_source {
-    my ( $class, $src, $config ) = @_;
+    my ( $class, $src ) = @_;
     my $source = $class->new;
     $source->raw_source( $src->raw );
     return $source;

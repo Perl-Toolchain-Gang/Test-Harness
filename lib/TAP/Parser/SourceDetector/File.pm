@@ -60,8 +60,9 @@ Returns a new C<TAP::Parser::SourceDetector::File> object.
 =cut
 
 sub can_handle {
-    my ( $class, $src, $config ) = @_;
-    my $meta = $src->meta;
+    my ( $class, $src ) = @_;
+    my $meta   = $src->meta;
+    my $config = $src->config_for( $class );
 
     return 0 unless $meta->{is_file};
     my $file = $meta->{file};
@@ -79,7 +80,7 @@ sub can_handle {
 =cut
 
 sub make_source {
-    my ( $class, $src, $config ) = @_;
+    my ( $class, $src ) = @_;
     my $source = $class->new;
     $source->raw_source( $src->raw );
     return $source;

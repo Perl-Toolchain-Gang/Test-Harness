@@ -70,7 +70,7 @@ sub _initialize {
 =cut
 
 sub can_handle {
-    my ( $class, $src, $config ) = @_;
+    my ( $class, $src ) = @_;
     my $meta = $src->meta;
 
     return 0 unless $meta->{is_file};
@@ -94,7 +94,7 @@ sub can_handle {
 =cut
 
 sub make_source {
-    my ( $class, $src, $config ) = @_;
+    my ( $class, $src ) = @_;
     my $meta = $src->meta;
     my $perl_script = ${ $src->raw };
     my $test_args   = $src->test_args || [];

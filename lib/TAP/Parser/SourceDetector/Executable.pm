@@ -74,7 +74,7 @@ sub _initialize {
 =cut
 
 sub can_handle {
-    my ( $class, $src, $config ) = @_;
+    my ( $class, $src ) = @_;
     my $meta = $src->meta;
 
     if ( $meta->{is_file} ) {
@@ -97,7 +97,7 @@ sub can_handle {
 =cut
 
 sub make_source {
-    my ( $class, $src, $config ) = @_;
+    my ( $class, $src ) = @_;
     my $meta   = $src->meta;
     my $source = $class->new;
 

@@ -22,7 +22,17 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  # TODO
+  use TAP::Parser::Source;
+  my $source = TAP::Parser::Source->new;
+  $source->raw( \'reference to raw TAP source' )
+         ->config( \%config )
+         ->merge( $boolean )
+         ->switches( \@switches )
+         ->test_args( \@args )
+         ->assemble_meta;
+
+  do { ... } if $source->meta->{is_file};
+  # see assemble_meta for a full list of data available
 
 =head1 DESCRIPTION
 
@@ -304,6 +314,30 @@ sub _read_shebang {
     return $shebang;
 }
 
+
+=head3 C<config_for>
+
+  my $config = $source->config_for( $class );
+
+Returns config for the $class given.  Class names may be fully qualified
+or abbreviated, eg:
+
+  # these are equivalent
+  $source->config_for( 'Perl' );
+  $source->config_for( 'TAP::Parser::SourceDetector::Perl' );
+
+If a fully qualified $class is given, its abbreviated version is checked first.
+
+=cut
+
+sub config_for {
+    my ( $self, $class ) = @_;
+    my ($abbrv_class) = ( $class =~ /(?:\:\:)?(\w+)$/ );
+    my $config = $self->config->{$abbrv_class} || $self->config->{$class};
+    return $config;
+}
+
+
 1;
 
 __END__
@@ -320,4 +354,3 @@ L<TAP::Parser::SourceFactory>,
 L<TAP::Parser::SourceDetector>
 
 =cut
-

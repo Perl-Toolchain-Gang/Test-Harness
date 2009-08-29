@@ -12,7 +12,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 32;
+use Test::More tests => 34;
 use File::Spec;
 
 my $dir = File::Spec->catdir(
@@ -33,6 +33,10 @@ use_ok( 'TAP::Parser::Source' );
     can_ok( $source, qw( raw meta config merge switches test_args assemble_meta ) );
 
     is_deeply( $source->config, {}, 'config empty by default' );
+    $source->config->{Foo} = { bar => 'baz' };
+    is_deeply( $source->config_for( 'Foo' ), { bar => 'baz' }, 'config_for( Foo )' );
+    is_deeply( $source->config_for( 'TAP::Parser::SourceDetector::Foo' ),
+	       { bar => 'baz' }, 'config_for( ...::SourceDetector::Foo )' );
 
     ok( ! $source->merge, 'merge not set by default' );
     $source->merge( 1 );

@@ -14,15 +14,16 @@ y  Create a new 'Source' class
 	move meta data assembling from SourceFactory
   ?	could have different sub-classes for internal cases
 
-    Refactory SourceFactory
+y   Refactory SourceFactory
 	use new Source class
+	remove assemble_meta
 
     Refactor SourceDetectors
 	whittle down to 2 methods:
-		can_handle( source [, config? ] )
+	   y	can_handle( source [, config? ] )
 		make_iterator( source )
 	TAP::Parser::SourceDetector::Perl
-		remove shebang detection
+	   y	remove shebang detection
 
     Refactor Iterators
 	remove shebang detection

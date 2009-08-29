@@ -181,7 +181,9 @@ sub make_detector {
 
     $self->_croak('no raw source defined!') unless defined $source->raw;
 
-    $source->assemble_meta;
+    $source->config( $self->config )
+           ->assemble_meta;
+
     # is the raw source already an object?
     return $source->raw
       if ( $source->meta->{is_object}
@@ -191,8 +193,7 @@ sub make_detector {
     my $sd_class = $self->detect_source( $source );
 
     # create it
-    my $config  = $self->_config_for( $sd_class );
-    my $detector = $sd_class->make_source( $source, $config );
+    my $detector = $sd_class->make_source( $source );
 
     return $detector;
 }
@@ -224,9 +225,7 @@ sub detect_source {
     # find a list of detectors that can handle this source:
     my %detectors;
     foreach my $dclass ( @{ $self->detectors } ) {
-        my $config = $self->_config_for($dclass);
-        my $confidence
-          = $dclass->can_handle( $source, $config );
+        my $confidence = $dclass->can_handle( $source );
 
         # warn "detector: $dclass: $confidence\n";
         $detectors{$dclass} = $confidence if $confidence;

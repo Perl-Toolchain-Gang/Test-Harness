@@ -16,8 +16,9 @@ use TAP::Parser::SourceDetector;
 TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
 sub can_handle {
-    my ( $class, $src, $config ) = @_;
-    my $meta = $src->meta;
+    my ( $class, $src ) = @_;
+    my $meta   = $src->meta;
+    my $config = $src->config_for( $class );
 
     if ( $config->{accept_all} ) {
         return 1;
@@ -30,7 +31,9 @@ sub can_handle {
 }
 
 sub make_source {
-    my ( $class, $src, $config ) = @_;
+    my ( $class, $src ) = @_;
+    my $meta   = $src->meta;
+    my $config = $src->config_for( $class );
     my $source = $class->new;
     $source->config( $config )->source([ $src->raw ])->custom;
     return $source;
