@@ -41,6 +41,8 @@ y    Refactor SourceDetectors
      y	don't need to inherit from TAP::Parser::SourceDetector
 		just need can_handle & make_iterator
 
+    Update TAP::Parser & Subclassing docs
+
     Move SourceDetector --> SourceHandler?
 	more descriptive of their function
 

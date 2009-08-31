@@ -112,7 +112,8 @@ The arguments should be a hashref with I<one> of the following keys:
 
 =item * C<source>
 
-I<TODO:> rewrite this when L<TAP::Parser::SourceFactory> is finished.
+I<TODO:> update this, it's out-of-date now that L<TAP::Parser::SourceFactory>
+is in use.
 
 This is the preferred method of passing arguments to the constructor.  To
 determine how to handle the source, the following steps are taken.
@@ -212,7 +213,7 @@ the future.
 
 =item * C<sources>
 
-I<Experimental>.
+I<NEW to 3.18>.
 
 If set, C<sources> must be a hashref containing the names of the
 L<TAP::Parser::SourceDetector> subclasses you want to load and/or configure.  The
@@ -256,7 +257,7 @@ See also L</make_result>.
 
 =item * C<source_factory_class>
 
-I<NEW>.
+I<NEW to 3.18>.
 
 This option was introduced to let you easily customize which I<source>
 factory class the parser should use.  It defaults to
@@ -335,6 +336,8 @@ given.
 The C<result_factory_class> can be customized, as described in L</new>.
 
 =head3 C<make_source_factory>
+
+I<NEW to 3.18>.
 
 Make a new L<TAP::Parser::SourceFactory> object and return it.  Passes through
 any arguments given.
@@ -1660,6 +1663,9 @@ never run. They're reported as parse failures (tests out of sequence).
 
 =head1 SUBCLASSING
 
+I<TODO:> update this, it's out-of-date now that L<TAP::Parser::SourceFactory>
+is in use.
+
 If you find you need to provide custom functionality (as you would have using
 L<Test::Harness::Straps>), you're in luck: C<TAP::Parser> and friends are
 designed to be easily subclassed.
@@ -1699,6 +1705,9 @@ deprecated first, and changed in a later release.
 
 =head2 Parser Components
 
+I<TODO:> update this, it's out-of-date now that L<TAP::Parser::SourceFactory>
+is in use.
+
 =head3 Sources
 
 A TAP parser consumes input from a single I<source> of TAP, which could come
@@ -1707,7 +1716,7 @@ A L<TAP::Parser::SourceFactory> is used to determine the type of a so-called
 'raw' source, and create L<TAP::Parser::SourceDetector> objects which then stream the
 TAP to the parser by way of L</Iterators>.
 
-There are quite a few I<SourceDetectors> available, 
+There are quite a few I<SourceDetectors> available,
 
 If you simply want C<TAP::Parser> to handle a new source of TAP you probably
 don't need to subclass C<TAP::Parser> itself.  Rather, you'll need to create
