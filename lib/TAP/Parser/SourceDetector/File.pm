@@ -51,8 +51,8 @@ won't need to use this module directly.
 
 Only votes if $source looks like a regular file.  Casts the following votes:
 
-  1.0 if it's a .tap file
-  1.0 if it has an extension matching any given in user config.
+  0.9 if it's a .tap file
+  0.9 if it has an extension matching any given in user config.
 
 =cut
 
@@ -63,10 +63,10 @@ sub can_handle {
 
     return 0 unless $meta->{is_file};
     my $file = $meta->{file};
-    return 1 if $file->{lc_ext} eq '.tap';
+    return 0.9 if $file->{lc_ext} eq '.tap';
 
     if ( my $exts = $config->{extensions} ) {
-        return 1 if grep { lc($_) eq $file->{lc_ext} } @$exts;
+        return 0.9 if grep { lc($_) eq $file->{lc_ext} } @$exts;
     }
 
     return 0;

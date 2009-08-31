@@ -92,7 +92,7 @@ my $perl = $^X;
 	 name => 'exec hash',
 	 raw  => { exec => 'foo' },
 	 meta => { is_hash => 1 },
-	 vote => 0.99,
+	 vote => 0.9,
 	},
        ],
        make_iterator =>
@@ -142,7 +142,7 @@ my $perl = $^X;
 		  is_file => 1,
 		  file => { lc_ext => '.pl', dir => '' }
 		 },
-	 vote => 1,
+	 vote => 0.9,
 	},
 	{
 	 name => 't/.../file',
@@ -158,7 +158,7 @@ my $perl = $^X;
 		  is_file => 1,
 		  file => { lc_ext => '', dir => '', shebang => '#!/usr/bin/perl' }
 		 },
-	 vote => 0.99,
+	 vote => 0.9,
 	},
 	{
 	 name => 'file default',
@@ -166,7 +166,7 @@ my $perl = $^X;
 		  is_file => 1,
 		  file => { lc_ext => '', dir => '' }
 		 },
-	 vote => 0.5,
+	 vote => 0.25,
 	},
        ],
        make_iterator =>
@@ -203,25 +203,25 @@ my $perl = $^X;
        can_handle =>
        [
 	{
-	 name => '.t',
+	 name => 'file',
 	 meta => { is_file => 1 },
 	 raw  => \'',
 	 vote => 0,
 	},
 	{
-	 name => '.t',
+	 name => 'scalar w/newlines',
 	 meta => { is_scalar => 1, has_newlines => 1 },
 	 raw  => \'',
 	 vote => 0.6,
 	},
 	{
-	 name => '.t',
+	 name => '1..10',
 	 meta => { is_scalar => 1, has_newlines => 1 },
 	 raw  => \"1..10\n",
 	 vote => 0.9,
 	},
 	{
-	 name => '.t',
+	 name => 'array',
 	 meta => { is_array => 1 },
 	 raw  => ['1..1', 'ok 1'],
 	 vote => 0.5,
@@ -262,7 +262,7 @@ my $perl = $^X;
 		  is_file => 1,
 		  file => { lc_ext => '.tap' }
 		 },
-	 vote => 1,
+	 vote => 0.9,
 	},
 	{
 	 name => '.foo with config',
@@ -271,7 +271,7 @@ my $perl = $^X;
 		  file => { lc_ext => '.foo' }
 		 },
 	 config => { File => { extensions => ['.foo'] } },
-	 vote => 1,
+	 vote => 0.9,
 	},
        ],
        make_iterator =>

@@ -51,27 +51,17 @@ won't need to use this module directly.
 
 =head2 Class Methods
 
-=cut
-
-sub _initialize {
-    my ( $self, @args ) = @_;
-    $self->SUPER::_initialize(@args);
-    $self->{switches} = [];
-    return $self;
-}
-
-
 =head3 C<can_handle>
 
   my $vote = $class->can_handle( $source );
 
 Only votes if $source looks like a file.  Casts the following votes:
 
-  0.99 if it has a shebang ala "#!...perl"
+  0.9  if it has a shebang ala "#!...perl"
   0.8  if it's a .t file
-  1.0  if it's a .pl file
+  0.9  if it's a .pl file
   0.75 if it's in a 't' directory
-  0.5  by default (backwards compat)
+  0.25 by default (backwards compat)
 
 =cut
 
@@ -83,16 +73,16 @@ sub can_handle {
     my $file = $meta->{file};
 
     if (my $shebang = $file->{shebang}) {
-	return 0.99 if $shebang =~ /^#!.*\bperl/;
+	return 0.9 if $shebang =~ /^#!.*\bperl/;
     }
 
     return 0.8 if $file->{lc_ext} eq '.t';    # vote higher than Executable
-    return 1   if $file->{lc_ext} eq '.pl';
+    return 0.9 if $file->{lc_ext} eq '.pl';
 
     return 0.75 if $file->{dir} =~ /^t\b/;    # vote higher than Executable
 
     # backwards compat, always vote:
-    return 0.5;
+    return 0.25;
 }
 
 =head3 C<make_iterator>

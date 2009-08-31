@@ -69,9 +69,9 @@ sub _initialize {
 
 Only votes if $source looks like an executable file.  Casts the following votes:
 
-  0.99 if it's a hash with an 'exec' key
+  0.9  if it's a hash with an 'exec' key
   0.8  if it's a .sh file
-  1.0  if it's a .bat file
+  0.8  if it's a .bat file
   0.75 if it's got an execute bit set
 
 =cut
@@ -89,7 +89,7 @@ sub can_handle {
         return 0.7 if $file->{execute};
     }
     elsif ( $meta->{is_hash} ) {
-        return 0.99 if $src->raw->{exec};
+        return 0.9 if $src->raw->{exec};
     }
 
     return 0;
@@ -102,13 +102,9 @@ sub can_handle {
 Returns a new L<TAP::Parser::Iterator::Process> for the source.
 C<$source-E<gt>raw> must be in one of the following forms:
 
-  {
-   exec => [ @exec ],
-  }
+  { exec => [ @exec ] }
 
-  [
-   @exec
-  ]
+  [ @exec ]
 
   $file
 
