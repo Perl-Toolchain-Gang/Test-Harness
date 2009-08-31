@@ -20,23 +20,5 @@ sub can_handle {
     return $vote;
 }
 
-sub make_source {
-    my $class  = shift;
-    my $source = $class->SUPER::make_source(@_);
-}
-
-sub _initialize {
-    my $self = shift;
-    $self->SUPER::_initialize(@_);
-    $main::INIT{ ref($self) }++;
-    $self->{initialized} = 1;
-    return $self;
-}
-
-sub source {
-    my $self = shift;
-    return $self->SUPER::source(@_);
-}
-
 1;
 

@@ -13,12 +13,12 @@ BEGIN {
 use strict;
 use vars qw(%INIT %CUSTOM);
 
-use Test::More tests => 16;
+use Test::More tests => 14;
 use File::Spec::Functions qw( catfile updir );
 
 use_ok('TAP::Parser::SubclassTest');
 
-# TODO: foreach my $source ( ... )
+# TODO: foreach my $source ( ... ) ?
 my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 
 {    # perl source
@@ -73,11 +73,6 @@ SKIP: {    # non-perl source
         }
     );
 
-    is( $INIT{MySourceDetector},     1, 'initialized MySourceDetector subclass' );
-    is( $CUSTOM{MySourceDetector},   1, '... and it was customized' );
-    {
-	local $TODO = 'deprecated?';
-	is( $INIT{MyIterator},   1, 'initialized MyIterator subclass' );
-	is( $CUSTOM{MyIterator}, 1, '... and it was customized' );
-    }
+    is( $CUSTOM{MySourceDetector},   1, 'customized a MySourceDetector' );
+    is( $INIT{MyIterator}, 1, 'initialized MyIterator subclass' );
 }

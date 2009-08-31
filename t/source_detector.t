@@ -102,16 +102,17 @@ my $perl = $^X;
 	 raw    => [ $perl, '-It/lib', '-T', $test ],
 	 iclass => 'TAP::Parser::Iterator::Process',
 	 output => [ '1..1', 'ok 1' ],
+	 assemble_meta => 1,
 	},
 	{
 	 name  => "invalid source->raw",
 	 raw   => "$perl -It/lib $test",
-	 error => qr/^Argument to &raw_source must be an array reference/,
+	 error => qr/^No command found/,
 	},
 	{
 	 name  => "non-existent source->raw",
 	 raw   => [],
-	 error => qr/No command found!/,
+	 error => qr/^No command found/,
 	},
        ],
       };
@@ -210,21 +211,21 @@ my $perl = $^X;
 	},
 	{
 	 name => 'scalar w/newlines',
-	 meta => { is_scalar => 1, has_newlines => 1 },
-	 raw  => \'',
-	 vote => 0.6,
+	 raw  => \"hello\nworld\n",
+	 vote => 0.3,
+	 assemble_meta => 1,
 	},
 	{
 	 name => '1..10',
-	 meta => { is_scalar => 1, has_newlines => 1 },
 	 raw  => \"1..10\n",
 	 vote => 0.9,
+	 assemble_meta => 1,
 	},
 	{
 	 name => 'array',
-	 meta => { is_array => 1 },
 	 raw  => ['1..1', 'ok 1'],
 	 vote => 0.5,
+	 assemble_meta => 1,
 	},
        ],
        make_iterator =>
@@ -234,12 +235,14 @@ my $perl = $^X;
 	 raw    => \"1..1\nok 1 - raw\n",
 	 iclass => 'TAP::Parser::Iterator::Array',
 	 output => [ '1..1', 'ok 1 - raw' ],
+	 assemble_meta => 1,
 	},
 	{
 	 name   => 'valid array',
 	 raw    => [ '1..1', 'ok 1 - raw' ],
 	 iclass => 'TAP::Parser::Iterator::Array',
 	 output => [ '1..1', 'ok 1 - raw' ],
+	 assemble_meta => 1,
 	},
        ],
       };

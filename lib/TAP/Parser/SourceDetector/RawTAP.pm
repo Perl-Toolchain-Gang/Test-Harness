@@ -25,18 +25,24 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
+  use TAP::Parser::Source;
   use TAP::Parser::SourceDetector::RawTAP;
-  my $source = TAP::Parser::SourceDetector::RawTAP->new;
-  my $stream = $source->source( \"1..1\nok 1\n" )->get_stream;
+
+  my $source = TAP::Parser::Source->new->raw( \"1..1\nok 1\n" );
+  $source->assemble_meta;
+
+  my $class = 'TAP::Parser::SourceDetector::RawTAP';
+  my $vote  = $class->can_handle( $source );
+  my $iter  = $class->make_iterator( $source );
 
 =head1 DESCRIPTION
 
 This is a I<raw TAP output> L<TAP::Parser::SourceDetector> - it has 2 jobs:
 
-1. Figure out if the I<raw> source it's given is actually just TAP output.
-See L<TAP::Parser::SourceFactory> for more details.
+1. Figure out if the L<TAP::Parser::Source> it's given is raw TAP output
+(L</can_handle>).
 
-2. Takes raw TAP and converts into an iterator.
+2. Creates an iterator for raw TAP output (L</make_iterator>).
 
 Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
 won't need to use this module directly.
@@ -45,17 +51,17 @@ won't need to use this module directly.
 
 =head2 Class Methods
 
-=head3 C<new>
-
- my $source = TAP::Parser::SourceDetector::RawTAP->new;
-
-Returns a new C<TAP::Parser::SourceDetector::RawTAP> object.
-
-=cut
-
-# new() implementation supplied by parent class
-
 =head3 C<can_handle>
+
+  my $vote = $class->can_handle( $source );
+
+Only votes if $source is an array, or a scalar with newlines.  Casts the
+following votes:
+
+  0.9  if it's a scalar with '..' in it
+  0.7  if it's a scalar with 'ok' in it
+  0.3  if it's just a scalar with newlines
+  0.5  if it's an array
 
 =cut
 
@@ -68,7 +74,7 @@ sub can_handle {
         return 0 unless $meta->{has_newlines};
         return 0.9 if ${ $src->raw } =~ /\d\.\.\d/;
         return 0.7 if ${ $src->raw } =~ /ok/;
-        return 0.6;
+        return 0.3;
     }
     elsif ( $meta->{is_array} ) {
         return 0.5;
@@ -78,63 +84,33 @@ sub can_handle {
 
 =head3 C<make_iterator>
 
+  my $iterator = $class->make_iterator( $source );
+
+Returns a new L<TAP::Parser::Iterator::Array> for the source.
+C<$source-E<gt>raw> must be an array ref, or a scalar ref.
+
+C<croak>s on error.
+
 =cut
 
 sub make_iterator {
     my ( $class, $src ) = @_;
-    my $source = $class->new;
-    $source->raw_source( $src->raw );
-    return $source->get_stream;
-}
+    my $meta = $src->meta;
 
-##############################################################################
-
-=head2 Instance Methods
-
-=head3 C<raw_source>
-
- my $raw_source = $source->raw_source;
- $source->raw_source( \$raw_tap );
-
-Getter/setter for the raw_source.  C<croaks> if it doesn't get a scalar or
-array ref.
-
-=cut
-
-sub raw_source {
-    my $self = shift;
-    if (@_) {
-        my $ref = ref $_[0];
-        if ( !defined($ref) ) {
-            ;    # fall through
-        }
-        elsif ( $ref eq 'SCALAR' ) {
-            my $scalar_ref = shift;
-            return $self->SUPER::raw_source( [ split "\n" => $$scalar_ref ] );
-        }
-        elsif ( $ref eq 'ARRAY' ) {
-            return $self->SUPER::raw_source(shift);
-        }
-        $self->_croak(
-            'Argument to &raw_source must be a scalar or array reference');
+    my $tap_array;
+    if ( $meta->{is_scalar} ) {
+	$tap_array = [ split "\n" => ${ $src->raw } ];
     }
-    return $self->SUPER::raw_source;
+    elsif ( $meta->{is_array} ) {
+	$tap_array = $src->raw;
+    }
+
+    $class->_croak( 'No raw TAP found in $source->raw' )
+      unless scalar $tap_array;
+
+    return TAP::Parser::Iterator::Array->new( $tap_array );
 }
 
-##############################################################################
-
-=head3 C<get_stream>
-
- my $stream = $source->get_stream( $iterator_maker );
-
-Returns a L<TAP::Parser::Iterator> for this TAP stream.
-
-=cut
-
-sub get_stream {
-    my ( $self, $factory ) = @_;
-    return TAP::Parser::Iterator::Array->new( $self->raw_source );
-}
 
 1;
 
@@ -146,6 +122,7 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 L<TAP::Object>,
 L<TAP::Parser>,
+L<TAP::Parser::SourceFactory>,
 L<TAP::Parser::SourceDetector>,
 L<TAP::Parser::SourceDetector::Executable>,
 L<TAP::Parser::SourceDetector::Perl>,

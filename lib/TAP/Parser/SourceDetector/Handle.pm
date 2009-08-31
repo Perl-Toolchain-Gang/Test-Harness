@@ -25,19 +25,25 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  use TAP::Parser::SourceDetector::Handle;
-  my $source = TAP::Parser::SourceDetector::Handle->new;
-  my $stream = $source->raw_source( \*TAP_FILE )->get_stream;
+  use TAP::Parser::Source;
+  use TAP::Parser::SourceDetector::Executable;
+
+  my $source = TAP::Parser::Source->new->raw( \*TAP_FILE );
+  $source->assemble_meta;
+
+  my $class = 'TAP::Parser::SourceDetector::Handle';
+  my $vote  = $class->can_handle( $source );
+  my $iter  = $class->make_iterator( $source );
 
 =head1 DESCRIPTION
 
 This is a I<raw TAP stored in an IO Handle> L<TAP::Parser::SourceDetector> class.  It
 has 2 jobs:
 
-1. Figure out if the I<raw> source it's given is an L<IO::Handle> or GLOB
-containing raw TAP output.  See L<TAP::Parser::SourceFactory> for more details.
+1. Figure out if the L<TAP::Parser::Source> it's given is an L<IO::Handle> or
+GLOB containing raw TAP output (L</can_handle>).
 
-2. Takes raw TAP from the handle/GLOB given and converts into an iterator.
+2. Creates an iterator for IO::Handle's & globs (L</make_iterator>).
 
 Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
 won't need to use this module directly.

@@ -52,26 +52,6 @@ subclassing L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head2 Class Methods
 
-=head3 C<new>
-
-I<Deprecated.>
-
- my $source = TAP::Parser::SourceDetector->new;
-
-Returns a new C<TAP::Parser::SourceDetector> object.
-
-=cut
-
-# new() implementation supplied by TAP::Object
-
-sub _initialize {
-    my ($self) = @_;
-    $self->config( {} );
-    return $self;
-}
-
-##############################################################################
-
 =head3 C<can_handle>
 
 I<Abstract method>.
@@ -111,96 +91,6 @@ sub make_iterator {
     $class->_croak("Abstract method 'make_iterator' not implemented for $class!");
     return;
 }
-
-##############################################################################
-
-=head2 Instance Methods
-
-=head3 C<raw_source>
-
-I<Deprecated.>
-
- my $raw_source = $source->raw_source;
- $source->raw_source( $some_value );
-
-Chaining getter/setter for the raw TAP source.
-
-=head3 C<source>
-
-I<Deprecated.>
-
-Synonym for L</raw_source>.
-
-=head3 C<config>
-
-I<Deprecated.>
-
- my $config = $source->config;
- $source->config({ %some_value });
-
-Chaining getter/setter for the source's configuration, if any.  This defaults
-to an empty hashref.
-
-=head3 C<merge>
-
-I<Deprecated.>
-
-  my $merge = $source->merge;
-
-Chaining getter/setter for the flag that dictates whether STDOUT and STDERR
-should be merged (where appropriate).
-
-=cut
-
-sub raw_source {
-    my $self = shift;
-    return $self->{raw_source} unless @_;
-    $self->{raw_source} = shift;
-    return $self;
-}
-
-sub source {
-    my $self = shift;
-    return $self->raw_source(@_);
-}
-
-sub config {
-    my $self = shift;
-    return $self->{config} unless @_;
-    $self->{config} = shift;
-    return $self;
-}
-
-sub merge {
-    my $self = shift;
-    return $self->{merge} unless @_;
-    $self->{merge} = shift;
-    return $self;
-}
-
-##############################################################################
-
-=head3 C<get_stream>
-
-I<Deprecated.>  I<Abstract method>.
-
- my $stream = $source->get_stream( $iterator_maker );
-
-Returns a L<TAP::Parser::Iterator> stream of the output generated from the
-raw TAP C<source>.
-
-The C<$iterator_maker> given must be an object that implements a
-C<make_iterator> method to capture the TAP stream.  Typically this is a
-L<TAP::Parser> instance.
-
-=cut
-
-sub get_stream {
-    my ( $self, $factory ) = @_;
-    my $class = ref($self) || $self;
-    $self->_croak("Abstract method 'get_stream' not implemented for $class!");
-}
-
 1;
 
 __END__
@@ -212,7 +102,8 @@ of the subclasses that ship with this module as an example.  What follows is
 a quick overview.
 
 Start by familiarizing yourself with L<TAP::Parser::Source> and
-L<TAP::Parser::SourceFactory>.
+L<TAP::Parser::SourceFactory>.  L<TAP::Parser::SourceDetector::RawTAP> is
+the easiest sub-class to use an an example.
 
 It's important to point out that if you want your subclass to be automatically
 used by L<TAP::Parser> you'll have to and make sure it gets loaded somehow.

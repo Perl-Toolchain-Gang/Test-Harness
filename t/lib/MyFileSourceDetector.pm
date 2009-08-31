@@ -16,15 +16,6 @@ $LAST_SOURCE = undef;
 
 TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 
-sub _initialize {
-    my $self = shift;
-    $self->SUPER::_initialize(@_);
-    $main::INIT{ ref($self) }++;
-    $self->{initialized} = [@_];
-    $LAST_OBJ = $self;
-    return $self;
-}
-
 sub can_handle {
     my $class = shift;
     $class->SUPER::can_handle(@_);

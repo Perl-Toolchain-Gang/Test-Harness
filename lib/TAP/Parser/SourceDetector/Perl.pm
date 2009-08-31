@@ -30,8 +30,13 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
+  use TAP::Parser::Source;
   use TAP::Parser::SourceDetector::Perl;
-  my $class = 'TAP::Parser::SourceDetector::Perl'
+
+  my $source = TAP::Parser::Source->new->raw( \'script.pl' );
+  $source->assemble_meta;
+
+  my $class = 'TAP::Parser::SourceDetector::Perl';
   my $vote  = $class->can_handle( $source );
   my $iter  = $class->make_iterator( $source );
 
@@ -40,9 +45,9 @@ $VERSION = '3.18';
 This is a I<Perl> L<TAP::Parser::SourceDetector> - it has 2 jobs:
 
 1. Figure out if the L<TAP::Parser::Source> it's given is actually a Perl
-script.  See L</can_handle> for more details.
+script (L</can_handle>).
 
-2. Takes a Perl script and creates an iterator from it.
+2. Creates an iterator for Perl sources (L</make_iterator>).
 
 Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
 won't need to use this module directly.
