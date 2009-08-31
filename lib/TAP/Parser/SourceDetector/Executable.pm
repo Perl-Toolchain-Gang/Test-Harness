@@ -57,8 +57,8 @@ sub _initialize {
     $self->SUPER::_initialize(@args);
 
     # TODO: does this really need to be done here?
-    _autoflush( \*STDOUT );
-    _autoflush( \*STDERR );
+    $self->_autoflush( \*STDOUT );
+    $self->_autoflush( \*STDERR );
 
     return $self;
 }
@@ -216,8 +216,8 @@ sub _get_command { return @{ shift->raw_source || [] } }
 
 # Turns on autoflush for the handle passed
 sub _autoflush {
-    my $flushed = shift;
-    my $old_fh  = select $flushed;
+    my ($class, $flushed) = @_;
+    my $old_fh = select $flushed;
     $| = 1;
     select $old_fh;
 }

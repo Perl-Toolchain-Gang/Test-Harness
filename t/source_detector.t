@@ -12,7 +12,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 59;
+use Test::More tests => 58;
 
 use IO::File;
 use IO::Handle;
@@ -176,6 +176,7 @@ my $perl = $^X;
 	 raw    => \$test,
 	 iclass => 'TAP::Parser::Iterator::Process',
 	 output => [ '1..1', 'ok 1' ],
+	 assemble_meta => 1,
 	},
        ],
       };
@@ -184,13 +185,12 @@ my $perl = $^X;
 
     # internals tests!
     {
-	local $TODO = 'figure out how to test these';
-	my $source = TAP::Parser::Source->new->raw([ $test ]);
-	my $detector = $class->new->raw_source( $source->raw );
-	can_ok $detector, '_switches';
-	ok( grep( $_ =~ /^['"]?-T['"]?$/, $detector->_switches ),
-	    '... and it should find the taint switch'
-	  );
+	my $source = TAP::Parser::Source->new->raw( \$test );
+	$source->assemble_meta;
+	my $iterator = $class->make_iterator( $source );
+	my @command  = @{ $iterator->{command} };
+	ok( grep( $_ =~ /^['"]?-T['"]?$/, @command ),
+	    '... and it should find the taint switch' );
     }
 }
 

@@ -37,7 +37,8 @@ y   Phase out current IteratorFactory & old Source
 	   y	make_iterator( source )
 	factor out get_stream & instance methods
 	TAP::Parser::SourceDetector::Perl
-	   !	remove shebang detection
+	   y	remove shebang detection
+	don't need to inherit from TAP::Parser::SourceDetector
 
     Move SourceDetector --> SourceHandler?
 	more descriptive of their function
@@ -50,11 +51,16 @@ y   Phase out current IteratorFactory & old Source
 	in TAP::Grammar
 	   	$stream
 	   	->new( stream => ... )
+	mv streams.t -> iterators.t
 
     Refactor Iterators
 	remove shebang detection
 	other tasks?
 	Exec iterator should be really easy to use
+		rename to Exec ?
+		make command available
+		don't execute command until ->next called
+		(makes testing easier)
 
     Phase out source
 
