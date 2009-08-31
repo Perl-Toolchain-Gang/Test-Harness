@@ -48,12 +48,6 @@ won't need to use this module directly.
 
 =head2 Class Methods
 
-=head3 C<new>
-
- my $source = TAP::Parser::SourceDetector::Executable->new;
-
-Returns a new C<TAP::Parser::SourceDetector::Executable> object.
-
 =cut
 
 # new() implementation supplied by TAP::Object
@@ -70,6 +64,15 @@ sub _initialize {
 }
 
 =head3 C<can_handle>
+
+  my $vote = $class->can_handle( $source );
+
+Only votes if $source looks like an executable file.  Casts the following votes:
+
+  0.99 if it's a hash with an 'exec' key
+  0.8  if it's a .sh file
+  1.0  if it's a .bat file
+  0.75 if it's got an execute bit set
 
 =cut
 
@@ -94,6 +97,23 @@ sub can_handle {
 
 =head3 C<make_iterator>
 
+  my $iterator = $class->make_iterator( $source );
+
+Returns a new L<TAP::Parser::Iterator::Process> for the source.
+C<$source-E<gt>raw> must be in one of the following forms:
+
+  {
+   exec => [ @exec ],
+  }
+
+  [
+   @exec
+  ]
+
+  $file
+
+C<croak>s on error.
+
 =cut
 
 sub make_iterator {
@@ -115,6 +135,15 @@ sub make_iterator {
 
     return $source->get_stream;
 }
+
+=head3 C<iterator_class>
+
+The class of iterator to use, override if you're sub-classing.  Defaults
+to L<TAP::Parser::Iterator::Process>.
+
+=cut
+
+use constant iterator_class => 'TAP::Parser::Iterator::Process';
 
 ##############################################################################
 
@@ -176,7 +205,7 @@ sub get_stream {
     my @command = $self->_get_command
       or $self->_croak('No command found!');
 
-    return TAP::Parser::Iterator::Process->new(
+    return $self->iterator_class->new(
         {   command => \@command,
             merge   => $self->merge
         }

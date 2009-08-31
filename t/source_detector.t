@@ -12,18 +12,20 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 68;
+use Test::More tests => 59;
 
+use IO::File;
+use IO::Handle;
 use File::Spec;
 
-use EmptyParser;
+use TAP::Parser::Source;
 use TAP::Parser::SourceDetector;
 use TAP::Parser::SourceDetector::Perl;
 use TAP::Parser::SourceDetector::File;
 use TAP::Parser::SourceDetector::RawTAP;
+use TAP::Parser::SourceDetector::Handle;
 
-my $parser = EmptyParser->new;
-my $dir    = File::Spec->catdir(
+my $dir = File::Spec->catdir(
     (   $ENV{PERL_CORE}
         ? ( File::Spec->updir(), 'ext', 'Test-Harness' )
         : ()
@@ -36,168 +38,352 @@ my $perl = $^X;
 
 # Abstract base class tests
 {
-    can_ok 'TAP::Parser::SourceDetector', 'new';
-    my $source = TAP::Parser::SourceDetector->new;
-    isa_ok $source, 'TAP::Parser::SourceDetector';
+    my $class  = 'TAP::Parser::SourceDetector';
+    my $source = TAP::Parser::Source->new;
+    my $error;
 
-    can_ok $source, 'raw_source';
-    is $source->raw_source('hello'), $source, '... can set';
-    is $source->raw_source, 'hello', '... and get';
+    can_ok $class, 'can_handle';
+    eval { $class->can_handle( $source ) };
+    $error = $@;
+    like $error, qr/^Abstract method 'can_handle'/,
+      '... with an appropriate error message';
 
-    # TODO: deprecated
-    can_ok $source, 'source';
-    is $source->source, 'hello', '... and get = raw_source';
-
-    can_ok $source, 'merge';
-    is $source->merge('hello'), $source, '... can set';
-    is $source->merge, 'hello', '... and get';
-
-    can_ok $source, 'config';
-    is $source->config('hello'), $source, '... can set';
-    is $source->config, 'hello', '... and get';
-
-    can_ok $source, 'get_stream';
-    eval { $source->get_stream($parser) };
-    my $error = $@;
-    like $error, qr/^Abstract method/,
+    can_ok $class, 'make_iterator';
+    eval { $class->make_iterator( $source ) };
+    $error = $@;
+    like $error, qr/^Abstract method 'make_iterator'/,
       '... with an appropriate error message';
 }
 
 # Executable source tests
 {
-    my $test = File::Spec->catfile( $dir, 'source' );
-    my $source = TAP::Parser::SourceDetector::Executable->new;
-    isa_ok $source, 'TAP::Parser::SourceDetector::Executable';
+    my $class = 'TAP::Parser::SourceDetector::Executable';
+    my $test  = File::Spec->catfile( $dir, 'source' );
+    my $tests =
+      {
+       default_vote => 0,
+       can_handle =>
+       [
+	{
+	 name => '.sh',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '.sh' }
+		 },
+	 vote => 0.8,
+	},
+	{
+	 name => '.bat',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '.bat' }
+		 },
+	 vote => 0.8,
+	},
+	{
+	 name => 'executable bit',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '', execute => 1 }
+		 },
+	 vote => 0.7,
+	},
+	{
+	 name => 'exec hash',
+	 raw  => { exec => 'foo' },
+	 meta => { is_hash => 1 },
+	 vote => 0.99,
+	},
+       ],
+       make_iterator =>
+       [
+	{
+	 name   => "valid executable",
+	 raw    => [ $perl, '-It/lib', '-T', $test ],
+	 iclass => 'TAP::Parser::Iterator::Process',
+	 output => [ '1..1', 'ok 1' ],
+	},
+	{
+	 name  => "invalid source->raw",
+	 raw   => "$perl -It/lib $test",
+	 error => qr/^Argument to &raw_source must be an array reference/,
+	},
+	{
+	 name  => "non-existent source->raw",
+	 raw   => [],
+	 error => qr/No command found!/,
+	},
+       ],
+      };
 
-    can_ok $source, 'source';
-    eval { $source->source("$perl -It/lib $test") };
-    ok my $error = $@, '... and calling it with a string should fail';
-    like $error, qr/^Argument to &raw_source must be an array reference/,
-      '... with an appropriate error message';
-    ok $source->source( [ $perl, '-It/lib', '-T', $test ] ),
-      '... and calling it with valid args should succeed';
-
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
-
-    isa_ok $stream, 'TAP::Parser::Iterator::Process',
-      'get_stream returns the right object';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
+    test_detector( $class, $tests );
 }
 
 # Perl source tests
 {
-    my $test = File::Spec->catfile( $dir, 'source' );
-    my $source = TAP::Parser::SourceDetector::Perl->new;
-    isa_ok $source, 'TAP::Parser::SourceDetector::Perl',
-      '... and the object it returns';
+    my $class = 'TAP::Parser::SourceDetector::Perl';
+    my $test  = File::Spec->catfile( $dir, 'source' );
+    my $tests =
+      {
+       default_vote => 0,
+       can_handle =>
+       [
+	{
+	 name => '.t',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '.t', dir => '' }
+		 },
+	 vote => 0.8,
+	},
+	{
+	 name => '.pl',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '.pl', dir => '' }
+		 },
+	 vote => 1,
+	},
+	{
+	 name => 't/.../file',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '', dir => 't' }
+		 },
+	 vote => 0.75,
+	},
+	{
+	 name => '#!...perl',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '', dir => '', shebang => '#!/usr/bin/perl' }
+		 },
+	 vote => 0.99,
+	},
+	{
+	 name => 'file default',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '', dir => '' }
+		 },
+	 vote => 0.5,
+	},
+       ],
+       make_iterator =>
+       [
+	{
+	 name   => $test,
+	 raw    => \$test,
+	 iclass => 'TAP::Parser::Iterator::Process',
+	 output => [ '1..1', 'ok 1' ],
+	},
+       ],
+      };
 
-    can_ok $source, 'source';
-    ok $source->source( [$test] ),
-      '... and calling it with valid args should succeed';
-
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
-
-    isa_ok $stream, 'TAP::Parser::Iterator::Process',
-      '... and the object it returns';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
+    test_detector( $class, $tests );
 
     # internals tests!
-    can_ok $source, '_switches';
-    ok( grep( $_ =~ /^['"]?-T['"]?$/, $source->_switches ),
-        '... and it should find the taint switch'
-    );
-}
-
-# coverage test for TAP::Parser::SourceDetector::Executable
-
-{
-
-    # coverage for method get_steam
-    my $source
-      = TAP::Parser::SourceDetector::Executable->new( { parser => $parser } );
-
-    my @die;
-    eval {
-        local $SIG{__DIE__} = sub { push @die, @_ };
-        $source->get_stream;
-    };
-
-    is @die, 1, 'coverage testing of Executable get_stream';
-    like pop @die, qr/No command found!/, '...and it failed as expect';
+    {
+	local $TODO = 'figure out how to test these';
+	my $source = TAP::Parser::Source->new->raw([ $test ]);
+	my $detector = $class->new->raw_source( $source->raw );
+	can_ok $detector, '_switches';
+	ok( grep( $_ =~ /^['"]?-T['"]?$/, $detector->_switches ),
+	    '... and it should find the taint switch'
+	  );
+    }
 }
 
 # Raw TAP source tests
 {
-    my $source = TAP::Parser::SourceDetector::RawTAP->new;
-    isa_ok $source, 'TAP::Parser::SourceDetector::RawTAP';
+    my $class = 'TAP::Parser::SourceDetector::RawTAP';
+    my $tests =
+      {
+       default_vote => 0,
+       can_handle =>
+       [
+	{
+	 name => '.t',
+	 meta => { is_file => 1 },
+	 raw  => \'',
+	 vote => 0,
+	},
+	{
+	 name => '.t',
+	 meta => { is_scalar => 1, has_newlines => 1 },
+	 raw  => \'',
+	 vote => 0.6,
+	},
+	{
+	 name => '.t',
+	 meta => { is_scalar => 1, has_newlines => 1 },
+	 raw  => \"1..10\n",
+	 vote => 0.9,
+	},
+	{
+	 name => '.t',
+	 meta => { is_array => 1 },
+	 raw  => ['1..1', 'ok 1'],
+	 vote => 0.5,
+	},
+       ],
+       make_iterator =>
+       [
+	{
+	 name   => 'valid scalar',
+	 raw    => \"1..1\nok 1 - raw\n",
+	 iclass => 'TAP::Parser::Iterator::Array',
+	 output => [ '1..1', 'ok 1 - raw' ],
+	},
+	{
+	 name   => 'valid array',
+	 raw    => [ '1..1', 'ok 1 - raw' ],
+	 iclass => 'TAP::Parser::Iterator::Array',
+	 output => [ '1..1', 'ok 1 - raw' ],
+	},
+       ],
+      };
 
-    can_ok $source, 'raw_source';
-    eval { $source->raw_source("1..1\nok 1\n") };
-    ok my $error = $@, '... and calling it with a string should fail';
-    like $error,
-      qr/^Argument to &raw_source must be a scalar or array reference/,
-      '... with an appropriate error message';
-    ok $source->raw_source( \"1..1\nok 1\n" ),
-      '... and calling it with valid args should succeed';
-
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
-
-    isa_ok $stream, 'TAP::Parser::Iterator::Array',
-      'get_stream returns the right object';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
+    test_detector( $class, $tests );
 }
 
 # Text file TAP source tests
 {
-    my $test = File::Spec->catfile( $dir, 'source.tap' );
-    my $source = TAP::Parser::SourceDetector::File->new;
-    isa_ok $source, 'TAP::Parser::SourceDetector::File';
+    my $test  = File::Spec->catfile( $dir, 'source.tap' );
+    my $class = 'TAP::Parser::SourceDetector::File';
+    my $tests =
+      {
+       default_vote => 0,
+       can_handle =>
+       [
+	{
+	 name => '.tap',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '.tap' }
+		 },
+	 vote => 1,
+	},
+	{
+	 name => '.foo with config',
+	 meta => {
+		  is_file => 1,
+		  file => { lc_ext => '.foo' }
+		 },
+	 config => { File => { extensions => ['.foo'] } },
+	 vote => 1,
+	},
+       ],
+       make_iterator =>
+       [
+	{
+	 name   => $test,
+	 raw    => \$test,
+	 iclass => 'TAP::Parser::Iterator::Stream',
+	 output => [ '1..1', 'ok 1' ],
+	 assemble_meta => 1,
+	},
+       ],
+      };
 
-    can_ok $source, 'raw_source';
-    ok $source->raw_source( \$test ),
-      '... and calling it with valid args should succeed';
-
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
-
-    isa_ok $stream, 'TAP::Parser::Iterator::Stream',
-      'get_stream returns the right object';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
+    test_detector( $class, $tests );
 }
 
 # IO::Handle TAP source tests
 {
-    my $test = File::Spec->catfile( $dir, 'source.tap' );
-    my $source = TAP::Parser::SourceDetector::File->new;
-    isa_ok $source, 'TAP::Parser::SourceDetector::File';
+    my $test  = File::Spec->catfile( $dir, 'source.tap' );
+    my $class = 'TAP::Parser::SourceDetector::Handle';
+    my $tests =
+      {
+       default_vote => 0,
+       can_handle =>
+       [
+	{
+	 name => 'glob',
+	 meta => { is_glob => 1 },
+	 vote => 0.8,
+	},
+	{
+	 name => 'IO::Handle',
+	 raw  => IO::Handle->new,
+	 vote => 0.9,
+	 assemble_meta => 1,
+	},
+       ],
+       make_iterator =>
+       [
+	{
+	 name   => 'IO::Handle',
+	 raw    => IO::File->new( $test ),
+	 iclass => 'TAP::Parser::Iterator::Stream',
+	 output => [ '1..1', 'ok 1' ],
+	 assemble_meta => 1,
+	},
+       ],
+      };
 
-    can_ok $source, 'raw_source';
-    ok $source->raw_source( \$test ),
-      '... and calling it with valid args should succeed';
-
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
-
-    isa_ok $stream, 'TAP::Parser::Iterator::Stream',
-      'get_stream returns the right object';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
+    test_detector( $class, $tests );
 }
 
+exit;
+
+###############################################################################
+# helper sub
+
+sub test_detector {
+    my ($class, $tests) = @_;
+    my ($short_class) = ($class =~ /\:\:(\w+)$/);
+
+    can_ok $class, 'can_handle', 'make_iterator';
+
+    {
+	my $default_vote = $tests->{default_vote} || 0;
+	my $source = TAP::Parser::Source->new;
+	is( $class->can_handle( $source ), $default_vote, '... can_handle default vote' );
+    }
+
+    foreach my $test (@{ $tests->{can_handle} }) {
+	my $source = TAP::Parser::Source->new;
+	$source->raw( $test->{raw} ) if $test->{raw};
+	$source->meta( $test->{meta} ) if $test->{meta};
+	$source->config( $test->{config} ) if $test->{config};
+	$source->assemble_meta if $test->{assemble_meta};
+	my $vote = $test->{vote} || 0;
+	my $name = $test->{name} || 'unnamed test';
+	$name    = "$short_class->can_handle( $name )";
+	is( $class->can_handle( $source ), $vote, $name );
+    }
+
+    foreach my $test (@{ $tests->{make_iterator} }) {
+	my $name = $test->{name} || 'unnamed test';
+	$name    = "$short_class->make_iterator( $name )";
+
+	my $source = TAP::Parser::Source->new;
+	$source->raw( $test->{raw} ) if $test->{raw};
+	$source->meta( $test->{meta} ) if $test->{meta};
+	$source->config( $test->{config} ) if $test->{config};
+	$source->assemble_meta if $test->{assemble_meta};
+
+	my $iterator = eval { $class->make_iterator( $source ) };
+	my $e = $@;
+	if (my $error = $test->{error}) {
+	    $e = '' unless defined $e;
+	    like $e, $error, "$name threw expected error";
+	    next;
+	} elsif ($e) {
+	    fail( "$name threw an unexpected error" );
+	    diag( $e );
+	    next;
+	}
+
+	isa_ok $iterator, $test->{iclass}, $name;
+	if ($test->{output}) {
+	    my $i = 1;
+	    foreach my $line (@{ $test->{output} }) {
+		is $iterator->next, $line, "... line $i";
+		$i++;
+	    }
+	    ok !$iterator->next, '... and we should have no more results';
+	}
+    }
+}

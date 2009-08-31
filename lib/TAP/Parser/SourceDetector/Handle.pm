@@ -46,17 +46,14 @@ won't need to use this module directly.
 
 =head2 Class Methods
 
-=head3 C<new>
-
- my $source = TAP::Parser::SourceDetector::Handle->new;
-
-Returns a new C<TAP::Parser::SourceDetector::Handle> object.
-
-=cut
-
-# new() implementation supplied by parent class
-
 =head3 C<can_handle>
+
+  my $vote = $class->can_handle( $source );
+
+Casts the following votes:
+
+  0.9 if $source is an IO::Handle
+  0.8 if $source is a glob
 
 =cut
 
@@ -75,58 +72,30 @@ sub can_handle {
 
 =head3 C<make_iterator>
 
+  my $iterator = $class->make_iterator( $source );
+
+Returns a new L<TAP::Parser::Iterator::Stream> for the source.
+
 =cut
 
 sub make_iterator {
-    my ( $class, $src ) = @_;
-    my $source = $class->new;
-    $source->raw_source( $src->raw );
-    return $source->get_stream;
+    my ( $class, $source ) = @_;
+
+    $class->_croak('$source->raw must be a glob ref or an IO::Handle')
+      unless $source->meta->{is_glob}
+	|| UNIVERSAL::isa( $source->raw, 'IO::Handle' );
+
+    return $class->iterator_class->new( $source->raw );
 }
 
-##############################################################################
+=head3 C<iterator_class>
 
-=head2 Instance Methods
-
-=head3 C<raw_source>
-
- my $raw_source = $source->raw_source;
- $source->raw_source( $raw_tap );
-
-Getter/setter for the raw_source.  C<croaks> if it doesn't get a scalar or
-L<IO::Handle> object.
+The class of iterator to use, override if you're sub-classing.  Defaults
+to L<TAP::Parser::Iterator::Stream>.
 
 =cut
 
-sub raw_source {
-    my $self = shift;
-    return $self->SUPER::raw_source unless @_;
-
-    my $ref = ref $_[0];
-    if ( !defined($ref) ) {
-        ;    # fall through
-    }
-    elsif ( $ref eq 'GLOB' || UNIVERSAL::isa( $ref, 'IO::Handle' ) ) {
-        return $self->SUPER::raw_source(shift);
-    }
-
-    $self->_croak('Argument to &source must be a glob ref or an IO::Handle');
-}
-
-##############################################################################
-
-=head3 C<get_stream>
-
- my $stream = $source->get_stream( $iterator_maker );
-
-Returns a L<TAP::Parser::Iterator> for this TAP stream.
-
-=cut
-
-sub get_stream {
-    my ( $self, $factory ) = @_;
-    return TAP::Parser::Iterator::Stream->new( $self->raw_source );
-}
+use constant iterator_class => 'TAP::Parser::Iterator::Stream';
 
 1;
 
@@ -138,6 +107,9 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 L<TAP::Object>,
 L<TAP::Parser>,
+L<TAP::Parser::Iterator>,
+L<TAP::Parser::Iterator::Stream>,
+L<TAP::Parser::SourceFactory>,
 L<TAP::Parser::SourceDetector>,
 L<TAP::Parser::SourceDetector::Executable>,
 L<TAP::Parser::SourceDetector::Perl>,

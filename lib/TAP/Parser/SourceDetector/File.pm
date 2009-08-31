@@ -45,17 +45,14 @@ won't need to use this module directly.
 
 =head2 Class Methods
 
-=head3 C<new>
-
- my $source = TAP::Parser::SourceDetector::File->new;
-
-Returns a new C<TAP::Parser::SourceDetector::File> object.
-
-=cut
-
-# new() implementation supplied by parent class
-
 =head3 C<can_handle>
+
+  my $vote = $class->can_handle( $source );
+
+Only votes if $source looks like a regular file.  Casts the following votes:
+
+  1.0 if it's a .tap file
+  1.0 if it has an extension matching any given in user config.
 
 =cut
 
@@ -77,61 +74,34 @@ sub can_handle {
 
 =head3 C<make_iterator>
 
+  my $iterator = $class->make_iterator( $source );
+
+Returns a new L<TAP::Parser::Iterator::Stream> for the source.  C<croak>s
+on error.
+
 =cut
 
 sub make_iterator {
-    my ( $class, $src ) = @_;
-    my $source = $class->new;
-    $source->raw_source( $src->raw );
-    return $source->get_stream;
-}
+    my ( $class, $source ) = @_;
 
-##############################################################################
+    $class->_croak('$source->raw must be a scalar ref')
+      unless $source->meta->{is_scalar};
 
-=head2 Instance Methods
-
-=head3 C<raw_source>
-
- my $source = $source->source;
- $source->source( $raw_tap );
-
-Getter/setter for the raw source.  C<croaks> if it doesn't get a scalar.
-
-=cut
-
-sub raw_source {
-    my $self = shift;
-    return $self->SUPER::raw_source unless @_;
-
-    my $ref = ref $_[0];
-    if ( !defined($ref) ) {
-        return $self->SUPER::raw_source( $_[0] );
-    }
-    elsif ( $ref eq 'SCALAR' ) {
-        return $self->SUPER::raw_source( ${ $_[0] } );
-    }
-
-    $self->_croak('Argument to &raw_source must be a scalar or scalar ref');
-}
-
-##############################################################################
-
-=head3 C<get_stream>
-
- my $stream = $source->get_stream( $iterator_maker );
-
-Returns a L<TAP::Parser::Iterator> for this TAP stream.
-
-=cut
-
-sub get_stream {
-    my ( $self, $factory ) = @_;
-    my $file = $self->raw_source;
+    my $file = ${ $source->raw };
     my $fh;
     open( $fh, '<', $file )
-      or $self->_croak("error opening TAP source file '$file': $!");
-    return TAP::Parser::Iterator::Stream->new( $fh );
+      or $class->_croak("error opening TAP source file '$file': $!");
+    return $class->iterator_class->new( $fh );
 }
+
+=head3 C<iterator_class>
+
+The class of iterator to use, override if you're sub-classing.  Defaults
+to L<TAP::Parser::Iterator::Stream>.
+
+=cut
+
+use constant iterator_class => 'TAP::Parser::Iterator::Stream';
 
 1;
 
@@ -140,7 +110,7 @@ __END__
 =head1 CONFIGURATION
 
   {
-   extensions => [ @list_of_exts_to_match ]
+   extensions => [ @case_insensitive_exts_to_match ]
   }
 
 =head1 SUBCLASSING

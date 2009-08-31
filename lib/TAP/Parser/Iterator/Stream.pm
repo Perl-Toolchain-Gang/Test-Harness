@@ -29,8 +29,8 @@ $VERSION = '3.18';
 =head1 DESCRIPTION
 
 This is a simple iterator wrapper for reading from filehandles, used by
-L<TAP::Parser>.  Unless you're subclassing, you probably won't need to use
-this module directly.
+L<TAP::Parser>.  Unless you're writing a plugin or subclassing, you probably
+won't need to use this module directly.
 
 =head1 METHODS
 

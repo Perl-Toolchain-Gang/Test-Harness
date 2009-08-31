@@ -50,12 +50,6 @@ won't need to use this module directly.
 
 =head2 Class Methods
 
-=head3 C<new>
-
- my $perl = TAP::Parser::SourceDetector::Perl->new;
-
-Returns a new C<TAP::Parser::SourceDetector::Perl> object.
-
 =cut
 
 sub _initialize {
@@ -67,6 +61,16 @@ sub _initialize {
 
 
 =head3 C<can_handle>
+
+  my $vote = $class->can_handle( $source );
+
+Only votes if $source looks like a file.  Casts the following votes:
+
+  0.99 if it has a shebang ala "#!...perl"
+  0.8  if it's a .t file
+  1.0  if it's a .pl file
+  0.75 if it's in a 't' directory
+  0.5  by default (backwards compat)
 
 =cut
 
@@ -91,6 +95,13 @@ sub can_handle {
 }
 
 =head3 C<make_iterator>
+
+  my $iterator = $class->make_iterator( $source );
+
+Returns a new L<TAP::Parser::Iterator::Process> for the source.
+
+Assumes the perl script is in C<$source-E<gt>raw>, C<croak>s if the file could
+not be found.
 
 =cut
 

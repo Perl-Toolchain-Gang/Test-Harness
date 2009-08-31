@@ -730,14 +730,14 @@ SKIP: {
     ok( !$e, 'no error on load custom source' ) || diag($e);
 
     no warnings 'once';
-    can_ok( 'MyFileSourceDetector', 'new' );
-    ok( $main::INIT{MyFileSourceDetector}, '... and an obj was instantiated' );
+    can_ok( 'MyFileSourceDetector', 'make_iterator' );
+    ok( $MyFileSourceDetector::CAN_HANDLE,
+	'... MyFileSourceDetector->can_handle was called' );
+    ok( $MyFileSourceDetector::MAKE_ITER,
+	'... MyFileSourceDetector->make_iterator was called' );
 
-    my $source = $MyFileSourceDetector::LAST_OBJ || {};
-    isa_ok( $source, 'MyFileSourceDetector', '... and MyFileSourceDetector obj was created' );
-    is( $source->raw_source, $source_test,
-        '... and has the right raw_source'
-    );
+    my $raw_source = eval { ${ $MyFileSourceDetector::LAST_SOURCE->raw } };
+    is( $raw_source, $source_test, '... used the right source' );
 
     my @output = tied($$capture)->dump;
     my $status = pop(@output) || '';

@@ -54,6 +54,8 @@ subclassing L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head3 C<new>
 
+I<Deprecated.>
+
  my $source = TAP::Parser::SourceDetector->new;
 
 Returns a new C<TAP::Parser::SourceDetector> object.
@@ -87,7 +89,7 @@ L<TAP::Parser::SourceFactory/detect_source> for details on how this is used.
 
 sub can_handle {
     my ( $class, $args ) = @_;
-    $class->_confess("'$class' has not defined a 'can_handle' method!");
+    $class->_croak("Abstract method 'can_handle' not implemented for $class!");
     return;
 }
 
@@ -106,7 +108,7 @@ C<croak>s on error.
 
 sub make_iterator {
     my ( $class, $args ) = @_;
-    $class->_confess("'$class' has not defined a 'make_iterator' method!");
+    $class->_croak("Abstract method 'make_iterator' not implemented for $class!");
     return;
 }
 
@@ -115,6 +117,8 @@ sub make_iterator {
 =head2 Instance Methods
 
 =head3 C<raw_source>
+
+I<Deprecated.>
 
  my $raw_source = $source->raw_source;
  $source->raw_source( $some_value );
@@ -129,6 +133,8 @@ Synonym for L</raw_source>.
 
 =head3 C<config>
 
+I<Deprecated.>
+
  my $config = $source->config;
  $source->config({ %some_value });
 
@@ -136,6 +142,8 @@ Chaining getter/setter for the source's configuration, if any.  This defaults
 to an empty hashref.
 
 =head3 C<merge>
+
+I<Deprecated.>
 
   my $merge = $source->merge;
 
