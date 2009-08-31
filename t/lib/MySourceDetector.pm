@@ -10,7 +10,8 @@ use MyIterator;
 use TAP::Parser::SourceFactory;
 use TAP::Parser::SourceDetector;
 
-@ISA = qw( TAP::Parser::SourceDetector MyCustom );
+#@ISA = qw( TAP::Parser::SourceDetector MyCustom );
+@ISA = qw( MyCustom );
 
 TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
 

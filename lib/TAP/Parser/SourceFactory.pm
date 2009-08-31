@@ -74,8 +74,9 @@ List of detectors that have been registered.
 sub register_detector {
     my ( $class, $dclass ) = @_;
 
-    confess("$dclass must inherit from TAP::Parser::SourceDetector!")
-      unless UNIVERSAL::isa( $dclass, 'TAP::Parser::SourceDetector' );
+    confess("$dclass must implement can_handle & make_iterator methods!")
+      unless UNIVERSAL::can( $dclass, 'can_handle' )
+	&& UNIVERSAL::can( $dclass, 'make_iterator' );
 
     my $detectors = $class->detectors;
     push @{$detectors}, $dclass
@@ -112,13 +113,6 @@ sub config {
     }
     $self->{config} = shift;
     return $self;
-}
-
-sub _config_for {
-    my ( $self, $sclass ) = @_;
-    my ($abbrv_sclass) = ( $sclass =~ /(?:\:\:)?(\w+)$/ );
-    my $config = $self->config->{$abbrv_sclass} || $self->config->{$sclass};
-    return $config;
 }
 
 sub _last_detector {
@@ -172,15 +166,19 @@ sub _load_detector {
     my ( $self, $detector ) = @_;
 
     my @errors;
-    foreach my $sclass ( "TAP::Parser::SourceDetector::$detector", $detector ) {
-        return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::SourceDetector' );
-        eval "use $sclass";
+    foreach my $dclass ( "TAP::Parser::SourceDetector::$detector", $detector ) {
+        return $dclass if UNIVERSAL::can( $dclass, 'can_handle' )
+	  && UNIVERSAL::can( $dclass, 'make_iterator' );
+
+        eval "use $dclass";
         if ( my $e = $@ ) {
             push @errors, $e;
             next;
         }
-        return $sclass if UNIVERSAL::isa( $sclass, 'TAP::Parser::SourceDetector' );
-        push @errors, "detector '$sclass' is not a TAP::Parser::SourceDetector";
+
+        return $dclass if UNIVERSAL::can( $dclass, 'can_handle' )
+	  && UNIVERSAL::can( $dclass, 'make_iterator' );
+        push @errors, "detector '$dclass' does not implement can_handle & make_iterator";
     }
 
     $self->_croak( "Cannot load detector '$detector': " . join( "\n", @errors ) );
