@@ -112,42 +112,55 @@ The arguments should be a hashref with I<one> of the following keys:
 
 =item * C<source>
 
-I<TODO:> update this, it's out-of-date now that L<TAP::Parser::SourceFactory>
-is in use.
+I<CHANGED in 3.18>
 
-This is the preferred method of passing arguments to the constructor.  To
-determine how to handle the source, the following steps are taken.
+This is the preferred method of passing arguments to the constructor.
 
-If the source contains a newline, it's assumed to be a string of raw TAP
-output.
+The I<source> is used to create a L<TAP::Parser::Source> that is passed to the
+L</source_factory_class> which in turn figures out how to handle the source and
+creates a <TAP::Parser::Iterator> for it.  The iterator is used by the parser to
+read in the TAP stream.
 
-If the source is a reference, it's assumed to be something to pass to
-the L<TAP::Parser::Iterator::Stream> constructor. This is used
-internally and you should not use it.
+To configure the I<SourceFactory> use the C<sources> parameter below.
 
-Otherwise, the parser does a C<-e> check to see if the source exists.  If so,
-it attempts to execute the source and read the output as a stream.  This is by
-far the preferred method of using the parser.
-
- foreach my $file ( @test_files ) {
-     my $parser = TAP::Parser->new( { source => $file } );
-     # do stuff with the parser
- }
+Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 
 =item * C<tap>
 
+I<CHANGED in 3.18>
+
 The value should be the complete TAP output.
+
+The I<tap> is used to create a L<TAP::Parser::Source> that is passed to the
+L</source_factory_class> which in turn figures out how to handle the source and
+creates a <TAP::Parser::Iterator> for it.  The iterator is used by the parser to
+read in the TAP stream.
+
+To configure the I<SourceFactory> use the C<sources> parameter below.
+
+Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 
 =item * C<exec>
 
-If passed an array reference, will attempt to create the iterator by
-passing a L<TAP::Parser::SourceDetector::Executable> object to
-L<TAP::Parser::Iterator::Source>, using the array reference strings as
-the command arguments to L<IPC::Open3::open3|IPC::Open3>:
+Must be passed an array reference.
+
+The I<exec> array ref is used to create a L<TAP::Parser::Source> that is passed
+to the L</source_factory_class> which in turn figures out how to handle the
+source and creates a <TAP::Parser::Iterator> for it.  The iterator is used by
+the parser to read in the TAP stream.
+
+By default the L<TAP::Parser::SourceDetector::Executable> class will create a
+L<TAP::Parser::Iterator::Process> object to handle the source.  This passes the
+array reference strings as command arguments to L<IPC::Open3::open3|IPC::Open3>:
 
  exec => [ '/usr/bin/ruby', 't/my_test.rb' ]
 
-Note that C<source> and C<exec> are mutually exclusive.
+If any C<test_args> are given they will be appended to the end of the command
+argument list.
+
+To configure the I<SourceFactory> use the C<sources> parameter below.
+
+Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 
 =back
 
@@ -192,8 +205,8 @@ be used when invoking the perl executable.
 
 =item * C<test_args>
 
-Used in conjunction with the C<source> option to supply a reference to
-an C<@ARGV> style array of arguments to pass to the test program.
+Used in conjunction with the C<source> and C<exec> option to supply a reference
+to an C<@ARGV> style array of arguments to pass to the test program.
 
 =item * C<spool>
 
@@ -270,9 +283,9 @@ L<TAP::Parser::SourceFactory>.
 # new() implementation supplied by TAP::Base
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub _default_grammar_class     {'TAP::Parser::Grammar'}
-sub _default_result_factory_class   {'TAP::Parser::ResultFactory'}
-sub _default_source_factory_class   {'TAP::Parser::SourceFactory'}
+sub _default_grammar_class {'TAP::Parser::Grammar'}
+sub _default_result_factory_class {'TAP::Parser::ResultFactory'}
+sub _default_source_factory_class {'TAP::Parser::SourceFactory'}
 
 ##############################################################################
 

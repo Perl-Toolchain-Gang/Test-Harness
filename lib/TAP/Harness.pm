@@ -309,13 +309,12 @@ A filehandle for catching standard output.
 
 =item * C<sources>
 
-I<This is an experimental feature and may change.>
+I<NEW to 3.18>.
 
 If set, C<sources> must be a hashref containing the names of the
-L<TAP::Parser::Source> subclasses you want to load and/or configure.  The
-values should contain a hash of configuration that will be passed to the
-source class during source detection and creation (ie: the methods
-L<TAP::Parser::Source/can_handle> and L<TAP::Parser::Source/make_source>).
+L<TAP::Parser::SourceDetector> subclasses you want to load and/or configure.
+The values should contain a hash of configuration that will be accessible to
+to the source detectors via L<TAP::Parser::Source/config_for>.
 
 For example:
 
@@ -325,8 +324,8 @@ For example:
     MyCustom => { some => 'config' },
   }
 
-For more details see L<TAP::Parser/new>, L<TAP::Parser::Source> & sub-classes,
-and L<TAP::Parser::SourceFactory>.
+For more details see L<TAP::Parser/new>, L<TAP::Parser::Source>,
+L<TAP::Parser::SourceDetector> & sub-classes, and L<TAP::Parser::SourceFactory>.
 
 =back
 
@@ -661,11 +660,39 @@ should be set higher.
 
 ##############################################################################
 
+=head1 CONFIGURING
+
+L<TAP::Harness> is designed to be fairly easy to configure to meet most needs.
+
+TODO
+
+Cover:
+* Plugins:
+** using sources parameter
+* Using from Module::Build & ExtUtils::MakeMaker
+* using from App::Prove
+* limitations:
+** not formatters (yet)
+** not
+** when to sub-class
+
+The I<tap> is used to create a L<TAP::Parser::Source> that is passed to the
+L</source_factory_class> which in turn figures out how to handle the source and
+creates a <TAP::Parser::Iterator> for it.  The iterator is used by the parser to
+read in the TAP stream.
+
+To configure the I<SourceFactory> use the C<sources> parameter below.
+
+
+=head1 WRITING PLUGINS
+
+TODO
+
 =head1 SUBCLASSING
 
-C<TAP::Harness> is designed to be (mostly) easy to subclass. If you
-don't like how a particular feature functions, just override the
-desired methods.
+If you can't configure C<TAP::Harness> to do exactly what you want, consider
+extending it.  It is designed to be (mostly) easy to subclass. If you don't
+like how a particular feature functions, just override the desired methods.
 
 =head2 Methods
 
@@ -831,6 +858,7 @@ sub _croak {
 
     return;
 }
+
 
 =head1 REPLACING
 
