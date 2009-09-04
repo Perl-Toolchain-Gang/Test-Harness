@@ -230,6 +230,29 @@ will be interpreted as raw TAP or as a TAP stream, respectively.
 If C<merge> is true the harness will create parsers that merge STDOUT
 and STDERR together for any processes they start.
 
+=item * C<sources>
+
+I<NEW to 3.18>.
+
+If set, C<sources> must be a hashref containing the names of the
+L<TAP::Parser::SourceDetector>s to load and/or configure.  The values are a
+hash of configuration that will be accessible to to the source detectors via
+L<TAP::Parser::Source/config_for>.
+
+For example:
+
+  sources => {
+    Perl => { exec => '/path/to/custom/perl' },
+    File => { extensions => [ '.tap', '.txt' ] },
+    MyCustom => { some => 'config' },
+  }
+
+The C<sources> parameter affects how C<source>, C<tap> and C<exec> parameters
+are handled.
+
+For more details, see the C<sources> parameter in L<TAP::Parser/new>,
+L<TAP::Parser::Source>, and L<TAP::Parser::SourceFactory>.
+
 =item * C<aggregator_class>
 
 The name of the class to use to aggregate test results. The default is
@@ -306,26 +329,6 @@ interface may change.
 =item * C<stdout>
 
 A filehandle for catching standard output.
-
-=item * C<sources>
-
-I<NEW to 3.18>.
-
-If set, C<sources> must be a hashref containing the names of the
-L<TAP::Parser::SourceDetector> subclasses you want to load and/or configure.
-The values should contain a hash of configuration that will be accessible to
-to the source detectors via L<TAP::Parser::Source/config_for>.
-
-For example:
-
-  sources => {
-    Perl => { exec => '/path/to/custom/perl' },
-    File => { extensions => [ '.tap', '.txt' ] },
-    MyCustom => { some => 'config' },
-  }
-
-For more details see L<TAP::Parser/new>, L<TAP::Parser::Source>,
-L<TAP::Parser::SourceDetector> & sub-classes, and L<TAP::Parser::SourceFactory>.
 
 =back
 
@@ -458,7 +461,9 @@ sub runtests {
 
 =head3 C<summary>
 
-Output the summary for a TAP::Parser::Aggregator.
+  $harness->summary( $aggregator );
+
+Output the summary for a L<TAP::Parser::Aggregator>.
 
 =cut
 
@@ -554,7 +559,7 @@ sub _aggregate_single {
   $harness->aggregate_tests( $aggregate, @tests );
 
 Run the named tests and display a summary of result. Tests will be run
-in the order found. 
+in the order found.
 
 Test results will be added to the supplied L<TAP::Parser::Aggregator>.
 C<aggregate_tests> may be called multiple times to run several sets of
@@ -582,20 +587,23 @@ are unsuitable for parallel execution.
 Note that for simpler testing requirements it will often be possible to
 replace the above code with a single call to C<runtests>.
 
-Each elements of the @tests array is either
+Each element of the C<@tests> array is either:
 
 =over
 
-=item * the file name of a test script to run
+=item * the source name of a test to run
 
-=item * a reference to a [ file name, display name ] array
+=item * a reference to a [ source name, display name ] array
 
 =back
+
+In the case of a perl test suite, typically I<source names> are simply the file
+names of the test scripts to run.
 
 When you supply a separate display name it becomes possible to run a
 test more than once; the display name is effectively the alias by which
 the test is known inside the harness. The harness doesn't care if it
-runs the same script more than once when each invocation uses a
+runs the same test more than once when each invocation uses a
 different name.
 
 =cut
@@ -659,83 +667,6 @@ should be set higher.
 =cut
 
 ##############################################################################
-
-=head1 CONFIGURING
-
-L<TAP::Harness> is designed to be fairly easy to configure to meet most needs.
-
-TODO
-
-Cover:
-* Plugins:
-** using sources parameter
-* Using from Module::Build & ExtUtils::MakeMaker
-* using from App::Prove
-* limitations:
-** not formatters (yet)
-** not
-** when to sub-class
-
-The I<tap> is used to create a L<TAP::Parser::Source> that is passed to the
-L</source_factory_class> which in turn figures out how to handle the source and
-creates a <TAP::Parser::Iterator> for it.  The iterator is used by the parser to
-read in the TAP stream.
-
-To configure the I<SourceFactory> use the C<sources> parameter below.
-
-
-=head1 WRITING PLUGINS
-
-TODO
-
-=head1 SUBCLASSING
-
-If you can't configure C<TAP::Harness> to do exactly what you want, consider
-extending it.  It is designed to be (mostly) easy to subclass. If you don't
-like how a particular feature functions, just override the desired methods.
-
-=head2 Methods
-
-TODO: This is out of date
-
-The following methods are ones you may wish to override if you want to
-subclass C<TAP::Harness>.
-
-=head3 C<summary>
-
-  $harness->summary( \%args );
-
-C<summary> prints the summary report after all tests are run. The
-argument is a hashref with the following keys:
-
-=over 4
-
-=item * C<start>
-
-This is created with C<< Benchmark->new >> and it the time the tests
-started. You can print a useful summary time, if desired, with:
-
-    $self->output(
-        timestr( timediff( Benchmark->new, $start_time ), 'nop' ) );
-
-=item * C<tests>
-
-This is an array reference of all test names. To get the L<TAP::Parser>
-object for individual tests:
-
- my $aggregate = $args->{aggregate};
- my $tests     = $args->{tests};
-
- for my $name ( @$tests ) {
-     my ($parser) = $aggregate->parsers($test);
-     ... do something with $parser
- }
-
-This is a bit clunky and will be cleaned up in a later release.
-
-=back
-
-=cut
 
 sub _get_parser_args {
     my ( $self, $job ) = @_;
@@ -860,6 +791,90 @@ sub _croak {
 }
 
 
+1;
+
+__END__
+
+##############################################################################
+
+=head1 CONFIGURING
+
+C<TAP::Harness> is designed to be easy to configure.
+
+=head2 Plugins
+
+C<TAP::Parser> plugins let you change the way TAP is I<input> to and I<output>
+from the parser.
+
+L<TAP::Parser::SourceDetector>s handle TAP I<input>.  You can configure them
+and load custom detectors using the C<sources> parameter to L</new>.
+
+L<TAP::Formatter>s handle TAP I<output>.  You can load custom formatters by
+using the C<formatter_class> parameter to L</new>.  To configure a formatter,
+you currently need to instantiate it outside of L<TAP::Harness> and pass it in
+with the C<formatter> parameter to L</new>.  This I<may> be addressed by adding
+a I<formatters> parameter to L</new> in the future.
+
+=head2 C<Module::Build> and C<ExtUtils::MakeMaker>
+
+TODO
+
+=head2 C<App::Prove>
+
+TODO
+
+=head1 WRITING PLUGINS
+
+If you can't configure C<TAP::Harness> to do what you want, and you can't find
+an existing plugin, consider writing one.
+
+The two primary use cases supported by L<TAP::Harness> for plugins are I<input>
+and I<output>:
+
+=over 2
+
+=item Customize how TAP gets into the parser
+
+To do this, you can either extend an existing L<TAP::Parser::SourceDetector>,
+or write your own.  It's a pretty simple API, and they can be loaded and
+configured using the C<sources> parameter to L</new>.
+
+=item Customize how TAP results are output from the parser
+
+To do this, you can either extend an existing L<TAP::Formatter>, or write your
+own.  Writing formatters are a bit more involved than writing a
+I<SourceDetector>, as you'll need to understand the L<TAP::Parser> API.  A
+good place to start is by understanding how L</aggregate_tests> works.
+
+Custom formatters can be loaded configured using the C<formatter_class>
+parameter to L</new>.
+
+=back
+
+=head1 SUBCLASSING
+
+If you can't configure C<TAP::Harness> to do exactly what you want, and writing
+a plugin isn't an option, consider extending it.  It is designed to be (mostly)
+easy to subclass, though the cases when sub-classing is necessary should be few
+and far between.
+
+=head2 Methods
+
+The following methods are ones you may wish to override if you want to
+subclass C<TAP::Harness>.
+
+=over 4
+
+=item L</new>
+
+=item L</runtests>
+
+=item L</summary>
+
+=back
+
+=cut
+
 =head1 REPLACING
 
 If you like the C<prove> utility and L<TAP::Parser> but you want your
@@ -877,7 +892,5 @@ to read over this code carefully to see how all of them are being used.
 L<Test::Harness>
 
 =cut
-
-1;
 
 # vim:ts=4:sw=4:et:sta

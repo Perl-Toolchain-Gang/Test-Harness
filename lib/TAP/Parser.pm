@@ -114,7 +114,7 @@ The arguments should be a hashref with I<one> of the following keys:
 
 I<CHANGED in 3.18>
 
-This is the preferred method of passing arguments to the constructor.
+This is the preferred method of passing input to the constructor.
 
 The I<source> is used to create a L<TAP::Parser::Source> that is passed to the
 L</source_factory_class> which in turn figures out how to handle the source and
@@ -167,6 +167,34 @@ Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 The following keys are optional.
 
 =over 4
+
+=item * C<sources>
+
+I<NEW to 3.18>.
+
+If set, C<sources> must be a hashref containing the names of the
+L<TAP::Parser::SourceDetector>s to load and/or configure.  The values are a
+hash of configuration that will be accessible to to the source detectors via
+L<TAP::Parser::Source/config_for>.
+
+For example:
+
+  sources => {
+    Perl => { exec => '/path/to/custom/perl' },
+    File => { extensions => [ '.tap', '.txt' ] },
+    MyCustom => { some => 'config' },
+  }
+
+This will cause C<TAP::Parser> to pass custom configuration to two of the built-
+in source detectors - L<TAP::Parser::SourceDetector::Perl>,
+L<TAP::Parser::SourceDetector::File> - and attempt to load the C<MyCustom>
+class.  See L<TAP::Parser::SourceFactory/load_detectors> for more detail.
+
+The C<sources> parameter affects how C<source>, C<tap> and C<exec> parameters
+are handled.
+
+See L<TAP::Parser::SourceFactory>, L<TAP::Parser::SourceDetector> and subclasses for
+more details.
 
 =item * C<callback>
 
@@ -223,35 +251,6 @@ allow exact synchronization.
 
 Subtleties of this behavior may be platform-dependent and may change in
 the future.
-
-=item * C<sources>
-
-I<NEW to 3.18>.
-
-If set, C<sources> must be a hashref containing the names of the
-L<TAP::Parser::SourceDetector> subclasses you want to load and/or configure.  The
-values should contain a hash of configuration that will be passed to the
-source class during source detection and creation (ie: the methods
-L<TAP::Parser::SourceDetector/can_handle> and L<TAP::Parser::SourceDetector/make_source>).
-
-For example:
-
-  sources => {
-    Perl => { exec => '/path/to/custom/perl' },
-    File => { extensions => [ '.tap', '.txt' ] },
-    MyCustom => { some => 'config' },
-  }
-
-Will cause C<TAP::Parser> to pass custom configuration to two of the TAP
-sources that ship with this module - L<TAP::Parser::SourceDetector::Perl> and
-L<TAP::Parser::SourceDetector::File>.  It will also attempt to load the C<MyCustom>
-class by looking in C<@INC> for it in this order:
-
-  TAP::Parser::SourceDetector::MyCustom
-  MyCustom
-
-See L<TAP::Parser::SourceFactory>, L<TAP::Parser::SourceDetector> and subclasses for
-more details.
 
 =item * C<grammar_class>
 
