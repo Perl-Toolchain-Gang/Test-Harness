@@ -61,6 +61,8 @@ Options that take arguments:
  -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
       --harness     Define test harness to use.  See TAP::Harness.
       --formatter   Result formatter to use. See TAP::Harness.
+      --source_handler
+                    Load and/or configure a SourceHandler. See TAP::Harness.
  -a,  --archive     Store the resulting TAP in an archive file.
  -j,  --jobs N      Run N test jobs in parallel (try 9.)
       --state=opts  Control prove's persistent state.
@@ -273,6 +275,31 @@ to C<@INC> prove (actually L<TAP::Parser::Source::Perl>) passes the
 names of any directories found in C<PERL5LIB> as -I switches. The net
 effect of this is that C<PERL5LIB> is honoured even when prove is run in
 taint mode.
+
+=head1 FORMATTERS
+
+You can load a custom L<TAP::Parser::Formatter>:
+
+  prove --formatter MyFormatter
+
+=head1 SOURCE HANDLERS
+
+You can load custom L<TAP::Parser::SourceHandler>s, to change the way the
+parser loads particular sources:
+
+  prove --source_handler MyHandler --source_handler YetAnother t
+
+If you want to provide config to the source you can use:
+
+  prove --source_handler MyCustom \
+        --source_handler 'Perl: {foo: bar baz, avg: 0.278}' \
+        --source_handler 'File: {extensions: [.txt, .tmp]}' t
+
+In this case you must have L<YAML> installed, and the configuration you pass
+must be a valid YAML string, or an error will be thrown.
+
+See L<TAP::Parser::SourceFactory> for more details on how configuration is
+passed to I<SourceHandlers>.
 
 =head1 PLUGINS
 

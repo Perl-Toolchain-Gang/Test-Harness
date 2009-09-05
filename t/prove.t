@@ -75,11 +75,13 @@ sub mabs {
     }
 }
 
-my ( @ATTR, %DEFAULT_ASSERTION, @SCHEDULE );
+my ( @ATTR, %DEFAULT_ASSERTION, @SCHEDULE, $HAS_YAML );
 
 # see the "ACTUAL TEST" section at the bottom
 
 BEGIN {    # START PLAN
+    $HAS_YAML = 0;
+    eval { require YAML; $HAS_YAML = 1; };
 
     # list of attributes
     @ATTR = qw(
@@ -1088,6 +1090,66 @@ BEGIN {    # START PLAN
             ],
         },
 
+        # Source handlers
+        {   name => 'source_handler simple',
+            args => { argv => [qw( one two three )] },
+            switches =>
+	    [ '--source_handler', 'MyCustom', $dummy_test ],
+            expect => {
+                sources =>
+                    {
+		     MyCustom => {},
+		    },
+            },
+            runlog => [
+                [   '_runtests',
+                    {   sources =>
+			{
+			 MyCustom => {},
+			},
+                        verbosity       => 0,
+                        show_count      => 1,
+                    },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name => 'source_handlers with config',
+            args => { argv => [qw( one two three )] },
+	    skip => $HAS_YAML ? 0 : 1,
+	    skip_reason => "YAML not available",
+            switches =>
+	    [ '--source_handler', 'Perl: {foo: bar baz, avg: 0.278}',
+	      '--source_handler', 'MyCustom',
+	      '--source_handler', 'File: {extensions: [.txt, .tmp]}',
+	      $dummy_test ],
+            expect => {
+                sources =>
+                    {
+		     Perl => {foo => 'bar baz', avg => 0.278},
+		     MyCustom => {},
+		     File => {extensions => ['.txt', '.tmp']},
+		    },
+            },
+            runlog => [
+                [   '_runtests',
+                    {   sources =>
+			{
+			 Perl => {foo => 'bar baz', avg => 0.278},
+			 MyCustom => {},
+			 File => {extensions => ['.txt', '.tmp']},
+			},
+                        verbosity       => 0,
+                        show_count      => 1,
+                    },
+                    'TAP::Harness',
+                    $dummy_test
+                ]
+            ],
+        },
+
         # Plugins
         {   name     => 'Load plugin',
             switches => [ '-P', 'Dummy', $dummy_test ],
@@ -1441,18 +1503,25 @@ BEGIN {    # START PLAN
 
     my $extra_plan = 0;
     for my $test (@SCHEDULE) {
-        $extra_plan += $test->{plan} || 0;
-        $extra_plan += 2 if $test->{runlog};
-        $extra_plan += 1 if $test->{switches};
+	my $plan = 0;
+        $plan += $test->{plan} || 0;
+        $plan += 2 if $test->{runlog};
+        $plan += 1 if $test->{switches};
+	$test->{_planned} = $plan + 3 + @ATTR;
+        $extra_plan += $plan;
     }
 
     plan tests => @SCHEDULE * ( 3 + @ATTR ) + $extra_plan;
 }    # END PLAN
 
 # ACTUAL TEST
-for my $test (@SCHEDULE) {
+for my $test (@SCHEDULE ) {
     my $name = $test->{name};
     my $class = $test->{class} || 'FakeProve';
+
+  SKIP:
+    {
+    skip $test->{skip_reason}, $test->{_planned} if $test->{skip};
 
     local $ENV{HARNESS_TIMER};
 
@@ -1530,4 +1599,7 @@ for my $test (@SCHEDULE) {
             }
         }
     }
+
+    } # SKIP
 }
+

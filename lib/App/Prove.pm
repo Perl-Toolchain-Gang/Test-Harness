@@ -59,7 +59,7 @@ BEGIN {
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
       state_class test_args state dry extension ignore_exit rules state_manager
-      normalize
+      normalize source_handlers
     );
     __PACKAGE__->mk_methods(@ATTR);
 }
@@ -82,7 +82,7 @@ sub _initialize {
     my $args = shift || {};
 
     # setup defaults:
-    for my $key (qw( argv rc_opts includes modules state plugins rules )) {
+    for my $key (qw( argv rc_opts includes modules state plugins rules source_handlers )) {
         $self->{$key} = [];
     }
     $self->{harness_class} = 'TAP::Harness';
@@ -240,6 +240,7 @@ sub process_args {
             'w'           => \$self->{warnings_warn},
             'normalize'   => \$self->{normalize},
             'rules=s@'    => $self->{rules},
+            'source_handler=s@' => $self->{source_handlers},
         ) or croak('Unable to continue');
 
         # Stash the remainder of argv for later
@@ -308,6 +309,11 @@ sub _get_args {
 
     if ( my $formatter = $self->formatter ) {
         $args{formatter_class} = $formatter;
+    }
+
+    foreach my $handler (@{ $self->source_handlers }) {
+	my ($name, $config) = $self->_parse_source_handler( $handler );
+        $args{sources}->{$name} = $config;
     }
 
     if ( $self->ignore_exit ) {
@@ -409,6 +415,30 @@ sub _load_extension {
 sub _load_extensions {
     my ( $self, $ext, @search ) = @_;
     $self->_load_extension( $_, @search ) for @$ext;
+}
+
+sub _parse_source_handler {
+    my ( $self, $handler ) = @_;
+
+    my ($name, $config);
+    if ($handler =~ /\W/) {
+	eval 'require YAML';
+	if (my $e = $@) {
+	    die "couldn't parse source_handlers '$handler': YAML not available";
+	}
+	my $hash;
+	eval { $hash = YAML::Load( $handler . "\n" ) };
+	if (my $e = $@) {
+	    die "couldn't parse source_handlers '$handler': $e";
+	}
+	($name) = keys %$hash;
+	$config = $hash->{$name};
+    } else {
+	$name = $handler;
+	$config = {};
+    }
+
+    return( $name, $config );
 }
 
 =head3 C<run>

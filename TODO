@@ -14,9 +14,15 @@ y  Create a new 'Source' class
 	move meta data assembling from SourceFactory
   ?	could have different sub-classes for internal cases
 
-y   Refactory SourceFactory
+y   Refactor SourceFactory
 	use new Source class from Parser
 	remove assemble_meta
+	given a Source (+ config?)
+	auto-loads source detectors from config
+	chooses best detector to use, handing over:
+		Source
+		source-specific config?
+	returns an iterator
 
 y   Phase out current IteratorFactory & old Source
 	source detectors should instantiate appropriate iterator
@@ -41,12 +47,23 @@ y    Refactor SourceDetectors
      y	don't need to inherit from TAP::Parser::SourceDetector
 		just need can_handle & make_iterator
 
-    Update TAP::Parser & Subclassing docs
+y   Refactor the Parser
+	creates a Source object
+	uses IteratorFactory to create an iterator
 
-    Move SourceDetector --> SourceHandler?
+y   Refactor App::Prove to open access to new TAP::Harness source parameters
+
+    Update proverun.t to be able to handle non-perl tests
+
+    Move SourceDetector --> SourceHandler
 	more descriptive of their function
+	rename 'sources' param --> source_handler
+		TAP::Harness
+		TAP::Parser
+		TAP::Parser::SourceFactory
 
     Clean up 'stream' vs 'iterator' usage
+	replace all instances of 'stream' with 'iterator'
 	in TAP::Parser
 	   y	$stream
 	   y	_stream
@@ -56,39 +73,26 @@ y    Refactor SourceDetectors
 	   	->new( stream => ... )
 	mv streams.t -> iterators.t
 
-    Refactor Iterators
-	remove shebang detection
-	other tasks?
-	Exec iterator should be really easy to use
-		rename to Exec ?
-		make command available
-		don't execute command until ->next called
-		(makes testing easier)
-
-    Phase out source
+    Process iterator should be really easy to use
+	rename to Exec ?
+	make command available via API
+	don't execute command until ->next called
+	(makes testing easier)
 
     Move SourceFactory --> IteratorFactory
-	given a Source (+ config?)
-	auto-loads source detectors from config
-	chooses best detector to use, handing over:
-		Source
-		source-specific config?
-	returns an iterator
-
-y   Refactor the Parser
-	creates a Source object
-	uses IteratorFactory to create an iterator
-
-    Replace all instances of 'stream' with 'iterator'
-	or vice-versa?
-
-    Refactor App::Prove to open access to new TAP::Harness source parameters
-
 
     Update docs
+	prove
+	App::Prove
+	TAP::Harness
+	TAP::Parser & Subclassing docs
+	lib/TAP/Harness/Beyond.pod
+	Changes
 
 
 TODO:
+
+    - update HACKING.pod: now lives in Git
 
     - Associate YAML diagnostic with the preceding test. Currently it's
       necessary to look ahead past a test to discover whether it has a
