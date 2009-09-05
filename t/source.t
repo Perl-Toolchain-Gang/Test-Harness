@@ -35,8 +35,8 @@ use_ok( 'TAP::Parser::Source' );
     is_deeply( $source->config, {}, 'config empty by default' );
     $source->config->{Foo} = { bar => 'baz' };
     is_deeply( $source->config_for( 'Foo' ), { bar => 'baz' }, 'config_for( Foo )' );
-    is_deeply( $source->config_for( 'TAP::Parser::SourceDetector::Foo' ),
-	       { bar => 'baz' }, 'config_for( ...::SourceDetector::Foo )' );
+    is_deeply( $source->config_for( 'TAP::Parser::SourceHandler::Foo' ),
+	       { bar => 'baz' }, 'config_for( ...::SourceHandler::Foo )' );
 
     ok( ! $source->merge, 'merge not set by default' );
     $source->merge( 1 );

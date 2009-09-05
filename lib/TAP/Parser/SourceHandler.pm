@@ -1,4 +1,4 @@
-package TAP::Parser::SourceDetector;
+package TAP::Parser::SourceHandler;
 
 use strict;
 use vars qw($VERSION @ISA);
@@ -10,7 +10,7 @@ use TAP::Parser::Iterator ();
 
 =head1 NAME
 
-TAP::Parser::SourceDetector - Base class for different TAP source detectors
+TAP::Parser::SourceHandler - Base class for different TAP source handlers
 
 =head1 VERSION
 
@@ -26,8 +26,8 @@ $VERSION = '3.18';
   # see TAP::Parser::SourceFactory for general usage
 
   # must be sub-classed for use
-  package MySourceDetector;
-  use base qw( TAP::Parser::SourceDetector );
+  package MySourceHandler;
+  use base qw( TAP::Parser::SourceHandler );
   sub can_handle    { return $confidence_level }
   sub make_iterator { return $iterator }
 
@@ -35,17 +35,17 @@ $VERSION = '3.18';
 
 =head1 DESCRIPTION
 
-This is an abstract base class for L<TAP::Parser::Source> detectors / handlers.
+This is an abstract base class for L<TAP::Parser::Source> handlers / handlers.
 
-A C<TAP::Parser::SourceDetector> does whatever is necessary to produce & capture
+A C<TAP::Parser::SourceHandler> does whatever is necessary to produce & capture
 a stream of TAP from the I<raw> source, and package it up in a
 L<TAP::Parser::Iterator> for the parser to consume.
 
-C<SourceDetectors> must implement the I<source detection & handling> interface
+C<SourceHandlers> must implement the I<source detection & handling> interface
 used by L<TAP::Parser::SourceFactory>.  At 2 methods, the interface is pretty
 simple: L</can_handle> and L</make_source>.
 
-Unless you're writing a new L<TAP::Parser::SourceDetector>, a plugin, or
+Unless you're writing a new L<TAP::Parser::SourceHandler>, a plugin, or
 subclassing L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head1 METHODS
@@ -102,7 +102,7 @@ of the subclasses that ship with this module as an example.  What follows is
 a quick overview.
 
 Start by familiarizing yourself with L<TAP::Parser::Source> and
-L<TAP::Parser::SourceFactory>.  L<TAP::Parser::SourceDetector::RawTAP> is
+L<TAP::Parser::SourceFactory>.  L<TAP::Parser::SourceHandler::RawTAP> is
 the easiest sub-class to use an an example.
 
 It's important to point out that if you want your subclass to be automatically
@@ -114,21 +114,21 @@ which will cause L<TAP::Parser::SourceFactory/load_sources> to load your
 subclass).
 
 Don't forget to register your class with
-L<TAP::Parser::SourceFactory/register_detector>.
+L<TAP::Parser::SourceFactory/register_handler>.
 
 =head2 Example
 
-  package MySourceDetector;
+  package MySourceHandler;
 
   use strict;
   use vars '@ISA'; # compat with older perls
 
-  use MySourceDetector; # see TAP::Parser::SourceDetector
+  use MySourceHandler; # see TAP::Parser::SourceHandler
   use TAP::Parser::SourceFactory;
 
-  @ISA = qw( TAP::Parser::SourceDetector );
+  @ISA = qw( TAP::Parser::SourceHandler );
 
-  TAP::Parser::SourceFactory->register_detector( __PACKAGE__ );
+  TAP::Parser::SourceFactory->register_handler( __PACKAGE__ );
 
   sub can_handle {
       my ( $class, $src ) = @_;
@@ -182,11 +182,11 @@ L<TAP::Parser>,
 L<TAP::Parser::Source>,
 L<TAP::Parser::Iterator>,
 L<TAP::Parser::SourceFactory>,
-L<TAP::Parser::SourceDetector::Executable>,
-L<TAP::Parser::SourceDetector::Perl>,
-L<TAP::Parser::SourceDetector::File>,
-L<TAP::Parser::SourceDetector::Handle>,
-L<TAP::Parser::SourceDetector::RawTAP>
+L<TAP::Parser::SourceHandler::Executable>,
+L<TAP::Parser::SourceHandler::Perl>,
+L<TAP::Parser::SourceHandler::File>,
+L<TAP::Parser::SourceHandler::Handle>,
+L<TAP::Parser::SourceHandler::RawTAP>
 
 =cut
 

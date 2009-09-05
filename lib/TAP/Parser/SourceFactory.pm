@@ -11,11 +11,11 @@ use File::Basename qw( fileparse );
 
 @ISA = qw(TAP::Object);
 
-use constant detectors => [];
+use constant handlers => [];
 
 =head1 NAME
 
-TAP::Parser::SourceFactory - Figures out which SourceDetector objects to use for a given Source
+TAP::Parser::SourceFactory - Figures out which SourceHandler objects to use for a given Source
 
 =head1 VERSION
 
@@ -34,9 +34,9 @@ $VERSION = '3.18';
 =head1 DESCRIPTION
 
 This is a factory class that takes a L<TAP::Parser::Source> and runs it through all the
-registered L<TAP::Parser::SourceDetector>s to see which one should handle the source.
+registered L<TAP::Parser::SourceHandler>s to see which one should handle the source.
 
-If you're a plugin author, you'll be interested in how to L</register_detector>s,
+If you're a plugin author, you'll be interested in how to L</register_handler>s,
 how L</detect_source> works.
 
 =head1 METHODS
@@ -49,38 +49,38 @@ Creates a new factory class:
 
   my $sf = TAP::Parser::SourceFactory->new( $config );
 
-C<$config> is optional.  If given, sets L</config> and calls L</load_detectors>.
+C<$config> is optional.  If given, sets L</config> and calls L</load_handlers>.
 
 =cut
 
 sub _initialize {
     my ( $self, $config ) = @_;
-    $self->config( $config || {} )->load_detectors;
+    $self->config( $config || {} )->load_handlers;
     return $self;
 }
 
-=head3 C<register_detector>
+=head3 C<register_handler>
 
-Registers a new L<TAP::Parser::SourceDetector> with this factory.
+Registers a new L<TAP::Parser::SourceHandler> with this factory.
 
-  __PACKAGE__->register_detector( $detector_class );
+  __PACKAGE__->register_handler( $handler_class );
 
-=head3 C<detectors>
+=head3 C<handlers>
 
-List of detectors that have been registered.
+List of handlers that have been registered.
 
 =cut
 
-sub register_detector {
+sub register_handler {
     my ( $class, $dclass ) = @_;
 
     confess("$dclass must implement can_handle & make_iterator methods!")
       unless UNIVERSAL::can( $dclass, 'can_handle' )
 	&& UNIVERSAL::can( $dclass, 'make_iterator' );
 
-    my $detectors = $class->detectors;
-    push @{$detectors}, $dclass
-      unless grep { $_ eq $dclass } @{$detectors};
+    my $handlers = $class->handlers;
+    push @{$handlers}, $dclass
+      unless grep { $_ eq $dclass } @{$handlers};
 
     return $class;
 }
@@ -94,13 +94,13 @@ sub register_detector {
  my $cfg = $sf->config;
  $sf->config({ Perl => { %config } });
 
-Chaining getter/setter for the configuration of the available source detectors.
-This is a hashref keyed on detector class whose values contain config to be passed
-onto the detectors during detection & creation.  Class names may be fully qualified
+Chaining getter/setter for the configuration of the available source handlers.
+This is a hashref keyed on handler class whose values contain config to be passed
+onto the handlers during detection & creation.  Class names may be fully qualified
 or abbreviated, eg:
 
   # these are equivalent
-  $sf->config({ 'TAP::Parser::SourceDetector::Perl' => { %config } });
+  $sf->config({ 'TAP::Parser::SourceHandler::Perl' => { %config } });
   $sf->config({ 'Perl' => { %config } });
 
 =cut
@@ -115,10 +115,10 @@ sub config {
     return $self;
 }
 
-sub _last_detector {
+sub _last_handler {
     my $self = shift;
-    return $self->{last_detector} unless @_;
-    $self->{last_detector} = shift;
+    return $self->{last_handler} unless @_;
+    $self->{last_handler} = shift;
     return $self;
 }
 
@@ -132,41 +132,41 @@ sub _testing {
 
 ##############################################################################
 
-=head3 C<load_detectors>
+=head3 C<load_handlers>
 
- $sf->load_detectors;
+ $sf->load_handlers;
 
-Loads the detector classes defined in L</config>.  For example, given a config:
+Loads the handler classes defined in L</config>.  For example, given a config:
 
   $sf->config({
-    MySourceDetector => { some => 'config' },
+    MySourceHandler => { some => 'config' },
   });
 
-C<load_detectors> will attempt to load the C<MySourceDetector> class by looking in
+C<load_handlers> will attempt to load the C<MySourceHandler> class by looking in
 C<@INC> for it in this order:
 
-  TAP::Parser::SourceDetector::MySourceDetector
-  MySourceDetector
+  TAP::Parser::SourceHandler::MySourceHandler
+  MySourceHandler
 
 C<croak>s on error.
 
 =cut
 
-sub load_detectors {
+sub load_handlers {
     my ($self) = @_;
-    foreach my $detector ( keys %{ $self->config } ) {
-        my $sclass = $self->_load_detector($detector);
+    foreach my $handler ( keys %{ $self->config } ) {
+        my $sclass = $self->_load_handler($handler);
 
         # TODO: store which class we loaded anywhere?
     }
     return $self;
 }
 
-sub _load_detector {
-    my ( $self, $detector ) = @_;
+sub _load_handler {
+    my ( $self, $handler ) = @_;
 
     my @errors;
-    foreach my $dclass ( "TAP::Parser::SourceDetector::$detector", $detector ) {
+    foreach my $dclass ( "TAP::Parser::SourceHandler::$handler", $handler ) {
         return $dclass if UNIVERSAL::can( $dclass, 'can_handle' )
 	  && UNIVERSAL::can( $dclass, 'make_iterator' );
 
@@ -178,10 +178,10 @@ sub _load_detector {
 
         return $dclass if UNIVERSAL::can( $dclass, 'can_handle' )
 	  && UNIVERSAL::can( $dclass, 'make_iterator' );
-        push @errors, "detector '$dclass' does not implement can_handle & make_iterator";
+        push @errors, "handler '$dclass' does not implement can_handle & make_iterator";
     }
 
-    $self->_croak( "Cannot load detector '$detector': " . join( "\n", @errors ) );
+    $self->_croak( "Cannot load handler '$handler': " . join( "\n", @errors ) );
 }
 
 ##############################################################################
@@ -190,7 +190,7 @@ sub _load_detector {
 
   my $iterator = $src_factory->make_iterator( $source );
 
-Given a L<TAP::Parser::Source>, finds the most suitable L<TAP::Parser::SourceDetector>
+Given a L<TAP::Parser::Source>, finds the most suitable L<TAP::Parser::SourceHandler>
 to use to create a L<TAP::Parser::Iterator> (see L</detect_source>).  Dies on error.
 
 =cut
@@ -206,11 +206,11 @@ sub make_iterator {
     # is the raw source already an object?
     return $source->raw
       if ( $source->meta->{is_object}
-	   && UNIVERSAL::isa( $source->raw, 'TAP::Parser::SourceDetector' ) );
+	   && UNIVERSAL::isa( $source->raw, 'TAP::Parser::SourceHandler' ) );
 
     # figure out what kind of source it is
     my $sd_class = $self->detect_source( $source );
-    $self->_last_detector( $sd_class );
+    $self->_last_handler( $sd_class );
 
     return if $self->_testing;
 
@@ -224,18 +224,18 @@ sub make_iterator {
 =head3 C<detect_source>
 
 Given a L<TAP::Parser::Source>, detects what kind of source it is and
-returns I<one> L<TAP::Parser::SourceDetector> (the most confident one).  Dies
+returns I<one> L<TAP::Parser::SourceHandler> (the most confident one).  Dies
 on error.
 
 The detection algorithm works something like this:
 
-  for (@registered_detectors) {
+  for (@registered_handlers) {
     # ask them how confident they are about handling this source
-    $confidence{$detector} = $detector->can_handle( $source )
+    $confidence{$handler} = $handler->can_handle( $source )
   }
-  # choose the most confident detector
+  # choose the most confident handler
 
-Ties are handled by choosing the first detector.
+Ties are handled by choosing the first handler.
 
 =cut
 
@@ -244,16 +244,16 @@ sub detect_source {
 
     confess('no raw source ref defined!') unless defined $source->raw;
 
-    # find a list of detectors that can handle this source:
-    my %detectors;
-    foreach my $dclass ( @{ $self->detectors } ) {
+    # find a list of handlers that can handle this source:
+    my %handlers;
+    foreach my $dclass ( @{ $self->handlers } ) {
         my $confidence = $dclass->can_handle( $source );
 
-        # warn "detector: $dclass: $confidence\n";
-        $detectors{$dclass} = $confidence if $confidence;
+        # warn "handler: $dclass: $confidence\n";
+        $handlers{$dclass} = $confidence if $confidence;
     }
 
-    if ( !%detectors ) {
+    if ( !%handlers ) {
         # use Data::Dump qw( pp );
         # warn pp( $meta );
 
@@ -263,24 +263,24 @@ sub detect_source {
         return;
     }
 
-    # if multiple detectors can handle it, choose the most confident one
-    my @detectors = (
+    # if multiple handlers can handle it, choose the most confident one
+    my @handlers = (
         map    {$_}
-          sort { $detectors{$a} cmp $detectors{$b} }
-          keys %detectors
+          sort { $handlers{$a} cmp $handlers{$b} }
+          keys %handlers
     );
 
-    # this is really useful for debugging detectors:
+    # this is really useful for debugging handlers:
     if ( $ENV{TAP_HARNESS_SOURCE_FACTORY_VOTES} ) {
         warn(
             "votes: ",
-            join( ', ', map {"$_: $detectors{$_}"} @detectors ),
+            join( ', ', map {"$_: $handlers{$_}"} @handlers ),
             "\n"
         );
     }
 
     # return 1st
-    return pop @detectors;
+    return pop @handlers;
 }
 
 
@@ -296,7 +296,7 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 =head2 Example
 
 If we've done things right, you'll probably want to write a new source,
-rather than sub-classing this (see L<TAP::Parser::SourceDetector> for that).
+rather than sub-classing this (see L<TAP::Parser::SourceHandler> for that).
 
 But in case you find the need to...
 
@@ -332,12 +332,12 @@ extensible TAP source detective work by Steve Purkis.
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::SourceDetector>,
-L<TAP::Parser::SourceDetector::File>,
-L<TAP::Parser::SourceDetector::Perl>,
-L<TAP::Parser::SourceDetector::RawTAP>,
-L<TAP::Parser::SourceDetector::Handle>,
-L<TAP::Parser::SourceDetector::Executable>
+L<TAP::Parser::SourceHandler>,
+L<TAP::Parser::SourceHandler::File>,
+L<TAP::Parser::SourceHandler::Perl>,
+L<TAP::Parser::SourceHandler::RawTAP>,
+L<TAP::Parser::SourceHandler::Handle>,
+L<TAP::Parser::SourceHandler::Executable>
 
 =cut
 

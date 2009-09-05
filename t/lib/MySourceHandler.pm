@@ -1,6 +1,6 @@
 # subclass for testing customizing & subclassing
 
-package MySourceDetector;
+package MySourceHandler;
 
 use strict;
 use vars '@ISA';
@@ -8,12 +8,12 @@ use vars '@ISA';
 use MyCustom;
 use MyIterator;
 use TAP::Parser::SourceFactory;
-use TAP::Parser::SourceDetector;
+use TAP::Parser::SourceHandler;
 
-#@ISA = qw( TAP::Parser::SourceDetector MyCustom );
+#@ISA = qw( TAP::Parser::SourceHandler MyCustom );
 @ISA = qw( MyCustom );
 
-TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
+TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
 
 sub can_handle {
     my ( $class, $source ) = @_;

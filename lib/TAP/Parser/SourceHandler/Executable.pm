@@ -1,19 +1,19 @@
-package TAP::Parser::SourceDetector::Executable;
+package TAP::Parser::SourceHandler::Executable;
 
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::SourceDetector    ();
+use TAP::Parser::SourceHandler    ();
 use TAP::Parser::SourceFactory     ();
 use TAP::Parser::Iterator::Process ();
 
-@ISA = qw(TAP::Parser::SourceDetector);
+@ISA = qw(TAP::Parser::SourceHandler);
 
-TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
+TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
 
 =head1 NAME
 
-TAP::Parser::SourceDetector::Executable - Stream output from an executable TAP source
+TAP::Parser::SourceHandler::Executable - Stream output from an executable TAP source
 
 =head1 VERSION
 
@@ -26,18 +26,18 @@ $VERSION = '3.18';
 =head1 SYNOPSIS
 
   use TAP::Parser::Source;
-  use TAP::Parser::SourceDetector::Executable;
+  use TAP::Parser::SourceHandler::Executable;
 
   my $source = TAP::Parser::Source->new->raw(['/usr/bin/ruby', 'mytest.rb']);
   $source->assemble_meta;
 
-  my $class = 'TAP::Parser::SourceDetector::Executable';
+  my $class = 'TAP::Parser::SourceHandler::Executable';
   my $vote  = $class->can_handle( $source );
   my $iter  = $class->make_iterator( $source );
 
 =head1 DESCRIPTION
 
-This is an I<executable> L<TAP::Parser::SourceDetector> - it has 2 jobs:
+This is an I<executable> L<TAP::Parser::SourceHandler> - it has 2 jobs:
 
 1. Figure out if the L<TAP::Parser::Source> it's given is an executable command
 (L</can_handle>).
@@ -153,17 +153,17 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 =head2 Example
 
-  package MyRubySourceDetector;
+  package MyRubySourceHandler;
 
   use strict;
   use vars '@ISA';
 
   use Carp qw( croak );
-  use TAP::Parser::SourceDetector::Executable;
+  use TAP::Parser::SourceHandler::Executable;
 
-  @ISA = qw( TAP::Parser::SourceDetector::Executable );
+  @ISA = qw( TAP::Parser::SourceHandler::Executable );
 
-  # expect $detector->(['mytest.rb', 'cmdline', 'args']);
+  # expect $handler->(['mytest.rb', 'cmdline', 'args']);
   sub make_iterator {
     my ($self, $source) = @_;
     my @test_args = @{ $source->test_args };
@@ -177,10 +177,10 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::SourceFactory>,
-L<TAP::Parser::SourceDetector>,
-L<TAP::Parser::SourceDetector::Perl>,
-L<TAP::Parser::SourceDetector::File>,
-L<TAP::Parser::SourceDetector::Handle>,
-L<TAP::Parser::SourceDetector::RawTAP>
+L<TAP::Parser::SourceHandler>,
+L<TAP::Parser::SourceHandler::Perl>,
+L<TAP::Parser::SourceHandler::File>,
+L<TAP::Parser::SourceHandler::Handle>,
+L<TAP::Parser::SourceHandler::RawTAP>
 
 =cut

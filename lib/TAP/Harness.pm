@@ -235,8 +235,8 @@ and STDERR together for any processes they start.
 I<NEW to 3.18>.
 
 If set, C<sources> must be a hashref containing the names of the
-L<TAP::Parser::SourceDetector>s to load and/or configure.  The values are a
-hash of configuration that will be accessible to to the source detectors via
+L<TAP::Parser::SourceHandler>s to load and/or configure.  The values are a
+hash of configuration that will be accessible to to the source handlers via
 L<TAP::Parser::Source/config_for>.
 
 For example:
@@ -806,8 +806,8 @@ C<TAP::Harness> is designed to be easy to configure.
 C<TAP::Parser> plugins let you change the way TAP is I<input> to and I<output>
 from the parser.
 
-L<TAP::Parser::SourceDetector>s handle TAP I<input>.  You can configure them
-and load custom detectors using the C<sources> parameter to L</new>.
+L<TAP::Parser::SourceHandler>s handle TAP I<input>.  You can configure them
+and load custom handlers using the C<sources> parameter to L</new>.
 
 L<TAP::Formatter>s handle TAP I<output>.  You can load custom formatters by
 using the C<formatter_class> parameter to L</new>.  To configure a formatter,
@@ -835,7 +835,7 @@ and I<output>:
 
 =item Customize how TAP gets into the parser
 
-To do this, you can either extend an existing L<TAP::Parser::SourceDetector>,
+To do this, you can either extend an existing L<TAP::Parser::SourceHandler>,
 or write your own.  It's a pretty simple API, and they can be loaded and
 configured using the C<sources> parameter to L</new>.
 
@@ -843,7 +843,7 @@ configured using the C<sources> parameter to L</new>.
 
 To do this, you can either extend an existing L<TAP::Formatter>, or write your
 own.  Writing formatters are a bit more involved than writing a
-I<SourceDetector>, as you'll need to understand the L<TAP::Parser> API.  A
+I<SourceHandler>, as you'll need to understand the L<TAP::Parser> API.  A
 good place to start is by understanding how L</aggregate_tests> works.
 
 Custom formatters can be loaded configured using the C<formatter_class>

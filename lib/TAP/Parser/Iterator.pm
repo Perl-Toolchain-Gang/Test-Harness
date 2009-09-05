@@ -36,7 +36,7 @@ $VERSION = '3.18';
 =head1 DESCRIPTION
 
 This is a simple iterator base class that defines L<TAP::Parser>'s iterator
-API.  Iterators are typically created from L<TAP::Parser::SourceDetector>s.
+API.  Iterators are typically created from L<TAP::Parser::SourceHandler>s.
 
 =head1 METHODS
 

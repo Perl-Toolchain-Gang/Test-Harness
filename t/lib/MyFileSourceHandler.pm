@@ -1,20 +1,20 @@
 # subclass for testing TAP::Harness custom sources
 
-package MyFileSourceDetector;
+package MyFileSourceHandler;
 
 use strict;
 use vars qw( @ISA $LAST_OBJ $CAN_HANDLE $MAKE_ITER $LAST_SOURCE );
 
 use MyCustom;
-use TAP::Parser::SourceDetector::File;
+use TAP::Parser::SourceHandler::File;
 
-@ISA      = qw( TAP::Parser::SourceDetector::File MyCustom );
+@ISA      = qw( TAP::Parser::SourceHandler::File MyCustom );
 $LAST_OBJ = undef;
 $CAN_HANDLE  = undef;
 $MAKE_ITER   = undef;
 $LAST_SOURCE = undef;
 
-TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
+TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
 
 sub can_handle {
     my $class = shift;

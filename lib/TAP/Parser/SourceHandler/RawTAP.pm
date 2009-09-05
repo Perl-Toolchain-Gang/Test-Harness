@@ -1,19 +1,19 @@
-package TAP::Parser::SourceDetector::RawTAP;
+package TAP::Parser::SourceHandler::RawTAP;
 
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::SourceDetector  ();
+use TAP::Parser::SourceHandler  ();
 use TAP::Parser::SourceFactory   ();
 use TAP::Parser::Iterator::Array ();
 
-@ISA = qw(TAP::Parser::SourceDetector);
+@ISA = qw(TAP::Parser::SourceHandler);
 
-TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
+TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
 
 =head1 NAME
 
-TAP::Parser::SourceDetector::RawTAP - Stream output from raw TAP in a scalar/array ref.
+TAP::Parser::SourceHandler::RawTAP - Stream output from raw TAP in a scalar/array ref.
 
 =head1 VERSION
 
@@ -26,18 +26,18 @@ $VERSION = '3.18';
 =head1 SYNOPSIS
 
   use TAP::Parser::Source;
-  use TAP::Parser::SourceDetector::RawTAP;
+  use TAP::Parser::SourceHandler::RawTAP;
 
   my $source = TAP::Parser::Source->new->raw( \"1..1\nok 1\n" );
   $source->assemble_meta;
 
-  my $class = 'TAP::Parser::SourceDetector::RawTAP';
+  my $class = 'TAP::Parser::SourceHandler::RawTAP';
   my $vote  = $class->can_handle( $source );
   my $iter  = $class->make_iterator( $source );
 
 =head1 DESCRIPTION
 
-This is a I<raw TAP output> L<TAP::Parser::SourceDetector> - it has 2 jobs:
+This is a I<raw TAP output> L<TAP::Parser::SourceHandler> - it has 2 jobs:
 
 1. Figure out if the L<TAP::Parser::Source> it's given is raw TAP output
 (L</can_handle>).
@@ -123,10 +123,10 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::SourceFactory>,
-L<TAP::Parser::SourceDetector>,
-L<TAP::Parser::SourceDetector::Executable>,
-L<TAP::Parser::SourceDetector::Perl>,
-L<TAP::Parser::SourceDetector::File>,
-L<TAP::Parser::SourceDetector::Handle>
+L<TAP::Parser::SourceHandler>,
+L<TAP::Parser::SourceHandler::Executable>,
+L<TAP::Parser::SourceHandler::Perl>,
+L<TAP::Parser::SourceHandler::File>,
+L<TAP::Parser::SourceHandler::Handle>
 
 =cut

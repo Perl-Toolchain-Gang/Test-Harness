@@ -40,11 +40,11 @@ A TAP I<source> is something that produces a stream of TAP for the parser to
 consume, such as an executable file, a text file, an archive, an IO handle, a
 database, etc.  C<TAP::Parser::Source>s encapsulate these I<raw> sources, and
 provide some useful meta data about them.  They are used by
-L<TAP::Parser::SourceDetector>s, which do whatever is required to produce &
+L<TAP::Parser::SourceHandler>s, which do whatever is required to produce &
 capture a stream of TAP from the I<raw> source, and package it up in a
 L<TAP::Parser::Iterator> for the parser to consume.
 
-Unless you're writing a new L<TAP::Parser::SourceDetector>, a plugin or
+Unless you're writing a new L<TAP::Parser::SourceHandler>, a plugin or
 subclassing L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head1 METHODS
@@ -176,7 +176,7 @@ sub test_args {
   my $meta = $source->assemble_meta;
 
 Gathers meta data about the L</raw> source, stashes it in L</meta> and returns
-it as a hashref.  This is done so that the L<TAP::Parser::SourceDetector>s don't
+it as a hashref.  This is done so that the L<TAP::Parser::SourceHandler>s don't
 have to repeat common checks.  Currently this includes:
 
     is_scalar => $bool,
@@ -331,7 +331,7 @@ or abbreviated, eg:
 
   # these are equivalent
   $source->config_for( 'Perl' );
-  $source->config_for( 'TAP::Parser::SourceDetector::Perl' );
+  $source->config_for( 'TAP::Parser::SourceHandler::Perl' );
 
 If a fully qualified $class is given, its abbreviated version is checked first.
 
@@ -358,6 +358,6 @@ Steve Purkis.
 L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::SourceFactory>,
-L<TAP::Parser::SourceDetector>
+L<TAP::Parser::SourceHandler>
 
 =cut

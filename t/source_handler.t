@@ -19,11 +19,11 @@ use IO::Handle;
 use File::Spec;
 
 use TAP::Parser::Source;
-use TAP::Parser::SourceDetector;
-use TAP::Parser::SourceDetector::Perl;
-use TAP::Parser::SourceDetector::File;
-use TAP::Parser::SourceDetector::RawTAP;
-use TAP::Parser::SourceDetector::Handle;
+use TAP::Parser::SourceHandler;
+use TAP::Parser::SourceHandler::Perl;
+use TAP::Parser::SourceHandler::File;
+use TAP::Parser::SourceHandler::RawTAP;
+use TAP::Parser::SourceHandler::Handle;
 
 my $dir = File::Spec->catdir(
     (   $ENV{PERL_CORE}
@@ -38,7 +38,7 @@ my $perl = $^X;
 
 # Abstract base class tests
 {
-    my $class  = 'TAP::Parser::SourceDetector';
+    my $class  = 'TAP::Parser::SourceHandler';
     my $source = TAP::Parser::Source->new;
     my $error;
 
@@ -57,7 +57,7 @@ my $perl = $^X;
 
 # Executable source tests
 {
-    my $class = 'TAP::Parser::SourceDetector::Executable';
+    my $class = 'TAP::Parser::SourceHandler::Executable';
     my $test  = File::Spec->catfile( $dir, 'source' );
     my $tests =
       {
@@ -117,12 +117,12 @@ my $perl = $^X;
        ],
       };
 
-    test_detector( $class, $tests );
+    test_handler( $class, $tests );
 }
 
 # Perl source tests
 {
-    my $class = 'TAP::Parser::SourceDetector::Perl';
+    my $class = 'TAP::Parser::SourceHandler::Perl';
     my $test  = File::Spec->catfile( $dir, 'source' );
     my $tests =
       {
@@ -182,7 +182,7 @@ my $perl = $^X;
        ],
       };
 
-    test_detector( $class, $tests );
+    test_handler( $class, $tests );
 
     # internals tests!
     {
@@ -197,7 +197,7 @@ my $perl = $^X;
 
 # Raw TAP source tests
 {
-    my $class = 'TAP::Parser::SourceDetector::RawTAP';
+    my $class = 'TAP::Parser::SourceHandler::RawTAP';
     my $tests =
       {
        default_vote => 0,
@@ -247,13 +247,13 @@ my $perl = $^X;
        ],
       };
 
-    test_detector( $class, $tests );
+    test_handler( $class, $tests );
 }
 
 # Text file TAP source tests
 {
     my $test  = File::Spec->catfile( $dir, 'source.tap' );
-    my $class = 'TAP::Parser::SourceDetector::File';
+    my $class = 'TAP::Parser::SourceHandler::File';
     my $tests =
       {
        default_vote => 0,
@@ -289,13 +289,13 @@ my $perl = $^X;
        ],
       };
 
-    test_detector( $class, $tests );
+    test_handler( $class, $tests );
 }
 
 # IO::Handle TAP source tests
 {
     my $test  = File::Spec->catfile( $dir, 'source.tap' );
-    my $class = 'TAP::Parser::SourceDetector::Handle';
+    my $class = 'TAP::Parser::SourceHandler::Handle';
     my $tests =
       {
        default_vote => 0,
@@ -325,7 +325,7 @@ my $perl = $^X;
        ],
       };
 
-    test_detector( $class, $tests );
+    test_handler( $class, $tests );
 }
 
 exit;
@@ -333,7 +333,7 @@ exit;
 ###############################################################################
 # helper sub
 
-sub test_detector {
+sub test_handler {
     my ($class, $tests) = @_;
     my ($short_class) = ($class =~ /\:\:(\w+)$/);
 

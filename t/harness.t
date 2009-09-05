@@ -719,7 +719,7 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             sources   => {
-                MyFileSourceDetector => { extensions => ['.1'] },
+                MyFileSourceHandler => { extensions => ['.1'] },
             },
         }
     );
@@ -730,13 +730,13 @@ SKIP: {
     ok( !$e, 'no error on load custom source' ) || diag($e);
 
     no warnings 'once';
-    can_ok( 'MyFileSourceDetector', 'make_iterator' );
-    ok( $MyFileSourceDetector::CAN_HANDLE,
-	'... MyFileSourceDetector->can_handle was called' );
-    ok( $MyFileSourceDetector::MAKE_ITER,
-	'... MyFileSourceDetector->make_iterator was called' );
+    can_ok( 'MyFileSourceHandler', 'make_iterator' );
+    ok( $MyFileSourceHandler::CAN_HANDLE,
+	'... MyFileSourceHandler->can_handle was called' );
+    ok( $MyFileSourceHandler::MAKE_ITER,
+	'... MyFileSourceHandler->make_iterator was called' );
 
-    my $raw_source = eval { ${ $MyFileSourceDetector::LAST_SOURCE->raw } };
+    my $raw_source = eval { ${ $MyFileSourceHandler::LAST_SOURCE->raw } };
     is( $raw_source, $source_test, '... used the right source' );
 
     my @output = tied($$capture)->dump;

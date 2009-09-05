@@ -1,19 +1,19 @@
-package TAP::Parser::SourceDetector::Handle;
+package TAP::Parser::SourceHandler::Handle;
 
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::SourceDetector   ();
+use TAP::Parser::SourceHandler   ();
 use TAP::Parser::SourceFactory    ();
 use TAP::Parser::Iterator::Stream ();
 
-@ISA = qw(TAP::Parser::SourceDetector);
+@ISA = qw(TAP::Parser::SourceHandler);
 
-TAP::Parser::SourceFactory->register_detector(__PACKAGE__);
+TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
 
 =head1 NAME
 
-TAP::Parser::SourceDetector::Handle - Stream TAP from an IO::Handle or a GLOB.
+TAP::Parser::SourceHandler::Handle - Stream TAP from an IO::Handle or a GLOB.
 
 =head1 VERSION
 
@@ -26,18 +26,18 @@ $VERSION = '3.18';
 =head1 SYNOPSIS
 
   use TAP::Parser::Source;
-  use TAP::Parser::SourceDetector::Executable;
+  use TAP::Parser::SourceHandler::Executable;
 
   my $source = TAP::Parser::Source->new->raw( \*TAP_FILE );
   $source->assemble_meta;
 
-  my $class = 'TAP::Parser::SourceDetector::Handle';
+  my $class = 'TAP::Parser::SourceHandler::Handle';
   my $vote  = $class->can_handle( $source );
   my $iter  = $class->make_iterator( $source );
 
 =head1 DESCRIPTION
 
-This is a I<raw TAP stored in an IO Handle> L<TAP::Parser::SourceDetector> class.  It
+This is a I<raw TAP stored in an IO Handle> L<TAP::Parser::SourceHandler> class.  It
 has 2 jobs:
 
 1. Figure out if the L<TAP::Parser::Source> it's given is an L<IO::Handle> or
@@ -116,10 +116,10 @@ L<TAP::Parser>,
 L<TAP::Parser::Iterator>,
 L<TAP::Parser::Iterator::Stream>,
 L<TAP::Parser::SourceFactory>,
-L<TAP::Parser::SourceDetector>,
-L<TAP::Parser::SourceDetector::Executable>,
-L<TAP::Parser::SourceDetector::Perl>,
-L<TAP::Parser::SourceDetector::File>,
-L<TAP::Parser::SourceDetector::RawTAP>
+L<TAP::Parser::SourceHandler>,
+L<TAP::Parser::SourceHandler::Executable>,
+L<TAP::Parser::SourceHandler::Perl>,
+L<TAP::Parser::SourceHandler::File>,
+L<TAP::Parser::SourceHandler::RawTAP>
 
 =cut
