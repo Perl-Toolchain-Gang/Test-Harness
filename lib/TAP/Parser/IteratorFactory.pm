@@ -1,10 +1,9 @@
-package TAP::Parser::SourceFactory;
+package TAP::Parser::IteratorFactory;
 
 use strict;
 use vars qw($VERSION @ISA);
 
 use TAP::Object ();
-use TAP::Parser::SourceFactory ();
 
 use Carp qw( confess );
 use File::Basename qw( fileparse );
@@ -15,7 +14,7 @@ use constant handlers => [];
 
 =head1 NAME
 
-TAP::Parser::SourceFactory - Figures out which SourceHandler objects to use for a given Source
+TAP::Parser::IteratorFactory - Figures out which SourceHandler objects to use for a given Source
 
 =head1 VERSION
 
@@ -27,8 +26,8 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
-  use TAP::Parser::SourceFactory;
-  my $factory = TAP::Parser::SourceFactory->new({ %config });
+  use TAP::Parser::IteratorFactory;
+  my $factory = TAP::Parser::IteratorFactory->new({ %config });
   my $iterator  = $factory->make_iterator( $filename );
 
 =head1 DESCRIPTION
@@ -47,7 +46,7 @@ how L</detect_source> works.
 
 Creates a new factory class:
 
-  my $sf = TAP::Parser::SourceFactory->new( $config );
+  my $sf = TAP::Parser::IteratorFactory->new( $config );
 
 C<$config> is optional.  If given, sets L</config> and calls L</load_handlers>.
 
@@ -300,14 +299,14 @@ rather than sub-classing this (see L<TAP::Parser::SourceHandler> for that).
 
 But in case you find the need to...
 
-  package MySourceFactory;
+  package MyIteratorFactory;
 
   use strict;
   use vars '@ISA';
 
-  use TAP::Parser::SourceFactory;
+  use TAP::Parser::IteratorFactory;
 
-  @ISA = qw( TAP::Parser::SourceFactory );
+  @ISA = qw( TAP::Parser::IteratorFactory );
 
   # override source detection algorithm
   sub detect_source {

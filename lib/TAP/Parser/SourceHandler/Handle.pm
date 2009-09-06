@@ -4,12 +4,12 @@ use strict;
 use vars qw($VERSION @ISA);
 
 use TAP::Parser::SourceHandler    ();
-use TAP::Parser::SourceFactory    ();
+use TAP::Parser::IteratorFactory  ();
 use TAP::Parser::Iterator::Stream ();
 
 @ISA = qw(TAP::Parser::SourceHandler);
 
-TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
+TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
 =head1 NAME
 
@@ -115,7 +115,7 @@ L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::Iterator>,
 L<TAP::Parser::Iterator::Stream>,
-L<TAP::Parser::SourceFactory>,
+L<TAP::Parser::IteratorFactory>,
 L<TAP::Parser::SourceHandler>,
 L<TAP::Parser::SourceHandler::Executable>,
 L<TAP::Parser::SourceHandler::Perl>,

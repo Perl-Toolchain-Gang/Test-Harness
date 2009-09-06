@@ -4,12 +4,12 @@ use strict;
 use vars qw($VERSION @ISA);
 
 use TAP::Parser::SourceHandler    ();
-use TAP::Parser::SourceFactory    ();
+use TAP::Parser::IteratorFactory  ();
 use TAP::Parser::Iterator::Stream ();
 
 @ISA = qw(TAP::Parser::SourceHandler);
 
-TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
+TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
 =head1 NAME
 
@@ -40,7 +40,7 @@ $VERSION = '3.18';
 This is a I<raw TAP stored in a file> L<TAP::Parser::SourceHandler> - it has 2 jobs:
 
 1. Figure out if the I<raw> source it's given is a file containing raw TAP
-output.  See L<TAP::Parser::SourceFactory> for more details.
+output.  See L<TAP::Parser::IteratorFactory> for more details.
 
 2. Takes raw TAP from the text file given, and converts into an iterator.
 

@@ -6,6 +6,7 @@ use strict;
 use vars qw( @ISA $LAST_OBJ $CAN_HANDLE $MAKE_ITER $LAST_SOURCE );
 
 use MyCustom;
+use TAP::Parser::IteratorFactory;
 use TAP::Parser::SourceHandler::File;
 
 @ISA      = qw( TAP::Parser::SourceHandler::File MyCustom );
@@ -14,7 +15,7 @@ $CAN_HANDLE  = undef;
 $MAKE_ITER   = undef;
 $LAST_SOURCE = undef;
 
-TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
+TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
 sub can_handle {
     my $class = shift;

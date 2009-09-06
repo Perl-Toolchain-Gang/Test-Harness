@@ -8,13 +8,13 @@ use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS   => ( $^O eq 'VMS' );
 
 use TAP::Parser::SourceHandler::Executable  ();
-use TAP::Parser::SourceFactory              ();
+use TAP::Parser::IteratorFactory            ();
 use TAP::Parser::Iterator::Process          ();
 use TAP::Parser::Utils qw( split_shell );
 
 @ISA = 'TAP::Parser::SourceHandler::Executable';
 
-TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
+TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
 =head1 NAME
 
@@ -302,7 +302,7 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::SourceFactory>,
+L<TAP::Parser::IteratorFactory>,
 L<TAP::Parser::SourceHandler>,
 L<TAP::Parser::SourceHandler::Executable>,
 L<TAP::Parser::SourceHandler::File>,

@@ -23,6 +23,7 @@ BEGIN {
       TAP::Parser::Aggregator
       TAP::Parser::Grammar
       TAP::Parser::Iterator
+      TAP::Parser::IteratorFactory
       TAP::Parser::Iterator::Array
       TAP::Parser::Iterator::Process
       TAP::Parser::Iterator::Stream
@@ -43,7 +44,6 @@ BEGIN {
       TAP::Parser::Scheduler::Spinner
       TAP::Parser::Source
       TAP::Parser::SourceHandler
-      TAP::Parser::SourceFactory
       TAP::Parser::SourceHandler::Executable
       TAP::Parser::SourceHandler::Perl
       TAP::Parser::SourceHandler::File

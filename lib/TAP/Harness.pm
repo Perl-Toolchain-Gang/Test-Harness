@@ -251,7 +251,7 @@ The C<sources> parameter affects how C<source>, C<tap> and C<exec> parameters
 are handled.
 
 For more details, see the C<sources> parameter in L<TAP::Parser/new>,
-L<TAP::Parser::Source>, and L<TAP::Parser::SourceFactory>.
+L<TAP::Parser::Source>, and L<TAP::Parser::IteratorFactory>.
 
 =item * C<aggregator_class>
 

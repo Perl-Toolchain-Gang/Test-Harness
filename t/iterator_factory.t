@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Tests for TAP::Parser::SourceFactory & source detection
+# Tests for TAP::Parser::IteratorFactory & source detection
 ##
 
 BEGIN {
@@ -20,13 +20,13 @@ use Test::More tests => 42;
 use IO::File;
 use File::Spec;
 use TAP::Parser::Source;
-use TAP::Parser::SourceFactory;
+use TAP::Parser::IteratorFactory;
 
 # Test generic API...
 {
-    can_ok 'TAP::Parser::SourceFactory', 'new';
-    my $sf = TAP::Parser::SourceFactory->new;
-    isa_ok $sf, 'TAP::Parser::SourceFactory';
+    can_ok 'TAP::Parser::IteratorFactory', 'new';
+    my $sf = TAP::Parser::IteratorFactory->new;
+    isa_ok $sf, 'TAP::Parser::IteratorFactory';
     can_ok $sf, 'config';
     can_ok $sf, 'handlers';
     can_ok $sf, 'detect_source';
@@ -43,7 +43,7 @@ use TAP::Parser::SourceFactory;
     is( $sf->config($config), $sf, '... and set config works' );
 
     # Load/Register a handler
-    $sf = TAP::Parser::SourceFactory->new(
+    $sf = TAP::Parser::IteratorFactory->new(
         { MySourceHandler => { accept => 'known-source' } } );
     can_ok( 'MySourceHandler', 'can_handle' );
     is_deeply( $sf->handlers, ['MySourceHandler'], '... was registered' );
@@ -143,7 +143,7 @@ foreach my $test (@sources) {
     }
 
     my $name = $test->{name} || substr( $test->{source}, 0, 10 );
-    my $sf = TAP::Parser::SourceFactory->new( $test->{config} )->_testing( 1 );
+    my $sf = TAP::Parser::IteratorFactory->new( $test->{config} )->_testing( 1 );
 
     my $raw     = $test->{source};
     my $source  = TAP::Parser::Source->new->raw( ref($raw) ? $raw : \$raw );

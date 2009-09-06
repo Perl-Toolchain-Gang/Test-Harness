@@ -301,7 +301,7 @@ error will be thrown.
 All C<--sources> are combined into a hash, and passed to L<TAP::Harness/new>'s
 C<sources> parameter.
 
-See L<TAP::Parser::SourceFactory> for more details on how configuration is
+See L<TAP::Parser::IteratorFactory> for more details on how configuration is
 passed to I<SourceHandlers>.
 
 =head1 PLUGINS

@@ -6,12 +6,12 @@ use strict;
 use vars '@ISA';
 
 use MyCustom;
+use TAP::Parser::IteratorFactory;
 use TAP::Parser::SourceHandler::Perl;
-use TAP::Parser::SourceFactory;
 
 @ISA = qw( TAP::Parser::SourceHandler::Perl MyCustom );
 
-TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
+TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
 sub can_handle {
     my $class = shift;

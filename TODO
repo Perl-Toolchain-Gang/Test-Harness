@@ -76,25 +76,24 @@ y   Write executable tests for non-perl sources
 x   use TAP::Parser::YAMLish::Reader in prove --sources
 	can't - doesn't read single line strings
 
-    Process iterator should be really easy to use
-	rename to Exec ?
-	make command available via API
-	don't execute command until ->next called
-	(makes testing easier)
+y   Move SourceFactory --> IteratorFactory
 
-    Move SourceFactory --> IteratorFactory
+?   Process iterator should be really easy to use
+	make command available via API?
+	don't execute command until ->next called?
 
-    Rename Iterator::Stream --> Iterator::Handle?
+?   Rename Iterator::Stream --> Iterator::Handle?
 
-    Rename Iterator::Process --> Iterator::Executable?
+?   Rename Iterator::Process --> Iterator::Executable?
 
-    Update docs
+y   Update docs
     y	prove
     y	App::Prove
-	TAP::Harness
-	TAP::Parser & Subclassing docs
-	lib/TAP/Harness/Beyond.pod
-	Changes
+    y	TAP::Harness
+    y	TAP::Parser & Subclassing docs
+    y	lib/TAP/Harness/Beyond.pod
+
+    Update Changes
 
 
 TODO:

@@ -357,7 +357,7 @@ Steve Purkis.
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::SourceFactory>,
+L<TAP::Parser::IteratorFactory>,
 L<TAP::Parser::SourceHandler>
 
 =cut

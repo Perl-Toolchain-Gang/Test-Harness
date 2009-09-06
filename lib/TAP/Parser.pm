@@ -9,7 +9,7 @@ use TAP::Parser::Result             ();
 use TAP::Parser::ResultFactory      ();
 use TAP::Parser::Source             ();
 use TAP::Parser::Iterator           ();
-use TAP::Parser::SourceFactory      ();
+use TAP::Parser::IteratorFactory    ();
 use TAP::Parser::SourceHandler::Executable ();
 use TAP::Parser::SourceHandler::Perl       ();
 use TAP::Parser::SourceHandler::File       ();
@@ -62,7 +62,7 @@ BEGIN {    # making accessors
           skip_all
           grammar_class
           result_factory_class
-          source_factory_class
+          iterator_factory_class
           )
     );
 
@@ -116,12 +116,12 @@ I<CHANGED in 3.18>
 
 This is the preferred method of passing input to the constructor.
 
-The I<source> is used to create a L<TAP::Parser::Source> that is passed to the
-L</source_factory_class> which in turn figures out how to handle the source and
+The C<source> is used to create a L<TAP::Parser::Source> that is passed to the
+L</iterator_factory_class> which in turn figures out how to handle the source and
 creates a <TAP::Parser::Iterator> for it.  The iterator is used by the parser to
 read in the TAP stream.
 
-To configure the I<SourceFactory> use the C<sources> parameter below.
+To configure the I<IteratorFactory> use the C<sources> parameter below.
 
 Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 
@@ -132,11 +132,11 @@ I<CHANGED in 3.18>
 The value should be the complete TAP output.
 
 The I<tap> is used to create a L<TAP::Parser::Source> that is passed to the
-L</source_factory_class> which in turn figures out how to handle the source and
+L</iterator_factory_class> which in turn figures out how to handle the source and
 creates a <TAP::Parser::Iterator> for it.  The iterator is used by the parser to
 read in the TAP stream.
 
-To configure the I<SourceFactory> use the C<sources> parameter below.
+To configure the I<IteratorFactory> use the C<sources> parameter below.
 
 Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 
@@ -145,7 +145,7 @@ Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 Must be passed an array reference.
 
 The I<exec> array ref is used to create a L<TAP::Parser::Source> that is passed
-to the L</source_factory_class> which in turn figures out how to handle the
+to the L</iterator_factory_class> which in turn figures out how to handle the
 source and creates a <TAP::Parser::Iterator> for it.  The iterator is used by
 the parser to read in the TAP stream.
 
@@ -158,7 +158,7 @@ array reference strings as command arguments to L<IPC::Open3::open3|IPC::Open3>:
 If any C<test_args> are given they will be appended to the end of the command
 argument list.
 
-To configure the I<SourceFactory> use the C<sources> parameter below.
+To configure the I<IteratorFactory> use the C<sources> parameter below.
 
 Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 
@@ -188,12 +188,12 @@ For example:
 This will cause C<TAP::Parser> to pass custom configuration to two of the built-
 in source handlers - L<TAP::Parser::SourceHandler::Perl>,
 L<TAP::Parser::SourceHandler::File> - and attempt to load the C<MyCustom>
-class.  See L<TAP::Parser::SourceFactory/load_handlers> for more detail.
+class.  See L<TAP::Parser::IteratorFactory/load_handlers> for more detail.
 
 The C<sources> parameter affects how C<source>, C<tap> and C<exec> parameters
 are handled.
 
-See L<TAP::Parser::SourceFactory>, L<TAP::Parser::SourceHandler> and subclasses for
+See L<TAP::Parser::IteratorFactory>, L<TAP::Parser::SourceHandler> and subclasses for
 more details.
 
 =item * C<callback>
@@ -267,13 +267,13 @@ L<TAP::Parser::ResultFactory>.
 
 See also L</make_result>.
 
-=item * C<source_factory_class>
+=item * C<iterator_factory_class>
 
-I<NEW to 3.18>.
+I<CHANGED in 3.18>
 
-This option was introduced to let you easily customize which I<source>
+This option was introduced to let you easily customize which I<iterator>
 factory class the parser should use.  It defaults to
-L<TAP::Parser::SourceFactory>.
+L<TAP::Parser::IteratorFactory>.
 
 =back
 
@@ -284,7 +284,7 @@ L<TAP::Parser::SourceFactory>.
 # This should make overriding behaviour of the Parser in subclasses easier:
 sub _default_grammar_class {'TAP::Parser::Grammar'}
 sub _default_result_factory_class {'TAP::Parser::ResultFactory'}
-sub _default_source_factory_class {'TAP::Parser::SourceFactory'}
+sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
 
 ##############################################################################
 
@@ -347,19 +347,19 @@ given.
 
 The C<result_factory_class> can be customized, as described in L</new>.
 
-=head3 C<make_source_factory>
+=head3 C<make_iterator_factory>
 
 I<NEW to 3.18>.
 
-Make a new L<TAP::Parser::SourceFactory> object and return it.  Passes through
+Make a new L<TAP::Parser::IteratorFactory> object and return it.  Passes through
 any arguments given.
 
-C<source_factory_class> can be customized, as described in L</new>.
+C<iterator_factory_class> can be customized, as described in L</new>.
 
 =cut
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub make_source_factory { shift->source_factory_class->new(@_); }
+sub make_iterator_factory { shift->iterator_factory_class->new(@_); }
 sub make_grammar        { shift->grammar_class->new(@_); }
 sub make_result   { shift->result_factory_class->make_result(@_); }
 
@@ -401,7 +401,7 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
     my @class_overrides = qw(
       grammar_class
       result_factory_class
-      source_factory_class
+      iterator_factory_class
     );
 
     sub _initialize {
@@ -463,7 +463,7 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
 	}
 
         if ($source->raw) {
-            my $src_factory = $self->make_source_factory($sources);
+            my $src_factory = $self->make_iterator_factory($sources);
 	    $source->merge( $merge )->switches( $switches )->test_args( $test_args );
 	    $iterator = $src_factory->make_iterator( $source );
         }
@@ -1681,7 +1681,7 @@ never run. They're reported as parse failures (tests out of sequence).
 
 =head1 SUBCLASSING
 
-I<TODO:> update this, it's out-of-date now that L<TAP::Parser::SourceFactory>
+I<TODO:> update this, it's out-of-date now that L<TAP::Parser::IteratorFactory>
 is in use.
 
 If you find you need to provide custom functionality (as you would have using
@@ -1723,14 +1723,14 @@ deprecated first, and changed in a later release.
 
 =head2 Parser Components
 
-I<TODO:> update this, it's out-of-date now that L<TAP::Parser::SourceFactory>
+I<TODO:> update this, it's out-of-date now that L<TAP::Parser::IteratorFactory>
 is in use.
 
 =head3 Sources
 
 A TAP parser consumes input from a single I<source> of TAP, which could come
 from anywhere (a file, an executable, a database, an io handle, a uri, etc..).
-A L<TAP::Parser::SourceFactory> is used to determine the type of a so-called
+A L<TAP::Parser::IteratorFactory> is used to determine the type of a so-called
 'raw' source, and create L<TAP::Parser::SourceHandler> objects which then stream the
 TAP to the parser by way of L</Iterators>.
 
@@ -1739,12 +1739,12 @@ There are quite a few I<SourceHandlers> available,
 If you simply want C<TAP::Parser> to handle a new source of TAP you probably
 don't need to subclass C<TAP::Parser> itself.  Rather, you'll need to create
 new L<TAP::Parser::SourceHandler> classes, and simply plug them into the parser (see
-L</new> for details).  To write one read L<TAP::Parser::SourceFactory> to get
+L</new> for details).  To write one read L<TAP::Parser::IteratorFactory> to get
 a feel for how the system works.
 
 If you find you really need to use your own source factory, set
-L</source_factory_class>.  If you need to customize the objects on creation,
-subclass L<TAP::Parser> and override L</make_source_factory>.
+L</iterator_factory_class>.  If you need to customize the objects on creation,
+subclass L<TAP::Parser> and override L</make_iterator_factory>.
 
 Note that L</make_source> & L</make_perl_source> are now I<DEPRECATED>.
 

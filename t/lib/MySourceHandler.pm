@@ -7,13 +7,13 @@ use vars '@ISA';
 
 use MyCustom;
 use MyIterator;
-use TAP::Parser::SourceFactory;
 use TAP::Parser::SourceHandler;
+use TAP::Parser::IteratorFactory;
 
 #@ISA = qw( TAP::Parser::SourceHandler MyCustom );
 @ISA = qw( MyCustom );
 
-TAP::Parser::SourceFactory->register_handler(__PACKAGE__);
+TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
 sub can_handle {
     my ( $class, $source ) = @_;

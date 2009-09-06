@@ -23,7 +23,7 @@ $VERSION = '3.18';
 =head1 SYNOPSIS
 
   # abstract class - don't use directly!
-  # see TAP::Parser::SourceFactory for general usage
+  # see TAP::Parser::IteratorFactory for general usage
 
   # must be sub-classed for use
   package MySourceHandler;
@@ -42,7 +42,7 @@ a stream of TAP from the I<raw> source, and package it up in a
 L<TAP::Parser::Iterator> for the parser to consume.
 
 C<SourceHandlers> must implement the I<source detection & handling> interface
-used by L<TAP::Parser::SourceFactory>.  At 2 methods, the interface is pretty
+used by L<TAP::Parser::IteratorFactory>.  At 2 methods, the interface is pretty
 simple: L</can_handle> and L</make_source>.
 
 Unless you're writing a new L<TAP::Parser::SourceHandler>, a plugin, or
@@ -63,7 +63,7 @@ C<$source> is a L<TAP::Parser::Source>.
 Returns a number between C<0> & C<1> reflecting how confidently the raw source
 can be handled.  For example, C<0> means the source cannot handle it, C<0.5>
 means it may be able to, and C<1> means it definitely can.  See
-L<TAP::Parser::SourceFactory/detect_source> for details on how this is used.
+L<TAP::Parser::IteratorFactory/detect_source> for details on how this is used.
 
 =cut
 
@@ -102,7 +102,7 @@ of the subclasses that ship with this module as an example.  What follows is
 a quick overview.
 
 Start by familiarizing yourself with L<TAP::Parser::Source> and
-L<TAP::Parser::SourceFactory>.  L<TAP::Parser::SourceHandler::RawTAP> is
+L<TAP::Parser::IteratorFactory>.  L<TAP::Parser::SourceHandler::RawTAP> is
 the easiest sub-class to use an an example.
 
 It's important to point out that if you want your subclass to be automatically
@@ -110,11 +110,11 @@ used by L<TAP::Parser> you'll have to and make sure it gets loaded somehow.
 If you're using L<prove> you can write an L<App::Prove> plugin.  If you're
 using L<TAP::Parser> or L<TAP::Harness> directly (eg. through a custom script,
 L<ExtUtils::MakeMaker>, or L<Module::Build>) you can use the C<config> option
-which will cause L<TAP::Parser::SourceFactory/load_sources> to load your
+which will cause L<TAP::Parser::IteratorFactory/load_sources> to load your
 subclass).
 
 Don't forget to register your class with
-L<TAP::Parser::SourceFactory/register_handler>.
+L<TAP::Parser::IteratorFactory/register_handler>.
 
 =head2 Example
 
@@ -124,11 +124,11 @@ L<TAP::Parser::SourceFactory/register_handler>.
   use vars '@ISA'; # compat with older perls
 
   use MySourceHandler; # see TAP::Parser::SourceHandler
-  use TAP::Parser::SourceFactory;
+  use TAP::Parser::IteratorFactory;
 
   @ISA = qw( TAP::Parser::SourceHandler );
 
-  TAP::Parser::SourceFactory->register_handler( __PACKAGE__ );
+  TAP::Parser::IteratorFactory->register_handler( __PACKAGE__ );
 
   sub can_handle {
       my ( $class, $src ) = @_;
@@ -181,7 +181,7 @@ L<TAP::Object>,
 L<TAP::Parser>,
 L<TAP::Parser::Source>,
 L<TAP::Parser::Iterator>,
-L<TAP::Parser::SourceFactory>,
+L<TAP::Parser::IteratorFactory>,
 L<TAP::Parser::SourceHandler::Executable>,
 L<TAP::Parser::SourceHandler::Perl>,
 L<TAP::Parser::SourceHandler::File>,
