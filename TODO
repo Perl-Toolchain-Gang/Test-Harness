@@ -73,7 +73,8 @@ y   Write executable tests for non-perl sources
     y	prove t/source_tests/source.sh if /bin/sh & /bin/echo exists
     y	prove t/source_tests/source.bat if Win32
 
-    use TAP::Parser::YAMLish::Reader in prove --sources ?
+x   use TAP::Parser::YAMLish::Reader in prove --sources
+	can't - doesn't read single line strings
 
     Process iterator should be really easy to use
 	rename to Exec ?

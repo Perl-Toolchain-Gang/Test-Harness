@@ -528,6 +528,7 @@ foreach my $test_args ( get_arg_sets() ) {
 SKIP: {
 
     my $cat = '/bin/cat';
+    # TODO: use TYPE on win32?
     unless ( -e $cat ) {
         skip "no '$cat'", 2;
     }
