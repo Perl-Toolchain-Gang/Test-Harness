@@ -1091,7 +1091,7 @@ BEGIN {    # START PLAN
         },
 
         # Source handlers
-        {   name => 'source simple',
+        {   name => 'Switch --source simple',
             args => { argv => [qw( one two three )] },
             switches =>
 	    [ '--source', 'MyCustom', $dummy_test ],
@@ -1116,7 +1116,7 @@ BEGIN {    # START PLAN
             ],
         },
 
-        {   name => 'sources with config',
+        {   name => 'Switch --sources with config',
             args => { argv => [qw( one two three )] },
 	    skip => $HAS_YAML ? 0 : 1,
 	    skip_reason => "YAML not available",

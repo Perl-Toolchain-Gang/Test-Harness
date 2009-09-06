@@ -12,7 +12,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 58;
+use Test::More tests => 70;
 
 use IO::File;
 use IO::Handle;
@@ -25,6 +25,10 @@ use TAP::Parser::SourceHandler::File;
 use TAP::Parser::SourceHandler::RawTAP;
 use TAP::Parser::SourceHandler::Handle;
 
+my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
+my $HAS_SH   = -x '/bin/sh';
+my $HAS_ECHO = -x '/bin/echo';
+
 my $dir = File::Spec->catdir(
     (   $ENV{PERL_CORE}
         ? ( File::Spec->updir(), 'ext', 'Test-Harness' )
@@ -35,6 +39,10 @@ my $dir = File::Spec->catdir(
 );
 
 my $perl = $^X;
+
+my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
+  qw( source source.1 source.bat source.pl source.sh source.t source.tap );
+
 
 # Abstract base class tests
 {
@@ -58,7 +66,6 @@ my $perl = $^X;
 # Executable source tests
 {
     my $class = 'TAP::Parser::SourceHandler::Executable';
-    my $test  = File::Spec->catfile( $dir, 'source' );
     my $tests =
       {
        default_vote => 0,
@@ -99,14 +106,14 @@ my $perl = $^X;
        [
 	{
 	 name   => "valid executable",
-	 raw    => [ $perl, '-It/lib', '-T', $test ],
+	 raw    => [ $perl, '-It/lib', '-T', $file{source} ],
 	 iclass => 'TAP::Parser::Iterator::Process',
-	 output => [ '1..1', 'ok 1' ],
+	 output => [ '1..1', 'ok 1 - source' ],
 	 assemble_meta => 1,
 	},
 	{
 	 name  => "invalid source->raw",
-	 raw   => "$perl -It/lib $test",
+	 raw   => "$perl -It/lib $file{source}",
 	 error => qr/^No command found/,
 	},
 	{
@@ -114,6 +121,24 @@ my $perl = $^X;
 	 raw   => [],
 	 error => qr/^No command found/,
 	},
+        {
+	 name => $file{'source.sh'},
+	 raw  => \$file{'source.sh'},
+	 skip => $HAS_SH && $HAS_ECHO ? 0 : 1,
+	 skip_reason => 'no /bin/sh, /bin/echo',
+	 iclass => 'TAP::Parser::Iterator::Process',
+	 output => [ '1..1', 'ok 1 - source.sh' ],
+	 assemble_meta => 1,
+        },
+        {
+	 name => $file{'source.bat'},
+	 raw  => \$file{'source.bat'},
+	 skip => $IS_WIN32 ? 0 : 1,
+	 skip_reason => 'not running Win32',
+	 iclass => 'TAP::Parser::Iterator::Process',
+	 output => [ '1..1', 'ok 1 - source.bat' ],
+	 assemble_meta => 1,
+        },
        ],
       };
 
@@ -123,7 +148,6 @@ my $perl = $^X;
 # Perl source tests
 {
     my $class = 'TAP::Parser::SourceHandler::Perl';
-    my $test  = File::Spec->catfile( $dir, 'source' );
     my $tests =
       {
        default_vote => 0,
@@ -173,10 +197,10 @@ my $perl = $^X;
        make_iterator =>
        [
 	{
-	 name   => $test,
-	 raw    => \$test,
+	 name   => $file{source},
+	 raw    => \$file{source},
 	 iclass => 'TAP::Parser::Iterator::Process',
-	 output => [ '1..1', 'ok 1' ],
+	 output => [ '1..1', 'ok 1 - source' ],
 	 assemble_meta => 1,
 	},
        ],
@@ -186,7 +210,7 @@ my $perl = $^X;
 
     # internals tests!
     {
-	my $source = TAP::Parser::Source->new->raw( \$test );
+	my $source = TAP::Parser::Source->new->raw( \$file{source} );
 	$source->assemble_meta;
 	my $iterator = $class->make_iterator( $source );
 	my @command  = @{ $iterator->{command} };
@@ -252,7 +276,6 @@ my $perl = $^X;
 
 # Text file TAP source tests
 {
-    my $test  = File::Spec->catfile( $dir, 'source.tap' );
     my $class = 'TAP::Parser::SourceHandler::File';
     my $tests =
       {
@@ -280,12 +303,20 @@ my $perl = $^X;
        make_iterator =>
        [
 	{
-	 name   => $test,
-	 raw    => \$test,
+	 name   => $file{'source.tap'},
+	 raw    => \$file{'source.tap'},
 	 iclass => 'TAP::Parser::Iterator::Stream',
-	 output => [ '1..1', 'ok 1' ],
+	 output => [ '1..1', 'ok 1 - source.tap' ],
 	 assemble_meta => 1,
 	},
+        {
+	 name   => $file{'source.1'},
+	 raw    => \$file{'source.1'},
+	 config => { File => { extensions => ['.1'] } },
+	 iclass => 'TAP::Parser::Iterator::Stream',
+	 output => [ '1..1', 'ok 1 - source.1' ],
+	 assemble_meta => 1,
+        },
        ],
       };
 
@@ -294,7 +325,6 @@ my $perl = $^X;
 
 # IO::Handle TAP source tests
 {
-    my $test  = File::Spec->catfile( $dir, 'source.tap' );
     my $class = 'TAP::Parser::SourceHandler::Handle';
     my $tests =
       {
@@ -317,9 +347,9 @@ my $perl = $^X;
        [
 	{
 	 name   => 'IO::Handle',
-	 raw    => IO::File->new( $test ),
+	 raw    => IO::File->new( $file{'source.tap'} ),
 	 iclass => 'TAP::Parser::Iterator::Stream',
-	 output => [ '1..1', 'ok 1' ],
+	 output => [ '1..1', 'ok 1 - source.tap' ],
 	 assemble_meta => 1,
 	},
        ],
@@ -361,32 +391,39 @@ sub test_handler {
 	my $name = $test->{name} || 'unnamed test';
 	$name    = "$short_class->make_iterator( $name )";
 
-	my $source = TAP::Parser::Source->new;
-	$source->raw( $test->{raw} ) if $test->{raw};
-	$source->meta( $test->{meta} ) if $test->{meta};
-	$source->config( $test->{config} ) if $test->{config};
-	$source->assemble_meta if $test->{assemble_meta};
+      SKIP:
+	{
+	    my $planned = 1;
+	    $planned   += 1 + scalar @{$test->{output}} if $test->{output};
+	    skip $test->{skip_reason}, $planned if $test->{skip};
 
-	my $iterator = eval { $class->make_iterator( $source ) };
-	my $e = $@;
-	if (my $error = $test->{error}) {
-	    $e = '' unless defined $e;
-	    like $e, $error, "$name threw expected error";
-	    next;
-	} elsif ($e) {
-	    fail( "$name threw an unexpected error" );
-	    diag( $e );
-	    next;
-	}
+	    my $source = TAP::Parser::Source->new;
+	    $source->raw( $test->{raw} ) if $test->{raw};
+	    $source->meta( $test->{meta} ) if $test->{meta};
+	    $source->config( $test->{config} ) if $test->{config};
+	    $source->assemble_meta if $test->{assemble_meta};
 
-	isa_ok $iterator, $test->{iclass}, $name;
-	if ($test->{output}) {
-	    my $i = 1;
-	    foreach my $line (@{ $test->{output} }) {
-		is $iterator->next, $line, "... line $i";
-		$i++;
+	    my $iterator = eval { $class->make_iterator( $source ) };
+	    my $e = $@;
+	    if (my $error = $test->{error}) {
+		$e = '' unless defined $e;
+		like $e, $error, "$name threw expected error";
+		next;
+	    } elsif ($e) {
+		fail( "$name threw an unexpected error" );
+		diag( $e );
+		next;
 	    }
-	    ok !$iterator->next, '... and we should have no more results';
+
+	    isa_ok $iterator, $test->{iclass}, $name;
+	    if ($test->{output}) {
+		my $i = 1;
+		foreach my $line (@{ $test->{output} }) {
+		    is $iterator->next, $line, "... line $i";
+		    $i++;
+		}
+		ok !$iterator->next, '... and we should have no more results';
+	    }
 	}
     }
 }

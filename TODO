@@ -67,11 +67,11 @@ y    Clean up 'stream' vs 'iterator' usage
 	   y	$stream
 	   y	->new( stream => ... )
 
-    Write executable tests for non-perl sources
-	Update proverun.t to be able to handle non-perl tests
-	prove --source 'File: {extensions: [.1]}' t/source_tests/source.1
-	prove t/source_tests/source.sh if /bin/sh & /bin/echo exists
-	prove t/source_tests/source.bat if Win32
+y   Write executable tests for non-perl sources
+    !	Update proverun.t to be able to handle non-perl tests (gave up, added to source_handler.t)
+    y	prove --source 'File: {extensions: [.1]}' t/source_tests/source.1
+    y	prove t/source_tests/source.sh if /bin/sh & /bin/echo exists
+    y	prove t/source_tests/source.bat if Win32
 
     use TAP::Parser::YAMLish::Reader in prove --sources ?
 
