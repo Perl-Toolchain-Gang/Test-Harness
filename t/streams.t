@@ -9,14 +9,13 @@ use TAP::Parser;
 use TAP::Parser::Iterator::Array;
 use TAP::Parser::Iterator::Stream;
 
-my $STREAMED   = 'TAP::Parser';
 my $ITER       = 'TAP::Parser::Iterator';
 my $ITER_FH    = "${ITER}::Stream";
 my $ITER_ARRAY = "${ITER}::Array";
 
 my $iterator  = $ITER_FH->new( \*DATA );
 isa_ok $iterator, 'TAP::Parser::Iterator';
-my $parser = TAP::Parser->new( { stream => $iterator } );
+my $parser = TAP::Parser->new({ iterator => $iterator });
 isa_ok $parser, 'TAP::Parser',
   '... and creating a streamed parser should succeed';
 
@@ -61,7 +60,7 @@ ok 5 # skip we have no description
 END_TAP
 
 $iterator = $ITER_ARRAY->new( [ split /\n/ => $tap ] );
-ok $parser = TAP::Parser->new( { stream => $iterator } ),
+ok $parser = TAP::Parser->new({ iterator => $iterator }),
   'Now we create a parser with the plan at the end';
 isa_ok $parser->_iterator, $ITER_ARRAY,
   '... and now we should have an array iterator';
@@ -100,7 +99,7 @@ END_TAP
 
 $iterator = $ITER_ARRAY->new( [ split /\n/ => $tap ] );
 
-ok $parser = TAP::Parser->new( { stream => $iterator } ),
+ok $parser = TAP::Parser->new({ iterator => $iterator }),
   'Now we create a parser with a plan as the second line';
 is $parser->next->as_string, 'ok 1 - input file opened',
   '... and the first test should parse correctly';
@@ -138,7 +137,7 @@ END_TAP
 
 $iterator = $ITER_ARRAY->new( [ split /\n/ => $tap ] );
 
-ok $parser = TAP::Parser->new( { stream => $iterator } ),
+ok $parser = TAP::Parser->new({ iterator => $iterator }),
   'Now we create a parser with the plan as the second to last line';
 is $parser->next->as_string, 'ok 1 - input file opened',
   '... and the first test should parse correctly';

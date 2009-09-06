@@ -119,7 +119,7 @@ END_TAP
 
     my $parser = TAP::Parser->new(
         {   spool => $spoolHandle,
-            stream => TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] )
+            iterator => TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] )
         }
     );
 

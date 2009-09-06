@@ -422,7 +422,8 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
             $self->$key($val);
         }
 
-        my $iterator    = delete $args{stream};
+        my $iterator    = delete $args{iterator};
+	$iterator     ||= delete $args{stream}; # deprecated
         my $tap         = delete $args{tap};
         my $raw_source  = delete $args{source};
         my $sources     = delete $args{sources};
@@ -435,7 +436,7 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
 
         if ( 1 < grep {defined} $iterator, $tap, $raw_source, $exec ) {
             $self->_croak(
-                "You may only choose one of 'exec', 'stream', 'tap' or 'source'"
+                "You may only choose one of 'exec', 'tap', 'source' or 'iterator'"
             );
         }
 
@@ -444,17 +445,22 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
         }
 
         # convert $tap & $exec to $raw_source equiv.
+        my $type = '';
 	my $source = TAP::Parser::Source->new;
-        my $raw_source_ref;
         if ($tap) {
+	    $type = 'raw TAP';
 	    $source->raw( \$tap );
         }
         elsif ($exec) {
+	    $type = 'exec ' . $exec->[0];
             $source->raw({ exec => [ @$exec, @$test_args ] });
         }
         elsif ($raw_source) {
+	    $type = 'source ' . ref( $raw_source ) || $raw_source;
             $source->raw( ref($raw_source) ? $raw_source : \$raw_source );
-        }
+        } elsif ($iterator) {
+	    $type = 'iterator ' . ref( $iterator );
+	}
 
         if ($source->raw) {
             my $src_factory = $self->make_source_factory($sources);
@@ -463,7 +469,7 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
         }
 
         unless ($iterator) {
-            $self->_croak('PANIC: could not determine stream');
+            $self->_croak("PANIC: could not determine iterator for input $type");
         }
 
         while ( my ( $k, $v ) = each %initialize ) {
@@ -1340,9 +1346,9 @@ sub _grammar {
     return $self->{_grammar} = shift if @_;
 
     return $self->{_grammar} ||= $self->make_grammar(
-        {   stream  => $self->_iterator,
-            parser  => $self,
-            version => $self->version
+        {   iterator => $self->_iterator,
+            parser   => $self,
+            version  => $self->version
         }
     );
 }

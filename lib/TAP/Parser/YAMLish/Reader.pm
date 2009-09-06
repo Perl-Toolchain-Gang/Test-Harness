@@ -294,7 +294,7 @@ C<TAP::Parser::YAMLish::Reader> object.
 
 =head3 C<read>
 
- my $got = $reader->read($stream);
+ my $got = $reader->read($iterator);
 
 Read YAMLish from a L<TAP::Parser::Iterator> and return the data structure it
 represents.

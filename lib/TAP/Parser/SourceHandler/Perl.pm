@@ -7,7 +7,7 @@ use vars qw($VERSION @ISA);
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS   => ( $^O eq 'VMS' );
 
-use TAP::Parser::SourceHandler::Executable ();
+use TAP::Parser::SourceHandler::Executable  ();
 use TAP::Parser::SourceFactory              ();
 use TAP::Parser::Iterator::Process          ();
 use TAP::Parser::Utils qw( split_shell );

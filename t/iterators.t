@@ -94,38 +94,38 @@ for my $test (@schedule) {
         my $subclass = $test->{subclass};
         my $source   = $test->{source};
         my $class    = $test->{class};
-        my $iter
+        my $iterator
           = $class
           ? $class->new($source)
           : make_iterator($source);
 
-        ok $iter,     "$name: We should be able to create a new iterator";
-        isa_ok $iter, 'TAP::Parser::Iterator',
+        ok $iterator,     "$name: We should be able to create a new iterator";
+        isa_ok $iterator, 'TAP::Parser::Iterator',
           '... and the object it returns';
-        isa_ok $iter, $subclass, '... and the object it returns';
+        isa_ok $iterator, $subclass, '... and the object it returns';
 
-        can_ok $iter, 'exit';
-        ok !defined $iter->exit,
+        can_ok $iterator, 'exit';
+        ok !defined $iterator->exit,
           "$name: ... and it should be undef before we are done ($subclass)";
 
-        can_ok $iter, 'next';
-        is $iter->next, 'one', "$name: next() should return the first result";
+        can_ok $iterator, 'next';
+        is $iterator->next, 'one', "$name: next() should return the first result";
 
-        is $iter->next, 'two',
+        is $iterator->next, 'two',
           "$name: next() should return the second result";
 
-        is $iter->next, '', "$name: next() should return the third result";
+        is $iterator->next, '', "$name: next() should return the third result";
 
-        is $iter->next, 'three',
+        is $iterator->next, 'three',
           "$name: next() should return the fourth result";
 
-        ok !defined $iter->next,
+        ok !defined $iterator->next,
           "$name: next() should return undef after it is empty";
 
-        is $iter->exit, 0,
+        is $iterator->exit, 0,
           "$name: ... and exit should now return 0 ($subclass)";
 
-        is $iter->wait, 0, "$name: wait should also now return 0 ($subclass)";
+        is $iterator->wait, 0, "$name: wait should also now return 0 ($subclass)";
 
         if ( my $after = $test->{after} ) {
             $after->();
@@ -137,9 +137,9 @@ for my $test (@schedule) {
 
     # coverage tests for the ctor
 
-    my $stream = make_iterator( IO::Handle->new );
+    my $iterator = make_iterator( IO::Handle->new );
 
-    isa_ok $stream, 'TAP::Parser::Iterator::Stream';
+    isa_ok $iterator, 'TAP::Parser::Iterator::Stream';
 
     my @die;
 
@@ -158,23 +158,23 @@ for my $test (@schedule) {
 
     # coverage test for VMS case
 
-    my $stream = make_iterator(
+    my $iterator = make_iterator(
         [   'not ',
             'ok 1 - I hate VMS',
         ]
     );
 
-    is $stream->next, 'not ok 1 - I hate VMS',
+    is $iterator->next, 'not ok 1 - I hate VMS',
       'coverage of VMS line-splitting case';
 
     # coverage test for VMS case - nothing after 'not'
 
-    $stream = make_iterator(
+    $iterator = make_iterator(
         [   'not ',
         ]
     );
 
-    is $stream->next, 'not ', '...and we find "not" by itself';
+    is $iterator->next, 'not ', '...and we find "not" by itself';
 }
 
 SKIP: {

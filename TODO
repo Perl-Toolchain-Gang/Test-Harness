@@ -57,16 +57,23 @@ y   Move SourceDetector --> SourceHandler
     y	more descriptive of their function
     y	rename 'source_handler' param back to 'sources'
 
-    Clean up 'stream' vs 'iterator' usage
+y    Clean up 'stream' vs 'iterator' usage
 	replace all instances of 'stream' with 'iterator'
-	in TAP::Parser
+    y	in TAP::Parser
 	   y	$stream
 	   y	_stream
-	   	->new( stream => ... )
-	in TAP::Grammar
-	   	$stream
-	   	->new( stream => ... )
-	mv streams.t -> iterators.t
+	   y	->new( stream => ... )
+    y	in TAP::Grammar
+	   y	$stream
+	   y	->new( stream => ... )
+
+    Write executable tests for non-perl sources
+	Update proverun.t to be able to handle non-perl tests
+	prove --source 'File: {extensions: [.1]}' t/source_tests/source.1
+	prove t/source_tests/source.sh if /bin/sh & /bin/echo exists
+	prove t/source_tests/source.bat if Win32
+
+    use TAP::Parser::YAMLish::Reader in prove --sources ?
 
     Process iterator should be really easy to use
 	rename to Exec ?
@@ -76,11 +83,13 @@ y   Move SourceDetector --> SourceHandler
 
     Move SourceFactory --> IteratorFactory
 
-    Update proverun.t to be able to handle non-perl tests
+    Rename Iterator::Stream --> Iterator::Handle?
+
+    Rename Iterator::Process --> Iterator::Executable?
 
     Update docs
-	prove
-	App::Prove
+    y	prove
+    y	App::Prove
 	TAP::Harness
 	TAP::Parser & Subclassing docs
 	lib/TAP/Harness/Beyond.pod

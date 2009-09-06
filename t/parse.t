@@ -349,7 +349,7 @@ END_TAP
 my $aref = [ split /\n/ => $tap ];
 
 can_ok $PARSER, 'new';
-$parser = $PARSER->new( { stream => TAP::Parser::Iterator::Array->new( $aref ) } );
+$parser = $PARSER->new( { iterator => TAP::Parser::Iterator::Array->new( $aref ) } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 
 # results() is sane?
@@ -530,7 +530,7 @@ END_TAP
 
     is @die, 1, 'coverage testing for _initialize';
 
-    like pop @die, qr/PANIC:\s+could not determine stream at/,
+    like pop @die, qr/PANIC:\s+could not determine iterator for input\s*at/,
       '...and it failed as expected';
 
     @die = ();
@@ -539,9 +539,9 @@ END_TAP
         local $SIG{__DIE__} = sub { push @die, @_ };
 
         $PARSER->new(
-            {   stream => 'stream',
-                tap    => 'tap',
-                source => 'source',    # only one of these is allowed
+            {   iterator => 'iterator',
+                tap      => 'tap',
+                source   => 'source',    # only one of these is allowed
             }
         );
     };
@@ -549,7 +549,7 @@ END_TAP
     is @die, 1, 'coverage testing for _initialize';
 
     like pop @die,
-      qr/You may only choose one of 'exec', 'stream', 'tap' or 'source'/,
+      qr/You may only choose one of 'exec', 'tap', 'source' or 'iterator'/,
       '...and it failed as expected';
 }
 
@@ -808,7 +808,7 @@ END_TAP
     # we're going to bash the internals a bit (but using the API as
     # much as possible) to force grammar->tokenise() to fail
 
-  # firstly we'll create a stream that dies when its next_raw method is called
+  # firstly we'll create a iterator that dies when its next_raw method is called
 
     package TAP::Parser::Iterator::Dies;
 
@@ -838,17 +838,17 @@ END_TAP
     {
         my $parser = TAP::Parser->new( { tap => $tap } );
 
-        # build a dying stream
+        # build a dying iterator
         my $iterator = TAP::Parser::Iterator::Dies->new;
 
-        # now replace the stream - we're forced to us an T::P intenal
+        # now replace the iterator - we're forced to us an T::P intenal
         # method for this
         $parser->_iterator($iterator);
 
         # build a new grammar
         my $grammar = TAP::Parser::Grammar->new(
-            {   stream => $iterator,
-                parser => $parser
+            {   iterator => $iterator,
+                parser   => $parser
             }
         );
 
@@ -874,17 +874,17 @@ END_TAP
 
         $parser->callback( 'ALL', sub { } );
 
-        # build a dying stream
+        # build a dying iterator
         my $iterator = TAP::Parser::Iterator::Dies->new;
 
-        # now replace the stream - we're forced to us an T::P intenal
+        # now replace the iterator - we're forced to us an T::P intenal
         # method for this
         $parser->_iterator($iterator);
 
         # build a new grammar
         my $grammar = TAP::Parser::Grammar->new(
-            {   stream => $iterator,
-                parser => $parser
+            {   iterator => $iterator,
+                parser   => $parser
             }
         );
 

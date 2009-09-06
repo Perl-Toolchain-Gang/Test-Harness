@@ -3,7 +3,7 @@ package TAP::Parser::SourceHandler::File;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::SourceHandler   ();
+use TAP::Parser::SourceHandler    ();
 use TAP::Parser::SourceFactory    ();
 use TAP::Parser::Iterator::Stream ();
 
@@ -25,9 +25,15 @@ $VERSION = '3.18';
 
 =head1 SYNOPSIS
 
+  use TAP::Parser::Source;
   use TAP::Parser::SourceHandler::File;
-  my $source = TAP::Parser::SourceHandler::File->new;
-  my $stream = $source->source (\"1..1\nok 1\n" )->get_stream;
+
+  my $source = TAP::Parser::Source->new->raw( \'file.tap' );
+  $source->assemble_meta;
+
+  my $class = 'TAP::Parser::SourceHandler::File';
+  my $vote  = $class->can_handle( $source );
+  my $iter  = $class->make_iterator( $source );
 
 =head1 DESCRIPTION
 

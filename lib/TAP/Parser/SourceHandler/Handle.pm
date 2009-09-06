@@ -3,7 +3,7 @@ package TAP::Parser::SourceHandler::Handle;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::SourceHandler   ();
+use TAP::Parser::SourceHandler    ();
 use TAP::Parser::SourceFactory    ();
 use TAP::Parser::Iterator::Stream ();
 

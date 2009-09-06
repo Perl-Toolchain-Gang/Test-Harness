@@ -20,10 +20,10 @@ not ok 4 - this is a real failure
 ok 5 # skip we have no description
 END_TAP
 
-my $stream = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
-isa_ok $stream, 'TAP::Parser::Iterator';
+my $iterator = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
+isa_ok $iterator, 'TAP::Parser::Iterator';
 
-my $parser1 = TAP::Parser->new( { stream => $stream } );
+my $parser1 = TAP::Parser->new({ iterator => $iterator });
 isa_ok $parser1, 'TAP::Parser';
 
 $parser1->run;

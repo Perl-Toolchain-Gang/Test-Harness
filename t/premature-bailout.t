@@ -27,7 +27,7 @@ not ok 5
 END_TAP
 
 my $parser  = TAP::Parser->new(
-    {   stream => TAP::Parser::Iterator::Array->new( tap_to_lines($tap) ),
+    {   iterator => TAP::Parser::Iterator::Array->new( tap_to_lines($tap) ),
     }
 );
 
@@ -105,7 +105,7 @@ is( $bailout->explanation, 'We ran out of foobar.',
 my $more_tap = "1..1\nok 1 - input file opened\n";
 
 my $second_parser = TAP::Parser->new(
-    {   stream => TAP::Parser::Iterator::Array->new( [ split( /\n/, $more_tap ) ] ),
+    {   iterator => TAP::Parser::Iterator::Array->new( [ split( /\n/, $more_tap ) ] ),
     }
 );
 

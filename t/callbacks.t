@@ -36,9 +36,9 @@ my %callbacks = (
     }
 );
 
-my $stream  = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
-my $parser  = TAP::Parser->new(
-    {   stream    => $stream,
+my $iterator = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
+my $parser   = TAP::Parser->new(
+    {   iterator  => $iterator,
         callbacks => \%callbacks,
     }
 );
@@ -78,9 +78,9 @@ my $end  = 0;
     },
 );
 
-$stream = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
+$iterator = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
 $parser = TAP::Parser->new(
-    {   stream    => $stream,
+    {   iterator  => $iterator,
         callbacks => \%callbacks,
     }
 );
@@ -103,10 +103,10 @@ is $end,  1, 'EOF callback correctly called';
     ELSES    => sub { },
 );
 
-$stream = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
+$iterator = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
 eval {
     $parser = TAP::Parser->new(
-        {   stream    => $stream,
+        {   iterator  => $iterator,
             callbacks => \%callbacks,
         }
     );
