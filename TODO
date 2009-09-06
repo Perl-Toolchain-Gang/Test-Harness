@@ -53,14 +53,9 @@ y   Refactor the Parser
 
 y   Refactor App::Prove to open access to new TAP::Harness source parameters
 
-    Update proverun.t to be able to handle non-perl tests
-
-    Move SourceDetector --> SourceHandler
-	more descriptive of their function
-	rename 'sources' param --> source_handler
-		TAP::Harness
-		TAP::Parser
-		TAP::Parser::SourceFactory
+y   Move SourceDetector --> SourceHandler
+    y	more descriptive of their function
+    y	rename 'source_handler' param back to 'sources'
 
     Clean up 'stream' vs 'iterator' usage
 	replace all instances of 'stream' with 'iterator'
@@ -80,6 +75,8 @@ y   Refactor App::Prove to open access to new TAP::Harness source parameters
 	(makes testing easier)
 
     Move SourceFactory --> IteratorFactory
+
+    Update proverun.t to be able to handle non-perl tests
 
     Update docs
 	prove

@@ -1091,10 +1091,10 @@ BEGIN {    # START PLAN
         },
 
         # Source handlers
-        {   name => 'source_handler simple',
+        {   name => 'source simple',
             args => { argv => [qw( one two three )] },
             switches =>
-	    [ '--source_handler', 'MyCustom', $dummy_test ],
+	    [ '--source', 'MyCustom', $dummy_test ],
             expect => {
                 sources =>
                     {
@@ -1116,14 +1116,14 @@ BEGIN {    # START PLAN
             ],
         },
 
-        {   name => 'source_handlers with config',
+        {   name => 'sources with config',
             args => { argv => [qw( one two three )] },
 	    skip => $HAS_YAML ? 0 : 1,
 	    skip_reason => "YAML not available",
             switches =>
-	    [ '--source_handler', 'Perl: {foo: bar baz, avg: 0.278}',
-	      '--source_handler', 'MyCustom',
-	      '--source_handler', 'File: {extensions: [.txt, .tmp]}',
+	    [ '--source', 'Perl: {foo: bar baz, avg: 0.278}',
+	      '--source', 'MyCustom',
+	      '--source', 'File: {extensions: [.txt, .tmp]}',
 	      $dummy_test ],
             expect => {
                 sources =>

@@ -59,7 +59,7 @@ BEGIN {
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
       state_class test_args state dry extension ignore_exit rules state_manager
-      normalize source_handlers
+      normalize sources
     );
     __PACKAGE__->mk_methods(@ATTR);
 }
@@ -82,7 +82,7 @@ sub _initialize {
     my $args = shift || {};
 
     # setup defaults:
-    for my $key (qw( argv rc_opts includes modules state plugins rules source_handlers )) {
+    for my $key (qw( argv rc_opts includes modules state plugins rules sources )) {
         $self->{$key} = [];
     }
     $self->{harness_class} = 'TAP::Harness';
@@ -215,6 +215,7 @@ sub process_args {
             'ext=s'       => \$self->{extension},
             'harness=s'   => \$self->{harness},
             'ignore-exit' => \$self->{ignore_exit},
+            'source=s@'   => $self->{sources},
             'formatter=s' => \$self->{formatter},
             'r|recurse'   => \$self->{recurse},
             'reverse'     => \$self->{backwards},
@@ -240,7 +241,6 @@ sub process_args {
             'w'           => \$self->{warnings_warn},
             'normalize'   => \$self->{normalize},
             'rules=s@'    => $self->{rules},
-            'source_handler=s@' => $self->{source_handlers},
         ) or croak('Unable to continue');
 
         # Stash the remainder of argv for later
@@ -311,8 +311,8 @@ sub _get_args {
         $args{formatter_class} = $formatter;
     }
 
-    foreach my $handler (@{ $self->source_handlers }) {
-	my ($name, $config) = $self->_parse_source_handler( $handler );
+    foreach my $handler (@{ $self->sources }) {
+	my ($name, $config) = $self->_parse_source( $handler );
         $args{sources}->{$name} = $config;
     }
 
@@ -417,19 +417,19 @@ sub _load_extensions {
     $self->_load_extension( $_, @search ) for @$ext;
 }
 
-sub _parse_source_handler {
+sub _parse_source {
     my ( $self, $handler ) = @_;
 
     my ($name, $config);
     if ($handler =~ /\W/) {
 	eval 'require YAML';
 	if (my $e = $@) {
-	    die "couldn't parse source_handlers '$handler': YAML not available";
+	    die "couldn't parse sources '$handler': YAML not available";
 	}
 	my $hash;
 	eval { $hash = YAML::Load( $handler . "\n" ) };
 	if (my $e = $@) {
-	    die "couldn't parse source_handlers '$handler': $e";
+	    die "couldn't parse sources '$handler': $e";
 	}
 	($name) = keys %$hash;
 	$config = $hash->{$name};

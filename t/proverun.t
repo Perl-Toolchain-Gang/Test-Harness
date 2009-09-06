@@ -38,7 +38,7 @@ BEGIN {
         },
     );
     # TODO: refactor this and add in a test for:
-    # prove --source_handler 'File: {extensions: [.1]}' t/source_tests/source.1
+    # prove --source 'File: {extensions: [.1]}' t/source_tests/source.1
 
     foreach my $test (@tests) {
         # let's fully expand that filename
