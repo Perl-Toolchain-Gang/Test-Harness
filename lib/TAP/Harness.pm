@@ -815,13 +815,43 @@ you currently need to instantiate it outside of L<TAP::Harness> and pass it in
 with the C<formatter> parameter to L</new>.  This I<may> be addressed by adding
 a I<formatters> parameter to L</new> in the future.
 
-=head2 C<Module::Build> and C<ExtUtils::MakeMaker>
+=head2 C<Module::Build>
 
-TODO
+L<Module::Build> version C<0.30> supports C<TAP::Harness>.
 
-=head2 C<App::Prove>
+To load C<TAP::Harness> plugins, you'll need to use the C<tap_harness_args>
+parameter to C<new>, typically from your C<Build.PL>.  For example:
 
-TODO
+  Module::Build->new(
+      module_name        => 'MyApp',
+      test_file_exts     => [qw(.t .tap .txt)],
+      use_tap_harness    => 1,
+      tap_harness_args   => {
+          sources => {
+              MyCustom => {},
+              File => {
+                  extensions => ['.tap', '.txt'],
+              },
+          },
+          formatter => 'TAP::Formatter::HTML',
+      },
+      build_requires     => {
+          'Module::Build' => '0.30',
+          'TAP::Harness'  => '3.18',
+      },
+  )->create_build_script;
+
+See L</new>
+
+=head2 C<ExtUtils::MakeMaker>
+
+L<ExtUtils::MakeMaker> does not support L<TAP::Harness> out-of-the-box.
+
+=head2 C<prove>
+
+L<prove> supports C<TAP::Harness> plugins, and has a plugin system of its
+own.  See L<prove/FORMATTERS>, L<prove/SOURCE HANDLERS> and L<App::Prove>
+for more details.
 
 =head1 WRITING PLUGINS
 
