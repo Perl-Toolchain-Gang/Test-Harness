@@ -26,9 +26,6 @@ my $builder = MyBuilder->new(
         keywords => [ 'TAP', 'test harness', 'prove' ],
     },
     recursive_test_files => 1,
-    requires             => {
-        'File::Spec' => '0.8',    # for 'rel2abs'
-    },
     recommends => {
         'Pod::Usage' => '1.12',    # for 'prove'
     },
