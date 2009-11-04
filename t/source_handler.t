@@ -359,6 +359,7 @@ my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
     my $class = 'TAP::Parser::SourceHandler::pgTAP';
     my $test  = File::Spec->catfile( $dir, 'source.t' );
     my $psql  = File::Spec->catfile( $dir, 'psql' );
+    $psql .= '.bat' if $^O eq 'MSWin32';
     my @command = qw(
         --no-psqlrc
         --no-align
