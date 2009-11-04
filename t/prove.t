@@ -1121,9 +1121,13 @@ BEGIN {    # START PLAN
 	    skip => $HAS_YAML ? 0 : 1,
 	    skip_reason => "YAML not available",
             switches =>
-	    [ '--source', 'Perl: {foo: bar baz, avg: 0.278}',
+	    [ '--source', 'Perl',
+              '--perl-option', 'foo=bar baz',
+              '--perl-option', 'avg=0.278',
 	      '--source', 'MyCustom',
-	      '--source', 'File: {extensions: [.txt, .tmp]}',
+	      '--source', 'File',
+              '--file-option', 'extensions=.txt',
+              '--file-option', 'extensions=.tmp',
 	      $dummy_test ],
             expect => {
                 sources =>

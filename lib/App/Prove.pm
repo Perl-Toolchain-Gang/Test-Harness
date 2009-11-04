@@ -197,7 +197,7 @@ sub process_args {
 
     {
         local @ARGV = @args;
-        Getopt::Long::Configure( 'no_ignore_case', 'bundling' );
+        Getopt::Long::Configure(qw(no_ignore_case bundling pass_through));
 
         # Don't add coderefs to GetOptions
         GetOptions(
@@ -420,25 +420,21 @@ sub _load_extensions {
 sub _parse_source {
     my ( $self, $handler ) = @_;
 
-    my ($name, $config);
-    if ($handler =~ /\W/) {
-	eval 'require YAML';
-	if (my $e = $@) {
-	    die "couldn't parse sources '$handler': YAML not available";
-	}
-	my $hash;
-	eval { $hash = YAML::Load( $handler . "\n" ) };
-	if (my $e = $@) {
-	    die "couldn't parse sources '$handler': $e";
-	}
-	($name) = keys %$hash;
-	$config = $hash->{$name};
-    } else {
-	$name = $handler;
-	$config = {};
-    }
-
-    return( $name, $config );
+    # Load any options.
+    (my $opt_name = lc $handler) =~ s/::/-/g;
+    local @ARGV = @{ $self->{argv} };
+    my %config;
+    Getopt::Long::GetOptions("$opt_name-option=s%" => sub {
+        my (undef, $k, $v) = @_;
+        if (exists $config{$k}) {
+            $config{$k} = [ $config{$k} ] unless ref $config{$k} eq 'ARRAY';
+            push @{ $config{$k} } => $v;
+        } else {
+            $config{$k} = $v;
+        }
+    });
+    $self->{argv} = \@ARGV;
+    return ($handler, \%config);
 }
 
 =head3 C<run>

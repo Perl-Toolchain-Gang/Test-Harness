@@ -291,12 +291,12 @@ parser interprets particular I<sources> of TAP.
 If you want to provide config to the source you can use:
 
   prove --source MyCustom \
-        --source 'Perl: {foo: bar baz, avg: 0.278}' \
-        --source 'File: {extensions: [.txt, .tmp]}' t
+        --source Perl --perl-option 'foo=bar baz' --perl-option avg=0.278 \
+        --source File --file-option extensions=.txt --file-option extensions=.tmp t
 
-In this case you must have L<YAML> installed, and the configuration you pass
-must be a valid YAML string (a C<"\n"> is appended to whatever you pass), or an
-error will be thrown.
+Each C<--$source-option> option must specify a key/value pair separated by an
+C<=>. If an option can take multiple values, just specify it multiple times,
+as with the C<extensions=> examples above.
 
 All C<--sources> are combined into a hash, and passed to L<TAP::Harness/new>'s
 C<sources> parameter.
