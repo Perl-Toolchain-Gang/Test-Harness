@@ -21,14 +21,11 @@ my $builder = MyBuilder->new(
               'http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Harness',
             MailingList => 'mailto:<tapx-dev@hexten.net>',
             repository =>
-              'http://svn.hexten.net/tapx/trunk',
+              'http://github.com/AndyA/Test-Harness/tree/master',
         },
         keywords => [ 'TAP', 'test harness', 'prove' ],
     },
     recursive_test_files => 1,
-    requires             => {
-        'File::Spec' => '0.8',    # for 'rel2abs'
-    },
     recommends => {
         'Pod::Usage' => '1.12',    # for 'prove'
     },

@@ -193,6 +193,16 @@ only makes sense in the context of tests written in Perl.
 A reference to an C<@INC> style array of arguments to be passed to each
 test program.
 
+  test_args => ['foo', 'bar'],
+
+if you want to pass different arguments to each test then you should
+pass a hash of arrays, keyed by the alias for each test:
+
+  test_args => {
+    my_test    => ['foo', 'bar'],
+    other_test => ['baz'],
+  }
+
 =item * C<color>
 
 Attempt to produce color output.
@@ -700,6 +710,17 @@ sub _get_parser_args {
     }
 
     if ( defined( my $test_args = $self->test_args ) ) {
+
+         if ( ref( $test_args ) eq 'HASH' ) {
+             # different args for each test
+             if ( exists( $test_args->{ $job->description } ) ) {
+                 $test_args = $test_args->{ $job->description };
+             }
+             else {
+                 $self->_croak( "TAP::Harness Can't find test_args for " . $job->description );
+             }
+        }
+
         $args{test_args} = $test_args;
     }
 
