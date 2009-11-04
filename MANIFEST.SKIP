@@ -36,3 +36,4 @@
 ^harness_runs.db$
 ^perltags$
 ^Session\.vim$
+^MYMETA.yml$
