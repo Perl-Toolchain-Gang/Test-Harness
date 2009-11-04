@@ -45,6 +45,13 @@ In F<Build.PL> for your application with pgTAP tests in F<t/*.pg>:
       },
   )->create_build_script;
 
+If you're using L<C<prove>|prove>:
+
+  prove --source Perl \
+        --source pgTAP --pgtap-option dbname=try \
+                       --pgtap-option username=postgres \
+                       --pgtap-option suffix=.pg
+
 Direct use:
 
   use TAP::Parser::Source;
