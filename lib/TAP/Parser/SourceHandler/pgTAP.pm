@@ -122,7 +122,7 @@ sub can_handle {
 
     # Otherwise, return a score for our supported suffixes.
     my %score_for = (
-        '.pg'   => 1,
+        '.pg'  => 0.9,
         '.sql' => 0.8,
         '.s'   => 0.75,
     );

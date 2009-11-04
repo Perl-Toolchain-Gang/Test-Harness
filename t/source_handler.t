@@ -381,7 +381,7 @@ my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
 		  file => { lc_ext => '.pg' }
 		 },
 	 config => {},
-	 vote => 1,
+	 vote => 0.9,
 	},
 	{
 	 name => '.sql',
