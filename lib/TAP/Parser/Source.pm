@@ -89,6 +89,10 @@ contain large amounts of data (eg: raw TAP).
 Chaining getter/setter for meta data about the source.  This defaults to an
 empty hashref.  See L</assemble_meta> for more info.
 
+=head3 C<has_meta>
+
+True if the source has meta data.
+
 =head3 C<config>
 
   my $config = $source->config;
