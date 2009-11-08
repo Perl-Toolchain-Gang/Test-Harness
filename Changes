@@ -5,11 +5,11 @@ Revision history for Test-Harness
           TAP is sourced by the parser.  Introduced a new 'sources' param to
           TAP::Harness, and new options to prove, eg:
 
-              prove --source XYZ --XYZ-option foo=bar
+              prove --source XYZ --xyz-option foo=bar
 
           The new TAP::Parser::SourceHandler API makes it much easier to
           write plugins.  This breaks backwards compatibility for plugins &
-          extenstions that rely on the following api's:
+          extenstions that rely on the following APIs:
 
               TAP::Parser::Source
               TAP::Parser::SourceFactory
@@ -26,6 +26,9 @@ Revision history for Test-Harness
           Please see the TAP::Parser docs for more details.
           [Steve Purkis & David Wheeler]
         - Added HARNESS_SUBCLASS option to Test::Harness
+        - Added TAP::Parser::SourceHandler::pgTAP. All the source handlers are
+          new, but this is the only one to add new functioality: the ability
+          to run pgTAP tests (http://pgtap.projects.postgresql.org/).
 
 3.17    2009-05-05
         - Changed the 'failures' so that it is overridden by verbosity rather
