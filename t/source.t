@@ -12,7 +12,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 34;
+use Test::More tests => 35;
 use File::Spec;
 
 my $dir = File::Spec->catdir(
@@ -177,16 +177,17 @@ use_ok( 'TAP::Parser::Source' );
     my $stat = delete $file->{stat};
     is( @$stat, 13, '... file->stat set' );
     my $size = delete $file->{size};
-    ok( $size, '... file->size set' );
+    isnt( $size, undef, '... file->size set' );
     my $dir = delete $file->{dir};
     ok( $dir, '... file->dir set' );
+    my $empty = delete $file->{empty};
+    isnt( $empty, undef, '... file->empty set' );
     is_deeply( $file, {
 		       basename   => 'source_tests',
 		       ext        => '',
 		       lc_ext     => '',
 		       binary     => 1,
 		       text       => 0,
-		       empty      => 0,
 		       exists     => 1,
 		       is_dir     => 1,
 		       is_file    => 0,
@@ -203,7 +204,7 @@ use_ok( 'TAP::Parser::Source' );
 # symlink test
 SKIP: {
     my $symlink_exists = eval { symlink( '', '' ); 1 };
-    skip 'symlink not supported on this platform', 5 unless $symlink_exists;
+    skip 'symlink not supported on this platform', 6 unless $symlink_exists;
 
     my $test    = File::Spec->catfile( $dir, 'source.t' );
     my $symlink = File::Spec->catfile( $dir, 'source_link.T' );

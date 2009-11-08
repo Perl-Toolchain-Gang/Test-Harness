@@ -64,7 +64,7 @@ SKIP: {    # non-perl source
     %INIT = %CUSTOM = ();
     my $cat = '/bin/cat';
     unless ( -e $cat ) {
-        skip "no '$cat'", 4;
+        skip "no '$cat'", 2;
     }
     my $file = catfile( @t_path, 't', 'data', 'catme.1' );
     my $p = TAP::Parser::SubclassTest->new(

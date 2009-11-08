@@ -1844,6 +1844,8 @@ support, or just words of encouragement have all been forthcoming.
 
 =item * Alex Vandiver
 
+=item * Cosimo Streppone
+
 =back
 
 =head1 AUTHORS
