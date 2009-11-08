@@ -1681,12 +1681,9 @@ never run. They're reported as parse failures (tests out of sequence).
 
 =head1 SUBCLASSING
 
-I<TODO:> update this, it's out-of-date now that L<TAP::Parser::IteratorFactory>
-is in use.
-
 If you find you need to provide custom functionality (as you would have using
 L<Test::Harness::Straps>), you're in luck: C<TAP::Parser> and friends are
-designed to be easily subclassed.
+designed to be easily plugged-into and/or subclassed.
 
 Before you start, it's important to know a few things:
 
@@ -1709,7 +1706,8 @@ This makes it possible for you to have a single point of configuring what
 subclasses should be used, which in turn means that in many cases you'll find
 you only need to sub-class one of the parser's components.
 
-The sole exception to this rule are I<SourceHandlers>, see below.
+The exception to this rule are I<SourceHandlers> & I<Iterators>, but those are
+both created with customizeable I<IteratorFactory>.
 
 =item 4
 
@@ -1723,44 +1721,43 @@ deprecated first, and changed in a later release.
 
 =head2 Parser Components
 
-I<TODO:> update this, it's out-of-date now that L<TAP::Parser::IteratorFactory>
-is in use.
-
 =head3 Sources
 
-A TAP parser consumes input from a single I<source> of TAP, which could come
+A TAP parser consumes input from a single I<raw source> of TAP, which could come
 from anywhere (a file, an executable, a database, an io handle, a uri, etc..).
-A L<TAP::Parser::IteratorFactory> is used to determine the type of a so-called
-'raw' source, and create L<TAP::Parser::SourceHandler> objects which then stream the
-TAP to the parser by way of L</Iterators>.
-
-There are quite a few I<SourceHandlers> available,
+The source gets bundled up in a L<TAP::Parser::Source> object which gathers some
+meta data about it.  The parser then uses a L<TAP::Parser::IteratorFactory> to
+determine which L<TAP::Parser::SourceHandler> to use to turn the raw source
+into a stream of TAP by way of L</Iterators>.
 
 If you simply want C<TAP::Parser> to handle a new source of TAP you probably
-don't need to subclass C<TAP::Parser> itself.  Rather, you'll need to create
-new L<TAP::Parser::SourceHandler> classes, and simply plug them into the parser (see
-L</new> for details).  To write one read L<TAP::Parser::IteratorFactory> to get
-a feel for how the system works.
+don't need to subclass C<TAP::Parser> itself.  Rather, you'll need to create a
+new L<TAP::Parser::SourceHandler> class, and just plug it into the parser using
+the I<sources> param to L</new>.  Before you start writing one, read through
+L<TAP::Parser::IteratorFactory> to get a feel for how the system works first.
 
-If you find you really need to use your own source factory, set
-L</iterator_factory_class>.  If you need to customize the objects on creation,
-subclass L<TAP::Parser> and override L</make_iterator_factory>.
+If you find you really need to use your own iterator factory you can still do
+so without sub-classing C<TAP::Parser> by setting L</iterator_factory_class>.
 
-Note that L</make_source> & L</make_perl_source> are now I<DEPRECATED>.
+If you just need to customize the objects on creation, subclass L<TAP::Parser>
+and override L</make_iterator_factory>.
+
+Note that L</make_source> & L</make_perl_source> have been I<DEPRECATED> and
+are now removed.
 
 =head3 Iterators
 
-A TAP parser uses I<iterators> to loop through the I<stream> provided by the
-parser's I<source>.  There are a few types of Iterators available, choosing
-which class to use is the responsibility of the I<iterator factory>.
+A TAP parser uses I<iterators> to loop through the I<stream> of TAP read in
+from the I<source> it was given.  There are a few types of Iterators available
+by default, all sub-classes of L<TAP::Parser::Iterator>.  Choosing which
+iterator to use is the responsibility of the I<siterator factory>, though it
+simply delegates to the I<Source Handler> it uses.
 
-To create your own iterators you'll have to subclass L<TAP::Parser::Iterator>
-and L<TAP::Parser::IteratorFactory>.  Then you'll need to customize the class
-used by your parser by setting the C<iterator_factory_class> parameter.
-See L</new> for more details.
+If you're writing your own L<TAP::Parser::SourceHandler>, you may need to
+create your own iterators too.  If so you'll need to subclass
+L<TAP::Parser::Iterator>.
 
-If you need to customize the objects on creation, subclass L<TAP::Parser> and
-override L</make_iterator>.
+Note that L</make_iterator> has been I<DEPRECATED> and is now removed.
 
 =head3 Results
 
@@ -1876,7 +1873,7 @@ progress on your bug as we make changes.
 Obviously, bugs which include patches are best. If you prefer, you can
 patch against bleed by via anonymous checkout of the latest version:
 
- svn checkout http://svn.hexten.net/tapx
+ git clone git://github.com/AndyA/Test-Harness.git
 
 =head1 COPYRIGHT & LICENSE
 

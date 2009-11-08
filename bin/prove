@@ -60,8 +60,8 @@ Options that take arguments:
  -M                 Load a module.
  -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
       --harness     Define test harness to use.  See TAP::Harness.
-      --formatter   Result formatter to use. See TAP::Harness.
-      --source      Load and/or configure a SourceHandler. See TAP::Harness.
+      --formatter   Result formatter to use. See FORMATTERS.
+      --source      Load and/or configure a SourceHandler. See SOURCE HANDLERS.
  -a,  --archive     Store the resulting TAP in an archive file.
  -j,  --jobs N      Run N test jobs in parallel (try 9.)
       --state=opts  Control prove's persistent state.
