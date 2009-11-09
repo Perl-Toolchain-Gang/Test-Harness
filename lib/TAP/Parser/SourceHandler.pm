@@ -3,7 +3,7 @@ package TAP::Parser::SourceHandler;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Object ();
+use TAP::Object           ();
 use TAP::Parser::Iterator ();
 
 @ISA = qw(TAP::Object);
@@ -69,7 +69,8 @@ L<TAP::Parser::IteratorFactory/detect_source> for details on how this is used.
 
 sub can_handle {
     my ( $class, $args ) = @_;
-    $class->_croak("Abstract method 'can_handle' not implemented for $class!");
+    $class->_croak(
+        "Abstract method 'can_handle' not implemented for $class!");
     return;
 }
 
@@ -88,7 +89,8 @@ C<croak>s on error.
 
 sub make_iterator {
     my ( $class, $args ) = @_;
-    $class->_croak("Abstract method 'make_iterator' not implemented for $class!");
+    $class->_croak(
+        "Abstract method 'make_iterator' not implemented for $class!");
     return;
 }
 1;

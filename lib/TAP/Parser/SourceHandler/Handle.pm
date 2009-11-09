@@ -89,7 +89,7 @@ sub make_iterator {
 
     $class->_croak('$source->raw must be a glob ref or an IO::Handle')
       unless $source->meta->{is_glob}
-	|| UNIVERSAL::isa( $source->raw, 'IO::Handle' );
+          || UNIVERSAL::isa( $source->raw, 'IO::Handle' );
 
     return $class->iterator_class->new( $source->raw );
 }

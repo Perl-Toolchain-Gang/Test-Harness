@@ -1091,24 +1091,21 @@ BEGIN {    # START PLAN
         },
 
         # Source handlers
-        {   name => 'Switch --source simple',
-            args => { argv => [qw( one two three )] },
-            switches =>
-	    [ '--source', 'MyCustom', $dummy_test ],
-            expect => {
-                sources =>
-                    {
-		     MyCustom => {},
-		    },
+        {   name     => 'Switch --source simple',
+            args     => { argv => [qw( one two three )] },
+            switches => [ '--source', 'MyCustom', $dummy_test ],
+            expect   => {
+                sources => {
+                    MyCustom => {},
+                },
             },
             runlog => [
                 [   '_runtests',
-                    {   sources =>
-			{
-			 MyCustom => {},
-			},
-                        verbosity       => 0,
-                        show_count      => 1,
+                    {   sources => {
+                            MyCustom => {},
+                        },
+                        verbosity  => 0,
+                        show_count => 1,
                     },
                     'TAP::Harness',
                     $dummy_test
@@ -1116,37 +1113,36 @@ BEGIN {    # START PLAN
             ],
         },
 
-        {   name => 'Switch --sources with config',
-            args => { argv => [qw( one two three )] },
-	    skip => $HAS_YAML ? 0 : 1,
-	    skip_reason => "YAML not available",
-            switches =>
-	    [ '--source', 'Perl',
-              '--perl-option', 'foo=bar baz',
-              '--perl-option', 'avg=0.278',
-	      '--source', 'MyCustom',
-	      '--source', 'File',
-              '--file-option', 'extensions=.txt',
-              '--file-option', 'extensions=.tmp',
-	      $dummy_test ],
+        {   name        => 'Switch --sources with config',
+            args        => { argv => [qw( one two three )] },
+            skip        => $HAS_YAML ? 0 : 1,
+            skip_reason => "YAML not available",
+            switches    => [
+                '--source',      'Perl',
+                '--perl-option', 'foo=bar baz',
+                '--perl-option', 'avg=0.278',
+                '--source',      'MyCustom',
+                '--source',      'File',
+                '--file-option', 'extensions=.txt',
+                '--file-option', 'extensions=.tmp',
+                $dummy_test
+            ],
             expect => {
-                sources =>
-                    {
-		     Perl => {foo => 'bar baz', avg => 0.278},
-		     MyCustom => {},
-		     File => {extensions => ['.txt', '.tmp']},
-		    },
+                sources => {
+                    Perl     => { foo => 'bar baz', avg => 0.278 },
+                    MyCustom => {},
+                    File => { extensions => [ '.txt', '.tmp' ] },
+                },
             },
             runlog => [
                 [   '_runtests',
-                    {   sources =>
-			{
-			 Perl => {foo => 'bar baz', avg => 0.278},
-			 MyCustom => {},
-			 File => {extensions => ['.txt', '.tmp']},
-			},
-                        verbosity       => 0,
-                        show_count      => 1,
+                    {   sources => {
+                            Perl     => { foo => 'bar baz', avg => 0.278 },
+                            MyCustom => {},
+                            File => { extensions => [ '.txt', '.tmp' ] },
+                        },
+                        verbosity  => 0,
+                        show_count => 1,
                     },
                     'TAP::Harness',
                     $dummy_test
@@ -1507,11 +1503,11 @@ BEGIN {    # START PLAN
 
     my $extra_plan = 0;
     for my $test (@SCHEDULE) {
-	my $plan = 0;
+        my $plan = 0;
         $plan += $test->{plan} || 0;
         $plan += 2 if $test->{runlog};
         $plan += 1 if $test->{switches};
-	$test->{_planned} = $plan + 3 + @ATTR;
+        $test->{_planned} = $plan + 3 + @ATTR;
         $extra_plan += $plan;
     }
 
@@ -1519,91 +1515,93 @@ BEGIN {    # START PLAN
 }    # END PLAN
 
 # ACTUAL TEST
-for my $test (@SCHEDULE ) {
+for my $test (@SCHEDULE) {
     my $name = $test->{name};
     my $class = $test->{class} || 'FakeProve';
 
-  SKIP:
+    SKIP:
     {
-    skip $test->{skip_reason}, $test->{_planned} if $test->{skip};
+        skip $test->{skip_reason}, $test->{_planned} if $test->{skip};
 
-    local $ENV{HARNESS_TIMER};
+        local $ENV{HARNESS_TIMER};
 
-    ok my $app = $class->new( exists $test->{args} ? $test->{args} : () ),
-      "$name: App::Prove created OK";
+        ok my $app = $class->new( exists $test->{args} ? $test->{args} : () ),
+          "$name: App::Prove created OK";
 
-    isa_ok $app, 'App::Prove';
-    isa_ok $app, $class;
+        isa_ok $app, 'App::Prove';
+        isa_ok $app, $class;
 
-    # Optionally parse command args
-    if ( my $switches = $test->{switches} ) {
-        if ( my $proverc = $test->{proverc} ) {
-            $app->add_rc_file( File::Spec->catfile( split /\//, $proverc ) );
-        }
-        eval { $app->process_args( '--norc', @$switches ) };
-        if ( my $err_pattern = $test->{parse_error} ) {
-            like $@, $err_pattern, "$name: expected parse error";
-        }
-        else {
-            ok !$@, "$name: no parse error";
-        }
-    }
-
-    my $expect = $test->{expect} || {};
-    for my $attr ( sort @ATTR ) {
-        my $val = $app->$attr();
-        my $assertion
-          = exists $expect->{$attr}
-          ? $expect->{$attr}
-          : $DEFAULT_ASSERTION{$attr};
-        my $is_ok = undef;
-
-        if ( 'CODE' eq ref $assertion ) {
-            $is_ok = ok $assertion->( $val, $attr ),
-              "$name: $attr has the expected value";
-        }
-        elsif ( 'Regexp' eq ref $assertion ) {
-            $is_ok = like $val, $assertion, "$name: $attr matches $assertion";
-        }
-        else {
-            $is_ok = is_deeply $val, $assertion,
-              "$name: $attr has the expected value";
-        }
-
-        unless ($is_ok) {
-            diag "got $val for $attr";
-        }
-    }
-
-    if ( my $runlog = $test->{runlog} ) {
-        eval { $app->run };
-        if ( my $err_pattern = $test->{run_error} ) {
-            like $@, $err_pattern, "$name: expected error OK";
-            pass;
-            pass for 1 .. $test->{plan};
-        }
-        else {
-            unless ( ok !$@, "$name: no error OK" ) {
-                diag "$name: error: $@\n";
+        # Optionally parse command args
+        if ( my $switches = $test->{switches} ) {
+            if ( my $proverc = $test->{proverc} ) {
+                $app->add_rc_file(
+                    File::Spec->catfile( split /\//, $proverc ) );
             }
-
-            my $gotlog = [ $app->get_log ];
-
-            if ( my $extra = $test->{extra} ) {
-                $extra->($gotlog);
+            eval { $app->process_args( '--norc', @$switches ) };
+            if ( my $err_pattern = $test->{parse_error} ) {
+                like $@, $err_pattern, "$name: expected parse error";
             }
-
-            unless (
-                is_deeply $gotlog, $runlog,
-                "$name: run results match"
-              )
-            {
-                use Data::Dumper;
-                diag Dumper( { wanted => $runlog, got => $gotlog } );
+            else {
+                ok !$@, "$name: no parse error";
             }
         }
-    }
 
-    } # SKIP
+        my $expect = $test->{expect} || {};
+        for my $attr ( sort @ATTR ) {
+            my $val = $app->$attr();
+            my $assertion
+              = exists $expect->{$attr}
+              ? $expect->{$attr}
+              : $DEFAULT_ASSERTION{$attr};
+            my $is_ok = undef;
+
+            if ( 'CODE' eq ref $assertion ) {
+                $is_ok = ok $assertion->( $val, $attr ),
+                  "$name: $attr has the expected value";
+            }
+            elsif ( 'Regexp' eq ref $assertion ) {
+                $is_ok = like $val, $assertion,
+                  "$name: $attr matches $assertion";
+            }
+            else {
+                $is_ok = is_deeply $val, $assertion,
+                  "$name: $attr has the expected value";
+            }
+
+            unless ($is_ok) {
+                diag "got $val for $attr";
+            }
+        }
+
+        if ( my $runlog = $test->{runlog} ) {
+            eval { $app->run };
+            if ( my $err_pattern = $test->{run_error} ) {
+                like $@, $err_pattern, "$name: expected error OK";
+                pass;
+                pass for 1 .. $test->{plan};
+            }
+            else {
+                unless ( ok !$@, "$name: no error OK" ) {
+                    diag "$name: error: $@\n";
+                }
+
+                my $gotlog = [ $app->get_log ];
+
+                if ( my $extra = $test->{extra} ) {
+                    $extra->($gotlog);
+                }
+
+                unless (
+                    is_deeply $gotlog, $runlog,
+                    "$name: run results match"
+                  )
+                {
+                    use Data::Dumper;
+                    diag Dumper( { wanted => $runlog, got => $gotlog } );
+                }
+            }
+        }
+
+    }    # SKIP
 }
 

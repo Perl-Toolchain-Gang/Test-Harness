@@ -354,7 +354,8 @@ is_deeply $token, $expected,
 {
     my $iterator = IT->new;
     my $parser   = EmptyParser->new;
-    my $grammar  = $GRAMMAR->new( { iterator => $iterator, parser => $parser } );
+    my $grammar
+      = $GRAMMAR->new( { iterator => $iterator, parser => $parser } );
 
     my $plan = '';
 
@@ -398,7 +399,8 @@ is_deeply $token, $expected,
 {
     my $iterator = IT->new;
     my $parser   = EmptyParser->new;
-    my $grammar  = $GRAMMAR->new( { iterator => $iterator, parser => $parser } );
+    my $grammar
+      = $GRAMMAR->new( { iterator => $iterator, parser => $parser } );
 
     $grammar->set_version(13);
 

@@ -528,6 +528,7 @@ foreach my $test_args ( get_arg_sets() ) {
 SKIP: {
 
     my $cat = '/bin/cat';
+
     # TODO: use TYPE on win32?
     unless ( -e $cat ) {
         skip "no '$cat'", 2;
@@ -733,9 +734,11 @@ SKIP: {
     no warnings 'once';
     can_ok( 'MyFileSourceHandler', 'make_iterator' );
     ok( $MyFileSourceHandler::CAN_HANDLE,
-	'... MyFileSourceHandler->can_handle was called' );
+        '... MyFileSourceHandler->can_handle was called'
+    );
     ok( $MyFileSourceHandler::MAKE_ITER,
-	'... MyFileSourceHandler->make_iterator was called' );
+        '... MyFileSourceHandler->make_iterator was called'
+    );
 
     my $raw_source = eval { ${ $MyFileSourceHandler::LAST_SOURCE->raw } };
     is( $raw_source, $source_test, '... used the right source' );

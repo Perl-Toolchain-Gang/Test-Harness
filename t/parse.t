@@ -349,7 +349,8 @@ END_TAP
 my $aref = [ split /\n/ => $tap ];
 
 can_ok $PARSER, 'new';
-$parser = $PARSER->new( { iterator => TAP::Parser::Iterator::Array->new( $aref ) } );
+$parser
+  = $PARSER->new( { iterator => TAP::Parser::Iterator::Array->new($aref) } );
 isa_ok $parser, $PARSER, '... and calling it should succeed';
 
 # results() is sane?
@@ -541,7 +542,7 @@ END_TAP
         $PARSER->new(
             {   iterator => 'iterator',
                 tap      => 'tap',
-                source   => 'source',    # only one of these is allowed
+                source   => 'source',     # only one of these is allowed
             }
         );
     };
@@ -808,7 +809,7 @@ END_TAP
     # we're going to bash the internals a bit (but using the API as
     # much as possible) to force grammar->tokenise() to fail
 
-  # firstly we'll create a iterator that dies when its next_raw method is called
+# firstly we'll create a iterator that dies when its next_raw method is called
 
     package TAP::Parser::Iterator::Dies;
 

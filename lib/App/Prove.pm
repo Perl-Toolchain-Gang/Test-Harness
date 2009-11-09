@@ -82,7 +82,9 @@ sub _initialize {
     my $args = shift || {};
 
     # setup defaults:
-    for my $key (qw( argv rc_opts includes modules state plugins rules sources )) {
+    for my $key (
+        qw( argv rc_opts includes modules state plugins rules sources ))
+    {
         $self->{$key} = [];
     }
     $self->{harness_class} = 'TAP::Harness';
@@ -311,8 +313,8 @@ sub _get_args {
         $args{formatter_class} = $formatter;
     }
 
-    foreach my $handler (@{ $self->sources }) {
-	my ($name, $config) = $self->_parse_source( $handler );
+    foreach my $handler ( @{ $self->sources } ) {
+        my ( $name, $config ) = $self->_parse_source($handler);
         $args{sources}->{$name} = $config;
     }
 
@@ -421,20 +423,24 @@ sub _parse_source {
     my ( $self, $handler ) = @_;
 
     # Load any options.
-    (my $opt_name = lc $handler) =~ s/::/-/g;
+    ( my $opt_name = lc $handler ) =~ s/::/-/g;
     local @ARGV = @{ $self->{argv} };
     my %config;
-    Getopt::Long::GetOptions("$opt_name-option=s%" => sub {
-        my (undef, $k, $v) = @_;
-        if (exists $config{$k}) {
-            $config{$k} = [ $config{$k} ] unless ref $config{$k} eq 'ARRAY';
-            push @{ $config{$k} } => $v;
-        } else {
-            $config{$k} = $v;
+    Getopt::Long::GetOptions(
+        "$opt_name-option=s%" => sub {
+            my ( undef, $k, $v ) = @_;
+            if ( exists $config{$k} ) {
+                $config{$k} = [ $config{$k} ]
+                  unless ref $config{$k} eq 'ARRAY';
+                push @{ $config{$k} } => $v;
+            }
+            else {
+                $config{$k} = $v;
+            }
         }
-    });
+    );
     $self->{argv} = \@ARGV;
-    return ($handler, \%config);
+    return ( $handler, \%config );
 }
 
 =head3 C<run>

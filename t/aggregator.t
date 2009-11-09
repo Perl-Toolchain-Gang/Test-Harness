@@ -23,7 +23,7 @@ END_TAP
 my $iterator = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
 isa_ok $iterator, 'TAP::Parser::Iterator';
 
-my $parser1 = TAP::Parser->new({ iterator => $iterator });
+my $parser1 = TAP::Parser->new( { iterator => $iterator } );
 isa_ok $parser1, 'TAP::Parser';
 
 $parser1->run;

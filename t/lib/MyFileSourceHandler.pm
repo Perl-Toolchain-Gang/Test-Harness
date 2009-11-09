@@ -9,8 +9,8 @@ use MyCustom;
 use TAP::Parser::IteratorFactory;
 use TAP::Parser::SourceHandler::File;
 
-@ISA      = qw( TAP::Parser::SourceHandler::File MyCustom );
-$LAST_OBJ = undef;
+@ISA         = qw( TAP::Parser::SourceHandler::File MyCustom );
+$LAST_OBJ    = undef;
 $CAN_HANDLE  = undef;
 $MAKE_ITER   = undef;
 $LAST_SOURCE = undef;
@@ -25,8 +25,8 @@ sub can_handle {
 }
 
 sub make_iterator {
-    my ($class, $source) = @_;
-    my $iter = $class->SUPER::make_iterator( $source );
+    my ( $class, $source ) = @_;
+    my $iter = $class->SUPER::make_iterator($source);
     $MAKE_ITER++;
     $LAST_SOURCE = $source;
     return $iter;

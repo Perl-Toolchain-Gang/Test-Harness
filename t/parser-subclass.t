@@ -37,8 +37,8 @@ my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
         'result_factory_class'
     );
 
-    is( $INIT{MyGrammar},      1, 'initialized MyGrammar' );
-    is( $CUSTOM{MyGrammar},    1, '... and it was customized' );
+    is( $INIT{MyGrammar},   1, 'initialized MyGrammar' );
+    is( $CUSTOM{MyGrammar}, 1, '... and it was customized' );
 
     # make sure overrided make_* methods work...
     %CUSTOM = ();
@@ -73,6 +73,6 @@ SKIP: {    # non-perl source
         }
     );
 
-    is( $CUSTOM{MySourceHandler},   1, 'customized a MySourceHandler' );
-    is( $INIT{MyIterator}, 1, 'initialized MyIterator subclass' );
+    is( $CUSTOM{MySourceHandler}, 1, 'customized a MySourceHandler' );
+    is( $INIT{MyIterator},        1, 'initialized MyIterator subclass' );
 }

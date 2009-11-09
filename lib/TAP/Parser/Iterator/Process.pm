@@ -114,7 +114,7 @@ sub _initialize {
     my @command = @{ delete $args->{command} || [] }
       or die "Must supply a command to execute";
 
-    $self->{command} = [ @command ];
+    $self->{command} = [@command];
 
     # Private. Used to frig with chunk size during testing.
     my $chunk_size = delete $args->{_chunk_size} || 65536;

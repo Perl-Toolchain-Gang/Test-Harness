@@ -18,7 +18,7 @@ TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 sub can_handle {
     my ( $class, $source ) = @_;
     my $meta   = $source->meta;
-    my $config = $source->config_for( $class );
+    my $config = $source->config_for($class);
 
     if ( $config->{accept_all} ) {
         return 1;
@@ -33,8 +33,7 @@ sub can_handle {
 sub make_iterator {
     my ( $class, $source ) = @_;
     $class->custom;
-    return MyIterator->new([ $source->raw ]);
+    return MyIterator->new( [ $source->raw ] );
 }
-
 
 1;

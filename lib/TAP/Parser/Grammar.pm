@@ -64,9 +64,9 @@ details).
 # new() implementation supplied by TAP::Object
 sub _initialize {
     my ( $self, $args ) = @_;
-    $self->{iterator} = $args->{iterator};  # TODO: accessor
-    $self->{iterator} ||= $args->{stream};  # deprecated
-    $self->{parser}   = $args->{parser};    # TODO: accessor
+    $self->{iterator} = $args->{iterator};    # TODO: accessor
+    $self->{iterator} ||= $args->{stream};    # deprecated
+    $self->{parser} = $args->{parser};        # TODO: accessor
     $self->set_version( $args->{version} || 12 );
     return $self;
 }

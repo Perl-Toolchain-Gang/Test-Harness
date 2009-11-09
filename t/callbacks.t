@@ -37,7 +37,7 @@ my %callbacks = (
 );
 
 my $iterator = TAP::Parser::Iterator::Array->new( [ split /\n/ => $tap ] );
-my $parser   = TAP::Parser->new(
+my $parser = TAP::Parser->new(
     {   iterator  => $iterator,
         callbacks => \%callbacks,
     }

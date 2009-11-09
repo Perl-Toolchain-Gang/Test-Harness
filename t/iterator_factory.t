@@ -50,9 +50,9 @@ use TAP::Parser::IteratorFactory;
 
     # Known source should pass
     {
-	my $source = TAP::Parser::Source->new->raw( \'known-source' );
-        my $iterator = eval { $sf->make_iterator( $source ) };
-        my $error = $@;
+        my $source   = TAP::Parser::Source->new->raw( \'known-source' );
+        my $iterator = eval { $sf->make_iterator($source) };
+        my $error    = $@;
         ok( !$error, 'make_iterator with known source doesnt fail' );
         diag($error) if $error;
         isa_ok( $iterator, 'MyIterator', '... and iterator class' );
@@ -60,9 +60,9 @@ use TAP::Parser::IteratorFactory;
 
     # No known source should fail
     {
-	my $source = TAP::Parser::Source->new->raw( \'unknown-source' );
-        my $iterator = eval { $sf->make_iterator( $source ) };
-        my $error = $@;
+        my $source   = TAP::Parser::Source->new->raw( \'unknown-source' );
+        my $iterator = eval { $sf->make_iterator($source) };
+        my $error    = $@;
         ok( $error, 'make_iterator with unknown source fails' );
         like $error, qr/^Cannot detect source of 'unknown-source'/,
           '... with an appropriate error message';
@@ -86,50 +86,50 @@ my $test_dir = File::Spec->catdir(
 );
 
 my @sources = (
-    {   file  => 'source.tap',
-        handler => 'TAP::Parser::SourceHandler::File',
-        iterator => 'TAP::Parser::Iterator::Stream',
-    },
-    {   file   => 'source.1',
+    {   file     => 'source.tap',
         handler  => 'TAP::Parser::SourceHandler::File',
-        config => { File => { extensions => ['.1'] } },
         iterator => 'TAP::Parser::Iterator::Stream',
     },
-    {   file  => 'source.pl',
-        handler => 'TAP::Parser::SourceHandler::Perl',
+    {   file     => 'source.1',
+        handler  => 'TAP::Parser::SourceHandler::File',
+        config   => { File => { extensions => ['.1'] } },
+        iterator => 'TAP::Parser::Iterator::Stream',
+    },
+    {   file     => 'source.pl',
+        handler  => 'TAP::Parser::SourceHandler::Perl',
         iterator => 'TAP::Parser::Iterator::Process',
     },
-    {   file  => 'source.t',
-        handler => 'TAP::Parser::SourceHandler::Perl',
+    {   file     => 'source.t',
+        handler  => 'TAP::Parser::SourceHandler::Perl',
         iterator => 'TAP::Parser::Iterator::Process',
     },
-    {   file  => 'source',
-        handler => 'TAP::Parser::SourceHandler::Perl',
+    {   file     => 'source',
+        handler  => 'TAP::Parser::SourceHandler::Perl',
         iterator => 'TAP::Parser::Iterator::Process',
     },
-    {   file  => 'source.sh',
-        handler => 'TAP::Parser::SourceHandler::Executable',
+    {   file     => 'source.sh',
+        handler  => 'TAP::Parser::SourceHandler::Executable',
         iterator => 'TAP::Parser::Iterator::Process',
     },
-    {   file  => 'source.bat',
-        handler => 'TAP::Parser::SourceHandler::Executable',
+    {   file     => 'source.bat',
+        handler  => 'TAP::Parser::SourceHandler::Executable',
         iterator => 'TAP::Parser::Iterator::Process',
     },
-    {   name   => 'raw tap string',
-        source => "0..1\nok 1 - raw tap\n",
+    {   name     => 'raw tap string',
+        source   => "0..1\nok 1 - raw tap\n",
         handler  => 'TAP::Parser::SourceHandler::RawTAP',
         iterator => 'TAP::Parser::Iterator::Array',
     },
-    {   name   => 'raw tap array',
-        source => [ "0..1\n", "ok 1 - raw tap\n" ],
+    {   name     => 'raw tap array',
+        source   => [ "0..1\n", "ok 1 - raw tap\n" ],
         handler  => 'TAP::Parser::SourceHandler::RawTAP',
         iterator => 'TAP::Parser::Iterator::Array',
     },
-    {   source => \*__DATA__,
+    {   source   => \*__DATA__,
         handler  => 'TAP::Parser::SourceHandler::Handle',
         iterator => 'TAP::Parser::Iterator::Stream',
     },
-    {   source => IO::File->new('-'),
+    {   source   => IO::File->new('-'),
         handler  => 'TAP::Parser::SourceHandler::Handle',
         iterator => 'TAP::Parser::Iterator::Stream',
     },
@@ -143,15 +143,17 @@ foreach my $test (@sources) {
     }
 
     my $name = $test->{name} || substr( $test->{source}, 0, 10 );
-    my $sf = TAP::Parser::IteratorFactory->new( $test->{config} )->_testing( 1 );
+    my $sf
+      = TAP::Parser::IteratorFactory->new( $test->{config} )->_testing(1);
 
-    my $raw     = $test->{source};
-    my $source  = TAP::Parser::Source->new->raw( ref($raw) ? $raw : \$raw );
-    my $iterator = eval { $sf->make_iterator( $source ) };
-    my $error   = $@;
+    my $raw      = $test->{source};
+    my $source   = TAP::Parser::Source->new->raw( ref($raw) ? $raw : \$raw );
+    my $iterator = eval { $sf->make_iterator($source) };
+    my $error    = $@;
     ok( !$error, "$name: no error on make_iterator" );
     diag($error) if $error;
-#    isa_ok( $iterator, $test->{iterator}, $name );
+
+    #    isa_ok( $iterator, $test->{iterator}, $name );
     is( $sf->_last_handler, $test->{handler}, $name );
 }
 

@@ -23,8 +23,8 @@ use_ok('MyResultFactory');
 my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 my $source = catfile( @t_path, 't', 'source_tests', 'source' );
 my %customize = (
-    grammar_class          => 'MyGrammar',
-    result_factory_class   => 'MyResultFactory',
+    grammar_class        => 'MyGrammar',
+    result_factory_class => 'MyResultFactory',
 );
 my $p = TAP::Parser->new(
     {   source => $source,

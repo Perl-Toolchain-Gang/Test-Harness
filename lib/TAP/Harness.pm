@@ -711,14 +711,16 @@ sub _get_parser_args {
 
     if ( defined( my $test_args = $self->test_args ) ) {
 
-         if ( ref( $test_args ) eq 'HASH' ) {
-             # different args for each test
-             if ( exists( $test_args->{ $job->description } ) ) {
-                 $test_args = $test_args->{ $job->description };
-             }
-             else {
-                 $self->_croak( "TAP::Harness Can't find test_args for " . $job->description );
-             }
+        if ( ref($test_args) eq 'HASH' ) {
+
+            # different args for each test
+            if ( exists( $test_args->{ $job->description } ) ) {
+                $test_args = $test_args->{ $job->description };
+            }
+            else {
+                $self->_croak( "TAP::Harness Can't find test_args for "
+                      . $job->description );
+            }
         }
 
         $args{test_args} = $test_args;
@@ -810,7 +812,6 @@ sub _croak {
 
     return;
 }
-
 
 1;
 

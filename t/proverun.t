@@ -37,12 +37,15 @@ BEGIN {
             name => 'Passing TODO',
         },
     );
+
     # TODO: refactor this and add in a test for:
     # prove --source 'File: {extensions: [.1]}' t/source_tests/source.1
 
     foreach my $test (@tests) {
+
         # let's fully expand that filename
-        $test->{file} = File::Spec->catfile( $t_dir,  'sample-tests', $test->{file} );
+        $test->{file}
+          = File::Spec->catfile( $t_dir, 'sample-tests', $test->{file} );
     }
     @SCHEDULE = (
         map {

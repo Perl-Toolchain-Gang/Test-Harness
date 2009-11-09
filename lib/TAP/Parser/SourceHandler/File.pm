@@ -65,7 +65,7 @@ Only votes if $source looks like a regular file.  Casts the following votes:
 sub can_handle {
     my ( $class, $src ) = @_;
     my $meta   = $src->meta;
-    my $config = $src->config_for( $class );
+    my $config = $src->config_for($class);
 
     return 0 unless $meta->{is_file};
     my $file = $meta->{file};
@@ -97,7 +97,7 @@ sub make_iterator {
     my $fh;
     open( $fh, '<', $file )
       or $class->_croak("error opening TAP source file '$file': $!");
-    return $class->iterator_class->new( $fh );
+    return $class->iterator_class->new($fh);
 }
 
 =head3 C<iterator_class>

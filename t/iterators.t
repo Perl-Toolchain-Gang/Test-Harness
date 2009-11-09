@@ -109,12 +109,14 @@ for my $test (@schedule) {
           "$name: ... and it should be undef before we are done ($subclass)";
 
         can_ok $iterator, 'next';
-        is $iterator->next, 'one', "$name: next() should return the first result";
+        is $iterator->next, 'one',
+          "$name: next() should return the first result";
 
         is $iterator->next, 'two',
           "$name: next() should return the second result";
 
-        is $iterator->next, '', "$name: next() should return the third result";
+        is $iterator->next, '',
+          "$name: next() should return the third result";
 
         is $iterator->next, 'three',
           "$name: next() should return the fourth result";
@@ -125,7 +127,8 @@ for my $test (@schedule) {
         is $iterator->exit, 0,
           "$name: ... and exit should now return 0 ($subclass)";
 
-        is $iterator->wait, 0, "$name: wait should also now return 0 ($subclass)";
+        is $iterator->wait, 0,
+          "$name: wait should also now return 0 ($subclass)";
 
         if ( my $after = $test->{after} ) {
             $after->();
@@ -213,21 +216,20 @@ SKIP: {
 
 sub make_iterator {
     my $thing = shift;
-    my $ref = ref $thing;
+    my $ref   = ref $thing;
     if ( $ref eq 'GLOB' || UNIVERSAL::isa( $ref, 'IO::Handle' ) ) {
-	return TAP::Parser::Iterator::Stream->new( $thing );
+        return TAP::Parser::Iterator::Stream->new($thing);
     }
     elsif ( $ref eq 'ARRAY' ) {
-	return TAP::Parser::Iterator::Array->new( $thing );
+        return TAP::Parser::Iterator::Array->new($thing);
     }
     elsif ( $ref eq 'HASH' ) {
-	return TAP::Parser::Iterator::Process->new( $thing );
+        return TAP::Parser::Iterator::Process->new($thing);
     }
     else {
         die "Can't iterate with a $ref";
     }
 }
-
 
 __DATA__
 one

@@ -63,11 +63,10 @@ Returns a new C<TAP::Parser::Source> object.
 
 sub _initialize {
     my ($self) = @_;
-    $self->meta( {} );
+    $self->meta(   {} );
     $self->config( {} );
     return $self;
 }
-
 
 ##############################################################################
 
@@ -174,7 +173,6 @@ sub test_args {
     return $self;
 }
 
-
 =head3 C<assemble_meta>
 
   my $meta = $source->assemble_meta;
@@ -238,14 +236,14 @@ sub assemble_meta {
 
     # rudimentary is object test - if it's blessed it'll
     # inherit from UNIVERSAL
-    $meta->{is_object}
-      = UNIVERSAL::isa( $raw, 'UNIVERSAL' ) ? 1 : 0;
+    $meta->{is_object} = UNIVERSAL::isa( $raw, 'UNIVERSAL' ) ? 1 : 0;
 
-    if ($meta->{is_object}) {
-	$meta->{class} = ref( $raw );
-    } else {
-	my $ref = lc( ref($raw) );
-	$meta->{"is_$ref"} = 1;
+    if ( $meta->{is_object} ) {
+        $meta->{class} = ref($raw);
+    }
+    else {
+        my $ref = lc( ref($raw) );
+        $meta->{"is_$ref"} = 1;
     }
 
     if ( $meta->{is_scalar} ) {
@@ -286,18 +284,16 @@ sub assemble_meta {
                 # put together some common info about the file
                 ( $file->{basename}, $file->{dir}, $file->{ext} )
                   = map { defined $_ ? $_ : '' }
-		    fileparse( $source, qr/\.[^.]*/ );
+                  fileparse( $source, qr/\.[^.]*/ );
                 $file->{lc_ext} = lc( $file->{ext} );
                 $file->{basename} .= $file->{ext} if $file->{ext};
 
-		if ( $file->{text} and $file->{read} ) {
-		    eval {
-			$file->{shebang} = $self->_read_shebang( $$raw );
-		    };
-		    if (my $e = $@) {
-			warn $e;
-		    }
-		}
+                if ( $file->{text} and $file->{read} ) {
+                    eval { $file->{shebang} = $self->_read_shebang($$raw); };
+                    if ( my $e = $@ ) {
+                        warn $e;
+                    }
+                }
             }
         }
     }
@@ -312,19 +308,19 @@ sub assemble_meta {
 }
 
 sub _read_shebang {
-    my ($self, $file) = @_;
+    my ( $self, $file ) = @_;
     my $shebang;
     local *TEST;
     if ( open( TEST, $file ) ) {
-	$shebang = <TEST>;
-	chomp $shebang;
-	close(TEST) or die "Can't close $file. $!\n";
-    } else {
-	die "Can't open $file. $!\n";
+        $shebang = <TEST>;
+        chomp $shebang;
+        close(TEST) or die "Can't close $file. $!\n";
+    }
+    else {
+        die "Can't open $file. $!\n";
     }
     return $shebang;
 }
-
 
 =head3 C<config_for>
 
@@ -347,7 +343,6 @@ sub config_for {
     my $config = $self->config->{$abbrv_class} || $self->config->{$class};
     return $config;
 }
-
 
 1;
 

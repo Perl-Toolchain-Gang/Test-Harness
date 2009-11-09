@@ -3,7 +3,7 @@ package TAP::Parser::SourceHandler::pgTAP;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Parser::IteratorFactory     ();
+use TAP::Parser::IteratorFactory   ();
 use TAP::Parser::Iterator::Process ();
 
 @ISA = qw(TAP::Parser::SourceHandler);
@@ -121,8 +121,8 @@ sub can_handle {
     my $suf = $meta->{file}{lc_ext};
 
     # If the config specifies a suffix, it's required.
-    if (my $config = $source->config_for('pgTAP')) {
-        if (defined $config->{suffix}) {
+    if ( my $config = $source->config_for('pgTAP') ) {
+        if ( defined $config->{suffix} ) {
             return $suf eq $config->{suffix} ? 1 : 0;
         }
     }
@@ -200,36 +200,38 @@ sub make_iterator {
     my ( $class, $source ) = @_;
     my $config = $source->config_for('pgTAP');
 
-    my @command = ($config->{psql} || 'psql');
+    my @command = ( $config->{psql} || 'psql' );
     push @command, qw(
-        --no-psqlrc
-        --no-align
-        --quiet
-        --pset pager=
-        --pset tuples_only=true
-        --set ON_ERROR_ROLLBACK=1
-        --set ON_ERROR_STOP=1
+      --no-psqlrc
+      --no-align
+      --quiet
+      --pset pager=
+      --pset tuples_only=true
+      --set ON_ERROR_ROLLBACK=1
+      --set ON_ERROR_STOP=1
     );
 
     for (qw(username host port dbname)) {
-        push @command, "--$_" => $config->{$_} if defined $config->{$_}
+        push @command, "--$_" => $config->{$_} if defined $config->{$_};
     }
 
     my $fn = ref $source->raw ? ${ $source->raw } : $source->raw;
-    $class->_croak('No such file or directory: ' . (defined $fn ? $fn : ''))
-        unless $fn && -e $fn;
+    $class->_croak(
+        'No such file or directory: ' . ( defined $fn ? $fn : '' ) )
+      unless $fn && -e $fn;
 
     push @command, '--file', $fn;
 
-    # XXX I'd like a way to be able to specify environment variables to set when
-    # the iterator executes the command...
-    # local $ENV{PGOPTIONS} = "--search_path=$config->{search_path}"
-    #     if $config->{search_path};
+  # XXX I'd like a way to be able to specify environment variables to set when
+  # the iterator executes the command...
+  # local $ENV{PGOPTIONS} = "--search_path=$config->{search_path}"
+  #     if $config->{search_path};
 
-    return TAP::Parser::Iterator::Process->new({
-        command => \@command,
-        merge   => $source->merge
-    });
+    return TAP::Parser::Iterator::Process->new(
+        {   command => \@command,
+            merge   => $source->merge
+        }
+    );
 }
 
 =head1 SEE ALSO

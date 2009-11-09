@@ -99,18 +99,17 @@ sub make_iterator {
 
     my $tap_array;
     if ( $meta->{is_scalar} ) {
-	$tap_array = [ split "\n" => ${ $src->raw } ];
+        $tap_array = [ split "\n" => ${ $src->raw } ];
     }
     elsif ( $meta->{is_array} ) {
-	$tap_array = $src->raw;
+        $tap_array = $src->raw;
     }
 
-    $class->_croak( 'No raw TAP found in $source->raw' )
+    $class->_croak('No raw TAP found in $source->raw')
       unless scalar $tap_array;
 
-    return TAP::Parser::Iterator::Array->new( $tap_array );
+    return TAP::Parser::Iterator::Array->new($tap_array);
 }
-
 
 1;
 
