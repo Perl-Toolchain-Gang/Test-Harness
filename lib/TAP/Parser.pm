@@ -1867,6 +1867,8 @@ Steve Purkis <spurkis@cpan.org>
 
 Nicholas Clark <nick@ccl4.org>
 
+Lee Johnson <notfadeaway at btinternet dot com>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to

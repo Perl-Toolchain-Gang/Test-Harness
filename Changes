@@ -25,6 +25,8 @@ Revision history for Test-Harness
 
           Please see the TAP::Parser docs for more details.
           [Steve Purkis & David Wheeler]
+        - Removed dependency on File::Spec [Schwern]
+        - Made it possible to pass different args to each test [Lee Johnson]
         - Added HARNESS_SUBCLASS option to Test::Harness
         - Added TAP::Parser::SourceHandler::pgTAP. All the source handlers are
           new, but this is the only one to add new functioality: the ability
