@@ -15,11 +15,11 @@ TAP::Parser::Grammar - A grammar for the Test Anything Protocol.
 
 =head1 VERSION
 
-Version 3.17_01
+Version 3.17_02
 
 =cut
 
-$VERSION = '3.17_01';
+$VERSION = '3.17_02';
 
 =head1 SYNOPSIS
 
