@@ -427,7 +427,8 @@ sub test_handler {
         my $default_vote = $tests->{default_vote} || 0;
         my $source = TAP::Parser::Source->new;
         is( $class->can_handle($source), $default_vote,
-            '... can_handle default vote' );
+            '... can_handle default vote'
+        );
     }
 
     foreach my $test ( @{ $tests->{can_handle} } ) {

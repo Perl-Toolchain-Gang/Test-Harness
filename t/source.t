@@ -30,13 +30,17 @@ use_ok('TAP::Parser::Source');
 {
     my $source = TAP::Parser::Source->new;
     isa_ok( $source, 'TAP::Parser::Source', 'new source' );
-    can_ok( $source,
-        qw( raw meta config merge switches test_args assemble_meta ) );
+    can_ok(
+        $source,
+        qw( raw meta config merge switches test_args assemble_meta )
+    );
 
     is_deeply( $source->config, {}, 'config empty by default' );
     $source->config->{Foo} = { bar => 'baz' };
-    is_deeply( $source->config_for('Foo'), { bar => 'baz' },
-        'config_for( Foo )' );
+    is_deeply(
+        $source->config_for('Foo'), { bar => 'baz' },
+        'config_for( Foo )'
+    );
     is_deeply(
         $source->config_for('TAP::Parser::SourceHandler::Foo'),
         { bar => 'baz' }, 'config_for( ...::SourceHandler::Foo )'
