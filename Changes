@@ -28,9 +28,11 @@ Revision history for Test-Harness
         - Removed dependency on File::Spec [Schwern]
         - Made it possible to pass different args to each test [Lee Johnson]
         - Added HARNESS_SUBCLASS option to Test::Harness
+        - Added TAP::Parser::SourceHandler::File which lets you to stream TAP
+          from a text file (eg: *.tap).
         - Added TAP::Parser::SourceHandler::pgTAP. All the source handlers are
-          new, but this is the only one to add new functioality: the ability
-          to run pgTAP tests (http://pgtap.projects.postgresql.org/).
+          new, but this is the only one to add major new functioality: the
+          ability to run pgTAP tests (http://pgtap.projects.postgresql.org/).
 
 3.17    2009-05-05
         - Changed the 'failures' so that it is overridden by verbosity rather

@@ -12,7 +12,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 35;
+use Test::More tests => 36;
 use File::Spec;
 
 my $dir = File::Spec->catdir(
@@ -153,13 +153,11 @@ use_ok('TAP::Parser::Source');
         'assemble_meta for file'
     );
 
-    # now check file meta - remove things that will vary between machine
+    # now check file meta - remove things that will vary between platforms
     my $stat = delete $file->{stat};
     is( @$stat, 13, '... file->stat set' );
-    my $size = delete $file->{size};
-    ok( $size, '... file->size set' );
-    my $dir = delete $file->{dir};
-    ok( $dir, '... file->dir set' );
+    ok( delete $file->{size}, '... file->size set' );
+    ok( delete $file->{dir}, '... file->dir set' );
     is_deeply(
         $file,
         {   basename   => 'source.t',
@@ -207,21 +205,18 @@ use_ok('TAP::Parser::Source');
         'assemble_meta for directory'
     );
 
-    # now check file meta - remove things that will vary between machine
+    # now check file meta - remove things that will vary between platforms
     my $stat = delete $file->{stat};
     is( @$stat, 13, '... file->stat set' );
-    my $size = delete $file->{size};
-    isnt( $size, undef, '... file->size set' );
-    my $dir = delete $file->{dir};
-    ok( $dir, '... file->dir set' );
-    my $empty = delete $file->{empty};
-    isnt( $empty, undef, '... file->empty set' );
+    ok( delete $file->{dir}, '... file->dir set' );
+    isnt( delete $file->{size}, undef, '... file->size set' );
+    isnt( delete $file->{binary}, undef, '... file->binary set' );
+    isnt( delete $file->{empty}, undef, '... file->empty set' );
     is_deeply(
         $file,
         {   basename   => 'source_tests',
             ext        => '',
             lc_ext     => '',
-            binary     => 1,
             text       => 0,
             exists     => 1,
             is_dir     => 1,
@@ -271,15 +266,13 @@ SKIP: {
         'assemble_meta for symlink'
     );
 
-    # now check file meta - remove things that will vary between machine
+    # now check file meta - remove things that will vary between platforms
     my $stat = delete $file->{stat};
     is( @$stat, 13, '... file->stat set' );
     my $lstat = delete $file->{lstat};
     is( @$lstat, 13, '... file->lstat set' );
-    my $size = delete $file->{size};
-    ok( $size, '... file->size set' );
-    my $dir = delete $file->{dir};
-    ok( $dir, '... file->dir set' );
+    ok( delete $file->{size}, '... file->size set' );
+    ok( delete $file->{dir}, '... file->dir set' );
     is_deeply(
         $file,
         {   basename   => 'source_link.T',
