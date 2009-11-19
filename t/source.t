@@ -12,7 +12,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 36;
+use Test::More tests => 45;
 use File::Spec;
 
 my $dir = File::Spec->catdir(
@@ -157,7 +157,10 @@ use_ok('TAP::Parser::Source');
     my $stat = delete $file->{stat};
     is( @$stat, 13, '... file->stat set' );
     ok( delete $file->{size}, '... file->size set' );
-    ok( delete $file->{dir}, '... file->dir set' );
+    ok( delete $file->{dir},  '... file->dir set' );
+    isnt( delete $file->{read},    undef, '... file->read set' );
+    isnt( delete $file->{write},   undef, '... file->write set' );
+    isnt( delete $file->{execute}, undef, '... file->execute set' );
     is_deeply(
         $file,
         {   basename   => 'source.t',
@@ -172,9 +175,6 @@ use_ok('TAP::Parser::Source');
             is_file    => 1,
             is_symlink => 0,
             sticky     => 0,
-            read       => 1,
-            write      => 1,
-            execute    => 0,
             setgid     => 0,
             setuid     => 0,
         },
@@ -209,9 +209,12 @@ use_ok('TAP::Parser::Source');
     my $stat = delete $file->{stat};
     is( @$stat, 13, '... file->stat set' );
     ok( delete $file->{dir}, '... file->dir set' );
-    isnt( delete $file->{size}, undef, '... file->size set' );
-    isnt( delete $file->{binary}, undef, '... file->binary set' );
-    isnt( delete $file->{empty}, undef, '... file->empty set' );
+    isnt( delete $file->{size},    undef, '... file->size set' );
+    isnt( delete $file->{binary},  undef, '... file->binary set' );
+    isnt( delete $file->{empty},   undef, '... file->empty set' );
+    isnt( delete $file->{read},    undef, '... file->read set' );
+    isnt( delete $file->{write},   undef, '... file->write set' );
+    isnt( delete $file->{execute}, undef, '... file->execute set' );
     is_deeply(
         $file,
         {   basename   => 'source_tests',
@@ -223,9 +226,6 @@ use_ok('TAP::Parser::Source');
             is_file    => 0,
             is_symlink => 0,
             sticky     => 0,
-            read       => 1,
-            write      => 1,
-            execute    => 1,
             setgid     => 0,
             setuid     => 0,
         },
@@ -272,7 +272,10 @@ SKIP: {
     my $lstat = delete $file->{lstat};
     is( @$lstat, 13, '... file->lstat set' );
     ok( delete $file->{size}, '... file->size set' );
-    ok( delete $file->{dir}, '... file->dir set' );
+    ok( delete $file->{dir},  '... file->dir set' );
+    isnt( delete $file->{read},    undef, '... file->read set' );
+    isnt( delete $file->{write},   undef, '... file->write set' );
+    isnt( delete $file->{execute}, undef, '... file->execute set' );
     is_deeply(
         $file,
         {   basename   => 'source_link.T',
@@ -287,9 +290,6 @@ SKIP: {
             is_file    => 1,
             is_symlink => 1,
             sticky     => 0,
-            read       => 1,
-            write      => 1,
-            execute    => 0,
             setgid     => 0,
             setuid     => 0,
         },

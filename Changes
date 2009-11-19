@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.17_03 2009-11-??
+        - Fix failures due to over-strict assertions in t/source.t.
+
 3.17_02 2009-11-17
         - Merge in Steve's missing changes. Oops.
 
