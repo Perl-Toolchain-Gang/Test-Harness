@@ -20,7 +20,7 @@ Inserts the sharpbang or equivalent magic number to a set of @files.
 # stolen from ExtUtils::MakeMaker which said:
 # stolen from the pink Camel book, more or less
 sub fixin {
-    my ( $self, @files ) = @_;
+    my @files = @_;
 
     my ($does_shbang) = $Config{'sharpbang'} =~ /^\s*\#\!/;
     for my $file (@files) {
@@ -35,8 +35,6 @@ sub fixin {
         my ( $cmd, $arg ) = split ' ', $line, 2;
         $cmd =~ s!^.*/!!;
 
-        # Now look (in reverse) for interpreter in absolute PATH
-        # (unless perl).
         my $interpreter;
         if ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
             if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
@@ -48,15 +46,7 @@ sub fixin {
             }
         }
         else {
-            my (@absdirs)
-              = reverse grep { $self->file_name_is_absolute($_) } $self->path;
-            $interpreter = '';
-
-            for my $dir (@absdirs) {
-                if ( $self->maybe_command($cmd) ) {
-                    $interpreter = $self->catfile( $dir, $cmd );
-                }
-            }
+            die "$file is not perl";
         }
 
         # Figure out how to invoke interpreter on this machine.
