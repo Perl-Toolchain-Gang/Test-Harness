@@ -24,11 +24,14 @@ sub fixin {
 
     my ($does_shbang) = $Config{'sharpbang'} =~ /^\s*\#\!/;
 
-    open( my $fixin, '<', $file_in ) or die "Can't process '$file_in': $!";
+    open my $fixin, '<', $file_in or die "Can't process '$file_in': $!";
     local $/ = "\n";
     chomp( my $line = <$fixin> );
-    next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
-          # Now figure out the interpreter name.
+
+    die "$file_in doesn't have a shebang line"
+      unless $line =~ s/^\s*\#!\s*//;
+
+    # Now figure out the interpreter name.
     my ( $cmd, $arg ) = split ' ', $line, 2;
     $cmd =~ s!^.*/!!;
 
@@ -49,8 +52,7 @@ sub fixin {
       unless defined $interpreter;
 
     # Figure out how to invoke interpreter on this machine.
-
-    my $shb = "";
+    my $shb = '';
 
     # this is probably value-free on DOSISH platforms
     if ($does_shbang) {
