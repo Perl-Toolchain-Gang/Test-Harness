@@ -78,19 +78,4 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
     system("$Config{'eunicefix'} $file_out") if $Config{'eunicefix'} ne ':';
 }
 
-sub _rename {
-    my ( $old, $new ) = @_;
-
-    for my $file ( $old, $new ) {
-        if ( $Is{VMS} and basename($file) !~ /\./ ) {
-
-            # rename() in 5.8.0 on VMS will not rename a file if it
-            # does not contain a dot yet it returns success.
-            $file = "$file.";
-        }
-    }
-
-    return rename( $old, $new );
-}
-
 1;
