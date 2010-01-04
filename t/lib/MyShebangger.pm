@@ -55,18 +55,16 @@ sub fix_shebang {
     my $shb = '';
 
     # this is probably value-free on DOSISH platforms
-    if ($does_shbang) {
-        $shb .= "$Config{'sharpbang'}$interpreter";
-        $shb .= ' ' . $arg if defined $arg;
-        $shb .= "\n";
-    }
+    my $shb_line = join ' ', grep defined, $interpreter, $arg;
+    $shb .= "$Config{'sharpbang'}$shb_line\n"
+      if $does_shbang;
     $shb .= qq{
-eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
+eval 'exec $shb_line -S \$0 \${1+"\$\@"}'
     if 0; # not running under some shell
 } unless $^O eq 'MSWin32';    # this won't work on win32, so don't
 
     open my $fixout, ">", "$file_out"
-      or die "Can't create new $file: $!\n";
+      or die "Can't create new $file_out: $!\n";
 
     # Print out the new #! line (or equivalent).
     local $\;
@@ -79,4 +77,18 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
     chmod 0755, $file_out;    # ignore failure
 }
 
+{
+    my @cleanup = ();
+    my $seq     = 1;
+    END { unlink @cleanup }
+
+    sub make_perl_executable {
+        my $file     = shift;
+        my $tmp_file = "${file}_${$}_$seq.pl";
+        $seq++;
+        fix_shebang( $file, $tmp_file );
+        push @cleanup, $tmp_file;
+        return $tmp_file;
+    }
+}
 1;

@@ -17,6 +17,7 @@ use Test::More tests => 123;
 use IO::File;
 use IO::Handle;
 use File::Spec;
+use MyShebangger;
 
 use TAP::Parser::Source;
 use TAP::Parser::SourceHandler;
@@ -318,7 +319,12 @@ my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
     my $class = 'TAP::Parser::SourceHandler::pgTAP';
     my $test  = File::Spec->catfile( $dir, 'source.t' );
     my $psql  = File::Spec->catfile( $dir, 'psql' );
-    $psql .= '.bat' if $^O eq 'MSWin32';
+    if ( $^O eq 'MSWin32' ) {
+        $psql .= '.bat';
+    }
+    else {
+        $psql = MyShebangger::make_perl_executable($psql);
+    }
     my @command = qw(
       --no-psqlrc
       --no-align
