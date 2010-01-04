@@ -35,7 +35,8 @@ sub fixin {
         my ( $cmd, $arg ) = split ' ', $line, 2;
         $cmd =~ s!^.*/!!;
 
-       # Now look (in reverse) for interpreter in absolute PATH (unless perl).
+        # Now look (in reverse) for interpreter in absolute PATH
+        # (unless perl).
         my $interpreter;
         if ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
             if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
