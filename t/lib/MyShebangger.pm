@@ -20,86 +20,63 @@ Inserts the sharpbang or equivalent magic number to a set of @files.
 # stolen from ExtUtils::MakeMaker which said:
 # stolen from the pink Camel book, more or less
 sub fixin {
-    my @files = @_;
+    my ( $file_in, $file_out ) = @_;
 
     my ($does_shbang) = $Config{'sharpbang'} =~ /^\s*\#\!/;
-    for my $file (@files) {
-        my $file_new = "$file.new";
-        my $file_bak = "$file.bak";
 
-        open( my $fixin, '<', $file ) or croak "Can't process '$file': $!";
-        local $/ = "\n";
-        chomp( my $line = <$fixin> );
-        next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
-              # Now figure out the interpreter name.
-        my ( $cmd, $arg ) = split ' ', $line, 2;
-        $cmd =~ s!^.*/!!;
+    open( my $fixin, '<', $file_in ) or croak "Can't process '$file_in': $!";
+    local $/ = "\n";
+    chomp( my $line = <$fixin> );
+    next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
+          # Now figure out the interpreter name.
+    my ( $cmd, $arg ) = split ' ', $line, 2;
+    $cmd =~ s!^.*/!!;
 
-        my $interpreter;
-        if ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
-            if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
-                $interpreter = $Config{startperl};
-                $interpreter =~ s,^\#!,,;
-            }
-            else {
-                $interpreter = $Config{perlpath};
-            }
+    my $interpreter;
+    if ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
+        if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
+            $interpreter = $Config{startperl};
+            $interpreter =~ s,^\#!,,;
         }
         else {
-            die "$file is not perl";
+            $interpreter = $Config{perlpath};
         }
+    }
+    else {
+        die "$file_in is not perl";
+    }
 
-        # Figure out how to invoke interpreter on this machine.
+    # Figure out how to invoke interpreter on this machine.
 
-        my ($shb) = "";
-        if ($interpreter) {
+    my ($shb) = "";
+    if ($interpreter) {
 
-            # this is probably value-free on DOSISH platforms
-            if ($does_shbang) {
-                $shb .= "$Config{'sharpbang'}$interpreter";
-                $shb .= ' ' . $arg if defined $arg;
-                $shb .= "\n";
-            }
-            $shb .= qq{
+        # this is probably value-free on DOSISH platforms
+        if ($does_shbang) {
+            $shb .= "$Config{'sharpbang'}$interpreter";
+            $shb .= ' ' . $arg if defined $arg;
+            $shb .= "\n";
+        }
+        $shb .= qq{
 eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
     if 0; # not running under some shell
 } unless $Is{Win32};    # this won't work on win32, so don't
-        }
-        else {
-            next;
-        }
-
-        open( my $fixout, ">", "$file_new" ) or do {
-            warn "Can't create new $file: $!\n";
-            next;
-        };
-
-        # Print out the new #! line (or equivalent).
-        local $\;
-        local $/;
-        print $fixout $shb, <$fixin>;
-        close $fixin;
-        close $fixout;
-
-        chmod 0666, $file_bak;
-        unlink $file_bak;
-        unless ( _rename( $file, $file_bak ) ) {
-            warn "Can't rename $file to $file_bak: $!";
-            next;
-        }
-        unless ( _rename( $file_new, $file ) ) {
-            warn "Can't rename $file_new to $file: $!";
-            unless ( _rename( $file_bak, $file ) ) {
-                warn "Can't rename $file_bak back to $file either: $!";
-                warn "Leaving $file renamed as $file_bak\n";
-            }
-            next;
-        }
-        unlink $file_bak;
     }
-    continue {
-        system("$Config{'eunicefix'} $file") if $Config{'eunicefix'} ne ':';
+    else {
+        next;
     }
+
+    open my $fixout, ">", "$file_out"
+      or die "Can't create new $file: $!\n";
+
+    # Print out the new #! line (or equivalent).
+    local $\;
+    local $/;
+    print $fixout $shb, <$fixin>;
+    close $fixin;
+    close $fixout;
+
+    system("$Config{'eunicefix'} $file_out") if $Config{'eunicefix'} ne ':';
 }
 
 sub _rename {
