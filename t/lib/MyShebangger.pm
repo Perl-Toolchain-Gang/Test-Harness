@@ -54,8 +54,6 @@ sub fixin {
 
             foreach my $dir (@absdirs) {
                 if ( $self->maybe_command($cmd) ) {
-                    warn "Ignoring $interpreter in $file\n"
-                      if $Verbose && $interpreter;
                     $interpreter = $self->catfile( $dir, $cmd );
                 }
             }
@@ -65,9 +63,6 @@ sub fixin {
 
         my ($shb) = "";
         if ($interpreter) {
-            print STDOUT "Changing sharpbang in $file to $interpreter"
-              if $Verbose;
-
             # this is probably value-free on DOSISH platforms
             if ($does_shbang) {
                 $shb .= "$Config{'sharpbang'}$interpreter";
@@ -80,8 +75,6 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
 } unless $Is{Win32};    # this won't work on win32, so don't
         }
         else {
-            warn "Can't find $cmd in PATH, $file unchanged"
-              if $Verbose;
             next;
         }
 
