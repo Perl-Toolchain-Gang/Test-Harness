@@ -9,17 +9,17 @@ use Config;
 
 MyShebangger - Encapsulate EUMM / MB shebang magic
 
-=item fixin
+=item fix_shebang
 
-  $mm->fixin(@files);
+  fix_shebang($file_in, $file_out);
 
-Inserts the sharpbang or equivalent magic number to a set of @files.
+Inserts the sharpbang or equivalent magic number at the start of a file.
 
 =cut
 
 # stolen from ExtUtils::MakeMaker which said:
 # stolen from the pink Camel book, more or less
-sub fixin {
+sub fix_shebang {
     my ( $file_in, $file_out ) = @_;
 
     my ($does_shbang) = $Config{'sharpbang'} =~ /^\s*\#\!/;
@@ -76,6 +76,7 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
     close $fixout;
 
     system("$Config{'eunicefix'} $file_out") if $Config{'eunicefix'} ne ':';
+    chmod 0755, $file_out;    # ignore failure
 }
 
 1;
