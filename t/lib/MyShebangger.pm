@@ -24,7 +24,7 @@ sub fixin {
 
     my ($does_shbang) = $Config{'sharpbang'} =~ /^\s*\#\!/;
 
-    open( my $fixin, '<', $file_in ) or croak "Can't process '$file_in': $!";
+    open( my $fixin, '<', $file_in ) or die "Can't process '$file_in': $!";
     local $/ = "\n";
     chomp( my $line = <$fixin> );
     next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
@@ -33,38 +33,35 @@ sub fixin {
     $cmd =~ s!^.*/!!;
 
     my $interpreter;
-    if ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
-        if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
-            $interpreter = $Config{startperl};
-            $interpreter =~ s,^\#!,,;
-        }
-        else {
-            $interpreter = $Config{perlpath};
-        }
+
+    die "$file_in is not perl"
+      unless $cmd =~ m{^perl(?:\z|[^a-z])};
+
+    if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
+        $interpreter = $Config{startperl};
+        $interpreter =~ s,^\#!,,;
     }
     else {
-        die "$file_in is not perl";
+        $interpreter = $Config{perlpath};
     }
+
+    die "Can't figure out which interpreter to use."
+      unless defined $interpreter;
 
     # Figure out how to invoke interpreter on this machine.
 
-    my ($shb) = "";
-    if ($interpreter) {
+    my $shb = "";
 
-        # this is probably value-free on DOSISH platforms
-        if ($does_shbang) {
-            $shb .= "$Config{'sharpbang'}$interpreter";
-            $shb .= ' ' . $arg if defined $arg;
-            $shb .= "\n";
-        }
-        $shb .= qq{
+    # this is probably value-free on DOSISH platforms
+    if ($does_shbang) {
+        $shb .= "$Config{'sharpbang'}$interpreter";
+        $shb .= ' ' . $arg if defined $arg;
+        $shb .= "\n";
+    }
+    $shb .= qq{
 eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
     if 0; # not running under some shell
-} unless $Is{Win32};    # this won't work on win32, so don't
-    }
-    else {
-        next;
-    }
+} unless $^O eq 'MSWin32';    # this won't work on win32, so don't
 
     open my $fixout, ">", "$file_out"
       or die "Can't create new $file: $!\n";
