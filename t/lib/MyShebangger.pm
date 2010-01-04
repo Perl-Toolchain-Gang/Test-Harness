@@ -52,7 +52,7 @@ sub fixin {
               = reverse grep { $self->file_name_is_absolute($_) } $self->path;
             $interpreter = '';
 
-            foreach my $dir (@absdirs) {
+            for my $dir (@absdirs) {
                 if ( $self->maybe_command($cmd) ) {
                     $interpreter = $self->catfile( $dir, $cmd );
                 }
@@ -63,6 +63,7 @@ sub fixin {
 
         my ($shb) = "";
         if ($interpreter) {
+
             # this is probably value-free on DOSISH platforms
             if ($does_shbang) {
                 $shb .= "$Config{'sharpbang'}$interpreter";
@@ -114,7 +115,7 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
 sub _rename {
     my ( $old, $new ) = @_;
 
-    foreach my $file ( $old, $new ) {
+    for my $file ( $old, $new ) {
         if ( $Is{VMS} and basename($file) !~ /\./ ) {
 
             # rename() in 5.8.0 on VMS will not rename a file if it
