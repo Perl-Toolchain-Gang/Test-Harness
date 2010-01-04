@@ -112,6 +112,7 @@ t/lib/MyIterator.pm
 t/lib/MyPerlSourceHandler.pm
 t/lib/MyResult.pm
 t/lib/MyResultFactory.pm
+t/lib/MyShebangger.pm
 t/lib/MySourceHandler.pm
 t/lib/NoFork.pm
 t/lib/NOP.pm

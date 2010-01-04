@@ -2,6 +2,8 @@ Revision history for Test-Harness
 
 3.17_04 
         - Fix failures due to unknown location of Perl in t/source_handler.t.
+        - Use EUMM style shebang magic to produce an executable 'psql'
+          for t/source_handler.t.
 
 3.17_03 2009-11-19
         - Fix failures due to over-strict assertions in t/source.t.
