@@ -31,11 +31,11 @@ sub fixin {
         local $/ = "\n";
         chomp( my $line = <$fixin> );
         next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
-        # Now figure out the interpreter name.
+              # Now figure out the interpreter name.
         my ( $cmd, $arg ) = split ' ', $line, 2;
         $cmd =~ s!^.*/!!;
 
-        # Now look (in reverse) for interpreter in absolute PATH (unless perl).
+       # Now look (in reverse) for interpreter in absolute PATH (unless perl).
         my $interpreter;
         if ( $cmd =~ m{^perl(?:\z|[^a-z])} ) {
             if ( $Config{startperl} =~ m,^\#!.*/perl, ) {
@@ -48,13 +48,13 @@ sub fixin {
         }
         else {
             my (@absdirs)
-                = reverse grep { $self->file_name_is_absolute($_) } $self->path;
+              = reverse grep { $self->file_name_is_absolute($_) } $self->path;
             $interpreter = '';
 
             foreach my $dir (@absdirs) {
                 if ( $self->maybe_command($cmd) ) {
                     warn "Ignoring $interpreter in $file\n"
-                        if $Verbose && $interpreter;
+                      if $Verbose && $interpreter;
                     $interpreter = $self->catfile( $dir, $cmd );
                 }
             }
@@ -65,7 +65,7 @@ sub fixin {
         my ($shb) = "";
         if ($interpreter) {
             print STDOUT "Changing sharpbang in $file to $interpreter"
-                if $Verbose;
+              if $Verbose;
 
             # this is probably value-free on DOSISH platforms
             if ($does_shbang) {
@@ -80,7 +80,7 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
         }
         else {
             warn "Can't find $cmd in PATH, $file unchanged"
-                if $Verbose;
+              if $Verbose;
             next;
         }
 
@@ -117,19 +117,19 @@ eval 'exec $interpreter $arg -S \$0 \${1+"\$\@"}'
     }
 }
 
-
 sub _rename {
-    my($old, $new) = @_;
+    my ( $old, $new ) = @_;
 
-    foreach my $file ($old, $new) {
-        if( $Is{VMS} and basename($file) !~ /\./ ) {
+    foreach my $file ( $old, $new ) {
+        if ( $Is{VMS} and basename($file) !~ /\./ ) {
+
             # rename() in 5.8.0 on VMS will not rename a file if it
             # does not contain a dot yet it returns success.
             $file = "$file.";
         }
     }
 
-    return rename($old, $new);
+    return rename( $old, $new );
 }
 
 1;
