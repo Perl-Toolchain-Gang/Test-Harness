@@ -530,15 +530,15 @@ Provide additional options to the harness. Currently supported options are:
 
 Run <n> (default 9) parallel jobs.
 
-=item C<< f >>
+=item C<< c >>
 
-Use forked parallelism.
+Try to color output. See L<TAP::Formatter::Base/"new">.
 
 =back
 
 Multiple options may be separated by colons:
 
-    HARNESS_OPTIONS=j9:f make test
+    HARNESS_OPTIONS=j9:c make test
 
 =item C<HARNESS_SUBCLASS>
 
