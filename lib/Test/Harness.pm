@@ -307,7 +307,7 @@ sub _filtered_inc {
         my $perl = $ENV{HARNESS_PERL} || $^X;
 
         # Avoid using -l for the benefit of Perl 6
-        chomp( @inc = `$perl -e "print join qq[\\n], \@INC, q[]"` );
+        chomp( @inc = `"$perl" -e "print join qq[\\n], \@INC, q[]"` );
         return @inc;
     }
 }
