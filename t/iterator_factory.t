@@ -135,7 +135,7 @@ my @sources = (
     },
 );
 
-foreach my $test (@sources) {
+for my $test (@sources) {
     local $TODO = $test->{TODO};
     if ( $test->{file} ) {
         $test->{name} = $test->{file};

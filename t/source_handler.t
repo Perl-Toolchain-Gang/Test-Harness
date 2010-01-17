@@ -437,7 +437,7 @@ sub test_handler {
         );
     }
 
-    foreach my $test ( @{ $tests->{can_handle} } ) {
+    for my $test ( @{ $tests->{can_handle} } ) {
         my $source = TAP::Parser::Source->new;
         $source->raw( $test->{raw} )       if $test->{raw};
         $source->meta( $test->{meta} )     if $test->{meta};
@@ -449,7 +449,7 @@ sub test_handler {
         is( $class->can_handle($source), $vote, $name );
     }
 
-    foreach my $test ( @{ $tests->{make_iterator} } ) {
+    for my $test ( @{ $tests->{make_iterator} } ) {
         my $name = $test->{name} || 'unnamed test';
         $name = "$short_class->make_iterator( $name )";
 
@@ -481,7 +481,7 @@ sub test_handler {
             isa_ok $iterator, $test->{iclass}, $name;
             if ( $test->{output} ) {
                 my $i = 1;
-                foreach my $line ( @{ $test->{output} } ) {
+                for my $line ( @{ $test->{output} } ) {
                     is $iterator->next, $line, "... line $i";
                     $i++;
                 }

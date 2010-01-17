@@ -47,7 +47,7 @@ for my $args ( [qw( yes no maybe )], [qw( 1 2 3 )] ) {
 }
 
 {
-    foreach my $test_arg_type (
+    for my $test_arg_type (
         [qw( magic hat brigade )],
         { $test => [qw( magic hat brigade )] },
       )

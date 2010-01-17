@@ -51,7 +51,7 @@ my @tests = qw(
 
 # make the tests check that the perl is indeed the $perl (thus they are
 # just printed tests.)
-foreach my $perl (@perls) {
+for my $perl (@perls) {
 
     # TODO make the API be *not* an environment variable!
     local $ENV{HARNESS_PERL} = $perl;

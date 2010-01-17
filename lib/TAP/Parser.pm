@@ -210,7 +210,7 @@ with the result as the argument if the C<run> method is used:
  );
 
  my $aggregator = TAP::Parser::Aggregator->new;
- foreach my $file ( @test_files ) {
+ for my $file ( @test_files ) {
      my $parser = TAP::Parser->new(
          {
              source    => $file,
@@ -1533,7 +1533,7 @@ result as its argument.
  );
 
  my $aggregator = TAP::Parser::Aggregator->new;
- foreach my $file ( @test_files ) {
+ for my $file ( @test_files ) {
      my $parser = TAP::Parser->new(
          {
              source    => $file,

@@ -64,9 +64,9 @@ is $@, '', '... and calling it with non-existent libs is fine';
 ok my $harness = $HARNESS->new,
   'Calling new() without arguments should succeed';
 
-foreach my $test_args ( get_arg_sets() ) {
+for my $test_args ( get_arg_sets() ) {
     my %args = %$test_args;
-    foreach my $key ( sort keys %args ) {
+    for my $key ( sort keys %args ) {
         $args{$key} = $args{$key}{in};
     }
     ok my $harness = $HARNESS->new( {%args} ),

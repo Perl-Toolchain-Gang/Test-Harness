@@ -33,7 +33,7 @@ my $p = TAP::Parser->new(
 );
 ok( $p, 'new customized parser' );
 
-foreach my $key ( keys %customize ) {
+for my $key ( keys %customize ) {
     is( $p->$key(), $customize{$key}, "customized $key" );
 }
 

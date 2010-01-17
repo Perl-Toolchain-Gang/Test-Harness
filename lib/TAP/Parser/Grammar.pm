@@ -294,7 +294,7 @@ sub tokenize {
 
     my $token;
 
-    foreach my $token_data ( @{ $self->{ordered_tokens} } ) {
+    for my $token_data ( @{ $self->{ordered_tokens} } ) {
         if ( $line =~ $token_data->{syntax} ) {
             my $handler = $token_data->{handler};
             $token = $self->$handler($line);
@@ -353,7 +353,7 @@ TAP parsing loop looks similar to the following:
  my @tokens;
  my $grammar = TAP::Grammar->new;
  LINE: while ( defined( my $line = $parser->_next_chunk_of_tap ) ) {
-     foreach my $type ( $grammar->token_types ) {
+     for my $type ( $grammar->token_types ) {
          my $syntax  = $grammar->syntax_for($type);
          if ( $line =~ $syntax ) {
              my $handler = $grammar->handler_for($type);

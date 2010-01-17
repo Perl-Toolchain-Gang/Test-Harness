@@ -69,7 +69,7 @@ can_ok $grammar, 'syntax_for';
 can_ok $grammar, 'handler_for';
 
 my ( %syntax_for, %handler_for );
-foreach my $type (@types) {
+for my $type (@types) {
     ok $syntax_for{$type} = $grammar->syntax_for($type),
       '... and calling syntax_for() with a type name should succeed';
     cmp_ok ref $syntax_for{$type}, 'eq', 'Regexp',

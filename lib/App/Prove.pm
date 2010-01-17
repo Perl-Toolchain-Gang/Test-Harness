@@ -313,7 +313,7 @@ sub _get_args {
         $args{formatter_class} = $formatter;
     }
 
-    foreach my $handler ( @{ $self->sources } ) {
+    for my $handler ( @{ $self->sources } ) {
         my ( $name, $config ) = $self->_parse_source($handler);
         $args{sources}->{$name} = $config;
     }

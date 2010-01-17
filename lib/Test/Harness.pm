@@ -270,7 +270,7 @@ sub _filtered_inc {
     elsif (IS_WIN32) {
 
         # Lose any trailing backslashes in the Win32 paths
-        s/[\\\/]+$// foreach @inc;
+        s/[\\\/]+$// for @inc;
     }
 
     my @default_inc = _default_inc();

@@ -152,7 +152,7 @@ C<croak>s on error.
 
 sub load_handlers {
     my ($self) = @_;
-    foreach my $handler ( keys %{ $self->config } ) {
+    for my $handler ( keys %{ $self->config } ) {
         my $sclass = $self->_load_handler($handler);
 
         # TODO: store which class we loaded anywhere?
@@ -164,7 +164,7 @@ sub _load_handler {
     my ( $self, $handler ) = @_;
 
     my @errors;
-    foreach my $dclass ( "TAP::Parser::SourceHandler::$handler", $handler ) {
+    for my $dclass ( "TAP::Parser::SourceHandler::$handler", $handler ) {
         return $dclass
           if UNIVERSAL::can( $dclass, 'can_handle' )
               && UNIVERSAL::can( $dclass, 'make_iterator' );
@@ -246,7 +246,7 @@ sub detect_source {
 
     # find a list of handlers that can handle this source:
     my %handlers;
-    foreach my $dclass ( @{ $self->handlers } ) {
+    for my $dclass ( @{ $self->handlers } ) {
         my $confidence = $dclass->can_handle($source);
 
         # warn "handler: $dclass: $confidence\n";

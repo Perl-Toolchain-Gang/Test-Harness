@@ -143,7 +143,7 @@ Create simple getter/setters.
 
 sub mk_methods {
     my ( $class, @methods ) = @_;
-    foreach my $method_name (@methods) {
+    for my $method_name (@methods) {
         my $method = "${class}::$method_name";
         no strict 'refs';
         *$method = sub {

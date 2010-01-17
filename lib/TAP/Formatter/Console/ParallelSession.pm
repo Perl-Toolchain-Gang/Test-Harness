@@ -94,7 +94,7 @@ sub _output_ruler {
 
     my $ruler = sprintf '===( %7d;%d  ', $context->{tests}, $now - $start;
 
-    foreach my $active ( @{ $context->{active} } ) {
+    for my $active ( @{ $context->{active} } ) {
         my $parser  = $active->parser;
         my $tests   = $parser->tests_run;
         my $planned = $parser->tests_planned || '?';

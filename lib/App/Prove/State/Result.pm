@@ -223,7 +223,7 @@ sub raw {
     my %raw  = %$self;
 
     my %tests;
-    foreach my $test ( $self->tests ) {
+    for my $test ( $self->tests ) {
         $tests{ $test->name } = $test->raw;
     }
     $raw{tests} = \%tests;

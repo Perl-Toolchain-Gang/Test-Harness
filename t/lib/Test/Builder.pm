@@ -466,7 +466,7 @@ sub _unoverload {
 
     $self->_try( sub { require overload } ) || return;
 
-    foreach my $thing (@_) {
+    for my $thing (@_) {
         if ( $self->_is_object($$thing) ) {
             if ( my $string_meth = overload::Method( $$thing, $type ) ) {
                 $$thing = $$thing->$string_meth();
@@ -566,7 +566,7 @@ sub is_num {
 sub _is_diag {
     my ( $self, $got, $type, $expect ) = @_;
 
-    foreach my $val ( \$got, \$expect ) {
+    for my $val ( \$got, \$expect ) {
         if ( defined $$val ) {
             if ( $type eq 'eq' ) {
 
@@ -1128,7 +1128,7 @@ If set to true, no "1..N" header will be printed.
 
 =cut
 
-foreach my $attribute (qw(No_Header No_Ending No_Diag)) {
+for my $attribute (qw(No_Header No_Ending No_Diag)) {
     my $method = lc $attribute;
 
     my $code = sub {

@@ -148,7 +148,7 @@ my $gp = $agg->_get_parsers(qw(tap1 tap2))
 
 is @$gp, 2,
   'coverage tests for _get_parser in scalar context... and we got the right number of parsers';
-isa_ok( $_, 'TAP::Parser' ) foreach (@$gp);
+isa_ok( $_, 'TAP::Parser' ) for (@$gp);
 
 # _get_parsers
 # todo_failed - this is a deprecated method, so it  (and these tests)

@@ -444,7 +444,7 @@ quickly testing an interface.
 No matter how many @methods you check, a single can_ok() call counts
 as one test.  If you desire otherwise, use:
 
-    foreach my $meth (@methods) {
+    for my $meth (@methods) {
         can_ok('Foo', $meth);
     }
 
@@ -468,7 +468,7 @@ sub can_ok ($@) {
     }
 
     my @nok = ();
-    foreach my $method (@methods) {
+    for my $method (@methods) {
         $tb->_try( sub { $proto->can($method) } ) or push @nok, $method;
     }
 
@@ -825,7 +825,7 @@ sub _format_stack {
 
     my $var       = '$FOO';
     my $did_arrow = 0;
-    foreach my $entry (@Stack) {
+    for my $entry (@Stack) {
         my $type = $entry->{type} || '';
         my $idx = $entry->{'idx'};
         if ( $type eq 'HASH' ) {
@@ -847,7 +847,7 @@ sub _format_stack {
     ( $vars[1] = $var ) =~ s/\$FOO/\$expected/;
 
     my $out = "Structures begin differing at:\n";
-    foreach my $idx ( 0 .. $#vals ) {
+    for my $idx ( 0 .. $#vals ) {
         my $val = $vals[$idx];
         $vals[$idx]
           = !defined $val ? 'undef'
@@ -1313,7 +1313,7 @@ sub _eq_hash {
 
     my $ok = 1;
     my $bigger = keys %$a1 > keys %$a2 ? $a1 : $a2;
-    foreach my $k ( keys %$bigger ) {
+    for my $k ( keys %$bigger ) {
         my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
         my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;
 
