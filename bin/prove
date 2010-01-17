@@ -33,7 +33,6 @@ Boolean options:
       --ext         Set the extension for tests (default '.t')
  -f,  --failures    Show failed tests.
  -o,  --comments    Show comments.
-      --fork        Fork to run harness in multiple processes.
       --ignore-exit Ignore exit status from test scripts.
  -m,  --merge       Merge test scripts' STDERR with their STDOUT.
  -r,  --recurse     Recursively descend into directories.
@@ -77,7 +76,7 @@ in F<.proverc> are specified in the same way as command line options:
 
     # .proverc
     --state=hot,fast,save
-    -j9 --fork
+    -j9
 
 Additional option files may be specified with the C<--rc> option.
 Default option file processing is disabled by the C<--norc> option.
