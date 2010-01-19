@@ -14,11 +14,11 @@ TAP::Parser::Result::Unknown - Unknown result token.
 
 =head1 VERSION
 
-Version 3.17_05
+Version 3.18
 
 =cut
 
-$VERSION = '3.17_05';
+$VERSION = '3.18';
 
 =head1 DESCRIPTION
 
