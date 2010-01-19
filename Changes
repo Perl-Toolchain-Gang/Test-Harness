@@ -1,6 +1,11 @@
 Revision history for Test-Harness
 
-3.17_04 
+3.18    2009-01-19
+        - Handle the case where the filename of the perl executable
+          contains space. Thanks to kmx.
+        - Various documentation fixes.
+
+3.17_04 2009-??-??
         - Fix failures due to unknown location of Perl in t/source_handler.t.
         - Use EUMM style shebang magic to produce an executable 'psql'
           for t/source_handler.t.
