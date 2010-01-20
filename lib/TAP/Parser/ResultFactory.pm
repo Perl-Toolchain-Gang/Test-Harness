@@ -30,11 +30,11 @@ TAP::Parser::ResultFactory - Factory for creating TAP::Parser output objects
 
 =head1 VERSION
 
-Version 3.19
+Version 3.20
 
 =cut
 
-$VERSION = '3.19';
+$VERSION = '3.20';
 
 =head2 DESCRIPTION
 

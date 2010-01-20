@@ -17,11 +17,11 @@ TAP::Parser::Iterator::Process - Iterator for proccess-based TAP sources
 
 =head1 VERSION
 
-Version 3.19
+Version 3.20
 
 =cut
 
-$VERSION = '3.19';
+$VERSION = '3.20';
 
 =head1 SYNOPSIS
 

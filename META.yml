@@ -1,6 +1,7 @@
 ---
 name: Test-Harness
-version: 3.19
+version: 3.20
+
 author:
   - 'Andy Armstrong  C<< <andy@hexten.net> >>'
 abstract: Run Perl standard test scripts with statistics
