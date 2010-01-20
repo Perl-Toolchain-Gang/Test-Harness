@@ -32,6 +32,7 @@ my $builder = MyBuilder->new(
     build_requires => {},
     add_to_cleanup => ['Test-Harness-*'],
     script_files   => ["bin/prove"],
+    ( $Module::Build::VERSION >= 0.34 ) ? ( auto_configure_requires => 0 ) : (),
 );
 
 $builder->create_build_script();
