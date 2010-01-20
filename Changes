@@ -1,5 +1,10 @@
 Revision history for Test-Harness
 
+3.19    2009-01-20
+        - Avoid depending on Module::Build. The resulting circular
+          dependency made it impossible to install Test::Harness and/or
+          Module::Build in some cases.
+
 3.18    2009-01-19
         - Handle the case where the filename of the perl executable
           contains space. Thanks to kmx.
