@@ -79,6 +79,7 @@ Get the exit status for this iterator's process.
 
 {
 
+    local $^W;    # no warnings
     # get around a catch22 in the test suite that causes failures on Win32:
     local $SIG{__DIE__} = undef;
     eval { require POSIX; &POSIX::WEXITSTATUS(0) };
