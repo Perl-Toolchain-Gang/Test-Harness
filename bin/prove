@@ -272,11 +272,11 @@ via the C<-Ilib> option to F<prove>.
 Normally when a Perl program is run in taint mode the contents of the
 C<PERL5LIB> environment variable do not appear in C<@INC>.
 
-Because C<PERL5LIB> is often used during testing to add build directories
-to C<@INC> prove (actually L<TAP::Parser::Source::Perl>) passes the
-names of any directories found in C<PERL5LIB> as -I switches. The net
-effect of this is that C<PERL5LIB> is honoured even when prove is run in
-taint mode.
+Because C<PERL5LIB> is often used during testing to add build
+directories to C<@INC> prove passes the names of any directories found
+in C<PERL5LIB> as -I switches. The net effect of this is that
+C<PERL5LIB> is honoured even when prove is run in taint mode.
+
 
 =head1 FORMATTERS
 

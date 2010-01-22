@@ -320,8 +320,7 @@ creates a grammar (TAP::Parser::Grammar) to decode the raw TAP into
 tokens, a result factory (TAP::Parser::ResultFactory) to turn the
 decoded TAP results into objects and, depending on whether it's
 running a test script or reading TAP from a file, scalar or array
-a source (TAP::Parser::Source, TAP::Parser::Source::Perl) or an
-iterator (TAP::Parser::IteratorFactory).
+a source or an iterator (TAP::Parser::IteratorFactory).
 
 Each of these objects may be replaced by calling one of these parser
 methods:

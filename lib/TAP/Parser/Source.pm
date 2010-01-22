@@ -307,19 +307,42 @@ sub assemble_meta {
     return $meta;
 }
 
-sub _read_shebang {
-    my ( $self, $file ) = @_;
-    my $shebang;
-    local *TEST;
-    if ( open( TEST, $file ) ) {
-        $shebang = <TEST>;
-        chomp $shebang;
-        close(TEST) or die "Can't close $file. $!\n";
+=head3 C<shebang>
+
+Get the shebang line for a script file.
+
+  my $shebang = TAP::Parser::Source->shebang( $some_script );
+
+May be called as a class method
+
+=cut
+
+{
+
+    # Global shebang cache.
+    my %shebang_for;
+
+    sub _read_shebang {
+        my ( $self, $file ) = @_;
+        my $shebang;
+        local *TEST;
+        if ( open( TEST, $file ) ) {
+            $shebang = <TEST>;
+            chomp $shebang;
+            close(TEST) or die "Can't close $file. $!\n";
+        }
+        else {
+            die "Can't open $file. $!\n";
+        }
+        return $shebang;
     }
-    else {
-        die "Can't open $file. $!\n";
+
+    sub shebang {
+        my ( $class, $file ) = @_;
+        $shebang_for{$file} = $class->_read_shebang($file)
+          unless exists $shebang_for{$file};
+        return $shebang_for{$file};
     }
-    return $shebang;
 }
 
 =head3 C<config_for>
