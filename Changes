@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.20    2009-01-22
+        - Remove references / dependency on TAP::Parser::Source::Perl
+
 3.19    2009-01-20
         - Avoid depending on Module::Build. The resulting circular
           dependency made it impossible to install Test::Harness and/or
