@@ -125,4 +125,25 @@ sub ACTION_smallprof {
     print join( '', @rows );
 }
 
+sub read_manifest {
+    my ( $self, $file, $into ) = @_;
+    open my $fh, '<', $file or die "Can't read $file: $!";
+    while (<$fh>) {
+        chomp;
+        s/\s*#.*//;
+        $into->{$_}++ if length $_;
+    }
+}
+
+sub ACTION_manifest {
+    my ( $self, @args ) = @_;
+    $self->SUPER::ACTION_manifest(@args);
+    my $stash = {};
+    my $mc    = 'MANIFEST.CUMMULATIVE';
+    $self->read_manifest( $mc,        $stash );
+    $self->read_manifest( 'MANIFEST', $stash );
+    open my $fh, '>', $mc or die "Can't write $mc: $!";
+    print $fh "$_\n" for sort keys %$stash;
+}
+
 1;
