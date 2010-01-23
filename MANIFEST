@@ -68,6 +68,7 @@ lib/TAP/Parser/YAMLish/Writer.pm
 lib/Test/Harness.pm
 Makefile.PL
 MANIFEST
+MANIFEST.CUMMULATIVE
 META.yml
 perlcriticrc
 README

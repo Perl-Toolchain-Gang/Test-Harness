@@ -10,7 +10,9 @@
 ^\.prove$
 
 # Makemaker generated files and dirs.
-^MANIFEST\.
+^MANIFEST\.SKIP
+^MANIFEST\.bak
+^MANIFEST\.OLD
 ^Makefile$
 ^Build$
 ^blib/
