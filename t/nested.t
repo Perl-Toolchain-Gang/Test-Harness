@@ -101,11 +101,12 @@ EOT
     },
 );
 
-plan tests => @tests * 1;
+plan tests => @tests * 2;
 
 for my $test (@tests) {
     my ( $name, $tap, $expect ) = @{$test}{ 'name', 'tap', 'expect' };
-    my $results = slurp_tap($tap);
+    my $results = eval{slurp_tap($tap)};
+    ok !$@, "$name: parsed without error";
     is_result( $results, $expect, $name );
 }
 
