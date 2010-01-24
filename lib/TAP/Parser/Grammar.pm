@@ -219,7 +219,7 @@ my %language_for;
     );
 
     my $setup_v13 = sub {
-        shift->{stream}->handle_unicode;
+        shift->{iterator}->handle_unicode;
     };
 
     my $toker_v12 = sub {
@@ -331,7 +331,7 @@ current line of TAP.
 
 sub _make_tokenize {
     my $self       = shift;
-    my $stream     = $self->{stream};
+    my $iterator   = $self->{iterator};
     my $parser     = $self->{parser};
     my $stack      = $self->{stack};
     my $last_depth = 0;
@@ -339,7 +339,7 @@ sub _make_tokenize {
 
     my $toker = sub {
         return shift @pushback if @pushback;
-        my $line = my $raw_line = $stream->next;
+        my $line = my $raw_line = $iterator->next;
         unless ( defined $raw_line ) {
             delete @{$self}{ 'parser', 'toker', 'tokenize' };    # Circular
             return;
