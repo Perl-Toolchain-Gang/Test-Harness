@@ -12,12 +12,9 @@ use strict;
 my %mm_args = (
     'NAME'         => 'Test::Harness',
     'VERSION_FROM' => 'lib/Test/Harness.pm',
-    'PREREQ_PM'    => {
-        'File::Spec' => 0.8,
-    },
-    'INSTALLDIRS' => 'perl',
-    'PL_FILES'    => {},
-    'test'        => { 'TESTS' => 't/*.t t/compat/*.t' },
+    'INSTALLDIRS'  => 'perl',
+    'PL_FILES'     => {},
+    'test'         => { 'TESTS' => 't/*.t t/compat/*.t' },
 
    # The core autogenerates a Makefile.PL, and finds prove with utils/prove.PL
     'EXE_FILES' => ['bin/prove'],

@@ -12,18 +12,10 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 68;
-
+use Test::More tests => 45;
 use File::Spec;
 
-use EmptyParser;
-use TAP::Parser::Source;
-use TAP::Parser::Source::Perl;
-use TAP::Parser::Source::File;
-use TAP::Parser::Source::RawTAP;
-
-my $parser = EmptyParser->new;
-my $dir    = File::Spec->catdir(
+my $dir = File::Spec->catdir(
     (   $ENV{PERL_CORE}
         ? ( File::Spec->updir(), 'ext', 'Test-Harness' )
         : ()
@@ -32,172 +24,278 @@ my $dir    = File::Spec->catdir(
     'source_tests'
 );
 
-my $perl = $^X;
+use_ok('TAP::Parser::Source');
 
-# Abstract base class tests
+# Basic tests
 {
-    can_ok 'TAP::Parser::Source', 'new';
     my $source = TAP::Parser::Source->new;
-    isa_ok $source, 'TAP::Parser::Source';
+    isa_ok( $source, 'TAP::Parser::Source', 'new source' );
+    can_ok(
+        $source,
+        qw( raw meta config merge switches test_args assemble_meta )
+    );
 
-    can_ok $source, 'raw_source';
-    is $source->raw_source('hello'), $source, '... can set';
-    is $source->raw_source, 'hello', '... and get';
+    is_deeply( $source->config, {}, 'config empty by default' );
+    $source->config->{Foo} = { bar => 'baz' };
+    is_deeply(
+        $source->config_for('Foo'), { bar => 'baz' },
+        'config_for( Foo )'
+    );
+    is_deeply(
+        $source->config_for('TAP::Parser::SourceHandler::Foo'),
+        { bar => 'baz' }, 'config_for( ...::SourceHandler::Foo )'
+    );
 
-    # TODO: deprecated
-    can_ok $source, 'source';
-    is $source->source, 'hello', '... and get = raw_source';
+    ok( !$source->merge, 'merge not set by default' );
+    $source->merge(1);
+    ok( $source->merge, '... merge now set' );
 
-    can_ok $source, 'merge';
-    is $source->merge('hello'), $source, '... can set';
-    is $source->merge, 'hello', '... and get';
+    is( $source->switches, undef, 'switches not set by default' );
+    $source->switches( ['-Ilib'] );
+    is_deeply( $source->switches, ['-Ilib'], '... switches now set' );
 
-    can_ok $source, 'config';
-    is $source->config('hello'), $source, '... can set';
-    is $source->config, 'hello', '... and get';
+    is( $source->test_args, undef, 'test_args not set by default' );
+    $source->test_args( ['foo'] );
+    is_deeply( $source->test_args, ['foo'], '... test_args now set' );
 
-    can_ok $source, 'get_stream';
-    eval { $source->get_stream($parser) };
-    my $error = $@;
-    like $error, qr/^Abstract method/,
-      '... with an appropriate error message';
+    $source->raw( \'hello world' );
+    my $meta = $source->assemble_meta;
+    is_deeply(
+        $meta,
+        {   is_scalar    => 1,
+            is_object    => 0,
+            has_newlines => 0,
+            length       => 11,
+        },
+        'assemble_meta for scalar that isnt a file'
+    );
+
+    is( $source->meta, $meta, '... and caches meta' );
 }
 
-# Executable source tests
+# array check
 {
-    my $test = File::Spec->catfile( $dir, 'source' );
-    my $source = TAP::Parser::Source::Executable->new;
-    isa_ok $source, 'TAP::Parser::Source::Executable';
-
-    can_ok $source, 'source';
-    eval { $source->source("$perl -It/lib $test") };
-    ok my $error = $@, '... and calling it with a string should fail';
-    like $error, qr/^Argument to &raw_source must be an array reference/,
-      '... with an appropriate error message';
-    ok $source->source( [ $perl, '-It/lib', '-T', $test ] ),
-      '... and calling it with valid args should succeed';
-
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
-
-    isa_ok $stream, 'TAP::Parser::Iterator::Process',
-      'get_stream returns the right object';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
-}
-
-# Perl source tests
-{
-    my $test = File::Spec->catfile( $dir, 'source' );
-    my $source = TAP::Parser::Source::Perl->new;
-    isa_ok $source, 'TAP::Parser::Source::Perl',
-      '... and the object it returns';
-
-    can_ok $source, 'source';
-    ok $source->source( [$test] ),
-      '... and calling it with valid args should succeed';
-
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
-
-    isa_ok $stream, 'TAP::Parser::Iterator::Process',
-      '... and the object it returns';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
-
-    # internals tests!
-    can_ok $source, '_switches';
-    ok( grep( $_ =~ /^['"]?-T['"]?$/, $source->_switches ),
-        '... and it should find the taint switch'
+    my $source = TAP::Parser::Source->new;
+    $source->raw( [ 'hello', 'world' ] );
+    my $meta = $source->assemble_meta;
+    is_deeply(
+        $meta,
+        {   is_array  => 1,
+            is_object => 0,
+            size      => 2,
+        },
+        'assemble_meta for array'
     );
 }
 
-# coverage test for TAP::Parser::Source::Executable
-
+# hash check
 {
-
-    # coverage for method get_steam
-    my $source
-      = TAP::Parser::Source::Executable->new( { parser => $parser } );
-
-    my @die;
-    eval {
-        local $SIG{__DIE__} = sub { push @die, @_ };
-        $source->get_stream;
-    };
-
-    is @die, 1, 'coverage testing of Executable get_stream';
-    like pop @die, qr/No command found!/, '...and it failed as expect';
+    my $source = TAP::Parser::Source->new;
+    $source->raw( { hello => 'world' } );
+    my $meta = $source->assemble_meta;
+    is_deeply(
+        $meta,
+        {   is_hash   => 1,
+            is_object => 0,
+        },
+        'assemble_meta for array'
+    );
 }
 
-# Raw TAP source tests
+# glob check
 {
-    my $source = TAP::Parser::Source::RawTAP->new;
-    isa_ok $source, 'TAP::Parser::Source::RawTAP';
-
-    can_ok $source, 'raw_source';
-    eval { $source->raw_source("1..1\nok 1\n") };
-    ok my $error = $@, '... and calling it with a string should fail';
-    like $error,
-      qr/^Argument to &raw_source must be a scalar or array reference/,
-      '... with an appropriate error message';
-    ok $source->raw_source( \"1..1\nok 1\n" ),
-      '... and calling it with valid args should succeed';
-
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
-
-    isa_ok $stream, 'TAP::Parser::Iterator::Array',
-      'get_stream returns the right object';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
+    my $source = TAP::Parser::Source->new;
+    $source->raw( \*__DATA__ );
+    my $meta = $source->assemble_meta;
+    is_deeply(
+        $meta,
+        {   is_glob   => 1,
+            is_object => 0,
+        },
+        'assemble_meta for array'
+    );
 }
 
-# Text file TAP source tests
+# object check
 {
-    my $test = File::Spec->catfile( $dir, 'source.tap' );
-    my $source = TAP::Parser::Source::File->new;
-    isa_ok $source, 'TAP::Parser::Source::File';
-
-    can_ok $source, 'raw_source';
-    ok $source->raw_source( \$test ),
-      '... and calling it with valid args should succeed';
-
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
-
-    isa_ok $stream, 'TAP::Parser::Iterator::Stream',
-      'get_stream returns the right object';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
+    my $source = TAP::Parser::Source->new;
+    $source->raw( bless {}, 'Foo::Bar' );
+    my $meta = $source->assemble_meta;
+    is_deeply(
+        $meta,
+        {   is_object => 1,
+            class     => 'Foo::Bar',
+        },
+        'assemble_meta for array'
+    );
 }
 
-# IO::Handle TAP source tests
+# file test
 {
-    my $test = File::Spec->catfile( $dir, 'source.tap' );
-    my $source = TAP::Parser::Source::File->new;
-    isa_ok $source, 'TAP::Parser::Source::File';
+    my $test = File::Spec->catfile( $dir, 'source.t' );
+    my $source = TAP::Parser::Source->new;
 
-    can_ok $source, 'raw_source';
-    ok $source->raw_source( \$test ),
-      '... and calling it with valid args should succeed';
+    $source->raw( \$test );
+    my $meta = $source->assemble_meta;
 
-    can_ok $source, 'get_stream';
-    my $stream = $source->get_stream($parser);
+    # separate meta->file to break up the test
+    my $file = delete $meta->{file};
+    is_deeply(
+        $meta,
+        {   is_scalar    => 1,
+            has_newlines => 0,
+            length       => length($test),
+            is_object    => 0,
+            is_file      => 1,
+            is_dir       => 0,
+            is_symlink   => 0,
+        },
+        'assemble_meta for file'
+    );
 
-    isa_ok $stream, 'TAP::Parser::Iterator::Stream',
-      'get_stream returns the right object';
-    can_ok $stream, 'next';
-    is $stream->next, '1..1', '... and the first line should be correct';
-    is $stream->next, 'ok 1', '... as should the second';
-    ok !$stream->next, '... and we should have no more results';
+    # now check file meta - remove things that will vary between platforms
+    my $stat = delete $file->{stat};
+    is( @$stat, 13, '... file->stat set' );
+    ok( delete $file->{size}, '... file->size set' );
+    ok( delete $file->{dir},  '... file->dir set' );
+    isnt( delete $file->{read},    undef, '... file->read set' );
+    isnt( delete $file->{write},   undef, '... file->write set' );
+    isnt( delete $file->{execute}, undef, '... file->execute set' );
+    is_deeply(
+        $file,
+        {   basename   => 'source.t',
+            ext        => '.t',
+            lc_ext     => '.t',
+            shebang    => '#!/usr/bin/perl',
+            binary     => 0,
+            text       => 1,
+            empty      => 0,
+            exists     => 1,
+            is_dir     => 0,
+            is_file    => 1,
+            is_symlink => 0,
+            sticky     => 0,
+            setgid     => 0,
+            setuid     => 0,
+        },
+        '... file->* set'
+    );
+}
+
+# dir test
+{
+    my $test   = File::Spec->catfile($dir);
+    my $source = TAP::Parser::Source->new;
+
+    $source->raw( \$test );
+    my $meta = $source->assemble_meta;
+
+    # separate meta->file to break up the test
+    my $file = delete $meta->{file};
+    is_deeply(
+        $meta,
+        {   is_scalar    => 1,
+            has_newlines => 0,
+            length       => length($test),
+            is_object    => 0,
+            is_file      => 0,
+            is_dir       => 1,
+            is_symlink   => 0,
+        },
+        'assemble_meta for directory'
+    );
+
+    # now check file meta - remove things that will vary between platforms
+    my $stat = delete $file->{stat};
+    is( @$stat, 13, '... file->stat set' );
+    ok( delete $file->{dir}, '... file->dir set' );
+    isnt( delete $file->{size},    undef, '... file->size set' );
+    isnt( delete $file->{binary},  undef, '... file->binary set' );
+    isnt( delete $file->{empty},   undef, '... file->empty set' );
+    isnt( delete $file->{read},    undef, '... file->read set' );
+    isnt( delete $file->{write},   undef, '... file->write set' );
+    isnt( delete $file->{execute}, undef, '... file->execute set' );
+    is_deeply(
+        $file,
+        {   basename   => 'source_tests',
+            ext        => '',
+            lc_ext     => '',
+            text       => 0,
+            exists     => 1,
+            is_dir     => 1,
+            is_file    => 0,
+            is_symlink => 0,
+            sticky     => 0,
+            setgid     => 0,
+            setuid     => 0,
+        },
+        '... file->* set'
+    );
+}
+
+# symlink test
+SKIP: {
+    my $symlink_exists = eval { symlink( '', '' ); 1 };
+    skip 'symlink not supported on this platform', 9 unless $symlink_exists;
+
+    my $test    = File::Spec->catfile( $dir, 'source.t' );
+    my $symlink = File::Spec->catfile( $dir, 'source_link.T' );
+    my $source  = TAP::Parser::Source->new;
+
+    eval { symlink( File::Spec->rel2abs($test), $symlink ) };
+    if ( my $e = $@ ) {
+        diag($@);
+        die "aborting test";
+    }
+
+    $source->raw( \$symlink );
+    my $meta = $source->assemble_meta;
+
+    # separate meta->file to break up the test
+    my $file = delete $meta->{file};
+    is_deeply(
+        $meta,
+        {   is_scalar    => 1,
+            has_newlines => 0,
+            length       => length($symlink),
+            is_object    => 0,
+            is_file      => 1,
+            is_dir       => 0,
+            is_symlink   => 1,
+        },
+        'assemble_meta for symlink'
+    );
+
+    # now check file meta - remove things that will vary between platforms
+    my $stat = delete $file->{stat};
+    is( @$stat, 13, '... file->stat set' );
+    my $lstat = delete $file->{lstat};
+    is( @$lstat, 13, '... file->lstat set' );
+    ok( delete $file->{size}, '... file->size set' );
+    ok( delete $file->{dir},  '... file->dir set' );
+    isnt( delete $file->{read},    undef, '... file->read set' );
+    isnt( delete $file->{write},   undef, '... file->write set' );
+    isnt( delete $file->{execute}, undef, '... file->execute set' );
+    is_deeply(
+        $file,
+        {   basename   => 'source_link.T',
+            ext        => '.T',
+            lc_ext     => '.t',
+            shebang    => '#!/usr/bin/perl',
+            binary     => 0,
+            text       => 1,
+            empty      => 0,
+            exists     => 1,
+            is_dir     => 0,
+            is_file    => 1,
+            is_symlink => 1,
+            sticky     => 0,
+            setgid     => 0,
+            setuid     => 0,
+        },
+        '... file->* set'
+    );
+
+    unlink $symlink;
 }
 

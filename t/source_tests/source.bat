@@ -1,3 +1,4 @@
-@echo off
-echo "1..1"
-echo "ok 1 - this is a test"
+@ECHO OFF
+REM this comment will fail if you try to run it through sh!
+ECHO 1..1
+ECHO ok 1 - source.bat

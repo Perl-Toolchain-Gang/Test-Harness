@@ -4,6 +4,8 @@ use strict;
 use File::Find;
 use IO::Handle;
 
+die "Unsupported";
+
 ##############################################################################
 
 =head1 NAME

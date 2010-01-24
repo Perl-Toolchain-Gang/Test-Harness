@@ -1,4 +1,104 @@
+Source Detector Todo
+--------------------
+
+y  Move Source --> SourceDetector
+	All sub-classes too
+
+y  Create a new 'Source' class
+	structure:
+		the raw source
+		params (merge, switches, test_args)
+		meta (assembles it too)
+		(note to self: include shebang for Perl source)
+		config?
+	move meta data assembling from SourceFactory
+  ?	could have different sub-classes for internal cases
+
+y   Refactor SourceFactory
+	use new Source class from Parser
+	remove assemble_meta
+	given a Source (+ config?)
+	auto-loads source detectors from config
+	chooses best detector to use, handing over:
+		Source
+		source-specific config?
+	returns an iterator
+
+y   Phase out current IteratorFactory & old Source
+	source detectors should instantiate appropriate iterator
+	in Parser:
+	   iterator_factory_class
+	   make_iterator
+	   _default_iterator_factory_class
+	   _default_source_class
+	   _default_perl_source_class
+	   source_class
+	   perl_source_class
+	   make_source
+	   make_perl_source
+
+y    Refactor SourceDetectors
+	whittle down to 2 methods:
+	   y	can_handle( source [, config? ] )
+	   y	make_iterator( source )
+     y	factor out get_stream & instance methods
+     y	TAP::Parser::SourceDetector::Perl
+	   y	remove shebang detection
+     y	don't need to inherit from TAP::Parser::SourceDetector
+		just need can_handle & make_iterator
+
+y   Refactor the Parser
+	creates a Source object
+	uses IteratorFactory to create an iterator
+
+y   Refactor App::Prove to open access to new TAP::Harness source parameters
+
+y   Move SourceDetector --> SourceHandler
+    y	more descriptive of their function
+    y	rename 'source_handler' param back to 'sources'
+
+y    Clean up 'stream' vs 'iterator' usage
+	replace all instances of 'stream' with 'iterator'
+    y	in TAP::Parser
+	   y	$stream
+	   y	_stream
+	   y	->new( stream => ... )
+    y	in TAP::Grammar
+	   y	$stream
+	   y	->new( stream => ... )
+
+y   Write executable tests for non-perl sources
+    !	Update proverun.t to be able to handle non-perl tests (gave up, added to source_handler.t)
+    y	prove --source 'File: {extensions: [.1]}' t/source_tests/source.1
+    y	prove t/source_tests/source.sh if /bin/sh & /bin/echo exists
+    y	prove t/source_tests/source.bat if Win32
+
+x   use TAP::Parser::YAMLish::Reader in prove --sources
+	can't - doesn't read single line strings
+
+y   Move SourceFactory --> IteratorFactory
+
+?   Process iterator should be really easy to use
+	make command available via API?
+	don't execute command until ->next called?
+
+?   Rename Iterator::Stream --> Iterator::Handle?
+
+?   Rename Iterator::Process --> Iterator::Executable?
+
+y   Update docs
+    y	prove
+    y	App::Prove
+    y	TAP::Harness
+    y	TAP::Parser & Subclassing docs
+    y	lib/TAP/Harness/Beyond.pod
+
+    Update Changes
+
+
 TODO:
+
+    - update HACKING.pod: now lives in Git
 
     - Associate YAML diagnostic with the preceding test. Currently it's
       necessary to look ahead past a test to discover whether it has a

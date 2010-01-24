@@ -13,12 +13,12 @@ BEGIN {
 use strict;
 use vars qw(%INIT %CUSTOM);
 
-use Test::More tests => 22;
+use Test::More tests => 14;
 use File::Spec::Functions qw( catfile updir );
 
 use_ok('TAP::Parser::SubclassTest');
 
-# TODO: foreach my $source ( ... )
+# TODO: for my $source ( ... ) ?
 my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 
 {    # perl source
@@ -32,28 +32,19 @@ my @t_path = $ENV{PERL_CORE} ? ( updir(), 'ext', 'Test-Harness' ) : ();
 
     ok( $p->{initialized}, 'new subclassed parser' );
 
-    is( $p->source_class      => 'MySource',     'source_class' );
-    is( $p->perl_source_class => 'MyPerlSource', 'perl_source_class' );
-    is( $p->grammar_class     => 'MyGrammar',    'grammar_class' );
-    is( $p->iterator_factory_class => 'MyIteratorFactory',
-        'iterator_factory_class'
-    );
+    is( $p->grammar_class => 'MyGrammar', 'grammar_class' );
     is( $p->result_factory_class => 'MyResultFactory',
         'result_factory_class'
     );
 
-    is( $INIT{MyPerlSource},   1, 'initialized MyPerlSource' );
-    is( $CUSTOM{MyPerlSource}, 1, '... and it was customized' );
-    is( $INIT{MyGrammar},      1, 'initialized MyGrammar' );
-    is( $CUSTOM{MyGrammar},    1, '... and it was customized' );
+    is( $INIT{MyGrammar},   1, 'initialized MyGrammar' );
+    is( $CUSTOM{MyGrammar}, 1, '... and it was customized' );
 
     # make sure overrided make_* methods work...
     %CUSTOM = ();
 
     $p->make_grammar;
     is( $CUSTOM{MyGrammar}, 1, 'make custom grammar' );
-    $p->make_iterator;
-    is( $CUSTOM{MyIterator}, 1, 'make custom iterator' );
     $p->make_result;
     is( $CUSTOM{MyResult}, 1, 'make custom result' );
 
@@ -73,17 +64,15 @@ SKIP: {    # non-perl source
     %INIT = %CUSTOM = ();
     my $cat = '/bin/cat';
     unless ( -e $cat ) {
-        skip "no '$cat'", 4;
+        skip "no '$cat'", 2;
     }
     my $file = catfile( @t_path, 't', 'data', 'catme.1' );
     my $p = TAP::Parser::SubclassTest->new(
         {   exec => [ $cat => $file ],
-            sources => { MySource => { accept_all => 1 } },
+            sources => { MySourceHandler => { accept_all => 1 } },
         }
     );
 
-    is( $INIT{MySource},     1, 'initialized MySource subclass' );
-    is( $CUSTOM{MySource},   1, '... and it was customized' );
-    is( $INIT{MyIterator},   1, 'initialized MyIterator subclass' );
-    is( $CUSTOM{MyIterator}, 1, '... and it was customized' );
+    is( $CUSTOM{MySourceHandler}, 1, 'customized a MySourceHandler' );
+    is( $INIT{MyIterator},        1, 'initialized MyIterator subclass' );
 }

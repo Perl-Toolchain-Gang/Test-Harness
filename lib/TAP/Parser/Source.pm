@@ -3,52 +3,49 @@ package TAP::Parser::Source;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Object                  ();
-use TAP::Parser::IteratorFactory ();
+use TAP::Object ();
+use File::Basename qw( fileparse );
 
 @ISA = qw(TAP::Object);
 
 =head1 NAME
 
-TAP::Parser::Source - Base class for different TAP sources
+TAP::Parser::Source - a TAP source & meta data about it
 
 =head1 VERSION
 
-Version 3.18
+Version 3.21
 
 =cut
 
-$VERSION = '3.18';
+$VERSION = '3.21';
 
 =head1 SYNOPSIS
 
-  # abstract class - don't use directly!
-  # see TAP::Parser::SourceFactory for general usage
+  use TAP::Parser::Source;
+  my $source = TAP::Parser::Source->new;
+  $source->raw( \'reference to raw TAP source' )
+         ->config( \%config )
+         ->merge( $boolean )
+         ->switches( \@switches )
+         ->test_args( \@args )
+         ->assemble_meta;
 
-  # must be sub-classed for use
-  package MySource;
-  use base qw( TAP::Parser::Source );
-  sub can_handle  { return $confidence_level }
-  sub make_source { return $new_source }
-  sub get_stream  { return $iterator }
-
-  # see example below for more details
+  do { ... } if $source->meta->{is_file};
+  # see assemble_meta for a full list of data available
 
 =head1 DESCRIPTION
 
-This is the base class for a TAP I<source>, i.e. something that produces a
-stream of TAP for the parser to consume, such as an executable file, a text
-file, an archive, an IO handle, a database, etc.  A C<TAP::Parser::Source>
-is a wrapper around the I<raw> TAP source that does whatever is necessary to
-capture the stream of TAP produced, and make it available to the Parser
-through a L<TAP::Parser::Iterator> object.
+A TAP I<source> is something that produces a stream of TAP for the parser to
+consume, such as an executable file, a text file, an archive, an IO handle, a
+database, etc.  C<TAP::Parser::Source>s encapsulate these I<raw> sources, and
+provide some useful meta data about them.  They are used by
+L<TAP::Parser::SourceHandler>s, which do whatever is required to produce &
+capture a stream of TAP from the I<raw> source, and package it up in a
+L<TAP::Parser::Iterator> for the parser to consume.
 
-C<Sources> must also implement the I<source detection> interface used by
-L<TAP::Parser::SourceFactory> to determine how to get TAP out of a given
-I<raw> source.  See L</can_handle> and L</make_source> for that.
-
-Unless you're writing a new L<TAP::Parser::Source>, a plugin or subclassing
-L<TAP::Parser>, you probably won't need to use this module directly.
+Unless you're writing a new L<TAP::Parser::SourceHandler>, a plugin or
+subclassing L<TAP::Parser>, you probably won't need to use this module directly.
 
 =head1 METHODS
 
@@ -66,118 +63,86 @@ Returns a new C<TAP::Parser::Source> object.
 
 sub _initialize {
     my ($self) = @_;
+    $self->meta(   {} );
     $self->config( {} );
     return $self;
 }
 
 ##############################################################################
 
-=head3 C<can_handle>
-
-I<Abstract method>.
-
-  my $vote = $class->can_handle( $raw_source_ref, $meta, $config );
-  # TODO: or preferably:
-  my $vote = $source->can_handle({
-      raw_source_ref => $raw_source_ref,
-      meta           => { %meta },
-      $config        => { %config },
-  });
-
-C<$raw_source_ref> is a reference as it may contain large amounts of data
-(eg: raw TAP), not to mention different data types.  C<$meta> is a hashref
-containing meta data about the source itself (see
-L<TAP::Parser::SourceFactory/assemble_meta>).  C<$config> is a hashref
-containing any configuration given by the user (how it's used is up to you).
-
-Returns a number between C<0> & C<1> reflecting how confidently the raw source
-can be handled.  For example, C<0> means the source cannot handle it, C<0.5>
-means it may be able to, and C<1> means it definitely can.  See
-L<TAP::Parser::SourceFactory/detect_source> for details on how this is used.
-
-=cut
-
-sub can_handle {
-    my ( $class, $args ) = @_;
-    confess("'$class' has not defined a 'can_handle' method!");
-    return;
-}
-
-=head3 C<make_source>
-
-I<Abstract method>.  Takes a hashref as an argument:
-
-  my $source = $class->make_source({
-      raw_source_ref => $raw_source_ref,
-      config         => { %config },
-      merge          => $bool,
-      perl_test_args => [ ... ],
-      switches       => [ ... ],
-      meta           => { %meta },
-      ...
-  });
-
-At the very least, C<raw_source_ref> is I<required>.  This is a reference as
-it may contain large amounts of data (eg: raw TAP output), not to mention
-different data types.
-
-Returns a new L<TAP::Parser::Source> object for use by the L<TAP::Parser>.
-C<croak>s on error.
-
-This is used primarily by L<TAP::Parser::SourceFactory>.
-
-=cut
-
-sub make_source {
-    my ( $class, $args ) = @_;
-    confess("'$class' has not defined a 'make_source' method!");
-    return;
-}
-
-##############################################################################
-
 =head2 Instance Methods
 
-=head3 C<raw_source>
+=head3 C<raw>
 
- my $raw_source = $source->raw_source;
- $source->raw_source( $some_value );
+  my $raw = $source->raw;
+  $source->raw( $some_value );
 
-Chaining getter/setter for the raw TAP source.
+Chaining getter/setter for the raw TAP source.  This is a reference, as it may
+contain large amounts of data (eg: raw TAP).
 
-=head3 C<source>
+=head3 C<meta>
 
-I<Deprecated.>
+  my $meta = $source->meta;
+  $source->meta({ %some_value });
 
-Synonym for L</raw_source>.
+Chaining getter/setter for meta data about the source.  This defaults to an
+empty hashref.  See L</assemble_meta> for more info.
+
+=head3 C<has_meta>
+
+True if the source has meta data.
 
 =head3 C<config>
 
- my $config = $source->config;
- $source->config({ %some_value });
+  my $config = $source->config;
+  $source->config({ %some_value });
 
-Chaining getter/setter for the source's configuration, if any.  This defaults
-to an empty hashref.
+Chaining getter/setter for the source's configuration, if any has been provided
+by the user.  How it's used is up to you.  This defaults to an empty hashref.
+See L</config_for> for more info.
 
 =head3 C<merge>
 
   my $merge = $source->merge;
+  $source->config( $bool );
 
 Chaining getter/setter for the flag that dictates whether STDOUT and STDERR
-should be merged (where appropriate).
+should be merged (where appropriate).  Defaults to undef.
+
+=head3 C<switches>
+
+  my $switches = $source->switches;
+  $source->config([ @switches ]);
+
+Chaining getter/setter for the list of command-line switches that should be
+passed to the source (where appropriate).  Defaults to undef.
+
+=head3 C<test_args>
+
+  my $test_args = $source->test_args;
+  $source->config([ @test_args ]);
+
+Chaining getter/setter for the list of command-line arguments that should be
+passed to the source (where appropriate).  Defaults to undef.
 
 =cut
 
-sub raw_source {
+sub raw {
     my $self = shift;
-    return $self->{raw_source} unless @_;
-    $self->{raw_source} = shift;
+    return $self->{raw} unless @_;
+    $self->{raw} = shift;
     return $self;
 }
 
-sub source {
+sub meta {
     my $self = shift;
-    return $self->raw_source(@_);
+    return $self->{meta} unless @_;
+    $self->{meta} = shift;
+    return $self;
+}
+
+sub has_meta {
+    return scalar %{ shift->meta } ? 1 : 0;
 }
 
 sub config {
@@ -194,123 +159,227 @@ sub merge {
     return $self;
 }
 
-##############################################################################
+sub switches {
+    my $self = shift;
+    return $self->{switches} unless @_;
+    $self->{switches} = shift;
+    return $self;
+}
 
-=head3 C<get_stream>
+sub test_args {
+    my $self = shift;
+    return $self->{test_args} unless @_;
+    $self->{test_args} = shift;
+    return $self;
+}
 
-I<Abstract method>.
+=head3 C<assemble_meta>
 
- my $stream = $source->get_stream( $iterator_maker );
+  my $meta = $source->assemble_meta;
 
-Returns a L<TAP::Parser::Iterator> stream of the output generated from the
-raw TAP C<source>.
+Gathers meta data about the L</raw> source, stashes it in L</meta> and returns
+it as a hashref.  This is done so that the L<TAP::Parser::SourceHandler>s don't
+have to repeat common checks.  Currently this includes:
 
-The C<$iterator_maker> given must be an object that implements a
-C<make_iterator> method to capture the TAP stream.  Typically this is a
-L<TAP::Parser> instance, rather than a L<TAP::Parser::IteratorFactory>.
+    is_scalar => $bool,
+    is_hash   => $bool,
+    is_array  => $bool,
+
+    # for scalars:
+    length => $n
+    has_newlines => $bool
+
+    # only done if the scalar looks like a filename
+    is_file => $bool,
+    is_dir  => $bool,
+    is_symlink => $bool,
+    file => {
+        # only done if the scalar looks like a filename
+        basename => $string, # including ext
+        dir      => $string,
+        ext      => $string,
+        lc_ext   => $string,
+        # system checks
+        exists  => $bool,
+        stat    => [ ... ], # perldoc -f stat
+        empty   => $bool,
+        size    => $n,
+        text    => $bool,
+        binary  => $bool,
+        read    => $bool,
+        write   => $bool,
+        execute => $bool,
+        setuid  => $bool,
+        setgid  => $bool,
+        sticky  => $bool,
+        is_file => $bool,
+        is_dir  => $bool,
+        is_symlink => $bool,
+        # only done if the file's a symlink
+        lstat      => [ ... ], # perldoc -f lstat
+        # only done if the file's a readable text file
+        shebang => $first_line,
+    }
+
+  # for arrays:
+  size => $n,
 
 =cut
 
-sub get_stream {
-    my ( $self, $factory ) = @_;
-    my $class = ref($self) || $self;
-    $self->_croak("Abstract method 'get_stream' not implemented for $class!");
+sub assemble_meta {
+    my ($self) = @_;
+
+    return $self->meta if $self->has_meta;
+
+    my $meta = $self->meta;
+    my $raw  = $self->raw;
+
+    # rudimentary is object test - if it's blessed it'll
+    # inherit from UNIVERSAL
+    $meta->{is_object} = UNIVERSAL::isa( $raw, 'UNIVERSAL' ) ? 1 : 0;
+
+    if ( $meta->{is_object} ) {
+        $meta->{class} = ref($raw);
+    }
+    else {
+        my $ref = lc( ref($raw) );
+        $meta->{"is_$ref"} = 1;
+    }
+
+    if ( $meta->{is_scalar} ) {
+        my $source = $$raw;
+        $meta->{length} = length($$raw);
+        $meta->{has_newlines} = $$raw =~ /\n/ ? 1 : 0;
+
+        # only do file checks if it looks like a filename
+        if ( !$meta->{has_newlines} and $meta->{length} < 1024 ) {
+            my $file = {};
+            $file->{exists} = -e $source ? 1 : 0;
+            if ( $file->{exists} ) {
+                $meta->{file} = $file;
+
+                # avoid extra system calls (see `perldoc -f -X`)
+                $file->{stat}    = [ stat(_) ];
+                $file->{empty}   = -z _ ? 1 : 0;
+                $file->{size}    = -s _;
+                $file->{text}    = -T _ ? 1 : 0;
+                $file->{binary}  = -B _ ? 1 : 0;
+                $file->{read}    = -r _ ? 1 : 0;
+                $file->{write}   = -w _ ? 1 : 0;
+                $file->{execute} = -x _ ? 1 : 0;
+                $file->{setuid}  = -u _ ? 1 : 0;
+                $file->{setgid}  = -g _ ? 1 : 0;
+                $file->{sticky}  = -k _ ? 1 : 0;
+
+                $meta->{is_file} = $file->{is_file} = -f _ ? 1 : 0;
+                $meta->{is_dir}  = $file->{is_dir}  = -d _ ? 1 : 0;
+
+                # symlink check requires another system call
+                $meta->{is_symlink} = $file->{is_symlink}
+                  = -l $source ? 1 : 0;
+                if ( $file->{is_symlink} ) {
+                    $file->{lstat} = [ lstat(_) ];
+                }
+
+                # put together some common info about the file
+                ( $file->{basename}, $file->{dir}, $file->{ext} )
+                  = map { defined $_ ? $_ : '' }
+                  fileparse( $source, qr/\.[^.]*/ );
+                $file->{lc_ext} = lc( $file->{ext} );
+                $file->{basename} .= $file->{ext} if $file->{ext};
+
+                if ( $file->{text} and $file->{read} ) {
+                    eval { $file->{shebang} = $self->_read_shebang($$raw); };
+                    if ( my $e = $@ ) {
+                        warn $e;
+                    }
+                }
+            }
+        }
+    }
+    elsif ( $meta->{is_array} ) {
+        $meta->{size} = $#$raw + 1;
+    }
+    elsif ( $meta->{is_hash} ) {
+        ;    # do nothing
+    }
+
+    return $meta;
+}
+
+=head3 C<shebang>
+
+Get the shebang line for a script file.
+
+  my $shebang = TAP::Parser::Source->shebang( $some_script );
+
+May be called as a class method
+
+=cut
+
+{
+
+    # Global shebang cache.
+    my %shebang_for;
+
+    sub _read_shebang {
+        my ( $self, $file ) = @_;
+        my $shebang;
+        local *TEST;
+        if ( open( TEST, $file ) ) {
+            $shebang = <TEST>;
+            chomp $shebang;
+            close(TEST) or die "Can't close $file. $!\n";
+        }
+        else {
+            die "Can't open $file. $!\n";
+        }
+        return $shebang;
+    }
+
+    sub shebang {
+        my ( $class, $file ) = @_;
+        $shebang_for{$file} = $class->_read_shebang($file)
+          unless exists $shebang_for{$file};
+        return $shebang_for{$file};
+    }
+}
+
+=head3 C<config_for>
+
+  my $config = $source->config_for( $class );
+
+Returns L</config> for the $class given.  Class names may be fully qualified
+or abbreviated, eg:
+
+  # these are equivalent
+  $source->config_for( 'Perl' );
+  $source->config_for( 'TAP::Parser::SourceHandler::Perl' );
+
+If a fully qualified $class is given, its abbreviated version is checked first.
+
+=cut
+
+sub config_for {
+    my ( $self, $class ) = @_;
+    my ($abbrv_class) = ( $class =~ /(?:\:\:)?(\w+)$/ );
+    my $config = $self->config->{$abbrv_class} || $self->config->{$class};
+    return $config;
 }
 
 1;
 
 __END__
 
-=head1 SUBCLASSING
-
-Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview, and any
-of the subclasses that ship with this module as an example.  What follows is
-a quick overview.
-
-Start by familiarizing yourself with L<TAP::Parser::SourceFactory>, and
-L<TAP::Parser::IteratorFactory>.
-
-It's important to point out that if you want your subclass to be automatically
-used by L<TAP::Parser> you'll have to and make sure it gets loaded somehow.
-If you're using L<prove> you can write an L<App::Prove> plugin.  If you're
-using L<TAP::Parser> or L<TAP::Harness> directly (eg. through a custom script,
-or even L<Module::Build>) you can use the C<config> option which will cause
-L<TAP::Parser::SourceFactory/load_sources> to load your subclass).
-
-Don't forget to register your class with
-L<TAP::Parser::SourceFactory/register_source>.
-
-=head2 Example
-
-  package MySource;
-
-  use strict;
-  use vars '@ISA'; # compat with older perls
-
-  use MySource; # see TAP::Parser::Source
-  use TAP::Parser::SourceFactory;
-
-  @ISA = qw( TAP::Parser::Source );
-
-  TAP::Parser::SourceFactory->register_source( __PACKAGE__ );
-
-  sub can_handle {
-      my ($class, $raw_source_ref, $meta, $config) = @_;
-
-      if ($config->{accept_all}) {
-          return 1.0;
-      } elsif (my $file = $meta->{file}) {
-          return 0.0 unless $file->{exists};
-          return 1.0 if $file->{lc_ext} eq '.tap';
-          return 0.9 if $file->{text};
-          return 0.1 if $file->{binary};
-      } elsif ($meta->{scalar}) {
-          return 0.9 if $meta->{has_newlines};
-          return 0.8 if $$raw_source_ref =~ /\d\.\.\d/;
-      } elsif ($meta->{array}) {
-          return 0.8 if $meta->{size} < 5;
-          return 0.6 if $raw_source_ref->[0] =~ /foo/;
-          return 0.5;
-      } elsif ($meta->{hash}) {
-          return 0.6 if $raw_source_ref->{foo};
-          return 0.2;
-      }
-
-      return 0;
-  }
-
-  sub make_source {
-      my ($class, $args) = @_;
-      my $source = MySource->new;
-      # do anything special here...
-      $source->merge( $args->{merge} );
-             ->raw_source( $args->{raw_source_ref} );
-      return $source;
-  }
-
-  sub get_stream {
-      my ($self, $factory) = @_;
-      return $factory->make_iterator( $self->source );
-  }
-
-  1;
-
 =head1 AUTHORS
 
-TAPx Developers.
-
-Source detection stuff added by Steve Purkis
+Steve Purkis.
 
 =head1 SEE ALSO
 
 L<TAP::Object>,
 L<TAP::Parser>,
-L<TAP::Parser::SourceFactory>,
-L<TAP::Parser::Source::Executable>,
-L<TAP::Parser::Source::Perl>,
-L<TAP::Parser::Source::File>,
-L<TAP::Parser::Source::Handle>,
-L<TAP::Parser::Source::RawTAP>
+L<TAP::Parser::IteratorFactory>,
+L<TAP::Parser::SourceHandler>
 
 =cut
-

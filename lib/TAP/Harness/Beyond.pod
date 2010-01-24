@@ -194,9 +194,18 @@ in random or reversed order.
 
 =head2 Rolling My Own
 
-If I need a feature that prove doesn't provide I can easily write
-my own test harness; one of the motives for the 3.00 rewrite of
-Test::Harness was to make it easier to subclass and extend.
+If I need a feature that prove doesn't provide I can easily write my own.
+
+Typically you'll want to change how TAP gets I<input> into and I<output>
+from the parser.  L<App::Prove> supports arbitrary plugins, and L<TAP::Harness>
+supports custom I<formatters> and I<source handlers> that you can load using
+either L<prove> or L<Module::Build>; there are many examples to base mine on.
+For more details see L<App::Prove>, L<TAP::Parser::SourceHandler>, and
+L<TAP::Formatter::Base>.
+
+If writing a plugin is not enough, you can write your own test harness; one of
+the motives for the 3.00 rewrite of Test::Harness was to make it easier to
+subclass and extend.
 
 The Test::Harness module is a compatibility wrapper around TAP::Harness.
 For new applications I should use TAP::Harness directly. As we'll
@@ -311,8 +320,7 @@ creates a grammar (TAP::Parser::Grammar) to decode the raw TAP into
 tokens, a result factory (TAP::Parser::ResultFactory) to turn the
 decoded TAP results into objects and, depending on whether it's
 running a test script or reading TAP from a file, scalar or array
-a source (TAP::Parser::Source, TAP::Parser::Source::Perl) or an
-iterator (TAP::Parser::IteratorFactory).
+a source or an iterator (TAP::Parser::IteratorFactory).
 
 Each of these objects may be replaced by calling one of these parser
 methods:

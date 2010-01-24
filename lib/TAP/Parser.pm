@@ -3,18 +3,18 @@ package TAP::Parser;
 use strict;
 use vars qw($VERSION @ISA);
 
-use TAP::Base                       ();
-use TAP::Parser::Grammar            ();
-use TAP::Parser::Result             ();
-use TAP::Parser::ResultFactory      ();
-use TAP::Parser::Source::Executable ();
-use TAP::Parser::Source::Perl       ();
-use TAP::Parser::Source::File       ();
-use TAP::Parser::Source::RawTAP     ();
-use TAP::Parser::Source::Handle     ();
-use TAP::Parser::Iterator           ();
-use TAP::Parser::IteratorFactory    ();
-use TAP::Parser::SourceFactory      ();
+use TAP::Base                              ();
+use TAP::Parser::Grammar                   ();
+use TAP::Parser::Result                    ();
+use TAP::Parser::ResultFactory             ();
+use TAP::Parser::Source                    ();
+use TAP::Parser::Iterator                  ();
+use TAP::Parser::IteratorFactory           ();
+use TAP::Parser::SourceHandler::Executable ();
+use TAP::Parser::SourceHandler::Perl       ();
+use TAP::Parser::SourceHandler::File       ();
+use TAP::Parser::SourceHandler::RawTAP     ();
+use TAP::Parser::SourceHandler::Handle     ();
 
 use Carp qw( confess );
 
@@ -24,11 +24,11 @@ TAP::Parser - Parse L<TAP|Test::Harness::TAP> output
 
 =head1 VERSION
 
-Version 3.18
+Version 3.21
 
 =cut
 
-$VERSION = '3.18';
+$VERSION = '3.21';
 
 my $DEFAULT_TAP_VERSION = 12;
 my $MAX_TAP_VERSION     = 14;
@@ -46,7 +46,7 @@ BEGIN {    # making accessors
 
     __PACKAGE__->mk_methods(
         qw(
-          _stream
+          _iterator
           _spool
           _nesting
           exec
@@ -61,14 +61,16 @@ BEGIN {    # making accessors
           start_time
           end_time
           skip_all
-          source_class
-          perl_source_class
           grammar_class
-          iterator_factory_class
           result_factory_class
-          source_factory_class
+          iterator_factory_class
           )
     );
+
+    sub _stream {    # deprecated
+        my $self = shift;
+        $self->_iterator(@_);
+    }
 }    # done making accessors
 
 =head1 SYNOPSIS
@@ -111,47 +113,89 @@ The arguments should be a hashref with I<one> of the following keys:
 
 =item * C<source>
 
-I<TODO:> rewrite this when L<TAP::Parser::SourceFactory> is finished.
+I<CHANGED in 3.18>
 
-This is the preferred method of passing arguments to the constructor.  To
-determine how to handle the source, the following steps are taken.
+This is the preferred method of passing input to the constructor.
 
-If the source contains a newline, it's assumed to be a string of raw TAP
-output.
+The C<source> is used to create a L<TAP::Parser::Source> that is passed to the
+L</iterator_factory_class> which in turn figures out how to handle the source and
+creates a <TAP::Parser::Iterator> for it.  The iterator is used by the parser to
+read in the TAP stream.
 
-If the source is a reference, it's assumed to be something to pass to
-the L<TAP::Parser::Iterator::Stream> constructor. This is used
-internally and you should not use it.
+To configure the I<IteratorFactory> use the C<sources> parameter below.
 
-Otherwise, the parser does a C<-e> check to see if the source exists.  If so,
-it attempts to execute the source and read the output as a stream.  This is by
-far the preferred method of using the parser.
-
- foreach my $file ( @test_files ) {
-     my $parser = TAP::Parser->new( { source => $file } );
-     # do stuff with the parser
- }
+Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 
 =item * C<tap>
 
+I<CHANGED in 3.18>
+
 The value should be the complete TAP output.
+
+The I<tap> is used to create a L<TAP::Parser::Source> that is passed to the
+L</iterator_factory_class> which in turn figures out how to handle the source and
+creates a <TAP::Parser::Iterator> for it.  The iterator is used by the parser to
+read in the TAP stream.
+
+To configure the I<IteratorFactory> use the C<sources> parameter below.
+
+Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 
 =item * C<exec>
 
-If passed an array reference, will attempt to create the iterator by
-passing a L<TAP::Parser::Source::Executable> object to
-L<TAP::Parser::Iterator::Source>, using the array reference strings as
-the command arguments to L<IPC::Open3::open3|IPC::Open3>:
+Must be passed an array reference.
+
+The I<exec> array ref is used to create a L<TAP::Parser::Source> that is passed
+to the L</iterator_factory_class> which in turn figures out how to handle the
+source and creates a <TAP::Parser::Iterator> for it.  The iterator is used by
+the parser to read in the TAP stream.
+
+By default the L<TAP::Parser::SourceHandler::Executable> class will create a
+L<TAP::Parser::Iterator::Process> object to handle the source.  This passes the
+array reference strings as command arguments to L<IPC::Open3::open3|IPC::Open3>:
 
  exec => [ '/usr/bin/ruby', 't/my_test.rb' ]
 
-Note that C<source> and C<exec> are mutually exclusive.
+If any C<test_args> are given they will be appended to the end of the command
+argument list.
+
+To configure the I<IteratorFactory> use the C<sources> parameter below.
+
+Note that C<source>, C<tap> and C<exec> are I<mutually exclusive>.
 
 =back
 
 The following keys are optional.
 
 =over 4
+
+=item * C<sources>
+
+I<NEW to 3.18>.
+
+If set, C<sources> must be a hashref containing the names of the
+L<TAP::Parser::SourceHandler>s to load and/or configure.  The values are a
+hash of configuration that will be accessible to to the source handlers via
+L<TAP::Parser::Source/config_for>.
+
+For example:
+
+  sources => {
+    Perl => { exec => '/path/to/custom/perl' },
+    File => { extensions => [ '.tap', '.txt' ] },
+    MyCustom => { some => 'config' },
+  }
+
+This will cause C<TAP::Parser> to pass custom configuration to two of the built-
+in source handlers - L<TAP::Parser::SourceHandler::Perl>,
+L<TAP::Parser::SourceHandler::File> - and attempt to load the C<MyCustom>
+class.  See L<TAP::Parser::IteratorFactory/load_handlers> for more detail.
+
+The C<sources> parameter affects how C<source>, C<tap> and C<exec> parameters
+are handled.
+
+See L<TAP::Parser::IteratorFactory>, L<TAP::Parser::SourceHandler> and subclasses for
+more details.
 
 =item * C<callback>
 
@@ -167,7 +211,7 @@ with the result as the argument if the C<run> method is used:
  );
 
  my $aggregator = TAP::Parser::Aggregator->new;
- foreach my $file ( @test_files ) {
+ for my $file ( @test_files ) {
      my $parser = TAP::Parser->new(
          {
              source    => $file,
@@ -190,8 +234,8 @@ be used when invoking the perl executable.
 
 =item * C<test_args>
 
-Used in conjunction with the C<source> option to supply a reference to
-an C<@ARGV> style array of arguments to pass to the test program.
+Used in conjunction with the C<source> and C<exec> option to supply a reference
+to an C<@ARGV> style array of arguments to pass to the test program.
 
 =item * C<spool>
 
@@ -209,67 +253,12 @@ allow exact synchronization.
 Subtleties of this behavior may be platform-dependent and may change in
 the future.
 
-=item * C<sources>
-
-I<Experimental>.
-
-If set, C<sources> must be a hashref containing the names of the
-L<TAP::Parser::Source> subclasses you want to load and/or configure.  The
-values should contain a hash of configuration that will be passed to the
-source class during source detection and creation (ie: the methods
-L<TAP::Parser::Source/can_handle> and L<TAP::Parser::Source/make_source>).
-
-For example:
-
-  sources => {
-    Perl => { exec => '/path/to/custom/perl' },
-    File => { extensions => [ '.tap', '.txt' ] },
-    MyCustom => { some => 'config' },
-  }
-
-Will cause C<TAP::Parser> to pass custom configuration to two of the TAP
-sources that ship with this module - L<TAP::Parser::Source::Perl> and
-L<TAP::Parser::Source::File>.  It will also attempt to load the C<MyCustom>
-class by looking in C<@INC> for it in this order:
-
-  TAP::Parser::Source::MyCustom
-  MyCustom
-
-See L<TAP::Parser::SourceFactory>, L<TAP::Parser::Source> and subclasses for
-more details.
-
-=item * C<source_class>
-
-I<DEPRECATED> - no longer used.
-
-This option was introduced to let you easily customize which I<source> class
-the parser should use.  It defaults to L<TAP::Parser::Source::Executable>.
-
-See also L</make_source>.
-
-=item * C<perl_source_class>
-
-I<DEPRECATED> - no longer used.
-
-This option was introduced to let you easily customize which I<perl source>
-class the parser should use.  It defaults to L<TAP::Parser::Source::Perl>.
-
-See also L</make_perl_source>.
-
 =item * C<grammar_class>
 
 This option was introduced to let you easily customize which I<grammar> class
 the parser should use.  It defaults to L<TAP::Parser::Grammar>.
 
 See also L</make_grammar>.
-
-=item * C<iterator_factory_class>
-
-This option was introduced to let you easily customize which I<iterator>
-factory class the parser should use.  It defaults to
-L<TAP::Parser::IteratorFactory>.
-
-See also L</make_iterator>.
 
 =item * C<result_factory_class>
 
@@ -279,13 +268,13 @@ L<TAP::Parser::ResultFactory>.
 
 See also L</make_result>.
 
-=item * C<source_factory_class>
+=item * C<iterator_factory_class>
 
-I<NEW>.
+I<CHANGED in 3.18>
 
-This option was introduced to let you easily customize which I<source>
+This option was introduced to let you easily customize which I<iterator>
 factory class the parser should use.  It defaults to
-L<TAP::Parser::SourceFactory>.
+L<TAP::Parser::IteratorFactory>.
 
 =back
 
@@ -294,12 +283,9 @@ L<TAP::Parser::SourceFactory>.
 # new() implementation supplied by TAP::Base
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub _default_source_class {'TAP::Parser::Source::Executable'}    # deprecated
-sub _default_perl_source_class {'TAP::Parser::Source::Perl'}     # deprecated
-sub _default_grammar_class     {'TAP::Parser::Grammar'}
-sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
+sub _default_grammar_class          {'TAP::Parser::Grammar'}
 sub _default_result_factory_class   {'TAP::Parser::ResultFactory'}
-sub _default_source_factory_class   {'TAP::Parser::SourceFactory'}
+sub _default_iterator_factory_class {'TAP::Parser::IteratorFactory'}
 
 ##############################################################################
 
@@ -347,38 +333,12 @@ sub run {
 
 ##############################################################################
 
-=head3 C<make_source>
-
-I<DEPRECATED> - no longer used.
-
-Make a new L<TAP::Parser::Source::Executable> object and return it.  Passes through any
-arguments given.
-
-The C<source_class> can be customized, as described in L</new>.
-
-=head3 C<make_perl_source>
-
-I<DEPRECATED> - no longer used.
-
-Make a new L<TAP::Parser::Source::Perl> object and return it.  Passes through
-any arguments given.
-
-The C<perl_source_class> can be customized, as described in L</new>.
-
 =head3 C<make_grammar>
 
 Make a new L<TAP::Parser::Grammar> object and return it.  Passes through any
 arguments given.
 
 The C<grammar_class> can be customized, as described in L</new>.
-
-=head3 C<make_iterator>
-
-Make a new L<TAP::Parser::Iterator> object using the parser's
-L<TAP::Parser::IteratorFactory>, and return it.  Passes through any arguments
-given.
-
-The C<iterator_factory_class> can be customized, as described in L</new>.
 
 =head3 C<make_result>
 
@@ -388,22 +348,21 @@ given.
 
 The C<result_factory_class> can be customized, as described in L</new>.
 
-=head3 C<make_source_factory>
+=head3 C<make_iterator_factory>
 
-Make a new L<TAP::Parser::SourceFactory> object and return it.  Passes through
+I<NEW to 3.18>.
+
+Make a new L<TAP::Parser::IteratorFactory> object and return it.  Passes through
 any arguments given.
 
-C<source_factory_class> can be customized, as described in L</new>.
+C<iterator_factory_class> can be customized, as described in L</new>.
 
 =cut
 
 # This should make overriding behaviour of the Parser in subclasses easier:
-sub make_source         { shift->source_class->new(@_); }         # deprecated
-sub make_perl_source    { shift->perl_source_class->new(@_); }    # deprecated
-sub make_source_factory { shift->source_factory_class->new(@_); }
-sub make_grammar        { shift->grammar_class->new(@_); }
-sub make_iterator { shift->iterator_factory_class->make_iterator(@_); }
-sub make_result   { shift->result_factory_class->make_result(@_); }
+sub make_iterator_factory { shift->iterator_factory_class->new(@_); }
+sub make_grammar          { shift->grammar_class->new(@_); }
+sub make_result           { shift->result_factory_class->make_result(@_); }
 
 {
 
@@ -442,19 +401,16 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
     );
 
     my @class_overrides = qw(
-      source_class
-      perl_source_class
       grammar_class
-      iterator_factory_class
       result_factory_class
-      source_factory_class
+      iterator_factory_class
     );
 
     sub _initialize {
         my ( $self, $arg_for ) = @_;
 
         # everything here is basically designed to convert any TAP source to a
-        # stream.
+        # TAP::Parser::Iterator.
 
         # Shallow copy
         my %args = %{ $arg_for || {} };
@@ -468,7 +424,8 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
             $self->$key($val);
         }
 
-        my $stream      = delete $args{stream};
+        my $iterator = delete $args{iterator};
+        $iterator ||= delete $args{stream};    # deprecated
         my $tap         = delete $args{tap};
         my $raw_source  = delete $args{source};
         my $sources     = delete $args{sources};
@@ -479,9 +436,9 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
         my $ignore_exit = delete $args{ignore_exit};
         my $test_args   = delete $args{test_args} || [];
 
-        if ( 1 < grep {defined} $stream, $tap, $raw_source, $exec ) {
+        if ( 1 < grep {defined} $iterator, $tap, $raw_source, $exec ) {
             $self->_croak(
-                "You may only choose one of 'exec', 'stream', 'tap' or 'source'"
+                "You may only choose one of 'exec', 'tap', 'source' or 'iterator'"
             );
         }
 
@@ -490,41 +447,41 @@ sub make_result   { shift->result_factory_class->make_result(@_); }
         }
 
         # convert $tap & $exec to $raw_source equiv.
-        my $raw_source_ref;
+        my $type   = '';
+        my $source = TAP::Parser::Source->new;
         if ($tap) {
-            $raw_source_ref = \$tap;
+            $type = 'raw TAP';
+            $source->raw( \$tap );
         }
         elsif ($exec) {
-            $raw_source_ref = { exec => [ @$exec, @$test_args ] };
+            $type = 'exec ' . $exec->[0];
+            $source->raw( { exec => [ @$exec, @$test_args ] } );
         }
         elsif ($raw_source) {
-            $raw_source_ref = ref($raw_source) ? $raw_source : \$raw_source;
+            $type = 'source ' . ref($raw_source) || $raw_source;
+            $source->raw( ref($raw_source) ? $raw_source : \$raw_source );
+        }
+        elsif ($iterator) {
+            $type = 'iterator ' . ref($iterator);
         }
 
-        if ($raw_source_ref) {
-            my $src_factory = $self->make_source_factory($sources);
-            my $source      = $src_factory->make_source(
-                {   raw_source_ref => $raw_source_ref,
-                    merge          => $merge,
-                    switches       => $switches,
-                    test_args      => $test_args
-                }
-            );
-
-            # TODO: replace this with something like:
-            # my $stream = $source->get_stream;  # notice no "( $self )"
-            $stream = $source->get_stream($self);
+        if ( $source->raw ) {
+            my $src_factory = $self->make_iterator_factory($sources);
+            $source->merge($merge)->switches($switches)
+              ->test_args($test_args);
+            $iterator = $src_factory->make_iterator($source);
         }
 
-        unless ($stream) {
-            $self->_croak('PANIC: could not determine stream');
+        unless ($iterator) {
+            $self->_croak(
+                "PANIC: could not determine iterator for input $type");
         }
 
         while ( my ( $k, $v ) = each %initialize ) {
             $self->{$k} = 'ARRAY' eq ref $v ? [] : $v;
         }
 
-        $self->_stream($stream);
+        $self->_iterator($iterator);
         $self->_spool($spool);
         $self->ignore_exit($ignore_exit);
 
@@ -1387,23 +1344,23 @@ determine the readiness of this parser.
 
 =cut
 
-sub get_select_handles { shift->_stream->get_select_handles }
+sub get_select_handles { shift->_iterator->get_select_handles }
 
 sub _grammar {
     my $self = shift;
     return $self->{_grammar} = shift if @_;
 
     return $self->{_grammar} ||= $self->make_grammar(
-        {   stream  => $self->_stream,
-            parser  => $self,
-            version => $self->version
+        {   iterator => $self->_iterator,
+            parser   => $self,
+            version  => $self->version
         }
     );
 }
 
 sub _iter {
     my $self        = shift;
-    my $stream      = $self->_stream;
+    my $iterator    = $self->_iterator;
     my $grammar     = $self->_grammar;
     my $spool       = $self->_spool;
     my $nesting     = $self->_nesting;
@@ -1441,8 +1398,8 @@ sub _iter {
 
     # Handle end of stream - which means either pop a block or finish
     my $end_handler = sub {
-        $self->exit( $stream->exit );
-        $self->wait( $stream->wait );
+        $self->exit( $iterator->exit );
+        $self->wait( $iterator->wait );
         $self->_finish;
         return;
     };
@@ -1505,7 +1462,7 @@ sub _finish {
     $self->end_time( $self->get_time );
 
     # Avoid leaks
-    $self->_stream(undef);
+    $self->_iterator(undef);
     $self->_grammar(undef);
 
     # If we just delete the iter we won't get a fault if it's recreated.
@@ -1579,7 +1536,7 @@ result as its argument.
  );
 
  my $aggregator = TAP::Parser::Aggregator->new;
- foreach my $file ( @test_files ) {
+ for my $file ( @test_files ) {
      my $parser = TAP::Parser->new(
          {
              source    => $file,
@@ -1732,7 +1689,7 @@ never run. They're reported as parse failures (tests out of sequence).
 
 If you find you need to provide custom functionality (as you would have using
 L<Test::Harness::Straps>), you're in luck: C<TAP::Parser> and friends are
-designed to be easily subclassed.
+designed to be easily plugged-into and/or subclassed.
 
 Before you start, it's important to know a few things:
 
@@ -1755,7 +1712,8 @@ This makes it possible for you to have a single point of configuring what
 subclasses should be used, which in turn means that in many cases you'll find
 you only need to sub-class one of the parser's components.
 
-The sole exception to this rule are I<Sources>, see below.
+The exception to this rule are I<SourceHandlers> & I<Iterators>, but those are
+both created with customizeable I<IteratorFactory>.
 
 =item 4
 
@@ -1771,39 +1729,41 @@ deprecated first, and changed in a later release.
 
 =head3 Sources
 
-A TAP parser consumes input from a single I<source> of TAP, which could come
+A TAP parser consumes input from a single I<raw source> of TAP, which could come
 from anywhere (a file, an executable, a database, an io handle, a uri, etc..).
-A L<TAP::Parser::SourceFactory> is used to determine the type of a so-called
-'raw' source, and create L<TAP::Parser::Source> objects which then stream the
-TAP to the parser by way of L</Iterators>.
-
-There are quite a few I<Sources> available, 
+The source gets bundled up in a L<TAP::Parser::Source> object which gathers some
+meta data about it.  The parser then uses a L<TAP::Parser::IteratorFactory> to
+determine which L<TAP::Parser::SourceHandler> to use to turn the raw source
+into a stream of TAP by way of L</Iterators>.
 
 If you simply want C<TAP::Parser> to handle a new source of TAP you probably
-don't need to subclass C<TAP::Parser> itself.  Rather, you'll need to create
-new L<TAP::Parser::Source> classes, and simply plug them into the parser (see
-L</new> for details).  To write one read L<TAP::Parser::SourceFactory> to get
-a feel for how the system works.
+don't need to subclass C<TAP::Parser> itself.  Rather, you'll need to create a
+new L<TAP::Parser::SourceHandler> class, and just plug it into the parser using
+the I<sources> param to L</new>.  Before you start writing one, read through
+L<TAP::Parser::IteratorFactory> to get a feel for how the system works first.
 
-If you find you really need to use your own source factory, set
-L</source_factory_class>.  If you need to customize the objects on creation,
-subclass L<TAP::Parser> and override L</make_source_factory>.
+If you find you really need to use your own iterator factory you can still do
+so without sub-classing C<TAP::Parser> by setting L</iterator_factory_class>.
 
-Note that L</make_source> & L</make_perl_source> are now I<DEPRECATED>.
+If you just need to customize the objects on creation, subclass L<TAP::Parser>
+and override L</make_iterator_factory>.
+
+Note that L</make_source> & L</make_perl_source> have been I<DEPRECATED> and
+are now removed.
 
 =head3 Iterators
 
-A TAP parser uses I<iterators> to loop through the I<stream> provided by the
-parser's I<source>.  There are a few types of Iterators available, choosing
-which class to use is the responsibility of the I<iterator factory>.
+A TAP parser uses I<iterators> to loop through the I<stream> of TAP read in
+from the I<source> it was given.  There are a few types of Iterators available
+by default, all sub-classes of L<TAP::Parser::Iterator>.  Choosing which
+iterator to use is the responsibility of the I<siterator factory>, though it
+simply delegates to the I<Source Handler> it uses.
 
-To create your own iterators you'll have to subclass L<TAP::Parser::Iterator>
-and L<TAP::Parser::IteratorFactory>.  Then you'll need to customize the class
-used by your parser by setting the C<iterator_factory_class> parameter.
-See L</new> for more details.
+If you're writing your own L<TAP::Parser::SourceHandler>, you may need to
+create your own iterators too.  If so you'll need to subclass
+L<TAP::Parser::Iterator>.
 
-If you need to customize the objects on creation, subclass L<TAP::Parser> and
-override L</make_iterator>.
+Note that L</make_iterator> has been I<DEPRECATED> and is now removed.
 
 =head3 Results
 
@@ -1890,6 +1850,8 @@ support, or just words of encouragement have all been forthcoming.
 
 =item * Alex Vandiver
 
+=item * Cosimo Streppone
+
 =back
 
 =head1 AUTHORS
@@ -1908,6 +1870,8 @@ Steve Purkis <spurkis@cpan.org>
 
 Nicholas Clark <nick@ccl4.org>
 
+Lee Johnson <notfadeaway at btinternet dot com>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to
@@ -1919,7 +1883,7 @@ progress on your bug as we make changes.
 Obviously, bugs which include patches are best. If you prefer, you can
 patch against bleed by via anonymous checkout of the latest version:
 
- svn checkout http://svn.hexten.net/tapx
+ git clone git://github.com/AndyA/Test-Harness.git
 
 =head1 COPYRIGHT & LICENSE
 

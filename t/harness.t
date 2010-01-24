@@ -64,9 +64,9 @@ is $@, '', '... and calling it with non-existent libs is fine';
 ok my $harness = $HARNESS->new,
   'Calling new() without arguments should succeed';
 
-foreach my $test_args ( get_arg_sets() ) {
+for my $test_args ( get_arg_sets() ) {
     my %args = %$test_args;
-    foreach my $key ( sort keys %args ) {
+    for my $key ( sort keys %args ) {
         $args{$key} = $args{$key}{in};
     }
     ok my $harness = $HARNESS->new( {%args} ),
@@ -528,6 +528,8 @@ foreach my $test_args ( get_arg_sets() ) {
 SKIP: {
 
     my $cat = '/bin/cat';
+
+    # TODO: use TYPE on win32?
     unless ( -e $cat ) {
         skip "no '$cat'", 2;
     }
@@ -719,7 +721,7 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             sources   => {
-                MyFileSource => { extensions => ['.1'] },
+                MyFileSourceHandler => { extensions => ['.1'] },
             },
         }
     );
@@ -730,14 +732,16 @@ SKIP: {
     ok( !$e, 'no error on load custom source' ) || diag($e);
 
     no warnings 'once';
-    can_ok( 'MyFileSource', 'new' );
-    ok( $main::INIT{MyFileSource}, '... and an obj was instantiated' );
-
-    my $source = $MyFileSource::LAST_OBJ || {};
-    isa_ok( $source, 'MyFileSource', '... and MyFileSource obj was created' );
-    is( $source->raw_source, $source_test,
-        '... and has the right raw_source'
+    can_ok( 'MyFileSourceHandler', 'make_iterator' );
+    ok( $MyFileSourceHandler::CAN_HANDLE,
+        '... MyFileSourceHandler->can_handle was called'
     );
+    ok( $MyFileSourceHandler::MAKE_ITER,
+        '... MyFileSourceHandler->make_iterator was called'
+    );
+
+    my $raw_source = eval { ${ $MyFileSourceHandler::LAST_SOURCE->raw } };
+    is( $raw_source, $source_test, '... used the right source' );
 
     my @output = tied($$capture)->dump;
     my $status = pop(@output) || '';
