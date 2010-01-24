@@ -3,6 +3,8 @@ Revision history for Test-Harness
 3.21    ????-??-??
         - Add test to ensure we're not depending on a module we no
           longer ship.
+        - Fix up skip counts for Windows case - tests were failing
+          on Windows.
 
 3.20    2009-01-22
         - Remove references / dependency on TAP::Parser::Source::Perl
