@@ -16,6 +16,7 @@ use Test::More;
 use File::Spec;
 
 use App::Prove;
+use Getopt::Long;
 
 package FakeProve;
 use vars qw( @ISA );
@@ -1113,10 +1114,10 @@ BEGIN {    # START PLAN
             ],
         },
 
-        {   name        => 'Switch --sources with config',
-            args        => { argv => [qw( one two three )] },
-            skip        => $HAS_YAML ? 0 : 1,
-            skip_reason => "YAML not available",
+        {   name => 'Switch --sources with config',
+            args => { argv => [qw( one two three )] },
+            skip => $Getopt::Long::VERSION >= 2.28 && $HAS_YAML ? 0 : 1,
+            skip_reason => "YAML not available or Getopt::Long too old",
             switches    => [
                 '--source',      'Perl',
                 '--perl-option', 'foo=bar baz',
