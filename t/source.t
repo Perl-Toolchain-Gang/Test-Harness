@@ -236,7 +236,7 @@ use_ok('TAP::Parser::Source');
 # symlink test
 SKIP: {
     my $symlink_exists = eval { symlink( '', '' ); 1 };
-    skip 'symlink not supported on this platform', 6 unless $symlink_exists;
+    skip 'symlink not supported on this platform', 9 unless $symlink_exists;
 
     my $test    = File::Spec->catfile( $dir, 'source.t' );
     my $symlink = File::Spec->catfile( $dir, 'source_link.T' );
