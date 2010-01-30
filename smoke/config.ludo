@@ -1,0 +1,49 @@
+---
+global:
+  perls:
+    - /home/andy/Works/Perl/versions/5.6.1
+    - /home/andy/Works/Perl/versions/5.6.2
+    - /home/andy/Works/Perl/versions/5.8.0
+    - /home/andy/Works/Perl/versions/5.8.1
+    - /home/andy/Works/Perl/versions/5.8.2
+    - /home/andy/Works/Perl/versions/5.8.3
+    - /home/andy/Works/Perl/versions/5.8.4
+    - /home/andy/Works/Perl/versions/5.8.5
+    - /home/andy/Works/Perl/versions/5.8.6
+    - /home/andy/Works/Perl/versions/5.8.7
+    - /home/andy/Works/Perl/versions/5.8.8
+    - /home/andy/Works/Perl/versions/5.8.9
+    - /home/andy/Works/Perl/versions/5.10.0
+    - /home/andy/Works/Perl/versions/5.10.1
+    - /home/andy/Works/Perl/versions/5.11.3
+  status: /home/andy/.smoke-tapx
+  svn: /usr/bin/svn
+  git: /usr/bin/git
+  rsync: /usr/bin/rsync
+  shell: /bin/bash
+  work: /home/andy/.smoke-work
+  description: CentOS 5.4 box
+tasks:
+  - mailto:
+      - email:
+          - tapx-commit@hexten.net
+          - tapx-dev@hexten.net
+        filter: failed
+        verbose: 1
+      - email:
+          - tapx-commit@hexten.net
+          - tapx-dev@hexten.net
+        filter: summary
+    name: Test::Harness
+    script:
+      - yes n | %PERL% Makefile.PL
+      - make
+      - make test
+      - make distclean
+      - yes n | %PERL% Build.PL
+      - ./Build
+      - ./Build testauthor
+      - ./Build testprove
+      - ./Build distclean
+    subdir: Test-Harness
+    git: git://github.com/AndyA/Test-Harness.git
