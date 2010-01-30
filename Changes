@@ -1,25 +1,25 @@
 Revision history for Test-Harness
 
-3.21    ????-??-??
+3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no
           longer ship.
         - Fix up skip counts for Windows case - tests were failing
           on Windows.
 
-3.20    2009-01-22
+3.20    2010-01-22
         - Remove references / dependency on TAP::Parser::Source::Perl
 
-3.19    2009-01-20
+3.19    2010-01-20
         - Avoid depending on Module::Build. The resulting circular
           dependency made it impossible to install Test::Harness and/or
           Module::Build in some cases.
 
-3.18    2009-01-19
+3.18    2010-01-19
         - Handle the case where the filename of the perl executable
           contains space. Thanks to kmx.
         - Various documentation fixes.
 
-3.17_04 2009-??-??
+3.17_04 2010-01-04
         - Fix failures due to unknown location of Perl in t/source_handler.t.
         - Use EUMM style shebang magic to produce an executable 'psql'
           for t/source_handler.t.
