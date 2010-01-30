@@ -1,21 +1,21 @@
 ---
 global:
   perls:
-    - /home/andy/Works/Perl/versions/5.6.1
-    - /home/andy/Works/Perl/versions/5.6.2
-    - /home/andy/Works/Perl/versions/5.8.0
-    - /home/andy/Works/Perl/versions/5.8.1
-    - /home/andy/Works/Perl/versions/5.8.2
-    - /home/andy/Works/Perl/versions/5.8.3
-    - /home/andy/Works/Perl/versions/5.8.4
-    - /home/andy/Works/Perl/versions/5.8.5
-    - /home/andy/Works/Perl/versions/5.8.6
-    - /home/andy/Works/Perl/versions/5.8.7
-    - /home/andy/Works/Perl/versions/5.8.8
-    - /home/andy/Works/Perl/versions/5.8.9
-    - /home/andy/Works/Perl/versions/5.10.0
-    - /home/andy/Works/Perl/versions/5.10.1
-    - /home/andy/Works/Perl/versions/5.11.3
+    - /home/andy/Works/Perl/versions/5.6.1/bin/perl
+    - /home/andy/Works/Perl/versions/5.6.2/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.0/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.1/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.2/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.3/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.4/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.5/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.6/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.7/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.8/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.9/bin/perl
+    - /home/andy/Works/Perl/versions/5.10.0/bin/perl
+    - /home/andy/Works/Perl/versions/5.10.1/bin/perl
+    - /home/andy/Works/Perl/versions/5.11.3/bin/perl
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
   git: /usr/bin/git
