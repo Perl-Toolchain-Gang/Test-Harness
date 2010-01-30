@@ -17,7 +17,7 @@ global:
     - /usr/bin/perl
     - /home/andy/Works/Perl/versions/5.8.9/bin/perl
     - /alt/local/bin/perl
-    - /home/andy/Works/Perl/versions/blead/bin/perl
+    - /home/andy/Works/Perl/versions/5.11.3/bin/perl
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
   git: /usr/bin/git
