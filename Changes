@@ -1,5 +1,10 @@
 Revision history for Test-Harness
 
+3.22
+
+        - Add brief HOWTO for creating and running pgTAP tests to
+          TAP::Parser::SourceHandler::pgTAP.
+
 3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no
           longer ship.
