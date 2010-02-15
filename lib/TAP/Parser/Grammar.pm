@@ -164,7 +164,7 @@ my %language_for;
             },
         },
         bailout => {
-            syntax  => qr/^Bail out!\s*(.*)/,
+            syntax  => qr/^\s*Bail out!\s*(.*)/,
             handler => sub {
                 my ( $self, $line ) = @_;
                 my $explanation = $1;

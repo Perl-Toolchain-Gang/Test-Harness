@@ -1,7 +1,7 @@
 Revision history for Test-Harness
 
 3.22
-
+        - Allow TAP::Parser to recognize a nested BAIL_OUT directive.
         - Add brief HOWTO for creating and running pgTAP tests to
           TAP::Parser::SourceHandler::pgTAP.
 
