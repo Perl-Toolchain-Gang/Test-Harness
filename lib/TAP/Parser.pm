@@ -1309,7 +1309,7 @@ sub _make_state_table {
         UNPLANNED_AFTER_TEST => {
             test => { act  => sub { }, continue => 'UNPLANNED' },
             plan => { act  => sub { }, continue => 'UNPLANNED' },
-            yaml => { goto => 'PLANNED' },
+            yaml => { goto => 'UNPLANNED' },
         },
     );
 
