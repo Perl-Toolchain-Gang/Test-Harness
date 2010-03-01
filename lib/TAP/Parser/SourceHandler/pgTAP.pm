@@ -33,14 +33,14 @@ In F<Build.PL> for your application with pgTAP tests in F<t/*.pg>:
           sources => {
               Perl  => undef,
               pgTAP => {
-                  dbname => 'try',
+                  dbname   => 'try',
                   username => 'postgres',
-                  suffix => '.pg',
+                  suffix   => '.pg',
               },
           }
       },
       build_requires     => {
-          'Module::Build'                      => '0.30',
+          'Module::Build'                     => '0.30',
           'TAP::Parser::SourceHandler::pgTAP' => '3.19',
       },
   )->create_build_script;
@@ -62,7 +62,7 @@ Direct use:
       dbname   => 'testing',
       username => 'postgres',
       suffix   => '.pg',
-  });
+  }});
   $source->assemble_meta;
 
   my $class = 'TAP::Parser::SourceHandler::pgTAP';
