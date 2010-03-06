@@ -504,7 +504,7 @@ stream-based protocol.  In fact, it's quite legal to have an infinite stream.
 For the same reason that we don't apply regexes to streams, we're not using a
 formal grammar here.  Instead, we parse the TAP in lines.
 
-For purposes for forward compatability, any result which does not match the
+For purposes for forward compatibility, any result which does not match the
 following grammar is currently referred to as
 L<TAP::Parser::Result::Unknown>.  It is I<not> a parse error.
 

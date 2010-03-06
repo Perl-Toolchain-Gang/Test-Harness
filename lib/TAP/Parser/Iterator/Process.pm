@@ -13,7 +13,7 @@ my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
 
 =head1 NAME
 
-TAP::Parser::Iterator::Process - Iterator for proccess-based TAP sources
+TAP::Parser::Iterator::Process - Iterator for process-based TAP sources
 
 =head1 VERSION
 

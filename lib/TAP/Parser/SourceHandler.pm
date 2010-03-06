@@ -110,7 +110,7 @@ the easiest sub-class to use an an example.
 It's important to point out that if you want your subclass to be automatically
 used by L<TAP::Parser> you'll have to and make sure it gets loaded somehow.
 If you're using L<prove> you can write an L<App::Prove> plugin.  If you're
-using L<TAP::Parser> or L<TAP::Harness> directly (eg. through a custom script,
+using L<TAP::Parser> or L<TAP::Harness> directly (e.g. through a custom script,
 L<ExtUtils::MakeMaker>, or L<Module::Build>) you can use the C<config> option
 which will cause L<TAP::Parser::IteratorFactory/load_sources> to load your
 subclass).

@@ -53,7 +53,7 @@ In C<.vimrc>, you can add the following lines:
 In other words, if your C<Leader> is a backslash, you can type C<\pt> to
 reformat the file using the C<.perltidyrc>.  If you are in visual mode
 (selecting lines with shift-v), then only the code you have currently have
-selected will be reformattted.
+selected will be reformatted.
 
 =item * emacs
 

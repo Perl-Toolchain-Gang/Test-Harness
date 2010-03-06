@@ -134,7 +134,7 @@ sub _aggregate {
     _aggregate_tests( $harness, $aggregate, @tests );
 }
 
-# Make sure the child seens all the extra junk in @INC
+# Make sure the child sees all the extra junk in @INC
 sub _apply_extra_INC {
     my $harness = shift;
 

@@ -101,7 +101,7 @@ sub directive { shift->{directive} }
   my $explanation = $result->explanation;
 
 If a test had either a C<TODO> or C<SKIP> directive, this method will return
-the accompanying explantion, if present.
+the accompanying explanation, if present.
 
   not ok 17 - 'Pigs can fly' # TODO not enough acid
 
