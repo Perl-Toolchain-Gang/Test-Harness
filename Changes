@@ -6,6 +6,7 @@ Revision history for Test-Harness
           TAP::Parser::SourceHandler::pgTAP.
         - Fix trailing plan + embedded YAML + TAP 13 case. Thanks to
           Steffen Schwigon. #54518.
+        - Numerous spelling fixes. Thanks to Ville Skyttä.
 
 3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no
