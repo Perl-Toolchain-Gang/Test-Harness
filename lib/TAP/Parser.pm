@@ -1849,6 +1849,8 @@ support, or just words of encouragement have all been forthcoming.
 
 =item * Cosimo Streppone
 
+=item * Ville Skyttä
+
 =back
 
 =head1 AUTHORS
