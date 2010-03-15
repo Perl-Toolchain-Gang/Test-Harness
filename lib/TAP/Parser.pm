@@ -425,6 +425,7 @@ sub make_result           { shift->result_factory_class->make_result(@_); }
         my $iterator = delete $args{iterator};
         $iterator ||= delete $args{stream};    # deprecated
         my $tap         = delete $args{tap};
+        my $version     = delete $args{version};
         my $raw_source  = delete $args{source};
         my $sources     = delete $args{sources};
         my $exec        = delete $args{exec};
@@ -479,6 +480,7 @@ sub make_result           { shift->result_factory_class->make_result(@_); }
             $self->{$k} = 'ARRAY' eq ref $v ? [] : $v;
         }
 
+        $self->version($version) if $version;
         $self->_iterator($iterator);
         $self->_spool($spool);
         $self->ignore_exit($ignore_exit);
