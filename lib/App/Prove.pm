@@ -59,7 +59,7 @@ BEGIN {
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
       state_class test_args state dry extension ignore_exit rules state_manager
-      normalize sources
+      normalize sources tapversion
     );
     __PACKAGE__->mk_methods(@ATTR);
 }
@@ -243,6 +243,7 @@ sub process_args {
             'w'           => \$self->{warnings_warn},
             'normalize'   => \$self->{normalize},
             'rules=s@'    => $self->{rules},
+            'tapversion=s' => \$self->{tapversion},
         ) or croak('Unable to continue');
 
         # Stash the remainder of argv for later
@@ -356,6 +357,8 @@ sub _get_args {
     # defined but zero-length exec runs test files as binaries
     $args{exec} = [ split( /\s+/, $self->exec ) ]
       if ( defined( $self->exec ) );
+
+    $args{version} = $self->tapversion if defined( $self->tapversion );
 
     if ( defined( my $test_args = $self->test_args ) ) {
         $args{test_args} = $test_args;
@@ -717,6 +720,8 @@ calling C<run>.
 =item C<warnings_fail>
 
 =item C<warnings_warn>
+
+=item C<tapversion>
 
 =back
 

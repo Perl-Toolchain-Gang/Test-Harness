@@ -85,6 +85,7 @@ BEGIN {
         ignore_exit       => sub { shift; shift },
         rules             => sub { shift; shift },
         sources           => sub { shift; shift },
+        version           => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -267,6 +268,13 @@ L<TAP::Parser::Source>, and L<TAP::Parser::IteratorFactory>.
 
 The name of the class to use to aggregate test results. The default is
 L<TAP::Parser::Aggregator>.
+
+=item * C<version>
+
+I<NEW to 3.22>.
+
+Assume this TAP version for L<TAP::Parser> instead of default TAP
+version 12.
 
 =item * C<formatter_class>
 
@@ -692,6 +700,7 @@ sub _get_parser_args {
     $args{spool}       = $self->_open_spool($test_prog);
     $args{merge}       = $self->merge;
     $args{ignore_exit} = $self->ignore_exit;
+    $args{version}     = $self->version if $self->version;
 
     if ( my $exec = $self->exec ) {
         $args{exec}
