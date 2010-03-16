@@ -7,6 +7,8 @@ Revision history for Test-Harness
         - Fix trailing plan + embedded YAML + TAP 13 case. Thanks to
           Steffen Schwigon. #54518.
         - Numerous spelling fixes. Thanks to Ville Skyttä.
+        - Add new option --tapversion for prove to set the default
+          assumed TAP version. Thanks to Steffen Schwigon.
 
 3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no
