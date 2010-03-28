@@ -124,6 +124,7 @@ t/lib/Test/Builder/Module.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
 t/multiplexer.t
+t/nested.t
 t/nofork-mux.t
 t/nofork.t
 t/object.t
@@ -138,6 +139,7 @@ t/proveenv.t
 t/proverc.t
 t/proverc/emptyexec
 t/proverun.t
+t/proveversion.t
 t/regression.t
 t/results.t
 t/sample-tests/bailout
@@ -174,6 +176,7 @@ t/sample-tests/shbang_misparse
 t/sample-tests/simple
 t/sample-tests/simple_fail
 t/sample-tests/simple_yaml
+t/sample-tests/simple_yaml_missing_version13
 t/sample-tests/skip
 t/sample-tests/skip_nomsg
 t/sample-tests/skipall
@@ -194,6 +197,7 @@ t/sample-tests/version_late
 t/sample-tests/version_old
 t/sample-tests/vms_nit
 t/sample-tests/with_comments
+t/sample-tests/yaml_late_plan
 t/sample-tests/zero_valid
 t/scheduler.t
 t/source.t

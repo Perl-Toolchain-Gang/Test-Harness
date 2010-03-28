@@ -39,3 +39,4 @@
 ^perltags$
 ^Session\.vim$
 ^MYMETA.yml$
+^packaging/
