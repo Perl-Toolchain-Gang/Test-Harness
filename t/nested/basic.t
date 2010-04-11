@@ -31,6 +31,7 @@ EOT
             { nesting => 0, type => 'test',    number        => 1, },
             { nesting => 0, type => 'test',    number        => 2, },
             { nesting => 0, type => 'test',    number        => 3, },
+            { nesting => 0, type => 'nest_in' },
             { nesting => 1, type => 'plan',    tests_planned => 3, },
             { nesting => 1, type => 'test',    number        => 1, },
             { nesting => 1, type => 'test',    number        => 2, },
@@ -38,6 +39,7 @@ EOT
 
             # FIXME should be PASS
             { nesting => 1, type => 'unknown', },
+            { nesting => 1, type => 'nest_out' },
             { nesting => 0, type => 'test', number => 4, },
             { nesting => 0, type => 'test', number => 5, },
             { nesting => 0, type => 'test', number => 6, },
@@ -82,6 +84,7 @@ EOT
             { nesting => 0, type => 'test',    number        => 1, },
             { nesting => 0, type => 'test',    number        => 2, },
             { nesting => 0, type => 'test',    number        => 3, },
+            { nesting => 0, type => 'nest_in' },
             { nesting => 1, type => 'plan',    tests_planned => 3, },
             { nesting => 1, type => 'test',    number        => 1, },
             { nesting => 1, type => 'yaml', },
@@ -90,6 +93,7 @@ EOT
 
             # FIXME should be PASS
             { nesting => 1, type => 'unknown', },
+            { nesting => 1, type => 'nest_out' },
             { nesting => 0, type => 'test', number => 4, },
             { nesting => 0, type => 'yaml', },
             { nesting => 0, type => 'test', number => 5, },
