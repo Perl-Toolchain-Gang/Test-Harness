@@ -1257,10 +1257,9 @@ sub _make_state_table {
                         $ver_num = $DEFAULT_TAP_VERSION;
                     }
                     if ( $ver_num > $MAX_TAP_VERSION ) {
-                        $self->_add_error(
-                                "TAP specified version $ver_num but "
-                              . "we don't know about versions later "
-                              . "than $MAX_TAP_VERSION" );
+                        warn "TAP specified version $ver_num but ",
+                          "we don't know about versions later ",
+                          "than $MAX_TAP_VERSION\n";
                         $ver_num = $MAX_TAP_VERSION;
                     }
                     $self->version($ver_num);

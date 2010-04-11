@@ -12,7 +12,7 @@ BEGIN {
     }
 }
 
-use Test::More tests => 294;
+use Test::More tests => 292;
 use IO::c55Capture;
 
 use File::Spec;
@@ -756,26 +756,6 @@ END_TAP
 
     like pop @errors,
       qr/Explicit TAP version must be at least 13. Got version 12/,
-      '... and trapped expected version error';
-
-    # now too high a version
-    $tap = <<'END_TAP';
-TAP version 14
-1..2
-ok 1 - input file opened
-ok 2 - Gandalf wins
-END_TAP
-
-    $parser = TAP::Parser->new( { tap => $tap } );
-
-    _get_results($parser);
-
-    @errors = $parser->parse_errors;
-
-    is @errors, 1, 'test too high version number';
-
-    like pop @errors,
-      qr/TAP specified version 14 but we don't know about versions later than 13/,
       '... and trapped expected version error';
 }
 
