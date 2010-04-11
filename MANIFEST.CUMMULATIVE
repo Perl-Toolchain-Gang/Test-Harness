@@ -58,6 +58,8 @@ lib/TAP/Parser/Multiplexer.pm
 lib/TAP/Parser/Result.pm
 lib/TAP/Parser/Result/Bailout.pm
 lib/TAP/Parser/Result/Comment.pm
+lib/TAP/Parser/Result/Nest/In.pm
+lib/TAP/Parser/Result/Nest/Out.pm
 lib/TAP/Parser/Result/Plan.pm
 lib/TAP/Parser/Result/Pragma.pm
 lib/TAP/Parser/Result/Test.pm
@@ -219,6 +221,7 @@ t/lib/Test/Simple.pm
 t/lib/if.pm
 t/multiplexer.t
 t/nested.t
+t/nested/basic.t
 t/nofork-mux.t
 t/nofork.t
 t/object.t

@@ -127,6 +127,7 @@ t/lib/Test/More.pm
 t/lib/Test/Simple.pm
 t/multiplexer.t
 t/nested.t
+t/nested/basic.t
 t/nofork-mux.t
 t/nofork.t
 t/object.t
