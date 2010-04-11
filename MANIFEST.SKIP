@@ -40,3 +40,4 @@
 ^Session\.vim$
 ^\.rev$
 ^MYMETA.yml$
+^packaging/

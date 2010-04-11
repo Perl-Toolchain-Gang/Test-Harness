@@ -15,11 +15,11 @@ TAP::Parser::SourceHandler::pgTAP - Stream TAP from pgTAP test scripts
 
 =head1 VERSION
 
-Version 3.21
+Version 3.22
 
 =cut
 
-$VERSION = '3.21';
+$VERSION = '3.22';
 
 =head1 SYNOPSIS
 
@@ -33,14 +33,14 @@ In F<Build.PL> for your application with pgTAP tests in F<t/*.pg>:
           sources => {
               Perl  => undef,
               pgTAP => {
-                  dbname => 'try',
+                  dbname   => 'try',
                   username => 'postgres',
-                  suffix => '.pg',
+                  suffix   => '.pg',
               },
           }
       },
       build_requires     => {
-          'Module::Build'                      => '0.30',
+          'Module::Build'                     => '0.30',
           'TAP::Parser::SourceHandler::pgTAP' => '3.19',
       },
   )->create_build_script;
@@ -62,7 +62,7 @@ Direct use:
       dbname   => 'testing',
       username => 'postgres',
       suffix   => '.pg',
-  });
+  }});
   $source->assemble_meta;
 
   my $class = 'TAP::Parser::SourceHandler::pgTAP';
@@ -89,6 +89,95 @@ Creates an iterator that will call C<psql> to run the pgTAP tests
 
 Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
 won't need to use this module directly.
+
+=head2 Testing with pgTAP
+
+If you just want to write tests with L<pgTAP|http://pgtap.org/>, here's how:
+
+=over
+
+=item *
+
+Build your test database, including pgTAP. It's best to install it in its own
+schema. To build it and install it in the schema "tap", do this (assuming your
+database is named "try"):
+
+  make TAPSCHEMA=tap
+  make install
+  psql -U postgres -d try -f pgtap.sql
+
+=item *
+
+Write your tests in files ending in F<.pg> in the F<t> directory, right
+alongside your normal Perl F<.t> tests. Here's a simple pgTAP test to get you
+started:
+
+  BEGIN;
+
+  SET search_path = public,tap,pg_catalog;
+
+  SELECT plan(1);
+
+  SELECT pass('This should pass!');
+
+  SELECT * FROM finish();
+  ROLLBACK;
+
+Note how C<search_path> has been set so that the pgTAP functions can be found
+in the "tap" schema. Consult the extensive L<pgTAP
+documentation|http://pgtap.org/documentation.html> for a comprehensive list of
+test functions.
+
+=item *
+
+Run your tests with C<prove> like so:
+
+  prove --source Perl \
+        --source pgTAP --pgtap-option dbname=try \
+                       --pgtap-option username=postgres \
+                       --pgtap-option suffix=.pg
+
+This will run both your Perl F<.t> tests and your pgTAP F<.pg> tests all
+together. You can also use F<C<pg_prove>|http://pgtap.org/pg_prove.html>,
+which ships with pgTAP, to run just the pgTAP tests like so:
+
+  pg_prove -d try -U postgres t/*.pg
+
+=item *
+
+Once you're sure that you've got the pgTAP tests working, modify your
+F<Build.PL> script to allow F<./Build test> to run both the Perl and the pgTAP
+tests, like so:
+
+  Module::Build->new(
+      module_name        => 'MyApp',
+      test_file_exts     => [qw(.t .pg)],
+      use_tap_harness    => 1,
+      configure_requires => { 'Module::Build' => '0.30', },
+      tap_harness_args   => {
+          sources => {
+              Perl  => undef,
+              pgTAP => {
+                  dbname   => 'try',
+                  username => 'postgres',
+                  suffix   => '.pg',
+              },
+          }
+      },
+      build_requires     => {
+          'Module::Build'                     => '0.30',
+          'TAP::Parser::SourceHandler::pgTAP' => '3.19',
+      },
+  )->create_build_script;
+
+The C<use_tap_harness> parameter is optional, since it's implicitly set by the
+use of the C<tap_harness_args> parameter. All the other parameters are
+required as you see here. See the documentation for C<make_iterator()> for a
+complete list of options to the C<pgTAP> key under C<sources>.
+
+And that's it. Now get testing!
+
+=back
 
 =head1 METHODS
 
@@ -245,6 +334,7 @@ L<TAP::Parser::SourceHandler::Perl>,
 L<TAP::Parser::SourceHandler::File>,
 L<TAP::Parser::SourceHandler::Handle>,
 L<TAP::Parser::SourceHandler::RawTAP>
+L<pgTAP|http://pgtap.org/>
 
 =head1 AUTHOR
 

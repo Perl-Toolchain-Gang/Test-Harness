@@ -24,11 +24,11 @@ TAP::Parser - Parse L<TAP|Test::Harness::TAP> output
 
 =head1 VERSION
 
-Version 3.21
+Version 3.22
 
 =cut
 
-$VERSION = '3.21';
+$VERSION = '3.22';
 
 my $DEFAULT_TAP_VERSION = 12;
 my $MAX_TAP_VERSION     = 14;
@@ -427,6 +427,7 @@ sub make_result           { shift->result_factory_class->make_result(@_); }
         my $iterator = delete $args{iterator};
         $iterator ||= delete $args{stream};    # deprecated
         my $tap         = delete $args{tap};
+        my $version     = delete $args{version};
         my $raw_source  = delete $args{source};
         my $sources     = delete $args{sources};
         my $exec        = delete $args{exec};
@@ -481,6 +482,7 @@ sub make_result           { shift->result_factory_class->make_result(@_); }
             $self->{$k} = 'ARRAY' eq ref $v ? [] : $v;
         }
 
+        $self->version($version) if $version;
         $self->_iterator($iterator);
         $self->_spool($spool);
         $self->ignore_exit($ignore_exit);
@@ -641,7 +643,7 @@ C<$result> object.
 Returns a list of pragmas each of which is a + or - followed by the
 pragma name.
  
-=head2 C<commment> methods
+=head2 C<comment> methods
 
  if ( $result->is_comment ) { ... }
 
@@ -718,7 +720,7 @@ line.
   my $explanation = $result->explanation;
 
 If a test had either a C<TODO> or C<SKIP> directive, this method will return
-the accompanying explantion, if present.
+the accompanying explanation, if present.
 
   not ok 17 - 'Pigs can fly' # TODO not enough acid
 
@@ -1046,7 +1048,7 @@ an executable, it returns the exit status of the executable.
 
 Once the parser is done, this will return the wait status.  If the parser ran
 an executable, it returns the wait status of the executable.  Otherwise, this
-mererely returns the C<exit> status.
+merely returns the C<exit> status.
 
 =head2 C<ignore_exit>
 
@@ -1311,7 +1313,7 @@ sub _make_state_table {
         UNPLANNED_AFTER_TEST => {
             test => { act  => sub { }, continue => 'UNPLANNED' },
             plan => { act  => sub { }, continue => 'UNPLANNED' },
-            yaml => { goto => 'PLANNED' },
+            yaml => { goto => 'UNPLANNED' },
         },
     );
 
@@ -1639,9 +1641,9 @@ passed instead.
 
 If you're looking for an EBNF grammar, see L<TAP::Parser::Grammar>.
 
-=head1 BACKWARDS COMPATABILITY
+=head1 BACKWARDS COMPATIBILITY
 
-The Perl-QA list attempted to ensure backwards compatability with
+The Perl-QA list attempted to ensure backwards compatibility with
 L<Test::Harness>.  However, there are some minor differences.
 
 =head2 Differences
@@ -1713,14 +1715,14 @@ subclasses should be used, which in turn means that in many cases you'll find
 you only need to sub-class one of the parser's components.
 
 The exception to this rule are I<SourceHandlers> & I<Iterators>, but those are
-both created with customizeable I<IteratorFactory>.
+both created with customizable I<IteratorFactory>.
 
 =item 4
 
 By subclassing, you may end up overriding undocumented methods.  That's not
 a bad thing per se, but be forewarned that undocumented methods may change
 without warning from one release to the next - we cannot guarantee backwards
-compatability.  If any I<documented> method needs changing, it will be
+compatibility.  If any I<documented> method needs changing, it will be
 deprecated first, and changed in a later release.
 
 =back
@@ -1756,7 +1758,7 @@ are now removed.
 A TAP parser uses I<iterators> to loop through the I<stream> of TAP read in
 from the I<source> it was given.  There are a few types of Iterators available
 by default, all sub-classes of L<TAP::Parser::Iterator>.  Choosing which
-iterator to use is the responsibility of the I<siterator factory>, though it
+iterator to use is the responsibility of the I<iterator factory>, though it
 simply delegates to the I<Source Handler> it uses.
 
 If you're writing your own L<TAP::Parser::SourceHandler>, you may need to
@@ -1805,7 +1807,7 @@ C<grammar_class> parameter.  See L</new> for more details.
 If you need to customize the objects on creation, subclass L<TAP::Parser> and
 override L</make_grammar>
 
-=head1 ACKNOWLEDGEMENTS
+=head1 ACKNOWLEDGMENTS
 
 All of the following have helped. Bug reports, patches, (im)moral
 support, or just words of encouragement have all been forthcoming.
@@ -1851,6 +1853,8 @@ support, or just words of encouragement have all been forthcoming.
 =item * Alex Vandiver
 
 =item * Cosimo Streppone
+
+=item * Ville Skyttä
 
 =back
 

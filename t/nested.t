@@ -1,157 +1,31 @@
-#!perl
+#!/usr/bin/perl -wT
 
 use strict;
-use warnings;
+use lib 't/lib';
 
-use Data::Dumper;
+use Test::More tests => 5;
+
 use TAP::Parser;
-use Test::More;
 
-my @tests = (
-    {   name => 'Simple nesting',
-        tap  => <<'EOT',
-TAP version 14
-ok 1 - We're on 1
-ok 2 - We're on 2
-ok 3 - We're on 3
-  1..3
-  ok 1 - We're on 4
-  ok 2 - We're on 5
-  ok 3 - We're on 6
-  PASS
-ok 4 - First nest
-ok 5 - We're on 7
-ok 6 - We're on 8
-ok 7 - We're on 9
-not ok 8
-1..8
-EOT
-        expect => [
-            { nesting => 0, type => 'version', version       => 14, },
-            { nesting => 0, type => 'test',    number        => 1, },
-            { nesting => 0, type => 'test',    number        => 2, },
-            { nesting => 0, type => 'test',    number        => 3, },
-            { nesting => 1, type => 'plan',    tests_planned => 3, },
-            { nesting => 1, type => 'test',    number        => 1, },
-            { nesting => 1, type => 'test',    number        => 2, },
-            { nesting => 1, type => 'test',    number        => 3, },
+my $tap = <<'END_TAP';
+1..2
+ok 1 - input file opened
+... this is junk
+    Bail out!  We ran out of foobar.
+END_TAP
+my $parser = TAP::Parser->new( { tap => $tap } );
+isa_ok $parser, 'TAP::Parser',
+  '... we should be able to parse bailed out tests';
 
-            # FIXME should be PASS
-            { nesting => 1, type => 'unknown', },
-            { nesting => 0, type => 'test', number => 4, },
-            { nesting => 0, type => 'test', number => 5, },
-            { nesting => 0, type => 'test', number => 6, },
-            { nesting => 0, type => 'test', number => 7, },
-            { nesting => 0, type => 'test', number => 8, },
-            { nesting => 0, type => 'plan', tests_planned => 8, }
-        ]
-    },
-    {   name => 'Yamlish',
-        tap  => <<'EOT',
-TAP version 14
-ok 1 - We're on 1
-ok 2 - We're on 2
-ok 3 - We're on 3
-  1..3
-  ok 1 - We're on 4
-    ---
-    -
-      sneep: skib
-      ponk: brek
-    ...
-  ok 2 - We're on 5
-  ok 3 - We're on 6
-  PASS
-ok 4 - First nest
-  ---
-  -
-    fnurk: skib
-    ponk: gleeb
-  -
-    bar: krup
-    foo: plink
-  ...
-ok 5 - We're on 7
-ok 6 - We're on 8
-ok 7 - We're on 9
-not ok 8
-1..8
-EOT
-        expect => [
-            { nesting => 0, type => 'version', version       => 14, },
-            { nesting => 0, type => 'test',    number        => 1, },
-            { nesting => 0, type => 'test',    number        => 2, },
-            { nesting => 0, type => 'test',    number        => 3, },
-            { nesting => 1, type => 'plan',    tests_planned => 3, },
-            { nesting => 1, type => 'test',    number        => 1, },
-            { nesting => 1, type => 'yaml', },
-            { nesting => 1, type => 'test',    number        => 2, },
-            { nesting => 1, type => 'test',    number        => 3, },
-
-            # FIXME should be PASS
-            { nesting => 1, type => 'unknown', },
-            { nesting => 0, type => 'test', number => 4, },
-            { nesting => 0, type => 'yaml', },
-            { nesting => 0, type => 'test', number => 5, },
-            { nesting => 0, type => 'test', number => 6, },
-            { nesting => 0, type => 'test', number => 7, },
-            { nesting => 0, type => 'test', number => 8, },
-            { nesting => 0, type => 'plan', tests_planned => 8, }
-        ]
-    },
-);
-
-plan tests => @tests * 2;
-
-for my $test (@tests) {
-    my ( $name, $tap, $expect ) = @{$test}{ 'name', 'tap', 'expect' };
-    my $results = eval{slurp_tap($tap)};
-    ok !$@, "$name: parsed without error";
-    is_result( $results, $expect, $name );
+my @results;
+while ( my $result = $parser->next ) {
+    push @results => $result;
 }
-
-sub is_result {
-    my ( $results, $expect, $msg ) = @_;
-    my @keep = qw(
-      version nesting type tests_planned number
-    );
-    my @got = ();
-    for my $r (@$results) {
-        my $rec = {};
-        for my $k (@keep) {
-            $rec->{$k} = $r->$k() if $r->can($k);
-        }
-        push @got, $rec;
-    }
-    unless ( is_deeply \@got, $expect, $msg ) {
-        diag Dumper($results);
-    }
-}
-
-sub slurp_tap {
-    my $tap     = shift;
-    my $parser  = TAP::Parser->new( { tap => $tap } );
-    my @results = ();
-    while ( my $result = $parser->next ) {
-        push @results, $result;
-    }
-    return \@results;
-}
-
-__DATA__
-
-
-
-
-1..3
-ok 1
-    1..3
-    ok 1
-    ok 2
-        ok 1
-        ok 2
-        ok 3
-        1..3
-    ok 3 - some name
-ok 2 - some name
-ok 3
+my $bailout = pop @results;
+ok $bailout->is_bailout, 'We should be able to parse a nested bailout';
+is $bailout->as_string,  'We ran out of foobar.',
+  '... and as_string() should return the explanation';
+is $bailout->raw, '    Bail out!  We ran out of foobar.',
+  '... and raw() should return the explanation';
+is $bailout->explanation, 'We ran out of foobar.',
+  '... and it should have the correct explanation';

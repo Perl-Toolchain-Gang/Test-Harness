@@ -17,11 +17,11 @@ App::Prove - Implements the C<prove> command.
 
 =head1 VERSION
 
-Version 3.21
+Version 3.22
 
 =cut
 
-$VERSION = '3.21';
+$VERSION = '3.22';
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ BEGIN {
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
       state_class test_args state dry extension ignore_exit rules state_manager
-      normalize sources
+      normalize sources tapversion
     );
     __PACKAGE__->mk_methods(@ATTR);
 }
@@ -203,46 +203,47 @@ sub process_args {
 
         # Don't add coderefs to GetOptions
         GetOptions(
-            'v|verbose'   => \$self->{verbose},
-            'f|failures'  => \$self->{failures},
-            'o|comments'  => \$self->{comments},
-            'l|lib'       => \$self->{lib},
-            'b|blib'      => \$self->{blib},
-            's|shuffle'   => \$self->{shuffle},
-            'color!'      => \$self->{color},
-            'colour!'     => \$self->{color},
-            'count!'      => \$self->{show_count},
-            'c'           => \$self->{color},
-            'D|dry'       => \$self->{dry},
-            'ext=s'       => \$self->{extension},
-            'harness=s'   => \$self->{harness},
-            'ignore-exit' => \$self->{ignore_exit},
-            'source=s@'   => $self->{sources},
-            'formatter=s' => \$self->{formatter},
-            'r|recurse'   => \$self->{recurse},
-            'reverse'     => \$self->{backwards},
-            'p|parse'     => \$self->{parse},
-            'q|quiet'     => \$self->{quiet},
-            'Q|QUIET'     => \$self->{really_quiet},
-            'e|exec=s'    => \$self->{exec},
-            'm|merge'     => \$self->{merge},
-            'I=s@'        => $self->{includes},
-            'M=s@'        => $self->{modules},
-            'P=s@'        => $self->{plugins},
-            'state=s@'    => $self->{state},
-            'directives'  => \$self->{directives},
-            'h|help|?'    => \$self->{show_help},
-            'H|man'       => \$self->{show_man},
-            'V|version'   => \$self->{show_version},
-            'a|archive=s' => \$self->{archive},
-            'j|jobs=i'    => \$self->{jobs},
-            'timer'       => \$self->{timer},
-            'T'           => \$self->{taint_fail},
-            't'           => \$self->{taint_warn},
-            'W'           => \$self->{warnings_fail},
-            'w'           => \$self->{warnings_warn},
-            'normalize'   => \$self->{normalize},
-            'rules=s@'    => $self->{rules},
+            'v|verbose'    => \$self->{verbose},
+            'f|failures'   => \$self->{failures},
+            'o|comments'   => \$self->{comments},
+            'l|lib'        => \$self->{lib},
+            'b|blib'       => \$self->{blib},
+            's|shuffle'    => \$self->{shuffle},
+            'color!'       => \$self->{color},
+            'colour!'      => \$self->{color},
+            'count!'       => \$self->{show_count},
+            'c'            => \$self->{color},
+            'D|dry'        => \$self->{dry},
+            'ext=s'        => \$self->{extension},
+            'harness=s'    => \$self->{harness},
+            'ignore-exit'  => \$self->{ignore_exit},
+            'source=s@'    => $self->{sources},
+            'formatter=s'  => \$self->{formatter},
+            'r|recurse'    => \$self->{recurse},
+            'reverse'      => \$self->{backwards},
+            'p|parse'      => \$self->{parse},
+            'q|quiet'      => \$self->{quiet},
+            'Q|QUIET'      => \$self->{really_quiet},
+            'e|exec=s'     => \$self->{exec},
+            'm|merge'      => \$self->{merge},
+            'I=s@'         => $self->{includes},
+            'M=s@'         => $self->{modules},
+            'P=s@'         => $self->{plugins},
+            'state=s@'     => $self->{state},
+            'directives'   => \$self->{directives},
+            'h|help|?'     => \$self->{show_help},
+            'H|man'        => \$self->{show_man},
+            'V|version'    => \$self->{show_version},
+            'a|archive=s'  => \$self->{archive},
+            'j|jobs=i'     => \$self->{jobs},
+            'timer'        => \$self->{timer},
+            'T'            => \$self->{taint_fail},
+            't'            => \$self->{taint_warn},
+            'W'            => \$self->{warnings_fail},
+            'w'            => \$self->{warnings_warn},
+            'normalize'    => \$self->{normalize},
+            'rules=s@'     => $self->{rules},
+            'tapversion=s' => \$self->{tapversion},
         ) or croak('Unable to continue');
 
         # Stash the remainder of argv for later
@@ -356,6 +357,8 @@ sub _get_args {
     # defined but zero-length exec runs test files as binaries
     $args{exec} = [ split( /\s+/, $self->exec ) ]
       if ( defined( $self->exec ) );
+
+    $args{version} = $self->tapversion if defined( $self->tapversion );
 
     if ( defined( my $test_args = $self->test_args ) ) {
         $args{test_args} = $test_args;
@@ -717,6 +720,8 @@ calling C<run>.
 =item C<warnings_fail>
 
 =item C<warnings_warn>
+
+=item C<tapversion>
 
 =back
 

@@ -1,22 +1,19 @@
 ---
 global:
   perls:
-    - /home/andy/Works/Perl/versions/5.6.0/bin/perl
     - /home/andy/Works/Perl/versions/5.6.1/bin/perl
     - /home/andy/Works/Perl/versions/5.6.2/bin/perl
-    - /home/andy/Works/Perl/versions/5.8.0/bin/perl
     - /home/andy/Works/Perl/versions/5.8.1/bin/perl
     - /home/andy/Works/Perl/versions/5.8.2/bin/perl
     - /home/andy/Works/Perl/versions/5.8.3/bin/perl
     - /home/andy/Works/Perl/versions/5.8.4/bin/perl
     - /home/andy/Works/Perl/versions/5.8.5/bin/perl
-    - interp: /home/andy/Works/Perl/versions/RHEL4/bin/perl
-      desc: with RHEL4 @INC patch
     - /home/andy/Works/Perl/versions/5.8.6/bin/perl
     - /home/andy/Works/Perl/versions/5.8.7/bin/perl
-    - /usr/bin/perl
+    - /home/andy/Works/Perl/versions/5.8.8/bin/perl
     - /home/andy/Works/Perl/versions/5.8.9/bin/perl
-    - /alt/local/bin/perl
+    - /home/andy/Works/Perl/versions/5.10.0/bin/perl
+    - /home/andy/Works/Perl/versions/5.10.1/bin/perl
     - /home/andy/Works/Perl/versions/5.11.3/bin/perl
   status: /home/andy/.smoke-tapx
   svn: /usr/bin/svn
@@ -24,7 +21,7 @@ global:
   rsync: /usr/bin/rsync
   shell: /bin/bash
   work: /home/andy/.smoke-work
-  description: Ubuntu box
+  description: CentOS 5.4 box
 tasks:
   - mailto:
       - email:

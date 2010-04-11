@@ -40,3 +40,56 @@ sub test_via_harness {
     return $self->SUPER::test_via_harness(
         qq{$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)"}, $tests );
 }
+
+BEGIN {
+    my %deny = (
+        manifest => 'dist_basics',
+        dist     => 'dist_core',
+    );
+    while ( my ( $verb, $override ) = each %deny ) {
+        my $super = "SUPER::$override";
+        no strict 'refs';
+        *{"MY::$override"} = sub {
+            my ( $self, @args ) = @_;
+            my $frag  = $self->$super(@args);
+            my $chunk = split_makefile_chunk($frag);
+            replace_rule(
+                $chunk, $verb,
+                ":\n\t\$(NOECHO) \$(ECHO) "
+                  . "\"Please use 'Build.PL $verb' instead of 'Makefile.PL $verb'\"\n\n"
+            );
+            return join_makefile_chunk($chunk);
+        };
+    }
+}
+
+# Returns a reference to a hash containing
+#  targets   a reference to an array of makefile section names
+#  sections  a reference to a hash mapping makefile section names to the
+#            text of those sections.
+
+sub split_makefile_chunk {
+    my $chunk    = shift;
+    my $target   = ' prefix';
+    my @targets  = ();
+    my %sections = ();
+    for my $ln ( split /\n/, $chunk ) {
+        if ( $ln =~ /^(\S+)/ ) {
+            $target = $1;
+            push @targets, $target;
+        }
+        $sections{$target} .= "$ln\n";
+    }
+    return { targets => \@targets, sections => \%sections };
+}
+
+sub join_makefile_chunk {
+    my $chunk = shift;
+    return join '', grep defined,
+      map { $chunk->{sections}{$_} } @{ $chunk->{targets} };
+}
+
+sub replace_rule {
+    my ( $chunk, $name, $body ) = @_;
+    $chunk->{sections}{$name} = "$name $body";
+}
