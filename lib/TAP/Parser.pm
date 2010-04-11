@@ -1428,7 +1428,7 @@ sub _iter {
         return $token;
     };
 
-    # Handle end of stream - which means either pop a block or finish
+    # Handle end of stream
     my $end_handler = sub {
         $self->exit( $iterator->exit );
         $self->wait( $iterator->wait );
