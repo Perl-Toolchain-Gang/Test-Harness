@@ -1132,8 +1132,11 @@ sub _add_error {
     return $self;
 }
 
+# Make a state table. The nest_in and nest_out closures are declared in
+# the calling scope (so they have access to the stack) and passed in
+# here.
 sub _make_state_table {
-    my $self = shift;
+    my ( $self, $nest_in, $nest_out ) = @_;
     my %states;
     my %planned_todo = ();
 
@@ -1168,6 +1171,8 @@ sub _make_state_table {
                 }
             },
         },
+        nest_in  => { act => $nest_in },
+        nest_out => { act => $nest_out },
     );
 
     # Provides default elements for transitions
@@ -1361,13 +1366,38 @@ sub _grammar {
 }
 
 sub _iter {
-    my $self        = shift;
-    my $iterator    = $self->_iterator;
-    my $grammar     = $self->_grammar;
-    my $spool       = $self->_spool;
-    my $nesting     = $self->_nesting;
-    my $state       = 'INIT';
-    my $state_table = $self->_make_state_table;
+    my $self     = shift;
+    my $iterator = $self->_iterator;
+    my $grammar  = $self->_grammar;
+    my $spool    = $self->_spool;
+    my $nesting  = $self->_nesting;
+    my $state    = 'INIT';
+    my @stack    = ();
+
+    my $nest_in = sub {
+        my $tok = shift;
+        push @stack, $state;
+        $state = 'INIT';
+
+        # TODO temporary assertion
+        die "Funky nesting on nest_in (", scalar @stack, " != ",
+          $tok->nesting + 1, ")"
+          unless @stack == $tok->nesting + 1;
+    };
+
+    my $nest_out = sub {
+        my $tok = shift;
+        die "Stack underrun"
+          unless @stack;
+        $state = pop @stack;
+
+        # TODO temporary assertion
+        die "Funky nesting on nest_out (", scalar @stack, " != ",
+          $tok->nesting - 1, ")"
+          unless @stack == $tok->nesting - 1;
+    };
+
+    my $state_table = $self->_make_state_table( $nest_in, $nest_out );
 
     $self->start_time( $self->get_time );
 
