@@ -33,6 +33,8 @@ SKIP: {
             ) and die "error $?";
         }
     );
-    like( $ans, qr/li class="yml"/,
-        "prove --tapversion=13 simple_yaml_missing_version13" );
+    like(
+        $ans, qr/li class="yml"/,
+        "prove --tapversion=13 simple_yaml_missing_version13"
+    );
 }
