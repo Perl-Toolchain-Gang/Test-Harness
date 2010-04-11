@@ -121,6 +121,13 @@ Currently you need to write a plugin to get around this.
 
 =cut
 
+sub _autoflush_stdhandles {
+    my ($class) = @_;
+
+    $class->_autoflush( \*STDOUT );
+    $class->_autoflush( \*STDERR );
+}
+
 sub make_iterator {
     my ( $class, $source ) = @_;
     my $meta        = $source->meta;
@@ -129,10 +136,37 @@ sub make_iterator {
     $class->_croak("Cannot find ($perl_script)") unless $meta->{is_file};
 
     # TODO: does this really need to be done here?
-    $class->_autoflush( \*STDOUT );
-    $class->_autoflush( \*STDERR );
+    $class->_autoflush_stdhandles;
 
-    my @switches = $class->_switches($source);
+    my ($libs, $switches) = $class->_mangle_switches(
+        $class->_filter_libs($class->_switches($source))
+    );
+
+    $class->_run($source, $libs, $switches);
+}
+
+sub _mangle_switches {
+    my ($class, $libs, $switches) = @_;
+
+    # Taint mode ignores environment variables so we must retranslate
+    # PERL5LIB as -I switches and place PERL5OPT on the command line
+    # in order that it be seen.
+    if ( grep { $_ eq "-T" || $_ eq "-t" } @{ $switches } ) {
+        return (
+            $libs, [
+                @{ $switches },
+                $class->_libs2switches($libs),
+                split_shell( $ENV{PERL5OPT} )
+            ],
+        );
+    }
+
+    return ($libs, $switches);
+}
+
+sub _filter_libs {
+    my ($class, @switches) = @_;
+
     my $path_sep = $Config{path_sep};
     my $path_re  = qr{$path_sep};
 
@@ -147,19 +181,24 @@ sub make_iterator {
     my @libs;
     my @filtered_switches;
     for (@switches) {
-        if ( !/$path_re/ && / ^ ['"]? -I ['"]? (.*?) ['"]? $ /x ) {
+        if ( !/$path_re/ && m/ ^ ['"]? -I ['"]? (.*?) ['"]? $ /x ) {
             push @libs, $1;
         }
         else {
             push @filtered_switches, $_;
         }
     }
-    @switches = @filtered_switches;
+
+    return \@libs, \@filtered_switches;
+}
+
+sub _iterator_hooks {
+    my ($class, $source, $libs) = @_;
 
     my $setup = sub {
-        if (@libs) {
+        if (@{ $libs }) {
             $ENV{PERL5LIB}
-              = join( $path_sep, grep {defined} @libs, $ENV{PERL5LIB} );
+              = join( $Config{path_sep}, grep {defined} @{ $libs }, $ENV{PERL5LIB} );
         }
     };
 
@@ -175,19 +214,25 @@ sub make_iterator {
         }
     };
 
-    # Taint mode ignores environment variables so we must retranslate
-    # PERL5LIB as -I switches and place PERL5OPT on the command line
-    # in order that it be seen.
-    if ( grep { $_ eq "-T" || $_ eq "-t" } @switches ) {
-        push @switches, $class->_libs2switches(@libs);
-        push @switches, split_shell( $ENV{PERL5OPT} );
-    }
+    return ($setup, $teardown);
+}
 
-    my @command = $class->_get_command_for_switches( $source, @switches )
+sub _run {
+    my ($class, $source, $libs, $switches) = @_;
+
+    my @command = $class->_get_command_for_switches( $source, $switches )
       or $class->_croak("No command found!");
 
+    my ($setup, $teardown) = $class->_iterator_hooks($source, $libs);
+
+    return $class->_create_iterator($source, \@command, $setup, $teardown);
+}
+
+sub _create_iterator {
+    my ($class, $source, $command, $setup, $teardown) = @_;
+
     return TAP::Parser::Iterator::Process->new(
-        {   command  => \@command,
+        {   command  => $command,
             merge    => $source->merge,
             setup    => $setup,
             teardown => $teardown,
@@ -196,20 +241,20 @@ sub make_iterator {
 }
 
 sub _get_command_for_switches {
-    my ( $class, $source, @switches ) = @_;
+    my ( $class, $source, $switches ) = @_;
     my $file    = ${ $source->raw };
     my @args    = @{ $source->test_args || [] };
     my $command = $class->get_perl;
 
    # XXX don't need to quote if we treat the parts as atoms (except maybe vms)
    #$file = qq["$file"] if ( $file =~ /\s/ ) && ( $file !~ /^".*"$/ );
-    my @command = ( $command, @switches, $file, @args );
+    my @command = ( $command, @{ $switches }, $file, @args );
     return @command;
 }
 
 sub _libs2switches {
     my $class = shift;
-    return map {"-I$_"} grep {$_} @_;
+    return map {"-I$_"} grep {$_} @{ $_[0] };
 }
 
 =head3 C<get_taint>
