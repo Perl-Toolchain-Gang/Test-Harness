@@ -200,7 +200,8 @@ my %language_for;
             handler => sub {
                 my ( $self, $line ) = @_;
                 my ( $pad, $marker ) = ( $1, $2 );
-                return $self->_make_yaml_token( $pad, $marker );
+                return $self->_make_yaml_token(
+                    ( $self->{stack}[-1] || '' ) . $pad, $marker );
             },
         },
         pragma => {
@@ -223,34 +224,46 @@ my %language_for;
     };
 
     my $toker_v12 = sub {
-        my ( $self, $raw_line, $line, $delta ) = @_;
+        my ( $self, $line ) = @_;
         my $parser = $self->{parser};
         for my $token_data ( @{ $self->{ordered_tokens} } ) {
-            if ( $raw_line =~ $token_data->{syntax} ) {
+            if ( $line =~ $token_data->{syntax} ) {
                 my $handler = $token_data->{handler};
-                return $parser->make_result( $self->$handler($raw_line) );
+                return $parser->make_result( $self->$handler($line) );
             }
         }
 
-        return $parser->make_result( $self->_make_unknown_token($raw_line) );
+        return $parser->make_result( $self->_make_unknown_token($line) );
     };
 
-    my $toker_v14 = sub {
-        my ( $self, $raw_line, $line, $delta ) = @_;
-        my $stack = $self->{stack};
-        if ( $delta > 0 && $line =~ /^---/ ) {
+    # Nesting requires exactly four spaces. Not five, not three, not
+    # tabs.
+    my $nest_pad = ' ' x 4;
 
-            # FIXME Nasty hack! Need a better way to handle YAML indent
-            my $tos = $stack->[-1];
-            my $token = $toker_v12->( $self, "$tos$line" );
-            $token->set_nesting( scalar @$stack - 1 );
-            return $token;
+    my $toker_v14 = sub {
+        my ( $self, $line ) = @_;
+
+        my $stack = $self->{stack};
+        my $depth = @$stack;
+        my $tos   = $stack->[-1] || '';
+
+        if ( $line =~ s/^$tos// ) {
+            while ( $line =~ s/^($nest_pad)// ) {
+                $tos .= $1;
+                push @$stack, $tos;
+            }
         }
         else {
-            my $token = $toker_v12->( $self, $line );
-            $token->set_nesting( scalar @$stack );
-            return $token;
+            while (@$stack) {
+                pop @$stack;
+                my $tos = $stack->[-1] || '';
+                last if $line =~ s/^$tos//;
+            }
         }
+
+        my $token = $toker_v12->( $self, $line );
+        $token->set_nesting( scalar @$stack );
+        return $token;
     };
 
     %language_for = (
@@ -330,58 +343,37 @@ current line of TAP.
 =cut
 
 sub _make_tokenize {
-    my $self       = shift;
-    my $iterator   = $self->{iterator};
-    my $parser     = $self->{parser};
-    my $stack      = $self->{stack};
-    my $last_depth = 0;
-    my @pushback   = ();
+    my $self     = shift;
+    my $iterator = $self->{iterator};
+    my $parser   = $self->{parser};
+    my $stack    = $self->{stack};
+    my @pushback = ();
 
-    my $toker = sub {
+    return sub {
         return shift @pushback if @pushback;
-        my $line = my $raw_line = $iterator->next;
-        unless ( defined $raw_line ) {
+        my $line = $iterator->next;
+        unless ( defined $line ) {
             delete @{$self}{ 'parser', 'toker', 'tokenize' };    # Circular
+                  # TODO synthetic nest_out tokens to close outstanding
+                  # nestings?
             return;
         }
-        my $depth = @$stack;
-        my $tos = $stack->[-1] || '';
-        if ( $line =~ s/^$tos// ) {
-            if ( $line =~ s/^(\s+)// ) {
-                push @$stack, $tos . $1;
-            }
-        }
-        else {
-            while (@$stack) {
-                pop @$stack;
-                my $tos = $stack->[-1] || '';
-                last if $line =~ s/^$tos//;
-            }
-        }
 
-        my $token = $self->{toker}(
-            $self,
-            $raw_line, $line, @$stack - $depth
-        );
+        my $last_depth = @$stack;
+        my $token = $self->{toker}( $self, $line );
 
         # We inject synthetic tokens when the nesting level changes.
         if ( defined $token && $token->nesting != $last_depth ) {
             push @pushback, $token;
             return $parser->make_result(
                 {   nesting => $last_depth,
-                    type    => $token->nesting < $depth
+                    type    => $token->nesting < $last_depth
                     ? 'nest_out'
                     : 'nest_in'
                 }
             );
         }
 
-        return $token;
-    };
-
-    return sub {
-        my $token = $toker->(@_);
-        $last_depth = $token ? $token->nesting : 0;
         return $token;
     };
 }
@@ -533,8 +525,7 @@ sub _make_yaml_token {
 
     # Construct a reader that reads from our input stripping leading
     # spaces from each line.
-    my $leader = length($pad);
-    my $strip  = qr{ ^ (\s{$leader}) (.*) $ }x;
+    my $strip  = qr{^($pad)(.*)$};
     my @extra  = ($marker);
     my $reader = sub {
         return shift @extra if @extra;

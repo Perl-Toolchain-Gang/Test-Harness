@@ -14,10 +14,10 @@ TAP version 14
 ok 1 - We're on 1
 ok 2 - We're on 2
 ok 3 - We're on 3
-  1..3
-  ok 1 - We're on 4
-  ok 2 - We're on 5
-  ok 3 - We're on 6
+    1..3
+    ok 1 - We're on 4
+    ok 2 - We're on 5
+    ok 3 - We're on 6
 ok 4 - First nest
 ok 5 - We're on 7
 ok 6 - We're on 8
@@ -50,15 +50,15 @@ TAP version 14
 ok 1 - We're on 1
 ok 2 - We're on 2
 ok 3 - We're on 3
-  1..3
-  ok 1 - We're on 4
-    ---
-    -
-      sneep: skib
-      ponk: brek
-    ...
-  ok 2 - We're on 5
-  ok 3 - We're on 6
+    1..3
+    ok 1 - We're on 4
+      ---
+      -
+        sneep: skib
+        ponk: brek
+      ...
+    ok 2 - We're on 5
+    ok 3 - We're on 6
 ok 4 - First nest
   ---
   -
@@ -101,10 +101,10 @@ TAP version 14
 ok 1 - We're on 1
 ok 2 - We're on 2
 ok 3 - We're on 3
-  ok 1 - We're on 4
-  ok 2 - We're on 5
-  ok 3 - We're on 6
-  1..3
+    ok 1 - We're on 4
+    ok 2 - We're on 5
+    ok 3 - We're on 6
+    1..3
 ok 4 - First nest
 ok 5 - We're on 7
 ok 6 - We're on 8
@@ -136,10 +136,10 @@ EOT
 ok 1 - We're on 1
 ok 2 - We're on 2
 ok 3 - We're on 3
-  1..3
-  ok 1 - We're on 4
-  ok 2 - We're on 5
-  ok 3 - We're on 6
+    1..3
+    ok 1 - We're on 4
+    ok 2 - We're on 5
+    ok 3 - We're on 6
 ok 4 - First nest
 ok 5 - We're on 7
 ok 6 - We're on 8
@@ -161,6 +161,76 @@ EOT
             { nesting => 0, type => 'test', number        => 7, },
             { nesting => 0, type => 'test', number        => 8, },
             { nesting => 0, type => 'plan', tests_planned => 8, }
+        ]
+    },
+    {   name => 'Crazy nesting',
+        tap  => <<'EOT',
+TAP version 14
+ok 1 - We're on 1
+ok 2 - We're on 2
+ok 3 - We're on 3
+    1..3
+    ok 1 - We're on 4
+    ok 2 - We're on 5
+  ok 3 - We're on 6
+ok 4 - First nest
+ok 5 - We're on 7
+ok 6 - We're on 8
+ok 7 - We're on 9
+not ok 8
+1..8
+EOT
+        expect => [
+            { nesting => 0, type => 'version', version       => 14, },
+            { nesting => 0, type => 'test',    number        => 1, },
+            { nesting => 0, type => 'test',    number        => 2, },
+            { nesting => 0, type => 'test',    number        => 3, },
+            { nesting => 0, type => 'nest_in' },
+            { nesting => 1, type => 'plan',    tests_planned => 3, },
+            { nesting => 1, type => 'test',    number        => 1, },
+            { nesting => 1, type => 'test',    number        => 2, },
+            { nesting => 1, type => 'nest_out' },
+            { nesting => 0, type => 'unknown', },
+            { nesting => 0, type => 'test',    number        => 4, },
+            { nesting => 0, type => 'test',    number        => 5, },
+            { nesting => 0, type => 'test',    number        => 6, },
+            { nesting => 0, type => 'test',    number        => 7, },
+            { nesting => 0, type => 'test',    number        => 8, },
+            { nesting => 0, type => 'plan',    tests_planned => 8, }
+        ]
+    },
+    {   name => 'Not four spaces',
+        tap  => <<'EOT',
+TAP version 14
+ok 1 - We're on 1
+ok 2 - We're on 2
+ok 3 - We're on 3
+  1..3
+  ok 1 - We're on 4
+  ok 2 - We're on 5
+  ok 3 - We're on 6
+ok 4 - First nest
+ok 5 - We're on 7
+ok 6 - We're on 8
+ok 7 - We're on 9
+not ok 8
+1..8
+EOT
+        expect => [
+            { nesting => 0, type => 'version', version       => 14, },
+            { nesting => 0, type => 'test',    number        => 1, },
+            { nesting => 0, type => 'test',    number        => 2, },
+            { nesting => 0, type => 'test',    number        => 3, },
+            { nesting => 0, type => 'unknown', },
+            { nesting => 0, type => 'unknown', },
+            { nesting => 0, type => 'unknown', },
+            { nesting => 0, type => 'unknown', },
+            { nesting => 0, type => 'test',    number        => 4, },
+            { nesting => 0, type => 'test',    number        => 5, },
+            { nesting => 0, type => 'test',    number        => 6, },
+            { nesting => 0, type => 'test',    number        => 7, },
+            { nesting => 0, type => 'test',    number        => 8, },
+            { nesting => 0, type => 'plan',    tests_planned => 8, }
         ]
     },
 );
