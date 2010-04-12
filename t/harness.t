@@ -130,7 +130,7 @@ for my $test_args ( get_arg_sets() ) {
     my $status           = pop @output;
     my $expected_status  = qr{^Result: PASS$};
     my $summary          = pop @output;
-    my $expected_summary = qr{^Files=1, Tests=1,  \d+ wallclock secs};
+    my $expected_summary = qr{^Files=1, Tests=1, +\d+ wallclock secs};
 
     is_deeply \@output, \@expected, '... and the output should be correct';
     like $status, $expected_status,
@@ -163,7 +163,7 @@ for my $test_args ( get_arg_sets() ) {
     $status           = pop @output;
     $expected_status  = qr{^Result: PASS$};
     $summary          = pop @output;
-    $expected_summary = qr{^Files=1, Tests=1,  \d+ wallclock secs};
+    $expected_summary = qr{^Files=1, Tests=1, +\d+ wallclock secs};
 
     is_deeply \@output, \@expected, '... and the output should be correct';
     like $status, $expected_status,
@@ -204,7 +204,7 @@ for my $test_args ( get_arg_sets() ) {
     $status           = pop @output;
     $expected_status  = qr{^Result: PASS$};
     $summary          = pop @output;
-    $expected_summary = qr{^Files=2, Tests=2,  \d+ wallclock secs};
+    $expected_summary = qr{^Files=2, Tests=2, +\d+ wallclock secs};
 
     is_deeply \@output, \@expected, '... and the output should be correct';
     like $status, $expected_status,
@@ -227,7 +227,7 @@ for my $test_args ( get_arg_sets() ) {
     $status           = pop @output;
     $expected_status  = qr{^Result: PASS$};
     $summary          = pop @output;
-    $expected_summary = qr/^Files=1, Tests=1,  \d+ wallclock secs/;
+    $expected_summary = qr/^Files=1, Tests=1, +\d+ wallclock secs/;
 
     is_deeply \@output, \@expected, '... and the output should be correct';
     like $status, $expected_status,
@@ -248,7 +248,7 @@ for my $test_args ( get_arg_sets() ) {
     $status           = pop @output;
     $expected_status  = qr{^Result: PASS$};
     $summary          = pop @output;
-    $expected_summary = qr/^Files=1, Tests=1,  \d+ wallclock secs/;
+    $expected_summary = qr/^Files=1, Tests=1, +\d+ wallclock secs/;
 
     is_deeply \@output, \@expected, '... and the output should be correct';
     like $status, $expected_status,
@@ -384,7 +384,7 @@ for my $test_args ( get_arg_sets() ) {
 
     $status           = pop @output;
     $summary          = pop @output;
-    $expected_summary = qr/^Files=1, Tests=3,  \d+ wallclock secs/;
+    $expected_summary = qr/^Files=1, Tests=3, +\d+ wallclock secs/;
 
     is_deeply \@output, \@expected, '... and the output should be correct';
     like $summary, $expected_summary,
@@ -494,7 +494,7 @@ for my $test_args ( get_arg_sets() ) {
 
     like $status, qr{^Result: FAIL$},
       '... and the status line should be correct';
-    $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
+    $expected_summary = qr/^Files=1, Tests=2, +\d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';
 
     # check the status output for no tests
@@ -518,7 +518,7 @@ for my $test_args ( get_arg_sets() ) {
 
     like $status, qr{^Result: FAIL$},
       '... and the status line should be correct';
-    $expected_summary = qr/^Files=1, Tests=2,  \d+ wallclock secs/;
+    $expected_summary = qr/^Files=1, Tests=2, +\d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';
 
     #XXXX

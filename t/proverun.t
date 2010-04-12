@@ -14,6 +14,7 @@ use strict;
 use Test::More;
 use File::Spec;
 use App::Prove;
+use TAP::Parser::Utils qw( split_shell );
 
 my @SCHEDULE;
 
@@ -57,6 +58,9 @@ BEGIN {
                         {   merge   => undef,
                             command => [
                                 'PERL',
+                                $ENV{HARNESS_PERL_SWITCHES}
+                                  ? split_shell( $ENV{HARNESS_PERL_SWITCHES} )
+                                  : (),
                                 $_->{file},
                             ],
                             setup    => \'CODE',

@@ -18,6 +18,8 @@ use File::Spec;
 use App::Prove;
 use Getopt::Long;
 
+use TAP::Parser::Utils qw( split_shell );
+
 package FakeProve;
 use vars qw( @ISA );
 
@@ -1591,6 +1593,11 @@ for my $test (@SCHEDULE) {
                 if ( my $extra = $test->{extra} ) {
                     $extra->($gotlog);
                 }
+
+                # adapt our expectations if HARNESS_PERL_SWITCHES is set
+                push @{ $runlog->[0][1]{switches} },
+                  split_shell( $ENV{HARNESS_PERL_SWITCHES} )
+                  if $ENV{HARNESS_PERL_SWITCHES};
 
                 unless (
                     is_deeply $gotlog, $runlog,
