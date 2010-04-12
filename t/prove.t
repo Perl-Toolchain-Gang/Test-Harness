@@ -1596,7 +1596,8 @@ for my $test (@SCHEDULE) {
 
                 # adapt our expectations if HARNESS_PERL_SWITCHES is set
                 push @{ $runlog->[0][1]{switches} },
-                  split_shell( $ENV{HARNESS_PERL_SWITCHES} );
+                  split_shell( $ENV{HARNESS_PERL_SWITCHES} )
+                  if $ENV{HARNESS_PERL_SWITCHES};
 
                 unless (
                     is_deeply $gotlog, $runlog,
