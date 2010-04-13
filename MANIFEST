@@ -1,5 +1,5 @@
 bin/prove
-Build.PL
+NotBuild.PL
 Changes
 Changes-2.64
 examples/analyze_tests.pl
