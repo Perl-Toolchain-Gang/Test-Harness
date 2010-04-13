@@ -1873,6 +1873,8 @@ Nicholas Clark <nick@ccl4.org>
 
 Lee Johnson <notfadeaway at btinternet dot com>
 
+Philippe Bruhat <book@cpan.org>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to
