@@ -9,6 +9,8 @@ Revision history for Test-Harness
         - Numerous spelling fixes. Thanks to Ville Skyttä.
         - Add new option --tapversion for prove to set the default
           assumed TAP version. Thanks to Steffen Schwigon.
+        - Fixed tests to run successfully under Devel::Cover. Thanks to
+          Phillipe Bruhat.
 
 3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no
