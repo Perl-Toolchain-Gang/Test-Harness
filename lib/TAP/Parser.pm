@@ -370,9 +370,7 @@ sub make_result           { shift->result_factory_class->make_result(@_); }
     my %initialize = (
         version       => $DEFAULT_TAP_VERSION,
         plan          => '',                    # the test plan (e.g., 1..3)
-        tap           => '',                    # the TAP
         tests_run     => 0,                     # actual current test numbers
-        results       => [],                    # TAP parser results
         skipped       => [],                    #
         todo          => [],                    #
         passed        => [],                    #
