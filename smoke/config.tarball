@@ -14,7 +14,7 @@ tasks:
         verbose: 1
     name: Test::Harness
     script:
-      - yes n | %PERL% Build.PL
+      - yes n | %PERL% NotBuild.PL
       - ./Build
       - ./Build test
       - ./Build dist

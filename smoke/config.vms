@@ -16,7 +16,7 @@ tasks:
         verbose: 1
     name: Test::Harness on VMS
     script:
-      - yes n | %PERL% Build.PL
+      - yes n | %PERL% NotBuild.PL
       - ./Build
       - ./Build dist
       - %PERL% smoke/testdrive.pl Test-Harness-*.tar.gz

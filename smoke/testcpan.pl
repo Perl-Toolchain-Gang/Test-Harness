@@ -60,7 +60,8 @@ sub build {
     my $cwd = getcwd;
     chdir $distribution;
     my $command
-      = -f 'Build.PL'    ? "perl -I$harness Build.PL && ./Build test"
+      = -f 'NotBuild.PL' ? "perl -I$harness NotBuild.PL && ./Build test"
+      : -f 'Build.PL'    ? "perl -I$harness Build.PL && ./Build test"
       : -f 'Makefile.PL' ? "perl -I$harness Makefile.PL && $MAKE test"
       :                    warn "Don't know how to build $distribution";
     return unless $command;

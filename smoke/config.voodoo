@@ -26,7 +26,7 @@ tasks:
       - make
       - make test
       - make distclean
-      - yes n | %PERL% Build.PL
+      - yes n | %PERL% NotBuild.PL
       - ./Build
       - ./Build test
       - ./Build testprove
