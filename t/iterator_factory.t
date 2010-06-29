@@ -4,7 +4,7 @@
 ##
 
 BEGIN {
-  unshift @INC, 't/lib';
+    unshift @INC, 't/lib';
 }
 
 use strict;

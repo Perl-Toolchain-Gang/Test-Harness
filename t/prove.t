@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-  unshift @INC, 't/lib';
+    unshift @INC, 't/lib';
 }
 
 use strict;
@@ -1013,7 +1013,7 @@ BEGIN {    # START PLAN
             args => {
                 argv => [qw( one two three )],
             },
-            proverc => 't/proverc/emptyexec',
+            proverc  => 't/proverc/emptyexec',
             switches => [$dummy_test],
             expect   => { exec => '' },
             runlog   => [

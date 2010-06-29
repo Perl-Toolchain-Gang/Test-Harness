@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-  push @INC, 't/lib';
+    push @INC, 't/lib';
 }
 
 use strict;

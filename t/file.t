@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-  unshift @INC, 't/lib';
+    unshift @INC, 't/lib';
 }
 
 use strict;
@@ -12,10 +12,8 @@ use TAP::Harness;
 
 my $HARNESS = 'TAP::Harness';
 
-my $source_tests
-  = 't/source_tests';
-my $sample_tests
-  = 't/sample-tests';
+my $source_tests = 't/source_tests';
+my $sample_tests = 't/sample-tests';
 
 plan tests => 56;
 

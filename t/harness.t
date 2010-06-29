@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-   unshift @INC, 't/lib';
+    unshift @INC, 't/lib';
 }
 
 use strict;
@@ -13,10 +13,8 @@ use TAP::Harness;
 
 my $HARNESS = 'TAP::Harness';
 
-my $source_tests
-  = 't/source_tests';
-my $sample_tests
-  = 't/sample-tests';
+my $source_tests = 't/source_tests';
+my $sample_tests = 't/sample-tests';
 
 plan tests => 128;
 
@@ -536,12 +534,7 @@ SKIP: {
         }
     );
 
-    eval {
-        _runtests(
-            $harness,
-            't/data/catme.1'
-        );
-    };
+    eval { _runtests( $harness, 't/data/catme.1' ); };
 
     my @output = tied($$capture)->dump;
     my $status = pop @output;
@@ -634,8 +627,7 @@ SKIP: {
         {   verbosity => -2,
             stdout    => $capture,
             exec      => sub {
-                open my $fh,
-                  't/data/catme.1';
+                open my $fh, 't/data/catme.1';
                 return $fh;
             },
         }
@@ -965,9 +957,7 @@ sub _runtests {
 
     # coverage tests for the basically untested T::H::_open_spool
 
-    my @spool = (
-        't', 'spool'
-    );
+    my @spool = ( 't', 'spool' );
     $ENV{PERL_TEST_HARNESS_DUMP_TAP} = File::Spec->catfile(@spool);
 
 # now given that we're going to be writing stuff to the file system, make sure we have

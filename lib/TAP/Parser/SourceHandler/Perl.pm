@@ -197,8 +197,10 @@ sub _iterator_hooks {
 
     my $setup = sub {
         if ( @{$libs} ) {
-            $ENV{PERL5LIB} = join( $Config{path_sep}, grep {defined} @{$libs},
-                $ENV{PERL5LIB} );
+            $ENV{PERL5LIB} = join(
+                $Config{path_sep}, grep {defined} @{$libs},
+                $ENV{PERL5LIB}
+            );
         }
     };
 
