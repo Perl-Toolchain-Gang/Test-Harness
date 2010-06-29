@@ -1,13 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if ( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = ( '../lib', '../ext/Test-Harness/t/lib' );
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
+   unshift @INC, 't/lib';
 }
 
 use strict;
@@ -27,10 +21,6 @@ my $HAS_SH   = -x '/bin/sh';
 my $HAS_ECHO = -x '/bin/echo';
 
 my $dir = File::Spec->catdir(
-    (   $ENV{PERL_CORE}
-        ? ( File::Spec->updir(), 'ext', 'Test-Harness' )
-        : ()
-    ),
     't',
     'source_tests'
 );
@@ -94,7 +84,7 @@ my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
         ],
         make_iterator => [
             {   name   => "valid executable",
-                raw    => [ $perl, '-It/lib', '-T', $file{source} ],
+                raw    => [ $perl, '-I../../lib', '-It/lib', '-T', $file{source} ],
                 iclass => 'TAP::Parser::Iterator::Process',
                 output        => [ '1..1', 'ok 1 - source' ],
                 assemble_meta => 1,

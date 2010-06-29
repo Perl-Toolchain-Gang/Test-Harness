@@ -1,13 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if ( $ENV{PERL_CORE} ) {
-        chdir 't';
-        @INC = ( '../lib', 'lib' );
-    }
-    else {
-        unshift @INC, 't/lib';
-    }
+  unshift @INC, 't/lib';
 }
 
 use strict;
@@ -20,10 +14,6 @@ my @SCHEDULE;
 
 BEGIN {
     my $t_dir = File::Spec->catdir(
-        (   $ENV{PERL_CORE}
-            ? ( File::Spec->updir(), 'ext', 'Test-Harness' )
-            : ()
-        ),
         't'
     );
 
