@@ -18,7 +18,10 @@ use_ok('TAP::Parser::Source');
 
 sub ct($) {
     my $hash = shift;
-    delete $hash->{is_symlink} if $ENV{PERL_CORE};
+    if ( $ENV{PERL_CORE} ) {
+        delete $hash->{is_symlink};
+        delete $hash->{lstat};
+    }
     return $hash;
 }
 
