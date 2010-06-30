@@ -16,6 +16,12 @@ my $dir = File::Spec->catdir(
 
 use_ok('TAP::Parser::Source');
 
+sub ct($) {
+    my $hash = shift;
+    delete $hash->{is_symlink} if $ENV{PERL_CORE};
+    return $hash;
+}
+
 # Basic tests
 {
     my $source = TAP::Parser::Source->new;
@@ -131,8 +137,8 @@ use_ok('TAP::Parser::Source');
     # separate meta->file to break up the test
     my $file = delete $meta->{file};
     is_deeply(
-        $meta,
-        {   is_scalar    => 1,
+        ct $meta,
+        ct {is_scalar    => 1,
             has_newlines => 0,
             length       => length($test),
             is_object    => 0,
@@ -152,8 +158,8 @@ use_ok('TAP::Parser::Source');
     isnt( delete $file->{write},   undef, '... file->write set' );
     isnt( delete $file->{execute}, undef, '... file->execute set' );
     is_deeply(
-        $file,
-        {   basename   => 'source.t',
+        ct $file,
+        ct {basename   => 'source.t',
             ext        => '.t',
             lc_ext     => '.t',
             shebang    => '#!/usr/bin/perl',
@@ -183,8 +189,8 @@ use_ok('TAP::Parser::Source');
     # separate meta->file to break up the test
     my $file = delete $meta->{file};
     is_deeply(
-        $meta,
-        {   is_scalar    => 1,
+        ct $meta,
+        ct {is_scalar    => 1,
             has_newlines => 0,
             length       => length($test),
             is_object    => 0,
@@ -206,8 +212,8 @@ use_ok('TAP::Parser::Source');
     isnt( delete $file->{write},   undef, '... file->write set' );
     isnt( delete $file->{execute}, undef, '... file->execute set' );
     is_deeply(
-        $file,
-        {   basename   => 'source_tests',
+        ct $file,
+        ct {basename   => 'source_tests',
             ext        => '',
             lc_ext     => '',
             text       => 0,
@@ -244,8 +250,8 @@ SKIP: {
     # separate meta->file to break up the test
     my $file = delete $meta->{file};
     is_deeply(
-        $meta,
-        {   is_scalar    => 1,
+        ct $meta,
+        ct {is_scalar    => 1,
             has_newlines => 0,
             length       => length($symlink),
             is_object    => 0,
@@ -267,8 +273,8 @@ SKIP: {
     isnt( delete $file->{write},   undef, '... file->write set' );
     isnt( delete $file->{execute}, undef, '... file->execute set' );
     is_deeply(
-        $file,
-        {   basename   => 'source_link.T',
+        ct $file,
+        ct {basename   => 'source_link.T',
             ext        => '.T',
             lc_ext     => '.t',
             shebang    => '#!/usr/bin/perl',
