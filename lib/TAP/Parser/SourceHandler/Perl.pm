@@ -282,7 +282,6 @@ sub get_taint {
 sub _switches {
     my ( $class, $source ) = @_;
     my $file     = ${ $source->raw };
-    my @args     = @{ $source->test_args || [] };
     my @switches = @{ $source->switches || [] };
     my $shebang  = $source->meta->{file}->{shebang};
     return unless defined $shebang;
