@@ -11,6 +11,8 @@ Revision history for Test-Harness
           assumed TAP version. Thanks to Steffen Schwigon.
         - Fixed tests to run successfully under Devel::Cover. Thanks to
           Phillipe Bruhat.
+        - Fixed injection of test args to work with general executables
+          as well as Perl scripts (#59186).
 
 3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no
