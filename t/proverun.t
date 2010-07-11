@@ -13,7 +13,7 @@ use TAP::Parser::Utils qw( split_shell );
 my @SCHEDULE;
 
 BEGIN {
-    my $t_dir = File::Spec->catdir( 't' );
+    my $t_dir = File::Spec->catdir('t');
 
     # to add a new test to proverun, just list the name of the file in
     # t/sample-tests and a name for the test.  The rest is handled
