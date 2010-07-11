@@ -120,6 +120,8 @@ sub make_iterator {
     $class->_autoflush( \*STDOUT );
     $class->_autoflush( \*STDERR );
 
+    push @command, @{ $source->test_args || [] };
+
     return $class->iterator_class->new(
         {   command => \@command,
             merge   => $source->merge

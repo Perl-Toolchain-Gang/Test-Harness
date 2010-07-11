@@ -452,7 +452,7 @@ sub make_result           { shift->result_factory_class->make_result(@_); }
         }
         elsif ($exec) {
             $type = 'exec ' . $exec->[0];
-            $source->raw( { exec => [ @$exec, @$test_args ] } );
+            $source->raw( { exec => $exec } );
         }
         elsif ($raw_source) {
             $type = 'source ' . ref($raw_source) || $raw_source;
