@@ -173,9 +173,9 @@ sub ct($) {
             is_dir     => 0,
             is_file    => 1,
             is_symlink => 0,
-            sticky     => 0,
-            setgid     => 0,
-            setuid     => 0,
+            sticky     => -k $test ? 1 : 0,
+            setgid     => -g $test ? 1 : 0,
+            setuid     => -u $test ? 1 : 0,
         },
         '... file->* set'
     );
@@ -183,7 +183,7 @@ sub ct($) {
 
 # dir test
 {
-    my $test   = File::Spec->catfile($dir);
+    my $test   = $dir;
     my $source = TAP::Parser::Source->new;
 
     $source->raw( \$test );
@@ -224,9 +224,9 @@ sub ct($) {
             is_dir     => 1,
             is_file    => 0,
             is_symlink => 0,
-            sticky     => 0,
-            setgid     => 0,
-            setuid     => 0,
+            sticky     => -k $test ? 1 : 0,
+            setgid     => -g $test ? 1 : 0,
+            setuid     => -u $test ? 1 : 0,
         },
         '... file->* set'
     );
@@ -288,9 +288,9 @@ SKIP: {
             is_dir     => 0,
             is_file    => 1,
             is_symlink => 1,
-            sticky     => 0,
-            setgid     => 0,
-            setuid     => 0,
+            sticky     => -k $symlink ? 1 : 0,
+            setgid     => -g $symlink ? 1 : 0,
+            setuid     => -u $symlink ? 1 : 0,
         },
         '... file->* set'
     );
