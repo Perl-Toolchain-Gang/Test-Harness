@@ -6,7 +6,7 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 123;
+use Test::More tests => 127;
 
 use IO::File;
 use IO::Handle;
@@ -28,7 +28,8 @@ my $dir = File::Spec->catdir(
 my $perl = $^X;
 
 my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
-  qw( source source.1 source.bat source.pl source.sh source.t source.tap );
+  qw( source source.1 source.bat source.pl source.sh source_args.sh source.t
+      source.tap );
 
 # Abstract base class tests
 {
@@ -106,6 +107,15 @@ my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
                 skip_reason => 'no /bin/sh, /bin/echo',
                 iclass      => 'TAP::Parser::Iterator::Process',
                 output        => [ '1..1', 'ok 1 - source.sh' ],
+                assemble_meta => 1,
+            },
+            {   name        => $file{'source_args.sh'},
+                raw         => { exec => [ $file{'source_args.sh'} ] },
+                test_args   => [ 'foo' ],
+                skip        => $HAS_SH && $HAS_ECHO ? 0 : 1,
+                skip_reason => 'no /bin/sh, /bin/echo',
+                iclass      => 'TAP::Parser::Iterator::Process',
+                output        => [ '1..1', 'ok 1 - source_args.sh foo' ],
                 assemble_meta => 1,
             },
             {   name        => $file{'source.bat'},
@@ -454,6 +464,7 @@ sub test_handler {
 
             my $source = TAP::Parser::Source->new;
             $source->raw( $test->{raw} )       if $test->{raw};
+            $source->test_args( $test->{test_args} ) if $test->{test_args};
             $source->meta( $test->{meta} )     if $test->{meta};
             $source->config( $test->{config} ) if $test->{config};
             $source->assemble_meta             if $test->{assemble_meta};
