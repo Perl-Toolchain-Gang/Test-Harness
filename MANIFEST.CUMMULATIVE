@@ -7,6 +7,7 @@ MANIFEST
 MANIFEST.CUMMULATIVE
 META.yml
 Makefile.PL
+NotBuild.PL
 README
 TODO
 bin/prove
@@ -312,6 +313,7 @@ t/source_tests/source.pl
 t/source_tests/source.sh
 t/source_tests/source.t
 t/source_tests/source.tap
+t/source_tests/source_args.sh
 t/source_tests/varsource
 t/spool.t
 t/state.t

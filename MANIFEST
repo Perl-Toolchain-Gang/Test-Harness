@@ -1,5 +1,4 @@
 bin/prove
-NotBuild.PL
 Changes
 Changes-2.64
 examples/analyze_tests.pl
@@ -70,6 +69,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.CUMMULATIVE
 META.yml
+NotBuild.PL
 perlcriticrc
 README
 t/000-load.t
@@ -216,6 +216,7 @@ t/source_tests/source.pl
 t/source_tests/source.sh
 t/source_tests/source.t
 t/source_tests/source.tap
+t/source_tests/source_args.sh
 t/spool.t
 t/state.t
 t/state_results.t
