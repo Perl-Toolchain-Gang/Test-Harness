@@ -86,6 +86,7 @@ BEGIN {
         rules             => sub { shift; shift },
         sources           => sub { shift; shift },
         version           => sub { shift; shift },
+        trap              => sub { shift; shift },
     );
 
     for my $method ( sort keys %VALIDATION_FOR ) {
@@ -348,6 +349,11 @@ interface may change.
 
 A filehandle for catching standard output.
 
+=item * C<trap>
+
+Attempt to print summary information if run is interrupted by
+SIGINT (Ctrl-C).
+
 =back
 
 Any keys for which the value is C<undef> will be ignored.
@@ -469,10 +475,28 @@ sub runtests {
 
     $self->_make_callback( 'before_runtests', $aggregate );
     $aggregate->start;
-    $self->aggregate_tests( $aggregate, @tests );
-    $aggregate->stop;
-    $self->summary($aggregate);
-    $self->_make_callback( 'after_runtests', $aggregate );
+    my $finish = sub {
+        my $interrupted = shift;
+        $aggregate->stop;
+        $self->summary( $aggregate, $interrupted );
+        $self->_make_callback( 'after_runtests', $aggregate );
+    };
+    my $run = sub {
+        $self->aggregate_tests( $aggregate, @tests );
+        $finish->();
+    };
+
+    if ( $self->trap ) {
+        local $SIG{INT} = sub {
+            print "\n";
+            $finish->(1);
+            exit;
+        };
+        $run->();
+    }
+    else {
+        $run->();
+    }
 
     return $aggregate;
 }
@@ -486,8 +510,8 @@ Output the summary for a L<TAP::Parser::Aggregator>.
 =cut
 
 sub summary {
-    my ( $self, $aggregate ) = @_;
-    $self->formatter->summary($aggregate);
+    my ( $self, @args ) = @_;
+    $self->formatter->summary(@args);
 }
 
 sub _after_test {

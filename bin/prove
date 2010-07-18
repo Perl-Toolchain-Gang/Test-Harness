@@ -44,6 +44,7 @@ Boolean options:
  -p,  --parse           Show full list of TAP parse errors, if any.
       --directives      Only show results with TODO or SKIP directives.
       --timer           Print elapsed time after each test.
+      --trap            Trap Ctrl-C and print summary on interrupt.
       --normalize       Normalize TAP output in verbose output
  -T                     Enable tainting checks.
  -t                     Enable tainting warnings.
@@ -151,6 +152,11 @@ Caveat: this is a bit of a kludge. In particular note that if anything
 that appears on STDERR looks like a test result the test harness will
 get confused. Use this option only if you understand the consequences
 and can live with the risk.
+
+=head2 C<--trap>
+
+The C<--trap> option will attempt to trap SIGINT (Ctrl-C) during a test
+run and display the test summary even if the run is interrupted
 
 =head2 C<--state>
 

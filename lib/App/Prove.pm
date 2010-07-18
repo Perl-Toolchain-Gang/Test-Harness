@@ -59,7 +59,7 @@ BEGIN {
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
       state_class test_args state dry extension ignore_exit rules state_manager
-      normalize sources tapversion
+      normalize sources tapversion trap
     );
     __PACKAGE__->mk_methods(@ATTR);
 }
@@ -244,6 +244,7 @@ sub process_args {
             'normalize'    => \$self->{normalize},
             'rules=s@'     => $self->{rules},
             'tapversion=s' => \$self->{tapversion},
+            'trap'         => \$self->{trap},
         ) or croak('Unable to continue');
 
         # Stash the remainder of argv for later
@@ -286,6 +287,8 @@ sub _get_args {
     my $self = shift;
 
     my %args;
+
+    $args{trap} = 1 if $self->trap;
 
     if ( defined $self->color ? $self->color : $self->_color_default ) {
         $args{color} = 1;
@@ -722,6 +725,8 @@ calling C<run>.
 =item C<warnings_warn>
 
 =item C<tapversion>
+
+=item C<trap>
 
 =back
 
