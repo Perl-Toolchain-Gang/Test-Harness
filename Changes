@@ -13,6 +13,8 @@ Revision history for Test-Harness
           Phillipe Bruhat.
         - Fixed injection of test args to work with general executables
           as well as Perl scripts (#59186).
+        - Made it possible to run executable tests in the current
+          directory (#59457).
 
 3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no

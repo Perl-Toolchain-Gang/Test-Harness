@@ -3,6 +3,8 @@ package TAP::Parser::SourceHandler::Executable;
 use strict;
 use vars qw($VERSION @ISA);
 
+use File::Spec;
+
 use TAP::Parser::SourceHandler     ();
 use TAP::Parser::IteratorFactory   ();
 use TAP::Parser::Iterator::Process ();
@@ -114,6 +116,11 @@ sub make_iterator {
     elsif ( $meta->{is_array} ) {
         @command = @{ $source->raw };
     }
+
+    # On Unix-like platforms makes it possible to run executables in the
+    # current directory. Should be a NOP on other platforms.
+    $command[0] = File::Spec->rel2abs( $command[0] )
+      if @command && -x $command[0];
 
     $class->_croak('No command found in $source->raw!') unless @command;
 

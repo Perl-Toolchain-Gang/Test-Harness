@@ -61,7 +61,7 @@ sub make_shell_test {
     }
     chmod 0777, $script;
     return unless -x $script;
-    return [ shell => "./$script" ];
+    return [ shell => $script ];
 }
 
 {
