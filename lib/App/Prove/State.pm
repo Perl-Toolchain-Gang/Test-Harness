@@ -378,7 +378,7 @@ sub _expand_dir_recursive {
     my ( $self, $dir, $extensions ) = @_;
 
     my @tests;
-    my $ext_string = join( '|', map { "\\Q$_\\E" } @{$extensions} );
+    my $ext_string = join( '|', map { quotemeta } @{$extensions} );
 
     find(
         {   follow      => 1,      #21938
