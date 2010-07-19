@@ -82,7 +82,7 @@ BEGIN {    # START PLAN
 
     # list of attributes
     @ATTR = qw(
-      archive argv blib color directives exec extension failures
+      archive argv blib color directives exec extensions failures
       formatter harness includes lib merge parse quiet really_quiet
       recurse backwards shuffle taint_fail taint_warn verbose
       warnings_fail warnings_warn
@@ -1081,6 +1081,34 @@ BEGIN {    # START PLAN
                     },
                     'TAP::Harness',
                     $dummy_test
+                ]
+            ],
+        },
+
+        # Specify an oddball extension
+        {   name => 'Switch --ext=.wango',
+            switches => [ '--ext=.wango' ],
+            expect => { extensions => ['.wango'] },
+            runlog => [
+                [   '_runtests',
+                    {   verbosity  => 0,
+                        show_count => 1,
+                    },
+                    'TAP::Harness',
+                ]
+            ],
+        },
+
+        # Handle multiple extensions
+        {   name => 'Switch --ext=.foo --ext=.bar',
+            switches => [ '--ext=.foo', '--ext=.bar', ],
+            expect => { extensions => ['.foo','.bar'] },
+            runlog => [
+                [   '_runtests',
+                    {   verbosity  => 0,
+                        show_count => 1,
+                    },
+                    'TAP::Harness',
                 ]
             ],
         },

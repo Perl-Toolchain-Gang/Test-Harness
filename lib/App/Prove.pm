@@ -58,7 +58,7 @@ BEGIN {
       formatter harness includes modules plugins jobs lib merge parse quiet
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
-      state_class test_args state dry extension ignore_exit rules state_manager
+      state_class test_args state dry extensions ignore_exit rules state_manager
       normalize sources tapversion
     );
     __PACKAGE__->mk_methods(@ATTR);
@@ -214,7 +214,7 @@ sub process_args {
             'count!'       => \$self->{show_count},
             'c'            => \$self->{color},
             'D|dry'        => \$self->{dry},
-            'ext=s'        => \$self->{extension},
+            'ext=s@'       => \$self->{extensions},
             'harness=s'    => \$self->{harness},
             'ignore-exit'  => \$self->{ignore_exit},
             'source=s@'    => $self->{sources},
@@ -496,8 +496,8 @@ sub _get_tests {
     my $self = shift;
 
     my $state = $self->state_manager;
-    my $ext   = $self->extension;
-    $state->extension($ext) if defined $ext;
+    my $ext   = $self->extensions;
+    $state->extensions($ext) if defined $ext;
     if ( defined( my $state_switch = $self->state ) ) {
         $state->apply_switch(@$state_switch);
     }
@@ -659,7 +659,7 @@ calling C<run>.
 
 =item C<exec>
 
-=item C<extension>
+=item C<extensions>
 
 =item C<failures>
 

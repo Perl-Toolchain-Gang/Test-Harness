@@ -13,6 +13,11 @@ Revision history for Test-Harness
           Phillipe Bruhat.
         - Fixed injection of test args to work with general executables
           as well as Perl scripts (#59186).
+        - Allow multiple --ext=.foo arguments to prove, to allow running
+          different types of tests in the same prove run.
+        - App::Prove::extension() is now App::Prove::extensions(), and
+          returns an arrayref of extensions, rather than a single scalar.
+          The same change has been made to App::Prove::State::extension().
 
 3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no
