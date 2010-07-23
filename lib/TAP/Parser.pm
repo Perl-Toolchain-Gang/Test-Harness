@@ -1702,11 +1702,11 @@ Many C<TAP::*> classes have a I<SUBCLASSING> section to guide you.
 
 =item 3
 
-Note that C<TAP::Parser> is designed to be the central 'maker' - ie: it is
+Note that C<TAP::Parser> is designed to be the central "maker" - ie: it is
 responsible for creating most new objects in the C<TAP::Parser::*> namespace.
 
 This makes it possible for you to have a single point of configuring what
-subclasses should be used, which in turn means that in many cases you'll find
+subclasses should be used, which means that in many cases you'll find
 you only need to sub-class one of the parser's components.
 
 The exception to this rule are I<SourceHandlers> & I<Iterators>, but those are
@@ -1727,7 +1727,7 @@ deprecated first, and changed in a later release.
 =head3 Sources
 
 A TAP parser consumes input from a single I<raw source> of TAP, which could come
-from anywhere (a file, an executable, a database, an io handle, a uri, etc..).
+from anywhere (a file, an executable, a database, an IO handle, a URI, etc..).
 The source gets bundled up in a L<TAP::Parser::Source> object which gathers some
 meta data about it.  The parser then uses a L<TAP::Parser::IteratorFactory> to
 determine which L<TAP::Parser::SourceHandler> to use to turn the raw source
@@ -1791,7 +1791,7 @@ override L</make_result>.
 
 =head3 Grammar
 
-L<TAP::Parser::Grammar> is the heart of the parser - it tokenizes the TAP
+L<TAP::Parser::Grammar> is the heart of the parser.  It tokenizes the TAP
 input I<stream> and produces results.  If you need to customize its behaviour
 you should probably familiarize yourself with the source first.  Enough
 lecturing.
