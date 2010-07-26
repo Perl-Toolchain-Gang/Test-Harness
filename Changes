@@ -18,8 +18,9 @@ Revision history for Test-Harness
         - App::Prove::extension() is now App::Prove::extensions(), and
           returns an arrayref of extensions, rather than a single scalar.
           The same change has been made to App::Prove::State::extension().
-        - Made it possible to run executable tests in the current
-          directory (#59457).
+        - Preserve old semantics for test scripts with a shebang line
+          by favouring Perl as the intepreter for any file with a
+          shebang (#59457).
         - Add --trap (summary on Ctrl-C) option to prove (#59427).
 
 3.21    2010-01-30

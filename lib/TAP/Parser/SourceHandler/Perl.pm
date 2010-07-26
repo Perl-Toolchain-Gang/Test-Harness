@@ -63,6 +63,7 @@ won't need to use this module directly.
 Only votes if $source looks like a file.  Casts the following votes:
 
   0.9  if it has a shebang ala "#!...perl"
+  0.75 if it has any shebang
   0.8  if it's a .t file
   0.9  if it's a .pl file
   0.75 if it's in a 't' directory
@@ -79,6 +80,11 @@ sub can_handle {
 
     if ( my $shebang = $file->{shebang} ) {
         return 0.9 if $shebang =~ /^#!.*\bperl/;
+        # We favour Perl as the interpreter for any shebang to preserve
+        # previous semantics: we used to execute everything via Perl and
+        # relied on it to pass the shebang off to the appropriate
+        # interpreter.
+        return 0.75;
     }
 
     return 0.8 if $file->{lc_ext} eq '.t';    # vote higher than Executable

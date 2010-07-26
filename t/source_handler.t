@@ -61,7 +61,7 @@ my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
                     is_file => 1,
                     file    => { lc_ext => '.sh' }
                 },
-                vote => 0.8,
+                vote => 0,
             },
             {   name => '.bat',
                 meta => {

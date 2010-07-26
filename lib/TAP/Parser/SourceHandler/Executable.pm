@@ -3,8 +3,6 @@ package TAP::Parser::SourceHandler::Executable;
 use strict;
 use vars qw($VERSION @ISA);
 
-use File::Spec;
-
 use TAP::Parser::SourceHandler     ();
 use TAP::Parser::IteratorFactory   ();
 use TAP::Parser::Iterator::Process ();
@@ -41,13 +39,13 @@ $VERSION = '3.22';
 
 This is an I<executable> L<TAP::Parser::SourceHandler> - it has 2 jobs:
 
-1. Figure out if the L<TAP::Parser::Source> it's given is an executable command
-(L</can_handle>).
+1. Figure out if the L<TAP::Parser::Source> it's given is an executable
+   command (L</can_handle>).
 
 2. Creates an iterator for executable commands (L</make_iterator>).
 
-Unless you're writing a plugin or subclassing L<TAP::Parser>, you probably
-won't need to use this module directly.
+Unless you're writing a plugin or subclassing L<TAP::Parser>, you
+probably won't need to use this module directly.
 
 =head1 METHODS
 
@@ -57,10 +55,10 @@ won't need to use this module directly.
 
   my $vote = $class->can_handle( $source );
 
-Only votes if $source looks like an executable file.  Casts the following votes:
+Only votes if $source looks like an executable file. Casts the
+following votes:
 
   0.9  if it's a hash with an 'exec' key
-  0.8  if it's a .sh file
   0.8  if it's a .bat file
   0.75 if it's got an execute bit set
 
@@ -74,7 +72,6 @@ sub can_handle {
         my $file = $meta->{file};
 
         # Note: we go in low so we can be out-voted
-        return 0.8 if $file->{lc_ext} eq '.sh';
         return 0.8 if $file->{lc_ext} eq '.bat';
         return 0.7 if $file->{execute};
     }
@@ -116,11 +113,6 @@ sub make_iterator {
     elsif ( $meta->{is_array} ) {
         @command = @{ $source->raw };
     }
-
-    # On Unix-like platforms makes it possible to run executables in the
-    # current directory. Should be a NOP on other platforms.
-    $command[0] = File::Spec->rel2abs( $command[0] )
-      if @command && -x $command[0];
 
     $class->_croak('No command found in $source->raw!') unless @command;
 

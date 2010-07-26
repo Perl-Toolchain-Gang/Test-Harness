@@ -98,7 +98,7 @@ my @sources = (
         iterator => 'TAP::Parser::Iterator::Process',
     },
     {   file     => 'source.sh',
-        handler  => 'TAP::Parser::SourceHandler::Executable',
+        handler  => 'TAP::Parser::SourceHandler::Perl',
         iterator => 'TAP::Parser::Iterator::Process',
     },
     {   file     => 'source.bat',
