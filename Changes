@@ -22,6 +22,8 @@ Revision history for Test-Harness
           by favouring Perl as the intepreter for any file with a
           shebang (#59457).
         - Add --trap (summary on Ctrl-C) option to prove (#59427).
+        - Removed TAP::Parser::SourceHandler::pgTAP. Find it in its own
+          distribution on CPAN.
 
 3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no

@@ -147,9 +147,6 @@ provides:
   TAP::Parser::SourceHandler::RawTAP:
     file: lib/TAP/Parser/SourceHandler/RawTAP.pm
     version: 3.21
-  TAP::Parser::SourceHandler::pgTAP:
-    file: lib/TAP/Parser/SourceHandler/pgTAP.pm
-    version: 3.21
   TAP::Parser::Utils:
     file: lib/TAP/Parser/Utils.pm
     version: 3.21

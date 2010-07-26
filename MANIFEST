@@ -59,7 +59,6 @@ lib/TAP/Parser/SourceHandler/Executable.pm
 lib/TAP/Parser/SourceHandler/File.pm
 lib/TAP/Parser/SourceHandler/Handle.pm
 lib/TAP/Parser/SourceHandler/Perl.pm
-lib/TAP/Parser/SourceHandler/pgTAP.pm
 lib/TAP/Parser/SourceHandler/RawTAP.pm
 lib/TAP/Parser/Utils.pm
 lib/TAP/Parser/YAMLish/Reader.pm

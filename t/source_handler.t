@@ -6,12 +6,11 @@ BEGIN {
 
 use strict;
 
-use Test::More tests => 127;
+use Test::More tests => 79;
 
 use IO::File;
 use IO::Handle;
 use File::Spec;
-use MyShebangger;
 
 use TAP::Parser::Source;
 use TAP::Parser::SourceHandler;
@@ -316,111 +315,6 @@ my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
 
     test_handler( $class, $tests );
 }
-
-# pgTAP source tests
-{
-    my $class = 'TAP::Parser::SourceHandler::pgTAP';
-    my $test  = File::Spec->catfile( $dir, 'source.t' );
-    my $psql  = File::Spec->catfile( $dir, 'psql' );
-    if ( $^O eq 'MSWin32' ) {
-        $psql .= '.bat';
-    }
-    else {
-        $psql = MyShebangger::make_perl_executable($psql);
-    }
-    my @command = qw(
-      --no-psqlrc
-      --no-align
-      --quiet
-      --pset pager=
-      --pset tuples_only=true
-      --set ON_ERROR_ROLLBACK=1
-      --set ON_ERROR_STOP=1
-    );
-    my $tests = {
-        default_vote => 0,
-        can_handle   => [
-            {   name => '.pg',
-                meta => {
-                    is_file => 1,
-                    file    => { lc_ext => '.pg' }
-                },
-                config => {},
-                vote   => 0.9,
-            },
-            {   name => '.sql',
-                meta => {
-                    is_file => 1,
-                    file    => { lc_ext => '.sql' }
-                },
-                config => {},
-                vote   => 0.8,
-            },
-            {   name => '.s',
-                meta => {
-                    is_file => 1,
-                    file    => { lc_ext => '.s' }
-                },
-                config => {},
-                vote   => 0.75,
-            },
-            {   name => 'config_suffix',
-                meta => {
-                    is_file => 1,
-                    file    => { lc_ext => '.foo' }
-                },
-                config => { pgTAP => { suffix => '.foo' } },
-                vote   => 1,
-            },
-            {   name => 'not_file',
-                meta => {
-                    is_file => 0,
-                },
-                vote => 0,
-            },
-        ],
-        make_iterator => [
-            {   name   => 'psql',
-                raw    => \$test,
-                config => { pgTAP => { psql => $psql } },
-                iclass => 'TAP::Parser::Iterator::Process',
-                output => [ @command, '--file', $test ],
-            },
-            {   name   => 'config',
-                raw    => $test,
-                config => {
-                    pgTAP => {
-                        psql     => $psql,
-                        username => 'who',
-                        host     => 'f',
-                        port     => 2,
-                        dbname   => 'fred',
-                    }
-                },
-                iclass => 'TAP::Parser::Iterator::Process',
-                output => [
-                    @command,
-                    qw(--username who --host f --port 2 --dbname fred --file),
-                    $test
-                ],
-            },
-            {   name   => 'error',
-                raw    => 'blah.pg',
-                iclass => 'TAP::Parser::Iterator::Process',
-                error  => qr/^No such file or directory: blah[.]pg/,
-            },
-            {   name   => 'undef error',
-                raw    => undef,
-                iclass => 'TAP::Parser::Iterator::Process',
-                error  => qr/^No such file or directory: /,
-            },
-        ],
-    };
-
-    test_handler( $class, $tests );
-}
-
-exit;
 
 ###############################################################################
 # helper sub
