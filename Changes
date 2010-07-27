@@ -24,6 +24,13 @@ Revision history for Test-Harness
         - Add --trap (summary on Ctrl-C) option to prove (#59427).
         - Removed TAP::Parser::SourceHandler::pgTAP. Find it in its own
           distribution on CPAN.
+        - Source options to prove can now be specified so as to be passed to
+          the source as a hash reference, eg:
+
+              prove --source XYZ --xyz-option pset=foo=bar
+
+          Ths "pset" option will be passed as a hash reference with the key
+          "foo" and the value "bar".
 
 3.21    2010-01-30
         - Add test to ensure we're not depending on a module we no
