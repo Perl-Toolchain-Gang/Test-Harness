@@ -1148,13 +1148,20 @@ BEGIN {    # START PLAN
                 '--source',      'File',
                 '--file-option', 'extensions=.txt',
                 '--file-option', 'extensions=.tmp',
+                '--file-option', 'hash=this=that',
+                '--file-option', 'hash=foo=bar',
+                '--file-option', 'sep=foo\\=bar',
                 $dummy_test
             ],
             expect => {
                 sources => {
                     Perl     => { foo => 'bar baz', avg => 0.278 },
                     MyCustom => {},
-                    File => { extensions => [ '.txt', '.tmp' ] },
+                    File => {
+                        extensions => [ '.txt', '.tmp' ],
+                        hash => { this => 'that', foo => 'bar'},
+                        sep => 'foo=bar',
+                    },
                 },
             },
             runlog => [
@@ -1162,7 +1169,11 @@ BEGIN {    # START PLAN
                     {   sources => {
                             Perl     => { foo => 'bar baz', avg => 0.278 },
                             MyCustom => {},
-                            File => { extensions => [ '.txt', '.tmp' ] },
+                            File => {
+                                extensions => [ '.txt', '.tmp' ],
+                                hash => { this => 'that', foo => 'bar'},
+                                sep => 'foo=bar',
+                            },
                         },
                         verbosity  => 0,
                         show_count => 1,

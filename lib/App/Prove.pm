@@ -434,14 +434,24 @@ sub _parse_source {
     my %config;
     Getopt::Long::GetOptions(
         "$opt_name-option=s%" => sub {
-            my ( undef, $k, $v ) = @_;
-            if ( exists $config{$k} ) {
-                $config{$k} = [ $config{$k} ]
-                  unless ref $config{$k} eq 'ARRAY';
-                push @{ $config{$k} } => $v;
-            }
-            else {
-                $config{$k} = $v;
+            my ( $name, $k, $v ) = @_;
+            if ($v =~ /(?<!\\)=/) {
+                # It's a hash option.
+                croak "Option $name must be consistently used as a hash"
+                    if exists $config{$k} && ref $config{$k} ne 'HASH';
+                $config{$k} ||= {};
+                my ($hk, $hv) = split /(?<!\\)=/, $v, 2;
+                $config{$k}{$hk} = $hv;
+            } else {
+                $v =~ s/\\=/=/g;
+                if ( exists $config{$k} ) {
+                    $config{$k} = [ $config{$k} ]
+                        unless ref $config{$k} eq 'ARRAY';
+                    push @{ $config{$k} } => $v;
+                }
+                else {
+                    $config{$k} = $v;
+                }
             }
         }
     );
