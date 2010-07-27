@@ -205,7 +205,6 @@ t/source_tests/harness_badtap
 t/source_tests/harness_complain
 t/source_tests/harness_directives
 t/source_tests/harness_failure
-t/source_tests/psql
 t/source_tests/psql.bat
 t/source_tests/source
 t/source_tests/source.1
