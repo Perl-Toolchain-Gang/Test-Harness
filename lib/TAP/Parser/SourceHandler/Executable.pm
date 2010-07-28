@@ -73,7 +73,7 @@ sub can_handle {
 
         # Note: we go in low so we can be out-voted
         return 0.8 if $file->{lc_ext} eq '.bat';
-        return 0.7 if $file->{execute};
+        return 0.25 if $file->{execute};
     }
     elsif ( $meta->{is_hash} ) {
         return 0.9 if $src->raw->{exec};

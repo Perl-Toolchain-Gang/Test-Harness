@@ -84,7 +84,7 @@ sub can_handle {
         # previous semantics: we used to execute everything via Perl and
         # relied on it to pass the shebang off to the appropriate
         # interpreter.
-        return 0.75;
+        return 0.3;
     }
 
     return 0.8 if $file->{lc_ext} eq '.t';    # vote higher than Executable

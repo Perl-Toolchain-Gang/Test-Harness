@@ -74,7 +74,7 @@ my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
                     is_file => 1,
                     file    => { lc_ext => '', execute => 1 }
                 },
-                vote => 0.7,
+                vote => 0.25,
             },
             {   name => 'exec hash',
                 raw  => { exec => 'foo' },
