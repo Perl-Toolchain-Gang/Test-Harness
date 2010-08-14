@@ -165,4 +165,5 @@ resources:
   homepage: http://testanything.org/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/AndyA/Test-Harness/tree/master
-version: 3.22
+version: 3.23
+
