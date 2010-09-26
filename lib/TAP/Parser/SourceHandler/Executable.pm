@@ -71,7 +71,7 @@ sub can_handle {
     if ( $meta->{is_file} ) {
         my $file = $meta->{file};
 
-        # Note: we go in low so we can be out-voted
+        return 0.85 if $file->{execute} && $file->{binary};
         return 0.8 if $file->{lc_ext} eq '.bat';
         return 0.25 if $file->{execute};
     }
