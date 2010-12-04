@@ -41,10 +41,5 @@ tasks:
       - make
       - make test
       - make distclean
-      - yes n | %PERL% NotBuild.PL
-      - ./Build
-      - ./Build testauthor
-      - ./Build testprove
-      - ./Build distclean
     subdir: Test-Harness
     git: git://github.com/AndyA/Test-Harness.git
