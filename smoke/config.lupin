@@ -2,7 +2,6 @@
 global:
   perls:
     - /home/andy/Works/Perl/versions/5.6.2/bin/perl
-    - /home/andy/Works/Perl/versions/5.8.0/bin/perl
     - /home/andy/Works/Perl/versions/5.8.1/bin/perl
     - /home/andy/Works/Perl/versions/5.8.2/bin/perl
     - /home/andy/Works/Perl/versions/5.8.3/bin/perl
@@ -41,5 +40,10 @@ tasks:
       - make
       - make test
       - make distclean
+      - yes n | %PERL% NotBuild.PL
+      - ./Build
+      - ./Build testauthor
+      - ./Build testprove
+      - ./Build distclean
     subdir: Test-Harness
     git: git://github.com/AndyA/Test-Harness.git
