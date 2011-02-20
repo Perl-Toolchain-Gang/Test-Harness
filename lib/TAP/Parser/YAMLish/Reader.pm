@@ -319,7 +319,7 @@ L<http://use.perl.org/~Alias/journal/29427>
 
 =head1 COPYRIGHT
 
-Copyright 2007-2010 Andy Armstrong.
+Copyright 2007-2011 Andy Armstrong.
 
 Portions copyright 2006-2008 Adam Kennedy.
 
