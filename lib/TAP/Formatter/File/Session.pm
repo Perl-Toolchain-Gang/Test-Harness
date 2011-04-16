@@ -103,7 +103,7 @@ sub close_test {
 
         $formatter->_output( $pretty
               . ( $self->{results} ? "\n" . $self->{results} : "" )
-              . "ok$time_report\n" );
+              . $self->_make_ok_line($time_report) );
     }
 }
 

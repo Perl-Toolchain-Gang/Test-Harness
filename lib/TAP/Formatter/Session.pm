@@ -180,4 +180,9 @@ sub _output_test_failure {
     $formatter->_output("\n");
 }
 
+sub _make_ok_line {
+    my ( $self, $suffix ) = @_;
+    return "ok$suffix\n";
+}
+
 1;

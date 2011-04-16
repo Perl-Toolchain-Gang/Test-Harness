@@ -200,7 +200,7 @@ sub _closures {
                     }
                 }
 
-                $formatter->_output("ok$time_report\n");
+                $formatter->_output( $self->_make_ok_line($time_report) );
             }
         },
     };
