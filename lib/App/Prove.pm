@@ -218,6 +218,7 @@ sub process_args {
             'D|dry'      => \$self->{dry},
             'ext=s@'     => sub {
                 my ( $opt, $val ) = @_;
+
                 # Workaround for Getopt::Long 2.25 handling of
                 # multivalue options
                 push @{ $self->{extensions} ||= [] }, $val;

@@ -77,11 +77,12 @@ sub new {
     my %args = %{ shift || {} };
 
     my $self = bless {
-        select       => [],
-        seq          => 1,
-        store        => delete $args{store},
-        extensions   => ( delete $args{extensions} || ['.t'] ),
-        result_class => ( delete $args{result_class} || 'App::Prove::State::Result' ),
+        select     => [],
+        seq        => 1,
+        store      => delete $args{store},
+        extensions => ( delete $args{extensions} || ['.t'] ),
+        result_class =>
+          ( delete $args{result_class} || 'App::Prove::State::Result' ),
     }, $class;
 
     $self->{_} = $self->result_class->new(
@@ -371,7 +372,8 @@ sub _get_raw_tests {
             sort -d $arg
           ? $recurse
               ? $self->_expand_dir_recursive( $arg, $extensions )
-              : map { glob( File::Spec->catfile( $arg, "*$_" ) ) } @{$extensions}
+              : map { glob( File::Spec->catfile( $arg, "*$_" ) ) }
+              @{$extensions}
           : $arg;
     }
     return @tests;
@@ -381,13 +383,13 @@ sub _expand_dir_recursive {
     my ( $self, $dir, $extensions ) = @_;
 
     my @tests;
-    my $ext_string = join( '|', map { quotemeta } @{$extensions} );
+    my $ext_string = join( '|', map {quotemeta} @{$extensions} );
 
     find(
         {   follow      => 1,      #21938
             follow_skip => 2,
             wanted      => sub {
-                -f
+                -f 
                   && /(?:$ext_string)$/
                   && push @tests => $File::Find::name;
               }

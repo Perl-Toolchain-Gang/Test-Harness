@@ -377,8 +377,10 @@ sub _summary_test_header {
     my $output = $self->_get_output_method($parser);
     my $wait   = $parser->wait;
     defined $wait or $wait = '(none)';
-    $self->$output( sprintf "$test$spaces(Wstat: %s Tests: %d Failed: %d)\n",
-        $wait, $parser->tests_run, scalar $parser->failed );
+    $self->$output(
+        sprintf "$test$spaces(Wstat: %s Tests: %d Failed: %d)\n",
+        $wait, $parser->tests_run, scalar $parser->failed
+    );
     $self->_printed_summary_header(1);
 }
 
