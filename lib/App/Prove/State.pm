@@ -354,7 +354,10 @@ sub _get_raw_tests {
     my @tests;
 
     # Do globbing on Win32.
-    @argv = map { glob "$_" } @argv if NEED_GLOB;
+    if (NEED_GLOB) {
+        eval "use File::Glob::Windows";    # [49732]
+        @argv = map { glob "$_" } @argv;
+    }
     my $extensions = $self->{extensions};
 
     for my $arg (@argv) {
