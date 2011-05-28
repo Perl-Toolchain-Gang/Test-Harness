@@ -70,16 +70,28 @@ sub _set_colors {
     }
 }
 
+sub _failure_color {
+    my ($self) = @_;
+
+    return $ENV{'HARNESS_SUMMARY_COL_FAIL'} || 'red';
+}
+
+sub _success_color {
+    my ($self) = @_;
+
+    return $ENV{'HARNESS_SUMMARY_COL_SUC'} || 'green';
+}
+
 sub _output_success {
     my ( $self, $msg ) = @_;
-    $self->_set_colors('green');
+    $self->_set_colors( $self->_success_color() );
     $self->_output($msg);
     $self->_set_colors('reset');
 }
 
 sub _failure_output {
     my $self = shift;
-    $self->_set_colors('red');
+    $self->_set_colors( $self->_failure_color() );
     my $out = join '', @_;
     my $has_newline = chomp $out;
     $self->_output($out);
