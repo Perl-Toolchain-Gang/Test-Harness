@@ -217,48 +217,70 @@ sub apply_switch {
     my %handler = (
         last => sub {
             $self->_select(
+                limit => shift,
                 where => sub { $_->generation >= $last_gen },
                 order => sub { $_->sequence }
             );
         },
         failed => sub {
             $self->_select(
+                limit => shift,
                 where => sub { $_->result != 0 },
                 order => sub { -$_->result }
             );
         },
         passed => sub {
-            $self->_select( where => sub { $_->result == 0 } );
+            $self->_select(
+                limit => shift,
+                where => sub { $_->result == 0 }
+            );
         },
         all => sub {
-            $self->_select();
+            $self->_select( limit => shift );
         },
         todo => sub {
             $self->_select(
+                limit => shift,
                 where => sub { $_->num_todo != 0 },
                 order => sub { -$_->num_todo; }
             );
         },
         hot => sub {
             $self->_select(
+                limit => shift,
                 where => sub { defined $_->last_fail_time },
                 order => sub { $now - $_->last_fail_time }
             );
         },
         slow => sub {
-            $self->_select( order => sub { -$_->elapsed } );
+            $self->_select(
+                limit => shift,
+                order => sub { -$_->elapsed }
+            );
         },
         fast => sub {
-            $self->_select( order => sub { $_->elapsed } );
+            $self->_select(
+                limit => shift,
+                order => sub { $_->elapsed }
+            );
         },
         new => sub {
-            $self->_select( order => sub { -$_->mtime } );
+            $self->_select(
+                limit => shift,
+                order => sub { -$_->mtime }
+            );
         },
         old => sub {
-            $self->_select( order => sub { $_->mtime } );
+            $self->_select(
+                limit => shift,
+                order => sub { $_->mtime }
+            );
         },
         fresh => sub {
-            $self->_select( where => sub { $_->mtime >= $last_run_time } );
+            $self->_select(
+                limit => shift,
+                where => sub { $_->mtime >= $last_run_time }
+            );
         },
         save => sub {
             $self->{should_save}++;
@@ -343,6 +365,10 @@ sub _query_clause {
                 do { local $_ = $results->test($_); $order->() }
             ]
           } @got;
+    }
+
+    if ( my $limit = $clause->{limit} ) {
+        @got = splice @got, 0, $limit if @got > $limit;
     }
 
     return @got;
