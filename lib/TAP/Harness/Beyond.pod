@@ -1,3 +1,7 @@
+=head1 NAME
+
+Test::Harness - Beyond make test
+
 =head1 Beyond make test
 
 Test::Harness is responsible for running test scripts, analysing
