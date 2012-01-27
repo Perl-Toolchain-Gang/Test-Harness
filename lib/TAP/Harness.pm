@@ -888,7 +888,7 @@ parameter to C<new>, typically from your C<Build.PL>.  For example:
                   extensions => ['.tap', '.txt'],
               },
           },
-          formatter => 'TAP::Formatter::HTML',
+          formatter_class => 'TAP::Formatter::HTML',
       },
       build_requires     => {
           'Module::Build' => '0.30',

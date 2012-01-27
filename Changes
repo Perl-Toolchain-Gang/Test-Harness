@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.24    ?
+        - RT #74393: corrected typo in M::B integration docs.
+
 3.23    2011-02-20
         - Merge in changes from core. Thanks BinGOs.
         - Made SourceHandler understand that an executable binary file
