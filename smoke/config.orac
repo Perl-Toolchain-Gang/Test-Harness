@@ -27,7 +27,7 @@ global:
   rsync: /usr/bin/rsync
   shell: /bin/bash
   work: /home/andy/.smoke-work
-  description: Ubuntu box
+  description: Debian box
 tasks:
   - mailto:
       - email:
