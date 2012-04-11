@@ -9,8 +9,9 @@ use Fcntl ':flock';
 
 use IPC::Run qw( run );
 
-use Mail::Send;
 use Getopt::Long;
+use Mail::Send;
+use Parallel::Iterator qw( iterate_as_array );
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
@@ -114,7 +115,7 @@ sub make_msg {
     my $msg = Mail::Send->new;
     $msg->to(@to);
     $msg->subject( fail_pass( !$failed )
-          . ": $task->{name} r$cur_rev ("
+          . ": $task->{name} revision $cur_rev ("
           . join( ', ', grep defined, hostname, @extra )
           . ")" );
     $msg->add( 'X-Is-Alert', $failed ? 'Yes' : 'No' );
@@ -235,34 +236,42 @@ sub test_and_report {
     mkpath($co_dir);
     chdir($co_dir);
     if ( $checkout->( $task, $cur_rev ) || $FORCE ) {
+        my @jobs       = ();
         my @summary    = ();
         my $sum_failed = 0;
         for my $perl ( @{ $Config->{global}->{perls} } ) {
             $perl = { interp => $perl } unless 'HASH' eq ref $perl;
             INTERP: for my $interp ( glob( $perl->{interp} ) ) {
-                my @results = ();
-                my $failed  = 0;
 
                 my $version = perl_version($interp);
                 if ( defined $version ) {
                     mention("Testing against $interp ($version)");
-                    my $rv = test_against_perl(
-                        $version, $interp, $task, $cur_rev,
-                        $perl->{desc}
-                    );
-                    $failed     += $rv->{failed};
-                    $sum_failed += $rv->{failed};
-                    push @results, $rv;
+                    push @jobs,
+                      [ $version, $interp, $task, $cur_rev, $perl->{desc} ];
                 }
-
-                next INTERP unless @results;
-                send_report(
-                    $task, $cur_rev, $version, $interp, $failed,
-                    @results
-                );
-                push @summary, [ $cur_rev, $version, $interp, $failed ];
             }
         }
+
+        my @res = iterate_as_array(
+            sub {
+                my ( $id, $args ) = @_;
+                my @args = @$args;
+                my $rv   = test_against_perl(@args);
+                return [ @args, $rv ];
+            },
+            \@jobs
+        );
+
+        for my $rs (@res) {
+            my ( $version, $interp, $task, $cur_rev, undef, $rv ) = @$rs;
+            $sum_failed += $rv->{failed};
+            send_report(
+                $task, $cur_rev, $version, $interp, $rv->{failed},
+                $rv
+            );
+            push @summary, [ $cur_rev, $version, $interp, $rv->{failed} ];
+        }
+
         send_summary( $task, $cur_rev, $sum_failed, @summary );
     }
 
