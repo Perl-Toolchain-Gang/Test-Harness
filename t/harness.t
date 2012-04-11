@@ -16,7 +16,7 @@ my $HARNESS = 'TAP::Harness';
 my $source_tests = 't/source_tests';
 my $sample_tests = 't/sample-tests';
 
-plan tests => 129;
+plan tests => 132;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -937,6 +937,33 @@ sub _runtests {
         });
 
         isa_ok $harness, 'TAP::Harness';
+    }
+
+
+    {
+        # string filehandle
+
+        my $string = '';
+        open my $fh, ">", $string or die $!;
+        my $harness = TAP::Harness->new({
+            stdout => $fh
+        });
+
+        isa_ok $harness, 'TAP::Harness';
+    }
+
+
+    {
+        # lexical filehandle reference
+
+        my $string = '';
+        open my $fh, ">", $string or die $!;
+        ok !eval {
+            TAP::Harness->new({
+                stdout => \$fh
+            });
+        };
+        like $@, qr/^option 'stdout' needs a filehandle /;
     }
 }
 
