@@ -26,8 +26,9 @@ BEGIN {
         stdout     => sub {
             my ( $self, $ref ) = @_;
             $self->_croak("option 'stdout' needs a filehandle")
-              unless ( ref $ref || '' ) eq 'GLOB'
-              or eval { $ref->can('print') };
+              unless ( ref $ref || '' )  eq 'GLOB'      # lexical filehandle
+                  or ( ref \$ref || '' ) eq 'GLOB'      # bare glob like *STDOUT
+                  or eval { $ref->can('print') };
             return $ref;
         },
     );

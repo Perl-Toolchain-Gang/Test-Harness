@@ -16,7 +16,7 @@ my $HARNESS = 'TAP::Harness';
 my $source_tests = 't/source_tests';
 my $sample_tests = 't/sample-tests';
 
-plan tests => 128;
+plan tests => 129;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -924,6 +924,17 @@ sub _runtests {
                 stdout => bless {}, 'GLOB', # again with the evil
             }
         );
+
+        isa_ok $harness, 'TAP::Harness';
+    }
+
+
+    {
+        # bare glob
+
+        my $harness = TAP::Harness->new({
+            stdout => *STDOUT
+        });
 
         isa_ok $harness, 'TAP::Harness';
     }
