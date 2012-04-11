@@ -26,26 +26,25 @@ BEGIN {
         stdout     => sub {
             my ( $self, $ref ) = @_;
 
-            $self->_croak("option 'stdout' needs a filehandle") unless $self->_is_filehandle($ref);
+            $self->_croak("option 'stdout' needs a filehandle")
+              unless $self->_is_filehandle($ref);
 
             return $ref;
         },
     );
 
-
     sub _is_filehandle {
-        my( $self, $ref ) = @_;
+        my ( $self, $ref ) = @_;
 
         return 0 if !defined $ref;
 
-        return 1 if ref $ref eq 'GLOB';                       # lexical filehandle
-        return 1 if !ref $ref && ref \$ref eq 'GLOB';         # bare glob like *STDOUT
+        return 1 if ref $ref eq 'GLOB';    # lexical filehandle
+        return 1 if !ref $ref && ref \$ref eq 'GLOB'; # bare glob like *STDOUT
 
         return 1 if eval { $ref->can('print') };
 
         return 0;
     }
-
 
     my @getter_setters = qw(
       _longest

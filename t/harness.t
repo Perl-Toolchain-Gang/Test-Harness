@@ -872,11 +872,12 @@ sub _runtests {
     is $harness->jobs(), 1, 'jobs';
 }
 
-
 {
-    # coverage tests for the stdout key of VALIDATON_FOR, used by _initialize() in the ctor
+
+# coverage tests for the stdout key of VALIDATON_FOR, used by _initialize() in the ctor
 
     {
+
         # ref $ref => false
         my @die;
 
@@ -884,8 +885,7 @@ sub _runtests {
             local $SIG{__DIE__} = sub { push @die, @_ };
 
             my $harness = TAP::Harness->new(
-                {
-                    stdout => bless {}, '0', # how evil is THAT !!!
+                {   stdout => bless {}, '0',    # how evil is THAT !!!
                 }
             );
         };
@@ -895,15 +895,15 @@ sub _runtests {
           '... and we died as expected';
     }
 
-
     {
+
         # ref => ! GLOB and ref->can(print)
 
         package Printable;
 
         sub new { return bless {}, shift }
 
-        sub print { return }
+        sub print {return}
 
         package main;
 
@@ -915,54 +915,45 @@ sub _runtests {
         isa_ok $harness, 'TAP::Harness';
     }
 
-
     {
+
         # ref $ref => GLOB
 
         my $harness = TAP::Harness->new(
-            {
-                stdout => bless {}, 'GLOB', # again with the evil
+            {   stdout => bless {}, 'GLOB',    # again with the evil
             }
         );
 
         isa_ok $harness, 'TAP::Harness';
     }
 
-
     {
+
         # bare glob
 
-        my $harness = TAP::Harness->new({
-            stdout => *STDOUT
-        });
+        my $harness = TAP::Harness->new( { stdout => *STDOUT } );
 
         isa_ok $harness, 'TAP::Harness';
     }
 
-
     {
+
         # string filehandle
 
         my $string = '';
         open my $fh, ">", \$string or die $!;
-        my $harness = TAP::Harness->new({
-            stdout => $fh
-        });
+        my $harness = TAP::Harness->new( { stdout => $fh } );
 
         isa_ok $harness, 'TAP::Harness';
     }
 
-
     {
+
         # lexical filehandle reference
 
         my $string = '';
         open my $fh, ">", \$string or die $!;
-        ok !eval {
-            TAP::Harness->new({
-                stdout => \$fh
-            });
-        };
+        ok !eval { TAP::Harness->new( { stdout => \$fh } ); };
         like $@, qr/^option 'stdout' needs a filehandle /;
     }
 }
