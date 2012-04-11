@@ -15,12 +15,8 @@ tasks:
       - email: andy@hexten.net
         filter: all
         verbose: 1
-      - email: n@rciss.us
-        filter: passed
-        verbose: 0
-      - email: andy.armstrong@bbc.co.uk
-        filter: failed
-        verbose: 0
+      - email: andy@hexten.net
+        filter: summary
     name: Test::Harness
     script:
       - yes n | %PERL% Makefile.PL
