@@ -17,11 +17,13 @@ global:
 tasks:
   - mailto:
       - email:
-          - andy@hexten.net
+          - tapx-commit@hexten.net
+          - tapx-dev@hexten.net
         filter: failed
         verbose: 1
       - email:
-          - andy@hexten.net
+          - tapx-commit@hexten.net
+          - tapx-dev@hexten.net
         filter: summary
     name: Test::Harness
     script:
