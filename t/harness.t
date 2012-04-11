@@ -16,7 +16,7 @@ my $HARNESS = 'TAP::Harness';
 my $source_tests = 't/source_tests';
 my $sample_tests = 't/sample-tests';
 
-plan tests => 128;
+plan tests => 132;
 
 # note that this test will always pass when run through 'prove'
 ok $ENV{HARNESS_ACTIVE},  'HARNESS_ACTIVE env variable should be set';
@@ -872,61 +872,99 @@ sub _runtests {
     is $harness->jobs(), 1, 'jobs';
 }
 
+
 {
+    # coverage tests for the stdout key of VALIDATON_FOR, used by _initialize() in the ctor
 
-# coverage tests for the stdout key of VALIDATON_FOR, used by _initialize() in the ctor
+    {
+        # ref $ref => false
+        my @die;
 
-    # the coverage tests are
-    # 1. ref $ref => false
-    # 2. ref => ! GLOB and ref->can(print)
-    # 3. ref $ref => GLOB
+        eval {
+            local $SIG{__DIE__} = sub { push @die, @_ };
 
-    # case 1
+            my $harness = TAP::Harness->new(
+                {
+                    stdout => bless {}, '0', # how evil is THAT !!!
+                }
+            );
+        };
 
-    my @die;
+        is @die, 1, 'bad filehandle to stdout';
+        like pop @die, qr/option 'stdout' needs a filehandle/,
+          '... and we died as expected';
+    }
 
-    eval {
-        local $SIG{__DIE__} = sub { push @die, @_ };
+
+    {
+        # ref => ! GLOB and ref->can(print)
+
+        package Printable;
+
+        sub new { return bless {}, shift }
+
+        sub print { return }
+
+        package main;
 
         my $harness = TAP::Harness->new(
-            {   stdout => bless {}, '0',    # how evil is THAT !!!
+            {   stdout => Printable->new(),
             }
         );
-    };
 
-    is @die, 1, 'bad filehandle to stdout';
-    like pop @die, qr/option 'stdout' needs a filehandle/,
-      '... and we died as expected';
+        isa_ok $harness, 'TAP::Harness';
+    }
 
-    # case 2
 
-    @die = ();
+    {
+        # ref $ref => GLOB
 
-    package Printable;
+        my $harness = TAP::Harness->new(
+            {
+                stdout => bless {}, 'GLOB', # again with the evil
+            }
+        );
 
-    sub new { return bless {}, shift }
+        isa_ok $harness, 'TAP::Harness';
+    }
 
-    sub print {return}
 
-    package main;
+    {
+        # bare glob
 
-    my $harness = TAP::Harness->new(
-        {   stdout => Printable->new(),
-        }
-    );
+        my $harness = TAP::Harness->new({
+            stdout => *STDOUT
+        });
 
-    isa_ok $harness, 'TAP::Harness';
+        isa_ok $harness, 'TAP::Harness';
+    }
 
-    # case 3
 
-    @die = ();
+    {
+        # string filehandle
 
-    $harness = TAP::Harness->new(
-        {   stdout => bless {}, 'GLOB',    # again with the evil
-        }
-    );
+        my $string = '';
+        open my $fh, ">", $string or die $!;
+        my $harness = TAP::Harness->new({
+            stdout => $fh
+        });
 
-    isa_ok $harness, 'TAP::Harness';
+        isa_ok $harness, 'TAP::Harness';
+    }
+
+
+    {
+        # lexical filehandle reference
+
+        my $string = '';
+        open my $fh, ">", $string or die $!;
+        ok !eval {
+            TAP::Harness->new({
+                stdout => \$fh
+            });
+        };
+        like $@, qr/^option 'stdout' needs a filehandle /;
+    }
 }
 
 {
