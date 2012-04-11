@@ -944,7 +944,7 @@ sub _runtests {
         # string filehandle
 
         my $string = '';
-        open my $fh, ">", $string or die $!;
+        open my $fh, ">", \$string or die $!;
         my $harness = TAP::Harness->new({
             stdout => $fh
         });
@@ -957,7 +957,7 @@ sub _runtests {
         # lexical filehandle reference
 
         my $string = '';
-        open my $fh, ">", $string or die $!;
+        open my $fh, ">", \$string or die $!;
         ok !eval {
             TAP::Harness->new({
                 stdout => \$fh
