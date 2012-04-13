@@ -15,7 +15,7 @@ use Parallel::Iterator qw( iterate_as_array );
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
-my $VERSION = 0.009;
+my $VERSION = 0.010;
 
 # Reopen STDIN.
 my $pty;
