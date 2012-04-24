@@ -15,7 +15,7 @@ use Parallel::Iterator qw( iterate_as_array );
 use Sys::Hostname;
 use YAML qw( DumpFile LoadFile );
 
-my $VERSION = 0.009;
+my $VERSION = 0.010;
 
 # Reopen STDIN.
 my $pty;
@@ -365,6 +365,7 @@ sub test_against_perl {
 
     # Doesn't work in 5.0.5
     local $ENV{PERL_MM_USE_DEFAULT} = 1;
+    local $ENV{PERL5LIB}            = undef;
 
     $desc = $desc ? "($desc) " : "";
 
