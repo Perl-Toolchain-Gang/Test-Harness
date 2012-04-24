@@ -45,4 +45,4 @@ tasks:
       - ./Build testprove
       - ./Build distclean
     subdir: Test-Harness
-    git: git.com:Perl-Toolchain-Gang/Test-Harness.git
+    git: git://github.com/Perl-Toolchain-Gang/Test-Harness.git
