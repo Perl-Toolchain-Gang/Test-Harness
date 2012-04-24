@@ -27,7 +27,7 @@ For ease of reference, at the time of writing the SVN repository was at:
 
 To get the latest version of trunk:
 
-  git clone git://github.com/AndyA/Test-Harness.git
+  git clone git://github.com/Perl-Toolchain-Gang/Test-Harness.git
 
 For best results, read the rest of this file, check RT for bugs which
 scratch your itch, join the mailing list, etc.

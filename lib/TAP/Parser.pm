@@ -1884,7 +1884,7 @@ progress on your bug as we make changes.
 Obviously, bugs which include patches are best. If you prefer, you can
 patch against bleed by via anonymous checkout of the latest version:
 
- git clone git://github.com/AndyA/Test-Harness.git
+ git clone git://github.com/Perl-Toolchain-Gang/Test-Harness.git
 
 =head1 COPYRIGHT & LICENSE
 

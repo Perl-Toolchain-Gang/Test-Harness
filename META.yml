@@ -164,6 +164,6 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Harness
   homepage: http://testanything.org/
   license: http://dev.perl.org/licenses/
-  repository: http://github.com/AndyA/Test-Harness/tree/master
+  repository: http://github.com/Perl-Toolchain-Gang/Test-Harness/tree/master
 version: 3.24
 

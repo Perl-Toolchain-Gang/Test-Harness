@@ -21,7 +21,7 @@ my $builder = MyBuilder->new(
               'http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Harness',
             MailingList => 'mailto:<tapx-dev@hexten.net>',
             repository =>
-              'http://github.com/AndyA/Test-Harness/tree/master',
+              'http://github.com/Perl-Toolchain-Gang/Test-Harness/tree/master',
         },
         keywords => [ 'TAP', 'test harness', 'prove' ],
     },
