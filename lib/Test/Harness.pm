@@ -255,7 +255,7 @@ sub _new_harness {
             elsif ( $opt =~ m/^a(.*)$/ ) {
                 my $archive = $1;
                 $class = "TAP::Harness::Archive";
-                $args->{archive} = $archive
+                $args->{archive} = $archive;
             }
             else {
                 die "Unknown HARNESS_OPTIONS item: $opt\n";
