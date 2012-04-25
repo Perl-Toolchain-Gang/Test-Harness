@@ -33,7 +33,7 @@ SKIP: {
     ok my $harness = Test::Harness::_new_harness, 'made harness';
     is( $harness->color, 1, "set color correctly" );
     is( $harness->jobs,  4, "set jobs correctly" );
-    is( $harness->formatter_class, "TAP::Formatter::SocketConsole",
+    is( $harness->formatter_class, "TAP::Formatter::HTML",
         "correct formatter" );
 
 }
