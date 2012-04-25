@@ -40,3 +40,4 @@
 ^Session\.vim$
 ^MYMETA.yml$
 ^packaging/
+^MYMETA\.json$
