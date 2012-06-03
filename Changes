@@ -1,6 +1,6 @@
 Revision history for Test-Harness
 
-3.24    ?
+3.24    2012-06-03
         - RT #74393: corrected typo in M::B integration docs.
         - RT #63473: fix typo.
         - RT #49732: Attempt to load File::Glob::Windows to get correct

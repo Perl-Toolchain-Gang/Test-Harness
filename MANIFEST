@@ -234,3 +234,4 @@ xt/author/pod.t
 xt/author/stdin.t
 xt/perls/harness_perl.t
 xt/perls/sample-tests/perl_version
+META.json
