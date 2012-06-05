@@ -46,11 +46,11 @@ Test::Harness - Run Perl standard test scripts with statistics
 
 =head1 VERSION
 
-Version 3.24
+Version 3.25
 
 =cut
 
-$VERSION = '3.24';
+$VERSION = '3.25';
 
 # Backwards compatibility for exportable variable names.
 *verbose  = *Verbose;

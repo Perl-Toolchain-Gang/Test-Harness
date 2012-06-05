@@ -12,11 +12,11 @@ TAP::Parser::Result::Version - TAP syntax version token.
 
 =head1 VERSION
 
-Version 3.24
+Version 3.25
 
 =cut
 
-$VERSION = '3.24';
+$VERSION = '3.25';
 
 =head1 DESCRIPTION
 

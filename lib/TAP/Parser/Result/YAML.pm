@@ -12,11 +12,11 @@ TAP::Parser::Result::YAML - YAML result token.
 
 =head1 VERSION
 
-Version 3.24
+Version 3.25
 
 =cut
 
-$VERSION = '3.24';
+$VERSION = '3.25';
 
 =head1 DESCRIPTION
 
