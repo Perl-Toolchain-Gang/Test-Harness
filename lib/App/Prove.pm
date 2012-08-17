@@ -549,8 +549,6 @@ sub _runtests {
 
         my ($parallel_tests,$serial_tests) = $self->_get_parallel_and_serial_tests(@tests);
 
-        warn "jobs:$args->{jobs} vs serial-jobs:$serial_args{jobs}";
-
         push @harnesses, (
             {
                 harness => $harness_class->new($args),
