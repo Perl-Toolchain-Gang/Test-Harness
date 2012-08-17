@@ -592,7 +592,7 @@ sub _runtests {
     return !$aggregator->has_errors;
 }
 
-# --exclude-from-parallel should point to a file that lists files in your test
+# --serial-tests should point to a file that lists files in your test
 # suite that aren't parallel safe, one per line.  Since you might want to leave
 # this in a global "rc" file, we don't expect that you want to run these tests because
 # they are in the file. Rather, all the tests you want to run should still be specified
