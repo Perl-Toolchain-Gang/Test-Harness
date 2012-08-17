@@ -538,7 +538,7 @@ sub _get_tests {
 sub _runtests {
     my ( $self, $args, $harness_class, @tests ) = @_;
 
-    my @harnesses; 
+    my @harnesses;
     my $state = $self->state_manager;
 
     if ($self->{serial_tests}) {
@@ -617,17 +617,19 @@ sub _get_parallel_and_serial_tests {
     # We don't expect that a simple string match will be enough.
     # Instead, we convert all tests to absolute paths, and compare those
     my (@parallel_tests,@serial_tests);
+    TEST_FILES:
     for my $test_file (@tests) {
         for my $serial_file (@serial_files) {
             if (abs_path($test_file) eq abs_path($serial_file)) {
                 push @serial_tests, $test_file;
-            }
-            else {
-                push @parallel_tests, $test_file;
+                next TEST_FILES;
             }
         }
 
+        # No matches for the serial files? It's parallel.
+        push @parallel_tests, $test_file;
     }
+
     return (\@parallel_tests,\@serial_tests);
 }
 
