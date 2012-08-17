@@ -5,6 +5,7 @@ use vars qw($VERSION @ISA);
 
 use TAP::Object ();
 use TAP::Harness;
+use TAP::Parser::Aggregator;
 use TAP::Parser::Utils qw( split_shell );
 use File::Spec;
 use Getopt::Long;
@@ -251,6 +252,7 @@ sub process_args {
             'w'            => \$self->{warnings_warn},
             'normalize'    => \$self->{normalize},
             'rules=s@'     => $self->{rules},
+            'serial-tests=s'=> \$self->{serial_tests},
             'tapversion=s' => \$self->{tapversion},
             'trap'         => \$self->{trap},
         ) or croak('Unable to continue');
@@ -535,26 +537,102 @@ sub _get_tests {
 
 sub _runtests {
     my ( $self, $args, $harness_class, @tests ) = @_;
-    my $harness = $harness_class->new($args);
 
+    my @harnesses;
     my $state = $self->state_manager;
 
-    $harness->callback(
-        after_test => sub {
-            $state->observe_test(@_);
-        }
-    );
+    if ($self->{serial_tests}) {
+        # It may be defined globally in a config file, but not used every time.
+        # warn "serial_tests doesn't make sense without --jobs" unless $self->{jobs};
+        my %serial_args = %$args;
+        delete $serial_args{jobs};
 
-    $harness->callback(
-        after_runtests => sub {
-            $state->commit(@_);
-        }
-    );
+        my ($parallel_tests,$serial_tests) = $self->_get_parallel_and_serial_tests(@tests);
 
-    my $aggregator = $harness->runtests(@tests);
+        push @harnesses, (
+            {
+                harness => $harness_class->new($args),
+                tests   => $parallel_tests,
+            },
+            {
+                harness => $harness_class->new(\%serial_args),
+                tests   => $serial_tests,
+            }
+        )
+    }
+    # Just one run. Easy.
+    else {
+        push @harnesses, {
+            harness => $harness_class->new($args),
+            tests   => \@tests,
+        };
+    }
+
+    my $aggregator = TAP::Parser::Aggregator->new;
+    $aggregator->start();
+    for my $href (@harnesses) {
+        my $harness = $href->{harness};
+        my $tests   = $href->{tests};
+
+        $harness->callback(
+            after_test => sub {
+                $state->observe_test(@_);
+            }
+        );
+
+        $harness->callback(
+            after_runtests => sub {
+                $state->commit(@_);
+            }
+        );
+        $harness->aggregate_tests( $aggregator, @$tests );
+    }
+    $aggregator->stop();
 
     return !$aggregator->has_errors;
 }
+
+# --serial-tests should point to a file that lists files in your test
+# suite that aren't parallel safe, one per line.  Since you might want to leave
+# this in a global "rc" file, we don't expect that you want to run these tests because
+# they are in the file. Rather, all the tests you want to run should still be specified
+# the normal way. If we find any matches between those files and what's
+# in this file then we will make sure that test runs in serial, not parallel
+sub _get_parallel_and_serial_tests {
+    my $self = shift;
+    my @tests = @_;
+    my $file = $self->{serial_tests};
+
+    my @serial_files;
+    local *SERIAL_FILE;
+    open SERIAL_FILE, "<$file" or croak "Can't read $file ($!)";
+    while ( defined( my $line = <SERIAL_FILE> ) ) {
+        push @serial_files, grep { defined and not /^#/ } $line;
+    }
+    close SERIAL_FILE;
+
+    require Cwd;
+    import Cwd 'abs_path';
+
+    # We don't expect that a simple string match will be enough.
+    # Instead, we convert all tests to absolute paths, and compare those
+    my (@parallel_tests,@serial_tests);
+    TEST_FILES:
+    for my $test_file (@tests) {
+        for my $serial_file (@serial_files) {
+            if (abs_path($test_file) eq abs_path($serial_file)) {
+                push @serial_tests, $test_file;
+                next TEST_FILES;
+            }
+        }
+
+        # No matches for the serial files? It's parallel.
+        push @parallel_tests, $test_file;
+    }
+
+    return (\@parallel_tests,\@serial_tests);
+}
+
 
 sub _get_switches {
     my $self = shift;

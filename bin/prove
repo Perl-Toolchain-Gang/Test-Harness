@@ -70,6 +70,7 @@ Options that take arguments:
  -j,  --jobs N          Run N test jobs in parallel (try 9.)
       --state=opts      Control prove's persistent state.
       --rc=rcfile       Process options from rcfile
+      --serial-tests=file File which contains paths to tests which can't be run in parallel
 
 =head1 NOTES
 
@@ -157,6 +158,19 @@ and can live with the risk.
 
 The C<--trap> option will attempt to trap SIGINT (Ctrl-C) during a test
 run and display the test summary even if the run is interrupted
+
+=head2 C<--serial-tests=FILE>
+
+The C<--serial-tests> option names a file which lists paths to tests which are
+known not to run in parallel. It is recommended that this option is set in
+.proverc. Whenever there is a match between tests specified to run and a path
+in this file, that test will be run in serial. We compare the file names by
+first converting them to absolute paths, so the format in the file doesn't have
+to exactly match how you define the tests to run, as long as they resolve to
+the same file.
+
+This feature is useful when you have a large test suite that you would like to
+speed up with parallelism, but some tests must currently be run in serial.
 
 =head2 C<--state>
 
