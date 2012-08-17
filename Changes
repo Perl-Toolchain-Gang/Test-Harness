@@ -1,5 +1,11 @@
 Revision history for Test-Harness
 
+        - Added experimental --serial-tests=FILE option to `prove`. It can be
+          used to specify tests which are not parallel-safe, allowing you to
+          start taking advantage of parallel test runs, without first making
+          the test suite 100% parallel-safe. The interface may change. Feedback
+          welcome. Thanks to Mark Stosberg
+
 3.25    2012-06-05
         - Rereleased to fix CPAN permission problem. No functional change.
 
