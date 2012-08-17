@@ -574,8 +574,6 @@ sub _runtests {
         my $harness = $href->{harness};
         my $tests   = $href->{tests};
 
-#        warn "starting a harness with @$tests";
-
         $harness->callback(
             after_test => sub {
                 $state->observe_test(@_);
