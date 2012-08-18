@@ -70,6 +70,9 @@ sub new {
 
 sub _set_rules {
     my ( $self, $rules, $tests ) = @_;
+
+    # Convert all incoming tests to job objects. 
+    # If no test description is provided use the file name as the description. 
     my @tests = map { TAP::Parser::Scheduler::Job->new(@$_) }
       map { 'ARRAY' eq ref $_ ? $_ : [ $_, $_ ] } @$tests;
     my $schedule = $self->_rule_clause( $rules, \@tests );
