@@ -188,6 +188,8 @@ sub _expand {
     return @match;
 }
 
+=head2 Instance Methods
+
 =head3 C<get_all>
 
 Get a list of all remaining tests.
