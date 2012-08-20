@@ -280,17 +280,11 @@ in parallel.
 
 =head3 --rules examples
 
-    # Run all tests in parallel, except those starting with "p"
+    # All tests are allowed to run in parallel, except those starting with "p"
     --rules='seq=t/p*.t' --rules='par=**'
 
-    # Run all tests in sequence, except those starting with "p"
-    --rules='t/p*.t'
-
-    # Run some  startup tests in sequence, then some parallel tests than some
-    # teardown tests in sequence.
-    --rules='seq=t/startup/*.t'
-    --rules='par=t/{a,b,c}/*.t'
-    --rules='seq=t/shutdown/*.t'
+    # All tests must run in sequence except those starting with "p", which should be run parallel
+    --rules='par=t/p*.t'
 
 =head3 --rules resolution
 
@@ -319,6 +313,12 @@ supported patterns:
     {foo,bar,baz} is any of foo, bar or baz.
     \ is an escape character
 
+=head3 More advance specifications for parallel vs sequence run rules
+
+If you need more advanced management of what runs in parallel vs in sequence, see
+the associated 'rules' documentation in L<TAP::Harness> and L<TAP::Parser::Scheduler>.
+If what's possible directly through C<prove> is not sufficient, you can write your own
+harness to access these features directly.
 
 =head2 @INC
 
