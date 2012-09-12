@@ -29,7 +29,7 @@ single test suite run.
 =head1 SYNOPSIS
 
     # Re-run failed tests
-    $ prove --state=fail,save -rbv
+    $ prove --state=failed,save -rbv
 
 =cut
 
