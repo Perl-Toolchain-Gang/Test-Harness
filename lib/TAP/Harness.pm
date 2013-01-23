@@ -485,6 +485,10 @@ sub runtests {
         $self->aggregate_tests( $aggregate, @tests );
         $finish->();
     };
+    $self->{bail_summary} = sub{
+        print "\n";
+        $finish->(1);
+    };
 
     if ( $self->trap ) {
         local $SIG{INT} = sub {
@@ -524,6 +528,7 @@ sub _after_test {
 sub _bailout {
     my ( $self, $result ) = @_;
     my $explanation = $result->explanation;
+    $self->{bail_summary}();
     die "FAILED--Further testing stopped"
       . ( $explanation ? ": $explanation\n" : ".\n" );
 }
