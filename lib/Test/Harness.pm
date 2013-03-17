@@ -73,7 +73,7 @@ END {
 
 $Verbose = $ENV{HARNESS_VERBOSE} || 0;
 $Debug   = $ENV{HARNESS_DEBUG}   || 0;
-$Switches = '';
+$Switches = '-w';
 $Columns = $ENV{HARNESS_COLUMNS} || $ENV{COLUMNS} || 80;
 $Columns--;    # Some shells have trouble with a full line of text.
 $Timer      = $ENV{HARNESS_TIMER}       || 0;
