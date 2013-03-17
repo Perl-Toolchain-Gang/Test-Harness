@@ -519,6 +519,17 @@ This is the version of C<Test::Harness>.
 
 =over 4
 
+=item C<HARNESS_PERL_SWITCHES>
+
+Setting this adds perl command line switches to each test file run.
+
+For example, C<HARNESS_PERL_SWITCHES=-T> will turn on taint mode.
+C<HARNESS_PERL_SWITCHES=-MDevel::Cover> will run C<Devel::Cover> for
+each test.
+
+C<-w> is always set.  You can turn this off in the test with C<BEGIN {
+$^W = 0 }>.
+
 =item C<HARNESS_TIMER>
 
 Setting this to true will make the harness display the number of
