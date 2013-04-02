@@ -9,7 +9,7 @@
 .prove
 /Build
 /Build.bat
-/MYMETA.yml
+/MYMETA.*
 /Makefile
 /PM_to_blib
 /_build
