@@ -32,7 +32,6 @@ Boolean options:
                         (default)
       --nocount         Disable the X/Y test count.
  -D   --dry             Dry run. Show test that would have run.
-      --ext             Set the extension for tests (default '.t')
  -f,  --failures        Show failed tests.
  -o,  --comments        Show comments.
       --ignore-exit     Ignore exit status from test scripts.
@@ -62,6 +61,7 @@ Options that take arguments:
  -M                     Load a module.
  -e,  --exec            Interpreter to run the tests ('' for compiled
                         tests.)
+      --ext             Set the extension for tests (default '.t')
       --harness         Define test harness to use.  See TAP::Harness.
       --formatter       Result formatter to use. See FORMATTERS.
       --source          Load and/or configure a SourceHandler. See
