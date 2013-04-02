@@ -34,11 +34,13 @@ return a real job.
 
     my $job = TAP::Parser::Scheduler::Spinner->new;
 
-Returns a new C<TAP::Parser::Scheduler::Spinner> object.
+Ignores any arguments and returns a new C<TAP::Parser::Scheduler::Spinner> object.
 
 =cut
 
 sub new { bless {}, shift }
+
+=head2 Instance Methods
 
 =head3 C<is_spinner>
 
@@ -49,5 +51,11 @@ return one right now.
 =cut
 
 sub is_spinner {1}
+
+=head1 SEE ALSO
+
+L<TAP::Parser::Scheduler>, L<TAP::Parser::Scheduler::Job>
+
+=cut
 
 1;
