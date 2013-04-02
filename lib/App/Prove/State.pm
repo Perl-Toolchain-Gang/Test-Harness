@@ -41,7 +41,7 @@ and the operations that may be performed on it.
 =head1 SYNOPSIS
 
     # Re-run failed tests
-    $ prove --state=fail,save -rbv
+    $ prove --state=failed,save -rbv
 
 =cut
 
