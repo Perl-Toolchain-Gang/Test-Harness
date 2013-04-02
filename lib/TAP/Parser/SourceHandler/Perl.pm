@@ -211,8 +211,8 @@ sub _iterator_hooks {
         }
     };
 
-    # Cargo culted from comments seen elsewhere about VMS / environment
-    # variables. I don't know if this is actually necessary.
+    # VMS environment variables aren't guaranteed to reset at the end of
+    # the process, so we need to put PERL5LIB back.
     my $previous = $ENV{PERL5LIB};
     my $teardown = sub {
         if ( defined $previous ) {
