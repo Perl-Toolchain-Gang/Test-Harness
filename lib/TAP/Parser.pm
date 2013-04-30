@@ -795,7 +795,11 @@ but had a TODO directive, it will be counted as a passed test.
 
 =cut
 
-sub passed { @{ shift->{passed} } }
+sub passed {
+    return @{ $_[0]->{passed} }
+      if ref $_[0]->{passed};
+    return wantarray ? 1 .. $_[0]->{passed} : $_[0]->{passed};
+}
 
 =head3 C<failed>
 
@@ -822,7 +826,11 @@ regardless of whether or not a TODO directive was found.
 
 =cut
 
-sub actual_passed { @{ shift->{actual_passed} } }
+sub actual_passed {
+    return @{ $_[0]->{actual_passed} }
+      if ref $_[0]->{actual_passed};
+    return wantarray ? 1 .. $_[0]->{actual_passed} : $_[0]->{actual_passed};
+}
 *actual_ok = \&actual_passed;
 
 =head3 C<actual_ok>
@@ -1496,6 +1504,17 @@ sub _finish {
     }
 
     $self->is_good_plan(0) unless defined $self->is_good_plan;
+
+    unless ( $self->parse_errors ) {
+        # Optimise storage where possible
+        if ( $self->tests_run == @{$self->{passed}} ) {
+            $self->{passed} = $self->tests_run;
+        }
+        if ( $self->tests_run == @{$self->{actual_passed}} ) {
+            $self->{actual_passed} = $self->tests_run;
+        }
+    }
+
     return $self;
 }
 
