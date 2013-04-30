@@ -4,6 +4,8 @@ Revision history for Test-Harness
         - Dramatically reduce memory usage (Nick Clark, RT #84939)
         - Store test_num (in Grammar.pm) as a number instead of a string.
           Reduces memory usage (Nick Clark, RT #84939)
+        - PERL5LIB is always propogated to a test's @INC, even with taint more
+          (Schwern, RT #84377)
 
 3.26    2013-01-16
         - Renamed env.opts.t to env_opts.t (for VMS)
