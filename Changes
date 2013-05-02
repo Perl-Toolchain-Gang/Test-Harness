@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.28    2013-05-02
+        - Bugfix: Fix taint failures on Windows (Jan Dubois)
+
 3.27    2013-04-30
         - Dramatically reduce memory usage (Nick Clark, RT #84939)
         - Store test_num (in Grammar.pm) as a number instead of a string.
