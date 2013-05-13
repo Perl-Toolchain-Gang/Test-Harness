@@ -11,6 +11,12 @@ use IO::c55Capture;
 
 use TAP::Harness;
 
+# This is done to prevent the colors environment variables from
+# interfering.
+local %ENV = %ENV;
+delete $ENV{HARNESS_SUMMARY_COL_FAIL};
+delete $ENV{HARNESS_SUMMARY_COL_SUC};
+
 my $HARNESS = 'TAP::Harness';
 
 my $source_tests = 't/source_tests';
