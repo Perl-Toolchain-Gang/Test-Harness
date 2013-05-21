@@ -14,8 +14,8 @@ use TAP::Harness;
 # This is done to prevent the colors environment variables from
 # interfering.
 local %ENV = %ENV;
-delete $ENV{HARNESS_SUMMARY_COL_FAIL};
-delete $ENV{HARNESS_SUMMARY_COL_SUC};
+delete $ENV{HARNESS_SUMMARY_COLOR_FAIL};
+delete $ENV{HARNESS_SUMMARY_COLOR_SUCCESS};
 
 my $HARNESS = 'TAP::Harness';
 

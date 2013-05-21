@@ -73,13 +73,13 @@ sub _set_colors {
 sub _failure_color {
     my ($self) = @_;
 
-    return $ENV{'HARNESS_SUMMARY_COL_FAIL'} || 'red';
+    return $ENV{'HARNESS_SUMMARY_COLOR_FAIL'} || 'red';
 }
 
 sub _success_color {
     my ($self) = @_;
 
-    return $ENV{'HARNESS_SUMMARY_COL_SUC'} || 'green';
+    return $ENV{'HARNESS_SUMMARY_COLOR_SUCCESS'} || 'green';
 }
 
 sub _output_success {
