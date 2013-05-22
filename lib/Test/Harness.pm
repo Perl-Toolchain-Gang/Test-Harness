@@ -576,6 +576,16 @@ Multiple options may be separated by colons:
 
 Specifies a TAP::Harness subclass to be used in place of TAP::Harness.
 
+=item C<HARNESS_SUMMARY_COLOR_SUCCESS>
+
+Determines the L<Term::ANSIColor> for the summary in case it is successful.
+This color defaults to C<'green'>.
+
+=item C<HARNESS_SUMMARY_COLOR_FAIL>
+
+Determines the L<Term::ANSIColor> for the failure in case it is successful.
+This color defaults to C<'red'>.
+
 =back
 
 =head1 Taint Mode
