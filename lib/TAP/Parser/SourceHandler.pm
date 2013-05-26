@@ -105,7 +105,7 @@ a quick overview.
 
 Start by familiarizing yourself with L<TAP::Parser::Source> and
 L<TAP::Parser::IteratorFactory>.  L<TAP::Parser::SourceHandler::RawTAP> is
-the easiest sub-class to use an an example.
+the easiest sub-class to use as an example.
 
 It's important to point out that if you want your subclass to be automatically
 used by L<TAP::Parser> you'll have to and make sure it gets loaded somehow.
