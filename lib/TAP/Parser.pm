@@ -174,7 +174,7 @@ I<NEW to 3.18>.
 
 If set, C<sources> must be a hashref containing the names of the
 L<TAP::Parser::SourceHandler>s to load and/or configure.  The values are a
-hash of configuration that will be accessible to to the source handlers via
+hash of configuration that will be accessible to the source handlers via
 L<TAP::Parser::Source/config_for>.
 
 For example:
