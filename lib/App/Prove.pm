@@ -180,7 +180,7 @@ sub process_args {
         }
     }
 
-    # Everything after the arisdottle '::' gets passed as args to
+    # Everything after the sigil '::' gets passed as args to
     # test programs.
     if ( defined( my $stop_at = _first_pos( '::', @args ) ) ) {
         my @test_args = splice @args, $stop_at;
