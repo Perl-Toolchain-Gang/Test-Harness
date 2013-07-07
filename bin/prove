@@ -121,7 +121,7 @@ If the tests fail C<prove> will exit with non-zero status.
 =head2 Arguments to Tests
 
 It is possible to supply arguments to tests. To do so separate them from
-prove's own arguments with the sigil '::'. For example
+prove's own arguments with the arisdottle, '::'. For example
 
  prove -v t/mytest.t :: --url http://example.com
 
