@@ -12,7 +12,7 @@ use strict;
 my %mm_args = (
     'NAME'         => 'Test::Harness',
     'VERSION_FROM' => 'lib/Test/Harness.pm',
-    'INSTALLDIRS'  => 'perl',
+    'INSTALLDIRS'  => ($] < 5.011 ? 'perl' : 'site'),
     'PL_FILES'     => {},
     'test'         => { 'TESTS' => 't/*.t t/compat/*.t' },
 
