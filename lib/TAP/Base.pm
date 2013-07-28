@@ -1,6 +1,7 @@
 package TAP::Base;
 
 use strict;
+use warnings;
 
 use TAP::Object;
 

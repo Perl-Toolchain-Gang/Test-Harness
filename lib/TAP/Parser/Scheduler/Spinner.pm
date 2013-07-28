@@ -1,6 +1,7 @@
 package TAP::Parser::Scheduler::Spinner;
 
 use strict;
+use warnings;
 use Carp;
 
 =head1 NAME

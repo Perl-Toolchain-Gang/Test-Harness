@@ -1,6 +1,7 @@
 package TAP::Parser::Iterator::Process;
 
 use strict;
+use warnings;
 
 use TAP::Parser::Iterator ();
 use Config;
@@ -137,7 +138,7 @@ sub _initialize {
 
         # HOTPATCH {{{
         my $xclose = \&IPC::Open3::xclose;
-        local $^W;    # no warnings
+        no warnings;
         local *IPC::Open3::xclose = sub {
             my $fh = shift;
             no strict 'refs';

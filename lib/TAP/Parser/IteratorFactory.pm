@@ -1,6 +1,7 @@
 package TAP::Parser::IteratorFactory;
 
 use strict;
+use warnings;
 
 use TAP::Object ();
 

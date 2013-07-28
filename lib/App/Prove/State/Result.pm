@@ -1,6 +1,7 @@
 package App::Prove::State::Result;
 
 use strict;
+use warnings;
 use Carp 'croak';
 
 use App::Prove::State::Result::Test;

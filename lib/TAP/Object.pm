@@ -1,6 +1,7 @@
 package TAP::Object;
 
 use strict;
+use warnings;
 
 =head1 NAME
 

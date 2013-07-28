@@ -1,6 +1,7 @@
 package TAP::Parser::Result::Bailout;
 
 use strict;
+use warnings;
 
 use TAP::Parser::Result;
 our @ISA = 'TAP::Parser::Result';

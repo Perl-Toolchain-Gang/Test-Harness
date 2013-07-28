@@ -1,6 +1,7 @@
 package TAP::Formatter::Console::Session;
 
 use strict;
+use warnings;
 use TAP::Formatter::Session;
 
 our @ISA = qw(TAP::Formatter::Session);

@@ -1,6 +1,8 @@
 package TAP::Parser::Scheduler;
 
 use strict;
+use warnings;
+
 use Carp;
 use TAP::Parser::Scheduler::Job;
 use TAP::Parser::Scheduler::Spinner;

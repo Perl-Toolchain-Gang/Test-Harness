@@ -1,6 +1,7 @@
 package TAP::Formatter::Console::ParallelSession;
 
 use strict;
+use warnings;
 use File::Spec;
 use File::Path;
 use TAP::Formatter::Console::Session;

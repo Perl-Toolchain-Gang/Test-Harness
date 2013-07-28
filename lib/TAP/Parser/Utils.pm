@@ -1,6 +1,7 @@
 package TAP::Parser::Utils;
 
 use strict;
+use warnings;
 use Exporter;
 
 our @ISA       = qw( Exporter );

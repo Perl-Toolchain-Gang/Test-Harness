@@ -1,6 +1,7 @@
 package TAP::Parser;
 
 use strict;
+use warnings;
 
 use TAP::Base                              ();
 use TAP::Parser::Grammar                   ();

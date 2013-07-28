@@ -1,6 +1,7 @@
 package TAP::Parser::Aggregator;
 
 use strict;
+use warnings;
 use Benchmark;
 
 use TAP::Object ();

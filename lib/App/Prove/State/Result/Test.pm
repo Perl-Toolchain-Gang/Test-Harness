@@ -1,6 +1,7 @@
 package App::Prove::State::Result::Test;
 
 use strict;
+use warnings;
 
 =head1 NAME
 

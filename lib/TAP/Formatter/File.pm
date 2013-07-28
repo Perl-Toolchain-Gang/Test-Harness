@@ -1,6 +1,7 @@
 package TAP::Formatter::File;
 
 use strict;
+use warnings;
 use TAP::Formatter::Base ();
 use TAP::Formatter::File::Session;
 use POSIX qw(strftime);

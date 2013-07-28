@@ -1,6 +1,7 @@
 package TAP::Parser::YAMLish::Reader;
 
 use strict;
+use warnings;
 
 use TAP::Object ();
 

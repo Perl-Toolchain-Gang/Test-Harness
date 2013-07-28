@@ -1,6 +1,7 @@
 package TAP::Parser::Result;
 
 use strict;
+use warnings;
 
 use TAP::Object ();
 

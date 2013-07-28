@@ -1,6 +1,7 @@
 package TAP::Parser::Source;
 
 use strict;
+use warnings;
 
 use TAP::Object ();
 use File::Basename qw( fileparse );

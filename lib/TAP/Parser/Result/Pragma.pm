@@ -1,6 +1,7 @@
 package TAP::Parser::Result::Pragma;
 
 use strict;
+use warnings;
 
 use TAP::Parser::Result;
 our @ISA = 'TAP::Parser::Result';

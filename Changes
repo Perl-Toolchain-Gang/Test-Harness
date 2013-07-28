@@ -1,5 +1,6 @@
 Revision history for Test-Harness
         - Get rid of use vars in favor of our (Leon Timmermans)
+        - Added use warnings to all modules (Leon Timmermans)
 
 3.28    2013-05-02
         - Bugfix: Fix taint failures on Windows (Jan Dubois)

@@ -1,6 +1,7 @@
 package TAP::Parser::Multiplexer;
 
 use strict;
+use warnings;
 
 use IO::Select;
 use TAP::Object ();

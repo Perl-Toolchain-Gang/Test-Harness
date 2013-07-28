@@ -1,6 +1,7 @@
 package App::Prove::State;
 
 use strict;
+use warnings;
 
 use File::Find;
 use File::Spec;

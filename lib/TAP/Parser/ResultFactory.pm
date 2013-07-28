@@ -1,6 +1,7 @@
 package TAP::Parser::ResultFactory;
 
 use strict;
+use warnings;
 
 use TAP::Object                  ();
 use TAP::Parser::Result::Bailout ();

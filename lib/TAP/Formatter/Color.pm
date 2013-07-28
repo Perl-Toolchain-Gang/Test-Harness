@@ -1,6 +1,7 @@
 package TAP::Formatter::Color;
 
 use strict;
+use warnings;
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 

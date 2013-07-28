@@ -1,6 +1,7 @@
 package TAP::Parser::Iterator::Array;
 
 use strict;
+use warnings;
 
 use TAP::Parser::Iterator ();
 

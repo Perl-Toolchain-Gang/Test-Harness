@@ -1,6 +1,7 @@
 package App::Prove;
 
 use strict;
+use warnings;
 
 use TAP::Object ();
 use TAP::Harness;

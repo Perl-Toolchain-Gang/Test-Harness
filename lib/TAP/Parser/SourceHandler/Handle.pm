@@ -1,6 +1,7 @@
 package TAP::Parser::SourceHandler::Handle;
 
 use strict;
+use warnings;
 
 use TAP::Parser::SourceHandler    ();
 use TAP::Parser::IteratorFactory  ();
