@@ -1,7 +1,6 @@
 package TAP::Parser::Scheduler;
 
 use strict;
-use vars qw($VERSION);
 use Carp;
 use TAP::Parser::Scheduler::Job;
 use TAP::Parser::Scheduler::Spinner;
@@ -16,7 +15,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 SYNOPSIS
 

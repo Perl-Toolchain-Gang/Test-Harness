@@ -5,9 +5,7 @@ use TAP::Formatter::Base ();
 use TAP::Formatter::File::Session;
 use POSIX qw(strftime);
 
-use vars qw($VERSION @ISA);
-
-@ISA = qw(TAP::Formatter::Base);
+our @ISA = qw(TAP::Formatter::Base);
 
 =head1 NAME
 
@@ -19,7 +17,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

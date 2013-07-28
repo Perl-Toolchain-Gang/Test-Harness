@@ -9,9 +9,7 @@ use IO::Handle;
 
 use TAP::Base;
 
-use vars qw($VERSION @ISA);
-
-@ISA = qw(TAP::Base);
+our @ISA = qw(TAP::Base);
 
 =head1 NAME
 
@@ -23,7 +21,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 $ENV{HARNESS_ACTIVE}  = 1;
 $ENV{HARNESS_VERSION} = $VERSION;

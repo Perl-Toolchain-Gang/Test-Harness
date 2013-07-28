@@ -1,7 +1,6 @@
 package App::Prove::State;
 
 use strict;
-use vars qw($VERSION @ISA);
 
 use File::Find;
 use File::Spec;
@@ -13,7 +12,7 @@ use TAP::Parser::YAMLish::Writer ();
 use TAP::Base;
 
 BEGIN {
-    @ISA = qw( TAP::Base );
+    our @ISA = qw( TAP::Base );
     __PACKAGE__->mk_methods('result_class');
 }
 
@@ -30,7 +29,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

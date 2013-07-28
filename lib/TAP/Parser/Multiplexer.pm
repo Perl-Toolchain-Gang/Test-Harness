@@ -1,7 +1,6 @@
 package TAP::Parser::Multiplexer;
 
 use strict;
-use vars qw($VERSION @ISA);
 
 use IO::Select;
 use TAP::Object ();
@@ -10,7 +9,7 @@ use constant IS_WIN32 => $^O =~ /^(MS)?Win32$/;
 use constant IS_VMS => $^O eq 'VMS';
 use constant SELECT_OK => !( IS_VMS || IS_WIN32 );
 
-@ISA = 'TAP::Object';
+our @ISA = 'TAP::Object';
 
 =head1 NAME
 
@@ -22,7 +21,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 SYNOPSIS
 

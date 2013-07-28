@@ -1,13 +1,12 @@
 package TAP::Parser::Iterator::Process;
 
 use strict;
-use vars qw($VERSION @ISA);
 
 use TAP::Parser::Iterator ();
 use Config;
 use IO::Handle;
 
-@ISA = 'TAP::Parser::Iterator';
+our @ISA = 'TAP::Parser::Iterator';
 
 my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
 
@@ -21,7 +20,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 SYNOPSIS
 

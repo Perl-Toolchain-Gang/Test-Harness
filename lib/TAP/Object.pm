@@ -1,7 +1,6 @@
 package TAP::Object;
 
 use strict;
-use vars qw($VERSION);
 
 =head1 NAME
 
@@ -13,18 +12,17 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 SYNOPSIS
 
     package TAP::Whatever;
 
     use strict;
-    use vars qw(@ISA);
 
     use TAP::Object;
 
-    @ISA = qw(TAP::Object);
+    our @ISA = qw(TAP::Object);
 
     # new() implementation by TAP::Object
     sub _initialize {

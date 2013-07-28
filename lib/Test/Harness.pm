@@ -1,6 +1,6 @@
 package Test::Harness;
 
-require 5.00405;
+use 5.006;
 
 use strict;
 
@@ -17,27 +17,11 @@ use TAP::Parser::Utils qw( split_shell );
 use Config;
 use Exporter;
 
-# TODO: Emulate at least some of these
-use vars qw(
-  $VERSION
-  @ISA @EXPORT @EXPORT_OK
-  $Verbose $Switches $Debug
-  $verbose $switches $debug
-  $Columns
-  $Color
-  $Directives
-  $Timer
-  $Strap
-  $HarnessSubclass
-  $has_time_hires
-  $IgnoreExit
-);
-
 # $ML $Last_ML_Print
 
 BEGIN {
     eval q{use Time::HiRes 'time'};
-    $has_time_hires = !$@;
+    our $has_time_hires = !$@;
 }
 
 =head1 NAME
@@ -50,7 +34,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 # Backwards compatibility for exportable variable names.
 *verbose  = *Verbose;
@@ -67,18 +51,18 @@ END {
     delete $ENV{HARNESS_VERSION};
 }
 
-@ISA       = ('Exporter');
-@EXPORT    = qw(&runtests);
-@EXPORT_OK = qw(&execute_tests $verbose $switches);
+our @ISA       = ('Exporter');
+our @EXPORT    = qw(&runtests);
+our @EXPORT_OK = qw(&execute_tests $verbose $switches);
 
-$Verbose = $ENV{HARNESS_VERBOSE} || 0;
-$Debug   = $ENV{HARNESS_DEBUG}   || 0;
-$Switches = '-w';
-$Columns = $ENV{HARNESS_COLUMNS} || $ENV{COLUMNS} || 80;
+our $Verbose = $ENV{HARNESS_VERBOSE} || 0;
+our $Debug   = $ENV{HARNESS_DEBUG}   || 0;
+our $Switches = '-w';
+our $Columns = $ENV{HARNESS_COLUMNS} || $ENV{COLUMNS} || 80;
 $Columns--;    # Some shells have trouble with a full line of text.
-$Timer      = $ENV{HARNESS_TIMER}       || 0;
-$Color      = $ENV{HARNESS_COLOR}       || 0;
-$IgnoreExit = $ENV{HARNESS_IGNORE_EXIT} || 0;
+our $Timer      = $ENV{HARNESS_TIMER}       || 0;
+our $Color      = $ENV{HARNESS_COLOR}       || 0;
+our $IgnoreExit = $ENV{HARNESS_IGNORE_EXIT} || 0;
 
 =head1 SYNOPSIS
 
@@ -227,7 +211,7 @@ sub _new_harness {
 
     my $args = {
         timer       => $Timer,
-        directives  => $Directives,
+        directives  => our $Directives,
         lib         => \@lib,
         switches    => \@switches,
         color       => $Color,

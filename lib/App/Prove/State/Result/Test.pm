@@ -2,8 +2,6 @@ package App::Prove::State::Result::Test;
 
 use strict;
 
-use vars qw($VERSION);
-
 =head1 NAME
 
 App::Prove::State::Result::Test - Individual test results.
@@ -14,7 +12,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

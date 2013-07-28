@@ -4,13 +4,11 @@ use strict;
 use TAP::Base ();
 use POSIX qw(strftime);
 
-use vars qw($VERSION @ISA);
-
 my $MAX_ERRORS = 5;
 my %VALIDATION_FOR;
 
 BEGIN {
-    @ISA = qw(TAP::Base);
+    our @ISA = qw(TAP::Base);
 
     %VALIDATION_FOR = (
         directives => sub { shift; shift },
@@ -65,7 +63,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

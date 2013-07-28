@@ -1,13 +1,12 @@
 package TAP::Parser::SourceHandler::Handle;
 
 use strict;
-use vars qw($VERSION @ISA);
 
 use TAP::Parser::SourceHandler    ();
 use TAP::Parser::IteratorFactory  ();
 use TAP::Parser::Iterator::Stream ();
 
-@ISA = qw(TAP::Parser::SourceHandler);
+our @ISA = qw(TAP::Parser::SourceHandler);
 
 TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
@@ -21,7 +20,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 SYNOPSIS
 

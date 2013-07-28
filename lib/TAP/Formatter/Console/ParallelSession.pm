@@ -7,9 +7,8 @@ use TAP::Formatter::Console::Session;
 use Carp;
 
 use constant WIDTH => 72;    # Because Eric says
-use vars qw($VERSION @ISA);
 
-@ISA = qw(TAP::Formatter::Console::Session);
+our @ISA = qw(TAP::Formatter::Console::Session);
 
 my %shared;
 
@@ -46,7 +45,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

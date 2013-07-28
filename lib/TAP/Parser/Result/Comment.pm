@@ -2,9 +2,8 @@ package TAP::Parser::Result::Comment;
 
 use strict;
 
-use vars qw($VERSION @ISA);
 use TAP::Parser::Result;
-@ISA = 'TAP::Parser::Result';
+our @ISA = 'TAP::Parser::Result';
 
 =head1 NAME
 
@@ -16,7 +15,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

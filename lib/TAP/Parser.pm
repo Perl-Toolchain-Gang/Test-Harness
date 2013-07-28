@@ -1,7 +1,6 @@
 package TAP::Parser;
 
 use strict;
-use vars qw($VERSION @ISA);
 
 use TAP::Base                              ();
 use TAP::Parser::Grammar                   ();
@@ -28,7 +27,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 my $DEFAULT_TAP_VERSION = 12;
 my $MAX_TAP_VERSION     = 13;
@@ -42,7 +41,7 @@ END {
 }
 
 BEGIN {    # making accessors
-    @ISA = qw(TAP::Base);
+    our @ISA = qw(TAP::Base);
 
     __PACKAGE__->mk_methods(
         qw(

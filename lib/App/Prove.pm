@@ -1,7 +1,6 @@
 package App::Prove;
 
 use strict;
-use vars qw($VERSION @ISA);
 
 use TAP::Object ();
 use TAP::Harness;
@@ -21,7 +20,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 
@@ -51,7 +50,7 @@ use constant PLUGINS => 'App::Prove::Plugin';
 my @ATTR;
 
 BEGIN {
-    @ISA = qw(TAP::Object);
+    our @ISA = qw(TAP::Object);
 
     @ATTR = qw(
       archive argv blib show_count color directives exec failures comments
