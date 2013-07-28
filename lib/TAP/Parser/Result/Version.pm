@@ -3,8 +3,7 @@ package TAP::Parser::Result::Version;
 use strict;
 use warnings;
 
-use TAP::Parser::Result;
-our @ISA = 'TAP::Parser::Result';
+use parent 'TAP::Parser::Result';
 
 =head1 NAME
 

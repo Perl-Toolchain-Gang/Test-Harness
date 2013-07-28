@@ -5,7 +5,7 @@ use warnings;
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 
-our @ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 my $NO_COLOR;
 

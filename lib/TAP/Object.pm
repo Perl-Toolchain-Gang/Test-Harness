@@ -21,9 +21,7 @@ our $VERSION = '3.28';
 
     use strict;
 
-    use TAP::Object;
-
-    our @ISA = qw(TAP::Object);
+    use parent 'TAP::Object';
 
     # new() implementation by TAP::Object
     sub _initialize {

@@ -2,10 +2,8 @@ package TAP::Formatter::Console;
 
 use strict;
 use warnings;
-use TAP::Formatter::Base ();
+use parent 'TAP::Formatter::Base';
 use POSIX qw(strftime);
-
-our @ISA = qw(TAP::Formatter::Base);
 
 =head1 NAME
 

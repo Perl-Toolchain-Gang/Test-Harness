@@ -3,11 +3,10 @@ package TAP::Parser::SourceHandler::RawTAP;
 use strict;
 use warnings;
 
-use TAP::Parser::SourceHandler   ();
 use TAP::Parser::IteratorFactory ();
 use TAP::Parser::Iterator::Array ();
 
-our @ISA = qw(TAP::Parser::SourceHandler);
+use parent 'TAP::Parser::SourceHandler';
 
 TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 

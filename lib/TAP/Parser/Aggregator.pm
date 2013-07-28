@@ -4,9 +4,7 @@ use strict;
 use warnings;
 use Benchmark;
 
-use TAP::Object ();
-
-our @ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 =head1 NAME
 

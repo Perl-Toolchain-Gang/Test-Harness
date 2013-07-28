@@ -3,9 +3,8 @@ package TAP::Parser::YAMLish::Reader;
 use strict;
 use warnings;
 
-use TAP::Object ();
+use parent 'TAP::Object';
 
-our @ISA     = 'TAP::Object';
 our $VERSION = '3.28';
 
 # TODO:

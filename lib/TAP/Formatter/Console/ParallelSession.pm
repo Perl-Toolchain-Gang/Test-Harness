@@ -4,12 +4,11 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Path;
-use TAP::Formatter::Console::Session;
 use Carp;
 
-use constant WIDTH => 72;    # Because Eric says
+use parent 'TAP::Formatter::Console::Session';
 
-our @ISA = qw(TAP::Formatter::Console::Session);
+use constant WIDTH => 72;    # Because Eric says
 
 my %shared;
 

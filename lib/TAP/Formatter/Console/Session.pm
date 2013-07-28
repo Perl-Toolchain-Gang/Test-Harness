@@ -2,9 +2,8 @@ package TAP::Formatter::Console::Session;
 
 use strict;
 use warnings;
-use TAP::Formatter::Session;
 
-our @ISA = qw(TAP::Formatter::Session);
+use parent 'TAP::Formatter::Session';
 
 my @ACCESSOR;
 

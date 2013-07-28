@@ -3,9 +3,7 @@ package TAP::Parser::Result;
 use strict;
 use warnings;
 
-use TAP::Object ();
-
-our @ISA = 'TAP::Object';
+use parent 'TAP::Object';
 
 BEGIN {
 
@@ -275,7 +273,7 @@ subclass L<TAP::Parser::Grammar> too, or else it'll never get used.
 
   use strict;
 
-  our @ISA = 'TAP::Parser::Result';
+  use parent 'TAP::Parser::Result';
 
   # register with the factory:
   TAP::Parser::ResultFactory->register_type( 'my_type' => __PACKAGE__ );

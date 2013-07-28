@@ -10,10 +10,9 @@ use Carp;
 use App::Prove::State::Result;
 use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
-use TAP::Base;
+use parent 'TAP::Base';
 
 BEGIN {
-    our @ISA = qw( TAP::Base );
     __PACKAGE__->mk_methods('result_class');
 }
 

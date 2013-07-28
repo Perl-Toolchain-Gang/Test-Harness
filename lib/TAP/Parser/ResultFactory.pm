@@ -3,7 +3,6 @@ package TAP::Parser::ResultFactory;
 use strict;
 use warnings;
 
-use TAP::Object                  ();
 use TAP::Parser::Result::Bailout ();
 use TAP::Parser::Result::Comment ();
 use TAP::Parser::Result::Plan    ();
@@ -13,7 +12,7 @@ use TAP::Parser::Result::Unknown ();
 use TAP::Parser::Result::Version ();
 use TAP::Parser::Result::YAML    ();
 
-our @ISA = 'TAP::Object';
+use parent 'TAP::Object';
 
 ##############################################################################
 
@@ -83,7 +82,7 @@ a completely new type, eg:
   # create a custom result type:
   package MyResult;
   use strict;
-  our @ISA = 'TAP::Parser::Result';
+  use parent 'TAP::Parser::Result';
 
   # register with the factory:
   TAP::Parser::ResultFactory->register_type( 'my_type' => __PACKAGE__ );
@@ -165,9 +164,8 @@ Of course, it's up to you to decide whether or not to ignore them.
   use strict;
 
   use MyResult;
-  use TAP::Parser::ResultFactory;
 
-  our @ISA = qw( TAP::Parser::ResultFactory );
+  use parent 'TAP::Parser::ResultFactory';
 
   # force all results to be 'MyResult'
   sub class_for {

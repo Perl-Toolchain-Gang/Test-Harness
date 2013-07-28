@@ -3,10 +3,8 @@ package TAP::Parser::SourceHandler;
 use strict;
 use warnings;
 
-use TAP::Object           ();
 use TAP::Parser::Iterator ();
-
-our @ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 =head1 NAME
 
@@ -27,7 +25,7 @@ our $VERSION = '3.28';
 
   # must be sub-classed for use
   package MySourceHandler;
-  use base qw( TAP::Parser::SourceHandler );
+  use parent 'TAP::Parser::SourceHandler';
   sub can_handle    { return $confidence_level }
   sub make_iterator { return $iterator }
 
@@ -127,7 +125,7 @@ L<TAP::Parser::IteratorFactory/register_handler>.
   use MySourceHandler; # see TAP::Parser::SourceHandler
   use TAP::Parser::IteratorFactory;
 
-  our @ISA = qw( TAP::Parser::SourceHandler );
+  use parent 'TAP::Parser::SourceHandler';
 
   TAP::Parser::IteratorFactory->register_handler( __PACKAGE__ );
 

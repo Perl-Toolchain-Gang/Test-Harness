@@ -3,7 +3,6 @@ package TAP::Parser;
 use strict;
 use warnings;
 
-use TAP::Base                              ();
 use TAP::Parser::Grammar                   ();
 use TAP::Parser::Result                    ();
 use TAP::Parser::ResultFactory             ();
@@ -17,6 +16,8 @@ use TAP::Parser::SourceHandler::RawTAP     ();
 use TAP::Parser::SourceHandler::Handle     ();
 
 use Carp qw( confess );
+
+use parent 'TAP::Base';
 
 =head1 NAME
 
@@ -42,8 +43,6 @@ END {
 }
 
 BEGIN {    # making accessors
-    our @ISA = qw(TAP::Base);
-
     __PACKAGE__->mk_methods(
         qw(
           _iterator

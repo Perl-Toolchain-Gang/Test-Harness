@@ -3,9 +3,7 @@ package TAP::Base;
 use strict;
 use warnings;
 
-use TAP::Object;
-
-our @ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 =head1 NAME
 
@@ -29,9 +27,7 @@ use constant GOT_TIME_HIRES => do {
 
     package TAP::Whatever;
 
-    use TAP::Base;
-    
-    our @ISA = qw(TAP::Base);
+    use parent 'TAP::Base';
 
     # ... later ...
     

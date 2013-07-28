@@ -8,9 +8,7 @@ use File::Spec;
 use File::Path;
 use IO::Handle;
 
-use TAP::Base;
-
-our @ISA = qw(TAP::Base);
+use parent 'TAP::Base';
 
 =head1 NAME
 

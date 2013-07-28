@@ -2,9 +2,8 @@ package TAP::Parser::Utils;
 
 use strict;
 use warnings;
-use Exporter;
 
-our @ISA       = qw( Exporter );
+use parent 'Exporter';
 our @EXPORT_OK = qw( split_shell );
 
 =head1 NAME

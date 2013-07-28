@@ -3,12 +3,10 @@ package TAP::Parser::IteratorFactory;
 use strict;
 use warnings;
 
-use TAP::Object ();
-
 use Carp qw( confess );
 use File::Basename qw( fileparse );
 
-our @ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 use constant handlers => [];
 
@@ -303,9 +301,7 @@ But in case you find the need to...
 
   use strict;
 
-  use TAP::Parser::IteratorFactory;
-
-  our @ISA = qw( TAP::Parser::IteratorFactory );
+  use parent 'TAP::Parser::IteratorFactory';
 
   # override source detection algorithm
   sub detect_source {

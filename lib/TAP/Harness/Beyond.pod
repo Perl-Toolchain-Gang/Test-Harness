@@ -223,7 +223,8 @@ document:
 
   package My::TAP::Harness;
 
-  use base qw( TAP::Harness ); use YAML;
+  use parent 'TAP::Harness';
+  use YAML;
 
   sub summary {
     my ( $self, $aggregate ) = @_; 

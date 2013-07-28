@@ -4,13 +4,12 @@ use strict;
 use warnings;
 
 use IO::Select;
-use TAP::Object ();
+
+use parent 'TAP::Object';
 
 use constant IS_WIN32 => $^O =~ /^(MS)?Win32$/;
 use constant IS_VMS => $^O eq 'VMS';
 use constant SELECT_OK => !( IS_VMS || IS_WIN32 );
-
-our @ISA = 'TAP::Object';
 
 =head1 NAME
 

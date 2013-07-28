@@ -2,9 +2,7 @@ package TAP::Formatter::File::Session;
 
 use strict;
 use warnings;
-use TAP::Formatter::Session;
-
-our @ISA = qw(TAP::Formatter::Session);
+use parent 'TAP::Formatter::Session';
 
 =head1 NAME
 

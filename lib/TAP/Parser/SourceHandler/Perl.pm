@@ -7,12 +7,11 @@ use Config;
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant IS_VMS => ( $^O eq 'VMS' );
 
-use TAP::Parser::SourceHandler::Executable ();
 use TAP::Parser::IteratorFactory           ();
 use TAP::Parser::Iterator::Process         ();
 use TAP::Parser::Utils qw( split_shell );
 
-our @ISA = 'TAP::Parser::SourceHandler::Executable';
+use parent 'TAP::Parser::SourceHandler::Executable';
 
 TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
@@ -345,7 +344,7 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
 
   use TAP::Parser::SourceHandler::Perl;
 
-  our @ISA = qw( TAP::Parser::SourceHandler::Perl );
+  use parent 'TAP::Parser::SourceHandler::Perl';
 
   # use the version of perl from the shebang line in the test file
   sub get_perl {

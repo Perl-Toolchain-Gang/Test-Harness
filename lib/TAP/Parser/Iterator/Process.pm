@@ -3,11 +3,10 @@ package TAP::Parser::Iterator::Process;
 use strict;
 use warnings;
 
-use TAP::Parser::Iterator ();
 use Config;
 use IO::Handle;
 
-our @ISA = 'TAP::Parser::Iterator';
+use parent 'TAP::Parser::Iterator';
 
 my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
 

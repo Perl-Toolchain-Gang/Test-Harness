@@ -3,11 +3,10 @@ package TAP::Parser::Grammar;
 use strict;
 use warnings;
 
-use TAP::Object                  ();
 use TAP::Parser::ResultFactory   ();
 use TAP::Parser::YAMLish::Reader ();
 
-our @ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 =head1 NAME
 

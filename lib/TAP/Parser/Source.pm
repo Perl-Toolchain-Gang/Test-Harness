@@ -3,12 +3,10 @@ package TAP::Parser::Source;
 use strict;
 use warnings;
 
-use TAP::Object ();
 use File::Basename qw( fileparse );
+use parent 'TAP::Object';
 
 use constant BLK_SIZE => 512;
-
-our @ISA = qw(TAP::Object);
 
 =head1 NAME
 

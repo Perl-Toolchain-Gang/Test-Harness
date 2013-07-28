@@ -16,7 +16,7 @@ use TAP::Parser::SourceHandler::Perl ();
 use TAP::Parser::Utils qw( split_shell );
 
 use Config;
-use Exporter;
+use parent 'Exporter';
 
 # $ML $Last_ML_Print
 
@@ -52,7 +52,6 @@ END {
     delete $ENV{HARNESS_VERSION};
 }
 
-our @ISA       = ('Exporter');
 our @EXPORT    = qw(&runtests);
 our @EXPORT_OK = qw(&execute_tests $verbose $switches);
 

@@ -2,11 +2,10 @@ package TAP::Formatter::File;
 
 use strict;
 use warnings;
-use TAP::Formatter::Base ();
 use TAP::Formatter::File::Session;
 use POSIX qw(strftime);
 
-our @ISA = qw(TAP::Formatter::Base);
+use parent 'TAP::Formatter::Base';
 
 =head1 NAME
 

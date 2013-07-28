@@ -2,15 +2,13 @@ package TAP::Formatter::Base;
 
 use strict;
 use warnings;
-use TAP::Base ();
+use parent 'TAP::Base';
 use POSIX qw(strftime);
 
 my $MAX_ERRORS = 5;
 my %VALIDATION_FOR;
 
 BEGIN {
-    our @ISA = qw(TAP::Base);
-
     %VALIDATION_FOR = (
         directives => sub { shift; shift },
         verbosity  => sub { shift; shift },

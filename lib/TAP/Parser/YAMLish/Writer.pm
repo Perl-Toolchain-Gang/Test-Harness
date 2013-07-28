@@ -3,9 +3,8 @@ package TAP::Parser::YAMLish::Writer;
 use strict;
 use warnings;
 
-use TAP::Object ();
+use parent 'TAP::Object';
 
-our @ISA     = 'TAP::Object';
 our $VERSION = '3.28';
 
 my $ESCAPE_CHAR = qr{ [ \x00-\x1f \" ] }x;

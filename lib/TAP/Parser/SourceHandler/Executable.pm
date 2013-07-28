@@ -3,11 +3,10 @@ package TAP::Parser::SourceHandler::Executable;
 use strict;
 use warnings;
 
-use TAP::Parser::SourceHandler     ();
 use TAP::Parser::IteratorFactory   ();
 use TAP::Parser::Iterator::Process ();
 
-our @ISA = qw(TAP::Parser::SourceHandler);
+use parent 'TAP::Parser::SourceHandler';
 
 TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
@@ -160,7 +159,7 @@ Please see L<TAP::Parser/SUBCLASSING> for a subclassing overview.
   use Carp qw( croak );
   use TAP::Parser::SourceHandler::Executable;
 
-  our @ISA = qw( TAP::Parser::SourceHandler::Executable );
+  use parent 'TAP::Parser::SourceHandler::Executable';
 
   # expect $handler->(['mytest.rb', 'cmdline', 'args']);
   sub make_iterator {
