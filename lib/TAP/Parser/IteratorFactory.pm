@@ -1,14 +1,12 @@
 package TAP::Parser::IteratorFactory;
 
 use strict;
-use vars qw($VERSION @ISA);
-
-use TAP::Object ();
+use warnings;
 
 use Carp qw( confess );
 use File::Basename qw( fileparse );
 
-@ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 use constant handlers => [];
 
@@ -22,7 +20,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 SYNOPSIS
 
@@ -302,11 +300,8 @@ But in case you find the need to...
   package MyIteratorFactory;
 
   use strict;
-  use vars '@ISA';
 
-  use TAP::Parser::IteratorFactory;
-
-  @ISA = qw( TAP::Parser::IteratorFactory );
+  use parent 'TAP::Parser::IteratorFactory';
 
   # override source detection algorithm
   sub detect_source {

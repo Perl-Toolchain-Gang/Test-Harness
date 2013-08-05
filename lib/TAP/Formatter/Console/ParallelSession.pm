@@ -1,15 +1,14 @@
 package TAP::Formatter::Console::ParallelSession;
 
 use strict;
+use warnings;
 use File::Spec;
 use File::Path;
-use TAP::Formatter::Console::Session;
 use Carp;
 
-use constant WIDTH => 72;    # Because Eric says
-use vars qw($VERSION @ISA);
+use parent 'TAP::Formatter::Console::Session';
 
-@ISA = qw(TAP::Formatter::Console::Session);
+use constant WIDTH => 72;    # Because Eric says
 
 my %shared;
 
@@ -46,7 +45,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

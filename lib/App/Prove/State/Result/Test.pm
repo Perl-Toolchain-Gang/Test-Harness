@@ -1,8 +1,7 @@
 package App::Prove::State::Result::Test;
 
 use strict;
-
-use vars qw($VERSION);
+use warnings;
 
 =head1 NAME
 
@@ -14,7 +13,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

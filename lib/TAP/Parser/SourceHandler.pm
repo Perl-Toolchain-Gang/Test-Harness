@@ -1,12 +1,10 @@
 package TAP::Parser::SourceHandler;
 
 use strict;
-use vars qw($VERSION @ISA);
+use warnings;
 
-use TAP::Object           ();
 use TAP::Parser::Iterator ();
-
-@ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 =head1 NAME
 
@@ -18,7 +16,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 SYNOPSIS
 
@@ -27,7 +25,7 @@ $VERSION = '3.28';
 
   # must be sub-classed for use
   package MySourceHandler;
-  use base qw( TAP::Parser::SourceHandler );
+  use parent 'TAP::Parser::SourceHandler';
   sub can_handle    { return $confidence_level }
   sub make_iterator { return $iterator }
 
@@ -123,12 +121,11 @@ L<TAP::Parser::IteratorFactory/register_handler>.
   package MySourceHandler;
 
   use strict;
-  use vars '@ISA'; # compat with older perls
 
   use MySourceHandler; # see TAP::Parser::SourceHandler
   use TAP::Parser::IteratorFactory;
 
-  @ISA = qw( TAP::Parser::SourceHandler );
+  use parent 'TAP::Parser::SourceHandler';
 
   TAP::Parser::IteratorFactory->register_handler( __PACKAGE__ );
 

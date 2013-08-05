@@ -1,11 +1,11 @@
 package TAP::Formatter::Color;
 
 use strict;
-use vars qw($VERSION @ISA);
+use warnings;
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 
-@ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 my $NO_COLOR;
 
@@ -75,7 +75,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

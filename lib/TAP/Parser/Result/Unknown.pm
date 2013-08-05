@@ -1,12 +1,9 @@
 package TAP::Parser::Result::Unknown;
 
 use strict;
+use warnings;
 
-use vars qw($VERSION @ISA);
-use TAP::Parser::Result;
-@ISA = 'TAP::Parser::Result';
-
-use vars qw($VERSION);
+use parent 'TAP::Parser::Result';
 
 =head1 NAME
 
@@ -18,7 +15,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 

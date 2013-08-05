@@ -1,13 +1,12 @@
 package TAP::Parser::Grammar;
 
 use strict;
-use vars qw($VERSION @ISA);
+use warnings;
 
-use TAP::Object                  ();
 use TAP::Parser::ResultFactory   ();
 use TAP::Parser::YAMLish::Reader ();
 
-@ISA = qw(TAP::Object);
+use parent 'TAP::Object';
 
 =head1 NAME
 
@@ -19,7 +18,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 SYNOPSIS
 

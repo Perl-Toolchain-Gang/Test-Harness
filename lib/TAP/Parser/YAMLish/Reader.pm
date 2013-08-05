@@ -1,12 +1,11 @@
 package TAP::Parser::YAMLish::Reader;
 
 use strict;
-use vars qw($VERSION @ISA);
+use warnings;
 
-use TAP::Object ();
+use parent 'TAP::Object';
 
-@ISA     = 'TAP::Object';
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 # TODO:
 #   Handle blessed object syntax

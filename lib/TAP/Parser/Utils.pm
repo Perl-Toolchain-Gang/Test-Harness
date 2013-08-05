@@ -1,11 +1,10 @@
 package TAP::Parser::Utils;
 
 use strict;
-use Exporter;
-use vars qw($VERSION @ISA @EXPORT_OK);
+use warnings;
 
-@ISA       = qw( Exporter );
-@EXPORT_OK = qw( split_shell );
+use parent 'Exporter';
+our @EXPORT_OK = qw( split_shell );
 
 =head1 NAME
 
@@ -17,7 +16,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 SYNOPSIS
 

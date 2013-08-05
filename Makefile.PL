@@ -18,6 +18,9 @@ my %mm_args = (
 
    # The core autogenerates a Makefile.PL, and finds prove with utils/prove.PL
     'EXE_FILES' => ['bin/prove'],
+    'PREREQ_PM'    => {
+        parent => 0,
+    }
 );
 
 {

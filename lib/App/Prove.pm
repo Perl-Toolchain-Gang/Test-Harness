@@ -1,15 +1,16 @@
 package App::Prove;
 
 use strict;
-use vars qw($VERSION @ISA);
+use warnings;
 
-use TAP::Object ();
 use TAP::Harness;
 use TAP::Parser::Utils qw( split_shell );
 use File::Spec;
 use Getopt::Long;
 use App::Prove::State;
 use Carp;
+
+use parent 'TAP::Object';
 
 =head1 NAME
 
@@ -21,7 +22,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 
@@ -51,8 +52,6 @@ use constant PLUGINS => 'App::Prove::Plugin';
 my @ATTR;
 
 BEGIN {
-    @ISA = qw(TAP::Object);
-
     @ATTR = qw(
       archive argv blib show_count color directives exec failures comments
       formatter harness includes modules plugins jobs lib merge parse quiet

@@ -1,11 +1,8 @@
 package TAP::Formatter::File::Session;
 
 use strict;
-use TAP::Formatter::Session;
-
-use vars qw($VERSION @ISA);
-
-@ISA = qw(TAP::Formatter::Session);
+use warnings;
+use parent 'TAP::Formatter::Session';
 
 =head1 NAME
 
@@ -17,7 +14,7 @@ Version 3.28
 
 =cut
 
-$VERSION = '3.28';
+our $VERSION = '3.28';
 
 =head1 DESCRIPTION
 
