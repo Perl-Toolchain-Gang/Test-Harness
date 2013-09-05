@@ -2,7 +2,7 @@ package Test::Simple;
 
 use 5.006;
 
-use strict 'vars';
+use strict;
 use warnings;
 use vars qw($VERSION @ISA @EXPORT);
 $VERSION = '0.72';
