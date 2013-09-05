@@ -8,8 +8,7 @@ $^C ||= 0;
 
 use strict;
 use warnings;
-use vars qw($VERSION);
-$VERSION = '0.72';
+our $VERSION = '0.72';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
 # Make Test::Builder thread-safe for ithreads.
@@ -169,7 +168,7 @@ test might be run multiple times in the same process.
 
 =cut
 
-use vars qw($Level);
+our $Level;
 
 sub reset {
     my ($self) = @_;

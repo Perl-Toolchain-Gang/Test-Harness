@@ -13,8 +13,8 @@ sub _carp {
     warn @_, " at $file line $line\n";
 }
 
-use vars qw($VERSION @EXPORT %EXPORT_TAGS $TODO);
-$VERSION = '0.72';
+our (@EXPORT, %EXPORT_TAGS, $TODO);
+our $VERSION = '0.72';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
 use parent qw(Test::Builder::Module);
@@ -771,7 +771,7 @@ along these lines.
 
 =cut
 
-use vars qw(@Data_Stack %Refs_Seen);
+our (@Data_Stack, %Refs_Seen);
 my $DNE = bless [], 'Does::Not::Exist';
 
 sub _dne {

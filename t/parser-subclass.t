@@ -6,7 +6,7 @@ BEGIN {
 
 use strict;
 use warnings;
-use vars qw(%INIT %CUSTOM);
+our (%INIT, %CUSTOM);
 
 use Test::More tests => 14;
 use File::Spec::Functions qw( catfile updir );

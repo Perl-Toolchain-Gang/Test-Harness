@@ -64,7 +64,7 @@ can_ok $factory, 'register_type';
     package MyResult;
     use strict;
     use warnings;
-    use vars qw($VERSION);
+    our $VERSION;
     use parent 'TAP::Parser::Result';
     TAP::Parser::ResultFactory->register_type( 'my_type' => __PACKAGE__ );
 }

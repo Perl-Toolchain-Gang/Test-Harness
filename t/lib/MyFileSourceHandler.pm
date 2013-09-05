@@ -4,7 +4,7 @@ package MyFileSourceHandler;
 
 use strict;
 use warnings;
-use vars qw( $LAST_OBJ $CAN_HANDLE $MAKE_ITER $LAST_SOURCE );
+our ($LAST_OBJ, $CAN_HANDLE, $MAKE_ITER, $LAST_SOURCE);
 
 use TAP::Parser::IteratorFactory;
 

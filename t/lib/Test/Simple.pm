@@ -4,8 +4,8 @@ use 5.006;
 
 use strict;
 use warnings;
-use vars qw($VERSION @EXPORT);
-$VERSION = '0.72';
+our @EXPORT;
+our $VERSION = '0.72';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
 use parent qw(Test::Builder::Module);
