@@ -2,8 +2,7 @@ package Test::Builder::Module;
 
 use Test::Builder;
 
-require Exporter;
-@ISA = qw(Exporter);
+use parent qw(Exporter);
 
 $VERSION = '0.72';
 

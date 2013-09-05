@@ -803,9 +803,8 @@ END_TAP
     package TAP::Parser::Iterator::Dies;
 
     use strict;
-    use vars qw(@ISA);
 
-    @ISA = qw(TAP::Parser::Iterator);
+    use parent qw(TAP::Parser::Iterator);
 
     sub next_raw {
         die 'this is the dying iterator';
@@ -899,9 +898,8 @@ END_TAP
     # coverage testing of TAP::Parser::_next_state
 
     package TAP::Parser::WithBrokenState;
-    use vars qw(@ISA);
 
-    @ISA = qw( TAP::Parser );
+    use parent qw( TAP::Parser );
 
     sub _make_state_table {
         return { INIT => { plan => { goto => 'FOO' } } };
@@ -937,9 +935,8 @@ END_TAP
     # coverage testing of TAP::Parser::_iter
 
     package TAP::Parser::WithBrokenIter;
-    use vars qw(@ISA);
 
-    @ISA = qw( TAP::Parser );
+    use parent qw( TAP::Parser );
 
     sub _iter {return}
 

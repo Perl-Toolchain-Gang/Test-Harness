@@ -54,8 +54,7 @@ use TAP::Base;
 package CallbackOK;
 
 use TAP::Base;
-use vars qw(@ISA);
-@ISA = 'TAP::Base';
+use parent 'TAP::Base';
 
 sub _initialize {
     my $self = shift;

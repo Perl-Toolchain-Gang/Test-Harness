@@ -4,12 +4,8 @@ package MyResult;
 
 use strict;
 use warnings;
-use vars '@ISA';
 
-use MyCustom;
-use TAP::Parser::Result;
-
-@ISA = qw( TAP::Parser::Result MyCustom );
+use parent qw( TAP::Parser::Result MyCustom );
 
 sub _initialize {
     my $self = shift;

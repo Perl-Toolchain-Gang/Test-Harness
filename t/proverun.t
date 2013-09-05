@@ -68,9 +68,8 @@ BEGIN {
 # Waaaaay too much boilerplate
 
 package FakeProve;
-use vars qw( @ISA );
 
-@ISA = qw( App::Prove );
+use parent qw( App::Prove );
 
 sub new {
     my $class = shift;

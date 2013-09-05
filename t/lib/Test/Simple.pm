@@ -4,12 +4,11 @@ use 5.006;
 
 use strict;
 use warnings;
-use vars qw($VERSION @ISA @EXPORT);
+use vars qw($VERSION @EXPORT);
 $VERSION = '0.72';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
-use Test::Builder::Module;
-@ISA    = qw(Test::Builder::Module);
+use parent qw(Test::Builder::Module);
 @EXPORT = qw(ok);
 
 my $CLASS = __PACKAGE__;

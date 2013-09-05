@@ -3,10 +3,7 @@ package MyBuilder;
 use strict;
 use warnings;
 
-BEGIN {
-    require Module::Build;
-    @ISA = qw(Module::Build);
-}
+use parent qw(Module::Build);
 
 # Test with Test::Harness
 sub ACTION_test_with_harness {

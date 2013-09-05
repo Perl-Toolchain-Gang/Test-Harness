@@ -15,8 +15,7 @@ can_ok( 'TAP::Object', '_croak' );
 {
 
     package TAP::TestObj;
-    use vars qw(@ISA);
-    @ISA = qw(TAP::Object);
+    use parent qw(TAP::Object);
 
     sub _initialize {
         my $self = shift;

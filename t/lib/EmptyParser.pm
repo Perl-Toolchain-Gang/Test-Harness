@@ -2,11 +2,8 @@ package EmptyParser;
 
 use strict;
 use warnings;
-use vars qw(@ISA);
 
-use TAP::Parser ();
-
-@ISA = qw(TAP::Parser);
+use parent qw(TAP::Parser);
 
 sub _initialize {
     shift->_set_defaults;

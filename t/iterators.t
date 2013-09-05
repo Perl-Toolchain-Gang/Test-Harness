@@ -29,8 +29,7 @@ my $setup    = sub { $did_setup++ };
 my $teardown = sub { $did_teardown++ };
 
 package NoForkProcess;
-use vars qw( @ISA );
-@ISA = qw( TAP::Parser::Iterator::Process );
+use parent qw( TAP::Parser::Iterator::Process );
 
 sub _use_open3 {return}
 

@@ -82,8 +82,7 @@ sub make_shell_test {
 
 package Test::Prove;
 
-use vars qw(@ISA);
-@ISA = 'App::Prove';
+use parent 'App::Prove';
 
 sub _runtests {
     my $self = shift;

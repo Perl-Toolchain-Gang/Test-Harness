@@ -76,8 +76,7 @@ Test::Builder - Backend for building test libraries
 
   package My::Test::Module;
   use Test::Builder;
-  require Exporter;
-  @ISA = qw(Exporter);
+  use parent qw(Exporter);
   @EXPORT = qw(ok);
 
   my $Test = Test::Builder->new;

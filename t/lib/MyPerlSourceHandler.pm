@@ -4,13 +4,10 @@ package MyPerlSourceHandler;
 
 use strict;
 use warnings;
-use vars '@ISA';
 
-use MyCustom;
 use TAP::Parser::IteratorFactory;
-use TAP::Parser::SourceHandler::Perl;
 
-@ISA = qw( TAP::Parser::SourceHandler::Perl MyCustom );
+use parent qw( TAP::Parser::SourceHandler::Perl MyCustom );
 
 TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 

@@ -16,9 +16,8 @@ use Getopt::Long;
 use TAP::Parser::Utils qw( split_shell );
 
 package FakeProve;
-use vars qw( @ISA );
 
-@ISA = qw( App::Prove );
+use parent qw( App::Prove );
 
 sub new {
     my $class = shift;

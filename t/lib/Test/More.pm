@@ -13,12 +13,11 @@ sub _carp {
     warn @_, " at $file line $line\n";
 }
 
-use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $TODO);
+use vars qw($VERSION @EXPORT %EXPORT_TAGS $TODO);
 $VERSION = '0.72';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
-use Test::Builder::Module;
-@ISA    = qw(Test::Builder::Module);
+use parent qw(Test::Builder::Module);
 @EXPORT = qw(ok use_ok require_ok
   is isnt like unlike is_deeply
   cmp_ok
