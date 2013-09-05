@@ -3,6 +3,7 @@
 package TAP::Parser::SubclassTest;
 
 use strict;
+use warnings;
 use vars qw(@ISA);
 
 use TAP::Parser;

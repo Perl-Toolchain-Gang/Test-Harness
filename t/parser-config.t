@@ -5,6 +5,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 use vars qw(%INIT %CUSTOM);
 
 use Test::More tests => 5;

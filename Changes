@@ -1,6 +1,7 @@
 Revision history for Test-Harness
         - Get rid of use vars in favor of our (Leon Timmermans)
-        - Added use warnings to all modules (Leon Timmermans)
+        - Added use warnings to all modules (Leon Timmermans) and tests (Karen
+          Etheridge)
         - Use parent instead of @ISA (Leon Timmermans)
 
 3.28    2013-05-02

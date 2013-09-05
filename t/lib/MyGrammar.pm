@@ -3,6 +3,7 @@
 package MyGrammar;
 
 use strict;
+use warnings;
 use vars '@ISA';
 
 use MyCustom;

@@ -8,6 +8,7 @@ require 5.006;
 use ExtUtils::MakeMaker qw/WriteMakefile prompt/;
 
 use strict;
+use warnings;
 
 my %mm_args = (
     'NAME'         => 'Test::Harness',

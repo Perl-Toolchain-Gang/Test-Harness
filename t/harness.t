@@ -5,6 +5,7 @@ BEGIN {
 }
 
 use strict;
+use warnings;
 
 use Test::More;
 use IO::c55Capture;

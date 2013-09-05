@@ -3,6 +3,7 @@
 package MyResult;
 
 use strict;
+use warnings;
 use vars '@ISA';
 
 use MyCustom;

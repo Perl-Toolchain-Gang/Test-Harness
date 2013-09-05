@@ -1,6 +1,7 @@
 #!/usr/bin/perl -wT
 
 use strict;
+use warnings;
 use lib 't/lib';
 
 use Test::More tests => 227;
@@ -62,6 +63,7 @@ can_ok $factory, 'register_type';
 
     package MyResult;
     use strict;
+    use warnings;
     use vars qw($VERSION @ISA);
     @ISA = 'TAP::Parser::Result';
     TAP::Parser::ResultFactory->register_type( 'my_type' => __PACKAGE__ );

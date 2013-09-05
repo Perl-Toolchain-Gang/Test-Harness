@@ -1,12 +1,13 @@
 package Test::Builder;
 
-use 5.004;
+use 5.006;
 
 # $^C was only introduced in 5.005-ish.  We do this to prevent
 # use of uninitialized value warnings in older perls.
 $^C ||= 0;
 
 use strict;
+use warnings;
 use vars qw($VERSION);
 $VERSION = '0.72';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number

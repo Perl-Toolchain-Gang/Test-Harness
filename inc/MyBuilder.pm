@@ -1,5 +1,8 @@
 package MyBuilder;
 
+use strict;
+use warnings;
+
 BEGIN {
     require Module::Build;
     @ISA = qw(Module::Build);

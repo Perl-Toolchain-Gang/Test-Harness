@@ -3,6 +3,7 @@
 package MySourceHandler;
 
 use strict;
+use warnings;
 use vars '@ISA';
 
 use MyCustom;

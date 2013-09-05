@@ -1,6 +1,7 @@
 package EmptyParser;
 
 use strict;
+use warnings;
 use vars qw(@ISA);
 
 use TAP::Parser ();

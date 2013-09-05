@@ -1,8 +1,9 @@
 package Test::More;
 
-use 5.004;
+use 5.006;
 
 use strict;
+use warnings;
 
 # Can't use Carp because it might cause use_ok() to accidentally succeed
 # even though the module being used forgot to use Carp.  Yes, this
