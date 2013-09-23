@@ -30,6 +30,7 @@ lib/TAP/Formatter/File/Session.pm
 lib/TAP/Formatter/Session.pm
 lib/TAP/Harness.pm
 lib/TAP/Harness/Beyond.pod
+lib/TAP/Harness/Env.pm
 lib/TAP/Object.pm
 lib/TAP/Parser.pm
 lib/TAP/Parser/Aggregator.pm
