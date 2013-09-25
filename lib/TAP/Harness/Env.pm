@@ -3,10 +3,8 @@ package TAP::Harness::Env;
 use strict;
 use warnings;
 
-use Exporter 5.57 'import';
-our @EXPORT_OK = qw/get_test_arguments/;
-
 use constant IS_VMS => ( $^O eq 'VMS' );
+use TAP::Object;
 use Text::ParseWords qw/shellwords/;
 
 our $VERSION = '3.28';
@@ -55,7 +53,8 @@ sub _default_inc {
     return @inc;
 }
 
-sub get_test_arguments {
+sub create {
+	my $package = shift;
     my %input = %{ shift || {} };
 
     my @libs         = @{ delete $input{libs}     || [] };
@@ -116,9 +115,7 @@ sub get_test_arguments {
             }
         }
     }
-	%args = (%args, %input);
-
-    return ( $class, \%args );
+    return TAP::Object->_construct($class, { %args, %input });
 }
 
 1;
