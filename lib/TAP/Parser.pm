@@ -19,6 +19,8 @@ use Carp qw( confess );
 
 use parent 'TAP::Base';
 
+=encoding utf8
+
 =head1 NAME
 
 TAP::Parser - Parse L<TAP|Test::Harness::TAP> output
@@ -637,7 +639,7 @@ C<$result> object.
 
 Returns a list of pragmas each of which is a + or - followed by the
 pragma name.
- 
+
 =head2 C<comment> methods
 
  if ( $result->is_comment ) { ... }
@@ -1763,7 +1765,7 @@ so without sub-classing C<TAP::Parser> by setting L</iterator_factory_class>.
 If you just need to customize the objects on creation, subclass L<TAP::Parser>
 and override L</make_iterator_factory>.
 
-Note that L</make_source> & L</make_perl_source> have been I<DEPRECATED> and
+Note that C<make_source> & C<make_perl_source> have been I<DEPRECATED> and
 are now removed.
 
 =head3 Iterators
