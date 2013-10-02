@@ -124,7 +124,7 @@ sub _construct {
     unless ( $class->can('new') ) {
         local $@;
         eval "require $class";
-        $self->_croak("Can't load $class") if $@;
+        $self->_croak("Can't load $class: $@") if $@;
     }
 
     return $class->new(@args);
