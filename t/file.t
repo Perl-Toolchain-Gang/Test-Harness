@@ -24,7 +24,7 @@ ok $ENV{HARNESS_VERSION}, 'HARNESS_VERSION env variable should be set';
 
 {
     my @output;
-    local $^W;
+    no warnings 'redefine';
     require TAP::Formatter::Base;
     local *TAP::Formatter::Base::_output = sub {
         my $self = shift;

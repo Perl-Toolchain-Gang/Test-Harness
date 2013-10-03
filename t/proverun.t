@@ -94,13 +94,11 @@ package main;
     # Patch TAP::Parser::Iterator::Process
     my @call_log = ();
 
-    local $^W;    # no warnings
+    no warnings qw(redefine once);
 
     my $orig_new = TAP::Parser::Iterator::Process->can('new');
 
-    # Avoid "used only once" warning
-    *TAP::Parser::Iterator::Process::new
-      = *TAP::Parser::Iterator::Process::new = sub {
+    *TAP::Parser::Iterator::Process::new = sub {
         push @call_log, [ 'new', @_ ];
 
         # And then new turns round and tramples on our args...

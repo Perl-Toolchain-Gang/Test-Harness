@@ -1007,7 +1007,7 @@ sub skip {
         $tb->skip($why);
     }
 
-    local $^W = 0;
+    no warnings 'exiting';
     last SKIP;
 }
 
@@ -1088,7 +1088,7 @@ sub todo_skip {
         $tb->todo_skip($why);
     }
 
-    local $^W = 0;
+    no warnings 'exiting';
     last TODO;
 }
 
@@ -1212,7 +1212,7 @@ sub _deep_check {
     {
 
         # Quiet uninitialized value warnings when comparing undefs.
-        local $^W = 0;
+        no warnings 'uninitialized';
 
         $tb->_unoverload_str( \$e1, \$e2 );
 
@@ -1358,7 +1358,7 @@ sub eq_set {
     return 0 unless @$a1 == @$a2;
 
     # There's faster ways to do this, but this is easiest.
-    local $^W = 0;
+    no warnings 'uninitialized';
 
     # It really doesn't matter how we sort them, as long as both arrays are
     # sorted with the same algorithm.

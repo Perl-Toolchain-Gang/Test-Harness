@@ -81,7 +81,7 @@ for my $test_args ( get_arg_sets() ) {
 
 {
     my @output;
-    local $^W;
+    no warnings 'redefine';
     local *TAP::Formatter::Base::_output = sub {
         my $self = shift;
         push @output => grep { $_ ne '' }
