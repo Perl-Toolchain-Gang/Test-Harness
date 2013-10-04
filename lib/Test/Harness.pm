@@ -13,7 +13,7 @@ use TAP::Parser::Aggregator          ();
 use TAP::Parser::Source              ();
 use TAP::Parser::SourceHandler::Perl ();
 
-use TAP::Parser::Utils qw( split_shell );
+use Text::ParseWords qw(shellwords);
 
 use Config;
 use parent 'Exporter';
@@ -193,7 +193,7 @@ sub _new_harness {
     my $sub_args = shift || {};
 
     my ( @lib, @switches );
-    my @opt = split_shell( $Switches, $ENV{HARNESS_PERL_SWITCHES} );
+    my @opt = map { shellwords($_) } grep { defined } $Switches, $ENV{HARNESS_PERL_SWITCHES};
     while ( my $opt = shift @opt ) {
         if ( $opt =~ /^ -I (.*) $ /x ) {
             push @lib, length($1) ? $1 : shift @opt;

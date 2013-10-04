@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use TAP::Harness;
-use TAP::Parser::Utils qw( split_shell );
+use Text::ParseWords qw(shellwords);
 use File::Spec;
 use Getopt::Long;
 use App::Prove::State;
@@ -573,7 +573,7 @@ sub _get_switches {
         push @switches, '-w';
     }
 
-    push @switches, split_shell( $ENV{HARNESS_PERL_SWITCHES} );
+    push @switches, shellwords( $ENV{HARNESS_PERL_SWITCHES} ) if defined $ENV{HARNESS_PERL_SWITCHES};
 
     return @switches ? \@switches : ();
 }
