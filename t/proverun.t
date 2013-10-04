@@ -9,7 +9,7 @@ use warnings;
 use Test::More;
 use File::Spec;
 use App::Prove;
-use TAP::Parser::Utils qw( split_shell );
+use Text::ParseWords qw(shellwords);
 
 my @SCHEDULE;
 
@@ -48,7 +48,7 @@ BEGIN {
                             command => [
                                 'PERL',
                                 $ENV{HARNESS_PERL_SWITCHES}
-                                ? split_shell( $ENV{HARNESS_PERL_SWITCHES} )
+                                ? shellwords( $ENV{HARNESS_PERL_SWITCHES} )
                                 : (),
                                 $_->{file},
                             ],

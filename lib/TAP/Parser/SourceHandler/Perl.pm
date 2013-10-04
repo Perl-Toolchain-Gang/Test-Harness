@@ -9,7 +9,7 @@ use constant IS_VMS => ( $^O eq 'VMS' );
 
 use TAP::Parser::IteratorFactory           ();
 use TAP::Parser::Iterator::Process         ();
-use TAP::Parser::Utils qw( split_shell );
+use Text::ParseWords qw(shellwords);
 
 use parent 'TAP::Parser::SourceHandler::Executable';
 
@@ -171,7 +171,7 @@ sub _mangle_switches {
             $libs,
             [   @{$switches},
                 $class->_libs2switches([@$libs, @perl5lib]),
-                split_shell( $ENV{PERL5OPT} )
+                defined $ENV{PERL5OPT} ? shellwords( $ENV{PERL5OPT} ) : ()
             ],
         );
     }
