@@ -116,7 +116,7 @@ sub ACTION_dprof {
 sub ACTION_smallprof {
     system( $^X, '-d:SmallProf', @profiling_target );
     open( FH, 'smallprof.out' ) or die "Can't open smallprof.out: $!";
-    @rows = grep {/\d+:/} <FH>;
+    my @rows = grep {/\d+:/} <FH>;
     close FH;
 
     @rows = reverse
