@@ -1,4 +1,6 @@
 Revision history for Test-Harness
+
+3.29    2013-08-10
         - Get rid of use vars in favor of our in all modules (Leon Timmermans)
           and tests (Karen Etheridge)
         - Added use warnings to all modules (Leon Timmermans) and tests (Karen
