@@ -224,7 +224,6 @@ t/subclass_tests/perl_source
 t/taint.t
 t/testargs.t
 t/unicode.t
-t/utils.t
 t/yamlish-output.t
 t/yamlish-writer.t
 t/yamlish.t
