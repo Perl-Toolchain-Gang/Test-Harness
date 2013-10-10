@@ -24,6 +24,8 @@ sub _has_module {
 SKIP: {
     skip "requires TAP::Formatter::HTML", 4
       unless _has_module('TAP::Formatter::HTML');
+    skip "requires TAP::Formatter::HTML 0.10 or higher", 4
+        unless TAP::Formatter::HTML->VERSION >= .10;
 
     local $ENV{HARNESS_OPTIONS} = 'j4:c:fTAP-Formatter-HTML';
 
