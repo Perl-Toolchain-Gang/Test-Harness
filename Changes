@@ -2,6 +2,7 @@ Revision history for Test-Harness
 
         - Fix missing parent prereq in META.{yml,json} and NotBuild.PL
           (Dagfinn Ilmari Mannsåker, #89650)
+        - Respect PERL5LIB in tainting source handler test (Dagfinn Ilmari Mannsåker)
 
 3.29    2013-08-10
         - Get rid of use vars in favor of our in all modules (Leon Timmermans)
