@@ -87,6 +87,7 @@ my %file = map { $_ => File::Spec->catfile( $dir, $_ ) }
             {   name => "valid executable",
                 raw  => [
                     $perl, ( $ENV{PERL_CORE} ? '-I../../lib' : () ),
+                    (map { "-I$_" } split /:/, $ENV{PERL5LIB} || ''),
                     '-It/lib', '-T', $file{source}
                 ],
                 iclass        => 'TAP::Parser::Iterator::Process',
