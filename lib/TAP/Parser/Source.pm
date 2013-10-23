@@ -327,7 +327,7 @@ May be called as a class method
         open my $fh, '<', $file or die "Can't read $file: $!\n";
 
         # Might be a binary file - so read a fixed number of bytes.
-        my $got = read $fh, my $buf, BLK_SIZE;
+        my $got = read $fh, my ($buf), BLK_SIZE;
         defined $got or die "I/O error: $!\n";
         return $1 if $buf =~ /(.*)/;
         return;
