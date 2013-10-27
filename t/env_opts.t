@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 16;
 
 use TAP::Harness::Env;
 
@@ -53,3 +53,14 @@ SKIP: {
 
 }
 
+{
+    local $ENV{HARNESS_TIMER} = 0;
+    ok my $harness = TAP::Harness::Env->create, 'made harness';
+    ok !$harness->timer, 'timer set via HARNESS_TIMER';
+}
+
+{
+    local $ENV{HARNESS_TIMER} = 1;
+    ok my $harness = TAP::Harness::Env->create, 'made harness';
+    ok $harness->timer, 'timer set via HARNESS_TIMER';
+}
