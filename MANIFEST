@@ -134,7 +134,6 @@ t/perl5lib.t
 t/premature-bailout.t
 t/process.t
 t/prove.t
-t/proveenv.t
 t/proverc.t
 t/proverc/emptyexec
 t/proverun.t

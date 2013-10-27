@@ -97,13 +97,6 @@ sub _initialize {
         }
     }
 
-    my %env_provides_default = (
-        HARNESS_TIMER => 'timer',
-    );
-
-    while ( my ( $env, $attr ) = each %env_provides_default ) {
-        $self->{$attr} = 1 if $ENV{$env};
-    }
     $self->state_class('App::Prove::State');
     return $self;
 }
@@ -572,8 +565,6 @@ sub _get_switches {
     elsif ( $self->warnings_warn ) {
         push @switches, '-w';
     }
-
-    push @switches, shellwords( $ENV{HARNESS_PERL_SWITCHES} ) if defined $ENV{HARNESS_PERL_SWITCHES};
 
     return @switches ? \@switches : ();
 }
