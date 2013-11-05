@@ -30,9 +30,6 @@ my $builder = MyBuilder->new(
     recommends           => {
         'Pod::Usage' => '1.12',    # for 'prove'
     },
-    requires => {
-        parent => 0,
-    },
     build_requires => {},
     add_to_cleanup => ['Test-Harness-*'],
     script_files   => ["bin/prove"],
