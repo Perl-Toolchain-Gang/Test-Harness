@@ -8,7 +8,7 @@ our @EXPORT;
 our $VERSION = '0.72';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
-use parent qw(Test::Builder::Module);
+use base qw(Test::Builder::Module);
 @EXPORT = qw(ok);
 
 my $CLASS = __PACKAGE__;

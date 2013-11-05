@@ -2,7 +2,7 @@ package TAP::Formatter::Console;
 
 use strict;
 use warnings;
-use parent 'TAP::Formatter::Base';
+use base 'TAP::Formatter::Base';
 use POSIX qw(strftime);
 
 =head1 NAME

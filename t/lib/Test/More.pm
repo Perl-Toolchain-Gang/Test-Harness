@@ -17,7 +17,7 @@ our (@EXPORT, %EXPORT_TAGS, $TODO);
 our $VERSION = '0.72';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
-use parent qw(Test::Builder::Module);
+use base qw(Test::Builder::Module);
 @EXPORT = qw(ok use_ok require_ok
   is isnt like unlike is_deeply
   cmp_ok

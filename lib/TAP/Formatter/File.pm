@@ -5,7 +5,7 @@ use warnings;
 use TAP::Formatter::File::Session;
 use POSIX qw(strftime);
 
-use parent 'TAP::Formatter::Base';
+use base 'TAP::Formatter::Base';
 
 =head1 NAME
 

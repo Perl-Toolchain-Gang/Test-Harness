@@ -6,7 +6,7 @@ use warnings;
 use Config;
 use IO::Handle;
 
-use parent 'TAP::Parser::Iterator';
+use base 'TAP::Parser::Iterator';
 
 my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
 

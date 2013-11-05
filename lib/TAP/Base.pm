@@ -3,7 +3,7 @@ package TAP::Base;
 use strict;
 use warnings;
 
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ use constant GOT_TIME_HIRES => do {
 
     package TAP::Whatever;
 
-    use parent 'TAP::Base';
+    use base 'TAP::Base';
 
     # ... later ...
     

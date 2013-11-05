@@ -3,7 +3,7 @@ package MyBuilder;
 use strict;
 use warnings;
 
-use parent qw(Module::Build);
+use base qw(Module::Build);
 
 # Test with Test::Harness
 sub ACTION_test_with_harness {

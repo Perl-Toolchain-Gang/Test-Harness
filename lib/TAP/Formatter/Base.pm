@@ -2,7 +2,7 @@ package TAP::Formatter::Base;
 
 use strict;
 use warnings;
-use parent 'TAP::Base';
+use base 'TAP::Base';
 use POSIX qw(strftime);
 
 my $MAX_ERRORS = 5;

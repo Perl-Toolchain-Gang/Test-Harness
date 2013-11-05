@@ -16,7 +16,7 @@ use TAP::Parser::SourceHandler::Perl ();
 use Text::ParseWords qw(shellwords);
 
 use Config;
-use parent 'Exporter';
+use base 'Exporter';
 
 # $ML $Last_ML_Print
 

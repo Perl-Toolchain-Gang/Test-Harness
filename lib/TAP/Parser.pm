@@ -17,7 +17,7 @@ use TAP::Parser::SourceHandler::Handle     ();
 
 use Carp qw( confess );
 
-use parent 'TAP::Base';
+use base 'TAP::Base';
 
 =encoding utf8
 

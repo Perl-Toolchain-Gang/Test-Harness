@@ -3,7 +3,7 @@ package TAP::Parser::Iterator::Stream;
 use strict;
 use warnings;
 
-use parent 'TAP::Parser::Iterator';
+use base 'TAP::Parser::Iterator';
 
 =head1 NAME
 

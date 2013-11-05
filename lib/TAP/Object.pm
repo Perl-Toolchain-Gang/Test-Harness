@@ -21,7 +21,7 @@ our $VERSION = '3.29';
 
     use strict;
 
-    use parent 'TAP::Object';
+    use base 'TAP::Object';
 
     # new() implementation by TAP::Object
     sub _initialize {

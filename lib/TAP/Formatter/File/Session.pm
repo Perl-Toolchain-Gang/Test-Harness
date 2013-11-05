@@ -2,7 +2,7 @@ package TAP::Formatter::File::Session;
 
 use strict;
 use warnings;
-use parent 'TAP::Formatter::Session';
+use base 'TAP::Formatter::Session';
 
 =head1 NAME
 

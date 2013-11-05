@@ -75,7 +75,7 @@ Test::Builder - Backend for building test libraries
 
   package My::Test::Module;
   use Test::Builder;
-  use parent qw(Exporter);
+  use base qw(Exporter);
   @EXPORT = qw(ok);
 
   my $Test = Test::Builder->new;

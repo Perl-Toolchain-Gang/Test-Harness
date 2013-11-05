@@ -6,7 +6,7 @@ use warnings;
 use TAP::Parser::ResultFactory   ();
 use TAP::Parser::YAMLish::Reader ();
 
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 =head1 NAME
 

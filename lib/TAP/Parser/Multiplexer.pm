@@ -5,7 +5,7 @@ use warnings;
 
 use IO::Select;
 
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 use constant IS_WIN32 => $^O =~ /^(MS)?Win32$/;
 use constant IS_VMS => $^O eq 'VMS';

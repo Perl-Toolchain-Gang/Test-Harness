@@ -12,7 +12,7 @@ use TAP::Parser::Result::Unknown ();
 use TAP::Parser::Result::Version ();
 use TAP::Parser::Result::YAML    ();
 
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 ##############################################################################
 
@@ -82,7 +82,7 @@ a completely new type, eg:
   # create a custom result type:
   package MyResult;
   use strict;
-  use parent 'TAP::Parser::Result';
+  use base 'TAP::Parser::Result';
 
   # register with the factory:
   TAP::Parser::ResultFactory->register_type( 'my_type' => __PACKAGE__ );
@@ -165,7 +165,7 @@ Of course, it's up to you to decide whether or not to ignore them.
 
   use MyResult;
 
-  use parent 'TAP::Parser::ResultFactory';
+  use base 'TAP::Parser::ResultFactory';
 
   # force all results to be 'MyResult'
   sub class_for {

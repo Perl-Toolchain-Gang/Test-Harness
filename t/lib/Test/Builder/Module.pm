@@ -2,7 +2,7 @@ package Test::Builder::Module;
 
 use Test::Builder;
 
-use parent qw(Exporter);
+use base qw(Exporter);
 
 $VERSION = '0.72';
 

@@ -5,7 +5,7 @@ use warnings;
 
 use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 my $NO_COLOR;
 
