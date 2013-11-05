@@ -157,9 +157,7 @@ sub _initialize {
             };
             die "Could not execute (@command): $@" if $@;
             if ( $] >= 5.006 ) {
-
-                # Kludge to avoid warning under 5.5
-                eval 'binmode($out, ":crlf")';
+                binmode($out, ":crlf");
             }
         }
         else {
