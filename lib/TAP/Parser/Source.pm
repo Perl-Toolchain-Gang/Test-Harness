@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use File::Basename qw( fileparse );
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 use constant BLK_SIZE => 512;
 

@@ -6,7 +6,7 @@ use warnings;
 use Carp qw( confess );
 use File::Basename qw( fileparse );
 
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 use constant handlers => [];
 
@@ -301,7 +301,7 @@ But in case you find the need to...
 
   use strict;
 
-  use parent 'TAP::Parser::IteratorFactory';
+  use base 'TAP::Parser::IteratorFactory';
 
   # override source detection algorithm
   sub detect_source {

@@ -3,7 +3,7 @@ package TAP::Formatter::Session;
 use strict;
 use warnings;
 
-use parent 'TAP::Base';
+use base 'TAP::Base';
 
 my @ACCESSOR;
 

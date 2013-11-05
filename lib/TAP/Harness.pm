@@ -8,7 +8,7 @@ use File::Spec;
 use File::Path;
 use IO::Handle;
 
-use parent 'TAP::Base';
+use base 'TAP::Base';
 
 =head1 NAME
 

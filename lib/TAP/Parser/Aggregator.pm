@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Benchmark;
 
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 =head1 NAME
 

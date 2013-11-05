@@ -10,7 +10,7 @@ use Getopt::Long;
 use App::Prove::State;
 use Carp;
 
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 =head1 NAME
 

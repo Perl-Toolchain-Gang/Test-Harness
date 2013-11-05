@@ -3,7 +3,7 @@ package TAP::Parser::YAMLish::Writer;
 use strict;
 use warnings;
 
-use parent 'TAP::Object';
+use base 'TAP::Object';
 
 our $VERSION = '3.29';
 

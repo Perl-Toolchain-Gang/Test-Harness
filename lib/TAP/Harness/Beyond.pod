@@ -227,7 +227,7 @@ document:
 
   package My::TAP::Harness;
 
-  use parent 'TAP::Harness';
+  use base 'TAP::Harness';
   use YAML;
 
   sub summary {

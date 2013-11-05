@@ -3,7 +3,7 @@ package TAP::Parser::Result::Unknown;
 use strict;
 use warnings;
 
-use parent 'TAP::Parser::Result';
+use base 'TAP::Parser::Result';
 
 =head1 NAME
 

@@ -6,7 +6,7 @@ use warnings;
 use TAP::Parser::IteratorFactory ();
 use TAP::Parser::Iterator::Array ();
 
-use parent 'TAP::Parser::SourceHandler';
+use base 'TAP::Parser::SourceHandler';
 
 TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 

@@ -6,7 +6,7 @@ use File::Spec;
 use File::Path;
 use Carp;
 
-use parent 'TAP::Formatter::Console::Session';
+use base 'TAP::Formatter::Console::Session';
 
 use constant WIDTH => 72;    # Because Eric says
 

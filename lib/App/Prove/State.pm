@@ -10,7 +10,7 @@ use Carp;
 use App::Prove::State::Result;
 use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
-use parent 'TAP::Base';
+use base 'TAP::Base';
 
 BEGIN {
     __PACKAGE__->mk_methods('result_class');
