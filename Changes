@@ -2,13 +2,16 @@ Revision history for Test-Harness
 
         - Fix missing parent prereq in META.{yml,json} and NotBuild.PL
           (Dagfinn Ilmari Mannsåker, #89650)
-        - Respect PERL5LIB in tainting source handler test (Dagfinn Ilmari Mannsåker)
+        - Respect PERL5LIB in tainting source handler test (Dagfinn Ilmari Mannsåker, 
+          Leon Timmermans)
         - Use base instead of parent:
 
           This dist is used for testing all other modules, so it should avoid
           having any non-core prerequisites.  Having parent as a prereq leads to a
           circular dependency of parent -> Test::More -> Test::Harness. (Graham Knop)
-
+        - Various POD fixes (Nathan Gary Glenn)
+        - Don't localize all of %ENV in harness.t (Craig Berry)
+        - Give TAP::Harness::Beyond a unique NAME (Leon Timmermans)
 
 3.29    2013-08-10
         - Get rid of use vars in favor of our in all modules (Leon Timmermans)
