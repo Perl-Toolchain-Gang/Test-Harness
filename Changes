@@ -1,5 +1,6 @@
 Revision history for Test-Harness
 
+        - Implement external rulesfile for TAP::Harness (David Golden)
         - Add harness_class argument to TAP::Harness::Env (Leon Timmermans)
         - Make prove respect environmental variables #28 (Leon Timmermans)
 
