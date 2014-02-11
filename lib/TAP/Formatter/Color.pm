@@ -18,7 +18,7 @@ BEGIN {
             $NO_COLOR = $@;
         }
         else {
-            my $console = Win32::Console->new( STD_OUTPUT_HANDLE() );
+            my $console = Win32::Console->new( STD_ERROR_HANDLE() );
 
             # eval here because we might not know about these variables
             my $fg = eval '$FG_LIGHTGRAY';
