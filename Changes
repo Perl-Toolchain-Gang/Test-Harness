@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Remove harness_class from argument hash in T::H::E (Leon Timmermans)
+
 3.31    2014-06-07
         - Implement external rulesfile for TAP::Harness (David Golden)
         - Add harness_class argument to TAP::Harness::Env (Leon Timmermans)

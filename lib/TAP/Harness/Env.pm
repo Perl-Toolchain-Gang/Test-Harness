@@ -91,7 +91,7 @@ sub create {
         ignore_exit => $ENV{HARNESS_IGNORE_EXIT} || 0,
     );
 
-    my $class = $input{harness_class} || $ENV{HARNESS_SUBCLASS} || 'TAP::Harness';
+    my $class = delete $input{harness_class} || $ENV{HARNESS_SUBCLASS} || 'TAP::Harness';
     if ( defined( my $env_opt = $ENV{HARNESS_OPTIONS} ) ) {
         for my $opt ( split /:/, $env_opt ) {
             if ( $opt =~ /^j(\d*)$/ ) {
