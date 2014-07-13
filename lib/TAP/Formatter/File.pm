@@ -30,7 +30,7 @@ This provides file orientated output formatting for TAP::Harness.
 
 =head2 C<< open_test >>
 
-See L<TAP::Formatter::base>
+See L<TAP::Formatter::Base>
 
 =cut
 
