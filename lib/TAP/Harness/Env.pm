@@ -130,20 +130,19 @@ Version 3.32
 
 =head1 SYNOPSIS
 
- my ($class, $args) = get_test_arguments();
- require_module($class);
- $class->new($args);
+ my $harness = TAP::Harness::Env->create(\%args);
+ $harness->runtests(@tests);
 
 =head1 DESCRIPTION
 
 This module implements the environmental variables that L<Test::Harness> for use with TAP::Harness.
 
-=head1 FUNCTIONS
+=head1 METHODS
 
 =over 4
 
-=item * get_test_options( \%args )
+=item * create( \%args )
 
-This function reads the environment and generates an appropriate argument hash from it. If given any arguments, there will override the environmental defaults. It will return of C<$class> and C<$args>.
+This function reads the environment and generates an appropriate argument hash from it. If given any arguments, there will override the environmental defaults. It will return instance of L<TAP::Harness> that the environment value is reflected.
 
 =back
