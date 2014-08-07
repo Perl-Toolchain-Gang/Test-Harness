@@ -100,7 +100,7 @@ Here are some examples:
 
 =head3 Rules resolution
 
-=over4
+=over 4
 
 =item * By default, all tests are eligible to be run in parallel. Specifying any of your own rules removes this one.
 
