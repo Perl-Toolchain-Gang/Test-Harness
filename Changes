@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.33
+        - Various documentation fixes (Leon Timmermans)
+
 3.32    2014-06-11
         - Remove harness_class from argument hash in T::H::E (Leon Timmermans)
 
