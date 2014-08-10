@@ -3,6 +3,8 @@ package TAP::Parser::SourceHandler::Executable;
 use strict;
 use warnings;
 
+use File::Spec;
+
 use TAP::Parser::IteratorFactory   ();
 use TAP::Parser::Iterator::Process ();
 
@@ -107,7 +109,8 @@ sub make_iterator {
         @command = @{ $source->raw->{exec} || [] };
     }
     elsif ( $meta->{is_scalar} ) {
-        @command = ${ $source->raw };
+        @command = File::Spec->rel2abs( ${ $source->raw } )
+          if ${ $source->raw };
     }
     elsif ( $meta->{is_array} ) {
         @command = @{ $source->raw };
