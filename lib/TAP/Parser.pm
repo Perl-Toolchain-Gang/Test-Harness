@@ -60,6 +60,8 @@ BEGIN {    # making accessors
           in_todo
           start_time
           end_time
+          start_times
+          end_times
           skip_all
           grammar_class
           result_factory_class
@@ -1007,11 +1009,20 @@ were skipped.
 
 =head3 C<start_time>
 
-Returns the time when the Parser was created.
+Returns the wall-clock time when the Parser was created.
 
 =head3 C<end_time>
 
-Returns the time when the end of TAP input was seen.
+Returns the wall-clock time when the end of TAP input was seen.
+
+=head3 C<start_times>
+
+Returns the CPU times (like L<perlfunc/times> when the Parser was created.
+
+=head3 C<end_times>
+
+Returns the CPU times (like L<perlfunc/times> when the end of TAP
+input was seen.
 
 =head3 C<has_problems>
 
@@ -1374,6 +1385,7 @@ sub _iter {
     my $state_table = $self->_make_state_table;
 
     $self->start_time( $self->get_time );
+    $self->start_times( $self->get_times );
 
     # Make next_state closure
     my $next_state = sub {
@@ -1466,6 +1478,7 @@ sub _finish {
     my $self = shift;
 
     $self->end_time( $self->get_time );
+    $self->end_times( $self->get_times );
 
     # Avoid leaks
     $self->_iterator(undef);

@@ -121,4 +121,13 @@ Return true if the time returned by get_time is high resolution (i.e. if Time::H
 
 sub time_is_hires { return GOT_TIME_HIRES }
 
+=head3 C<get_times>
+
+Return array reference of the four-element list of CPU seconds,
+as with L<perlfunc/times>.
+
+=cut
+
+sub get_times { return [ times() ] }
+
 1;

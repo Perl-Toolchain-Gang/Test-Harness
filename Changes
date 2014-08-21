@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Enable printing CPU times spent per test (Jarkko Hietaniemi)
+
 3.33
         - Various documentation fixes (Leon Timmermans, Justin Cook)
 
