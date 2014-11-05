@@ -15,16 +15,27 @@ my %mm_args = (
     'VERSION_FROM' => 'lib/Test/Harness.pm',
     'INSTALLDIRS'  => ($] < 5.011 ? 'perl' : 'site'),
     'PL_FILES'     => {},
-    'test'         => { 'TESTS' => 't/*.t t/compat/*.t' },
+    'test' => { 'TESTS' => 't/*.t t/compat/*.t' },
 
-   # The core autogenerates a Makefile.PL, and finds prove with utils/prove.PL
-    'EXE_FILES' => ['bin/prove'],
-    'PREREQ_PM'    => {
-    }
+    'EXE_FILES'    => ['bin/prove'],
+    'PREREQ_PM'    => {},
+    'META_MERGE'   => {
+        resources => {
+            homepage   => 'http://testanything.org/',
+            bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Harness',
+
+#           MailingList => 'mailto:<tapx-dev@hexten.net>',
+            repository => 'http://github.com/Perl-Toolchain-Gang/Test-Harness/tree/master',
+        },
+        keywords   => [ 'TAP', 'test', 'harness', 'prove' ],
+        recommends => {
+            'Pod::Usage' => '1.12',    # for 'prove'
+        },
+    },
 );
 
 {
-    local $^W = 0;    # Silence warning about non-numeric version
+	no warnings;
     if ( $ExtUtils::MakeMaker::VERSION >= '6.31' ) {
         $mm_args{LICENSE} = 'perl';
     }
@@ -44,55 +55,27 @@ sub test_via_harness {
         qq{$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)"}, $tests );
 }
 
-BEGIN {
-    my %deny = (
-        manifest => 'dist_basics',
-        dist     => 'dist_core',
-    );
-    while ( my ( $verb, $override ) = each %deny ) {
-        my $super = "SUPER::$override";
-        no strict 'refs';
-        *{"MY::$override"} = sub {
-            my ( $self, @args ) = @_;
-            my $frag  = $self->$super(@args);
-            my $chunk = split_makefile_chunk($frag);
-            replace_rule(
-                $chunk, $verb,
-                ":\n\t\$(NOECHO) \$(ECHO) "
-                  . "\"Please use 'Build.PL $verb' instead of 'Makefile.PL $verb'\"\n\n"
-            );
-            return join_makefile_chunk($chunk);
-        };
-    }
-}
+sub postamble {
+	return <<"END";
+testprove: pure_all
+	$^X -Iblib/lib bin/prove -b -r t
 
-# Returns a reference to a hash containing
-#  targets   a reference to an array of makefile section names
-#  sections  a reference to a hash mapping makefile section names to the
-#            text of those sections.
+testleaks: pure_all
+	$^X -MDevel::Leak::Object=GLOBAL_bless -Iblib/lib bin/prove -b -r t
 
-sub split_makefile_chunk {
-    my $chunk    = shift;
-    my $target   = ' prefix';
-    my @targets  = ();
-    my %sections = ();
-    for my $ln ( split /\n/, $chunk ) {
-        if ( $ln =~ /^(\S+)/ ) {
-            $target = $1;
-            push @targets, $target;
-        }
-        $sections{$target} .= "$ln\n";
-    }
-    return { targets => \@targets, sections => \%sections };
-}
+testreference: pure_all
+	$^X -Ireference/Test-Harness-2.64/lib reference/Test-Harness-2.64/bin/prove -Iblib/lib -r t
 
-sub join_makefile_chunk {
-    my $chunk = shift;
-    return join '', grep defined,
-      map { $chunk->{sections}{$_} } @{ $chunk->{targets} };
-}
+testauthor: pure_all
+	$^X -Iblib/lib bin/prove -b -r xt
 
-sub replace_rule {
-    my ( $chunk, $name, $body ) = @_;
-    $chunk->{sections}{$name} = "$name $body";
+critic:
+	perlcritic -1 -q -profile perlcriticrc bin/prove lib/ t/*.t
+
+tags:
+	ctags -f tags --recurse --totals --exclude=blib --exclude=.git --exclude='*~' --languages=Perl t/ lib/ bin/prove
+
+tidy:
+	(find lib t -name *.pm; find t -name *.t; echo Makefile.PL; echo bin/prove) | while read a; do perltidy -b \$\$a && rm \$\$a.bak; done;
+END
 }

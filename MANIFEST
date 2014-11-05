@@ -14,7 +14,6 @@ examples/t/10-stuff.t
 examples/t/ruby.t
 examples/test_urls.txt
 HACKING.pod
-inc/MyBuilder.pm
 lib/App/Prove.pm
 lib/App/Prove/State.pm
 lib/App/Prove/State/Result.pm
@@ -68,7 +67,6 @@ Makefile.PL
 MANIFEST
 MANIFEST.CUMMULATIVE
 META.yml
-NotBuild.PL
 perlcriticrc
 README
 t/000-load.t
