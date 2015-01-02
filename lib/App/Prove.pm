@@ -634,6 +634,7 @@ current Perl.
 
 sub print_version {
     my $self = shift;
+    require TAP::Harness;
     printf(
         "TAP::Harness v%s and Perl v%vd\n",
         $TAP::Harness::VERSION, $^V
