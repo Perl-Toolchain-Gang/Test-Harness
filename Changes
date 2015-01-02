@@ -1,6 +1,7 @@
 Revision history for Test-Harness
 
         - Fix prove --version to actually print the version (Leon Timmermans, #101216)
+        - Add --version to usage message (Leon Timmermans, #101215)
 
 3.34    2014-11-02
         - Enable printing CPU times spent per test (Jarkko Hietaniemi)
