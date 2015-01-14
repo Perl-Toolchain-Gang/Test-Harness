@@ -1,5 +1,6 @@
 Revision history for Test-Harness
 
+3.35    2015-01-14
         - Fix prove --version to actually print the version (Leon Timmermans, #101216)
         - Add --version to usage message (Leon Timmermans, #101215)
 
