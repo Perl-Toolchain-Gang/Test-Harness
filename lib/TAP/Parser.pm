@@ -97,7 +97,7 @@ L<http://testanything.org>
 
 It includes the TAP::Parser Cookbook:
 
-L<http://testanything.org/wiki/index.php/TAP::Parser_Cookbook>
+L<http://testanything.org/testing-with-tap/perl/tap::parser-cookbook.html>
 
 =head1 METHODS
 
