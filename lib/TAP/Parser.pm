@@ -1340,9 +1340,9 @@ sub _make_state_table {
         my $st = { %state_globals, %{ $states{$name} } };
 
         # Add defaults
-        for my $next ( sort keys %{$st} ) {
+        for my $next ( keys %$st ) {
             if ( my $default = $state_defaults{$next} ) {
-                for my $def ( sort keys %{$default} ) {
+                for my $def ( keys %$default ) {
                     $st->{$next}->{$def} ||= $default->{$def};
                 }
             }
