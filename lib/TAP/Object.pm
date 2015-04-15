@@ -50,9 +50,7 @@ L</_initialize> method.  Returns a new object.
 =cut
 
 sub new {
-    my $class = shift;
-    my $self = bless {}, $class;
-    return $self->_initialize(@_);
+    return bless({}, shift)->_initialize(@_);
 }
 
 =head2 Instance Methods
