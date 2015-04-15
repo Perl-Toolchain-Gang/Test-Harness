@@ -87,7 +87,7 @@ BEGIN {
         trap              => sub { shift; shift },
     );
 
-    for my $method ( sort keys %VALIDATION_FOR ) {
+    for my $method ( keys %VALIDATION_FOR ) {
         no strict 'refs';
         if ( $method eq 'lib' || $method eq 'switches' ) {
             *{$method} = sub {
@@ -432,7 +432,7 @@ Any keys for which the value is C<undef> will be ignored.
         $self->SUPER::_initialize( $arg_for, \@legal_callback );
         my %arg_for = %$arg_for;    # force a shallow copy
 
-        for my $name ( sort keys %VALIDATION_FOR ) {
+        for my $name ( keys %VALIDATION_FOR ) {
             my $property = delete $arg_for{$name};
             if ( defined $property ) {
                 my $validate = $VALIDATION_FOR{$name};
@@ -475,8 +475,8 @@ Any keys for which the value is C<undef> will be ignored.
             );
         }
 
-        if ( my @props = sort keys %arg_for ) {
-            $self->_croak("Unknown arguments to TAP::Harness::new (@props)");
+        if ( my @props = keys %arg_for ) {
+            $self->_croak('Unknown arguments to TAP::Harness::new ('.join(' ',sort @props).')');
         }
 
         return $self;
