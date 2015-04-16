@@ -61,6 +61,8 @@ Iterate raw input without applying any fixes for quirky input syntax.
 
 =cut
 
+if ( $^O eq 'VMS' ) {
+    eval <<'END' ;
 sub next {
     my $self = shift;
     my $line = $self->next_raw;
@@ -74,6 +76,11 @@ sub next {
     }
 
     return $line;
+}
+END
+}
+else {
+    eval 'sub next { shift->next_raw(@_) }';
 }
 
 sub next_raw {
@@ -125,17 +132,8 @@ Return the C<exit> status for this iterator.
 
 =cut
 
-sub wait {
-    require Carp;
-    my $msg = Carp::longmess('abstract method called directly!');
-    $_[0]->_croak($msg);
-}
-
-sub exit {
-    require Carp;
-    my $msg = Carp::longmess('abstract method called directly!');
-    $_[0]->_croak($msg);
-}
+#can not call abstract base method, next_raw is a fatal stub
+*exit = *wait = *next_raw;
 
 1;
 
