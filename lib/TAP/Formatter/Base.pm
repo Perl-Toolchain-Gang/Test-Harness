@@ -20,6 +20,7 @@ BEGIN {
         color      => sub { shift; shift },
         jobs       => sub { shift; shift },
         show_count => sub { shift; shift },
+        ruler      => sub { shift; shift },
         stdout     => sub {
             my ( $self, $ref ) = @_;
 
@@ -194,6 +195,11 @@ The number of concurrent jobs this formatter will handle.
 
 Boolean value.  If false, disables the C<X/Y> test count which shows up while
 tests are running.
+
+=item * C<ruler>
+
+Boolean value.  If false, doesn't show the progress ruler when running parallel
+test jobs.
 
 =back
 

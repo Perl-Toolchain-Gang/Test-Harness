@@ -9,7 +9,7 @@ my @ACCESSOR;
 
 BEGIN {
 
-    @ACCESSOR = qw( name formatter parser show_count );
+    @ACCESSOR = qw( name formatter parser show_count ruler );
 
     for my $method (@ACCESSOR) {
         no strict 'refs';
@@ -51,6 +51,8 @@ The constructor returns a new C<TAP::Formatter::Console::Session> object.
 =item * C<name>
 
 =item * C<show_count>
+
+=item * C<ruler>
 
 =back
 

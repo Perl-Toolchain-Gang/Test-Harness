@@ -87,7 +87,7 @@ sub _output_ruler {
     $now = $new_now;
     $start ||= $now;
     my $formatter = $self->formatter;
-    return if $formatter->really_quiet;
+    return if $formatter->really_quiet or ! $formatter->ruler;
 
     my $context = $shared{$formatter};
 

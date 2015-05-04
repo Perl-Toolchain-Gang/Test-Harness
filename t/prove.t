@@ -85,7 +85,7 @@ BEGIN {    # START PLAN
       archive argv blib color directives exec extensions failures
       formatter harness includes lib merge parse quiet really_quiet
       recurse backwards shuffle taint_fail taint_warn verbose
-      warnings_fail warnings_warn
+      warnings_fail warnings_warn ruler
     );
 
     # what we expect if the 'expect' hash does not define it
@@ -139,6 +139,7 @@ BEGIN {    # START PLAN
                 verbose       => 21,
                 warnings_fail => 22,
                 warnings_warn => 23,
+                ruler         => 24,
             },
             expect => {
                 archive       => 1,
@@ -164,6 +165,7 @@ BEGIN {    # START PLAN
                 verbose       => 21,
                 warnings_fail => 22,
                 warnings_warn => 23,
+                ruler         => 24,
             }
         },
         {   name   => 'Call with defaults',
@@ -173,6 +175,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -206,7 +209,7 @@ BEGIN {    # START PLAN
             },
             runlog => [
                 [   '_runtests',
-                    { verbosity => 0, show_count => 1 },
+                    { verbosity => 0, show_count => 1, ruler => 1 },
                     'one', 'two',
                     'three'
                 ]
@@ -225,6 +228,7 @@ BEGIN {    # START PLAN
                     {   lib => mabs( [ 'blib/lib', 'blib/arch' ] ),
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -244,6 +248,7 @@ BEGIN {    # START PLAN
                     {   color      => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -263,6 +268,7 @@ BEGIN {    # START PLAN
                     {   directives => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -281,6 +287,7 @@ BEGIN {    # START PLAN
                     {   exec       => [1],
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -299,6 +306,7 @@ BEGIN {    # START PLAN
                     {   failures   => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -318,6 +326,7 @@ BEGIN {    # START PLAN
                     {   formatter_class => 'TAP::Harness',
                         verbosity       => 0,
                         show_count      => 1,
+                        ruler           => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -337,6 +346,7 @@ BEGIN {    # START PLAN
                     {   lib => mabs( [qw( four five six )] ),
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -355,6 +365,7 @@ BEGIN {    # START PLAN
                     {   lib => mabs( ['lib'] ),
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -373,6 +384,7 @@ BEGIN {    # START PLAN
                     {   merge      => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -391,6 +403,7 @@ BEGIN {    # START PLAN
                     {   errors     => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -408,6 +421,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => -1,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -425,6 +439,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => -2,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -442,6 +457,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -459,6 +475,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'three', 'two', 'one'
                 ]
@@ -477,6 +494,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'xxxone', 'xxxtwo',
                     'xxxthree'
@@ -496,6 +514,7 @@ BEGIN {    # START PLAN
                     {   switches   => ['-T'],
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -514,6 +533,7 @@ BEGIN {    # START PLAN
                     {   switches   => ['-t'],
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -531,6 +551,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 1,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -549,6 +570,7 @@ BEGIN {    # START PLAN
                     {   switches   => ['-W'],
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -567,6 +589,7 @@ BEGIN {    # START PLAN
                     {   switches   => ['-w'],
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     'one', 'two', 'three'
                 ]
@@ -586,6 +609,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 1,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -604,6 +628,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 1,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -621,6 +646,7 @@ BEGIN {    # START PLAN
                     {   failures   => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -638,6 +664,7 @@ BEGIN {    # START PLAN
                     {   failures   => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -655,6 +682,7 @@ BEGIN {    # START PLAN
                     {   lib => mabs( ['lib'] ),
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -672,6 +700,7 @@ BEGIN {    # START PLAN
                     {   lib => mabs( ['lib'] ),
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -689,6 +718,7 @@ BEGIN {    # START PLAN
                     {   lib => mabs( [ 'blib/lib', 'blib/arch' ] ),
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -706,6 +736,7 @@ BEGIN {    # START PLAN
                     {   lib => mabs( [ 'blib/lib', 'blib/arch' ] ),
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -722,6 +753,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     "xxx$dummy_test"
                 ]
@@ -738,6 +770,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     "xxx$dummy_test"
                 ]
@@ -755,6 +788,7 @@ BEGIN {    # START PLAN
                     {   color      => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -771,6 +805,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -787,6 +822,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -803,6 +839,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     reverse @dummy_tests
                 ]
@@ -822,6 +859,7 @@ BEGIN {    # START PLAN
                     {   errors     => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -841,6 +879,7 @@ BEGIN {    # START PLAN
                     {   errors     => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -857,6 +896,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => -1,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -873,6 +913,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => -1,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -889,6 +930,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => -2,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -905,6 +947,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => -2,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -922,6 +965,7 @@ BEGIN {    # START PLAN
                     {   merge      => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -939,6 +983,7 @@ BEGIN {    # START PLAN
                     {   merge      => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -956,6 +1001,7 @@ BEGIN {    # START PLAN
                     {   directives => 1,
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -975,6 +1021,7 @@ BEGIN {    # START PLAN
                     {   exec       => [],
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -993,6 +1040,7 @@ BEGIN {    # START PLAN
                     {   exec       => ['-s'],
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -1011,6 +1059,7 @@ BEGIN {    # START PLAN
                     {   exec       => [qw(/foo/bar/perl -Ilib)],
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -1029,6 +1078,7 @@ BEGIN {    # START PLAN
                     {   exec       => [],
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -1043,6 +1093,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                 ]
             ],
@@ -1056,6 +1107,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                 ]
             ],
@@ -1077,6 +1129,7 @@ BEGIN {    # START PLAN
                         },
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -1124,6 +1177,7 @@ BEGIN {    # START PLAN
                         },
                         verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -1149,6 +1203,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -1177,6 +1232,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -1201,6 +1257,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -1241,6 +1298,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
@@ -1265,6 +1323,7 @@ BEGIN {    # START PLAN
                 [   '_runtests',
                     {   verbosity  => 0,
                         show_count => 1,
+                        ruler      => 1,
                     },
                     $dummy_test
                 ]
