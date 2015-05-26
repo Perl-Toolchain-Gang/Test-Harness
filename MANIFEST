@@ -116,10 +116,6 @@ t/lib/NoFork.pm
 t/lib/NOP.pm
 t/lib/TAP/Harness/TestSubclass.pm
 t/lib/TAP/Parser/SubclassTest.pm
-t/lib/Test/Builder.pm
-t/lib/Test/Builder/Module.pm
-t/lib/Test/More.pm
-t/lib/Test/Simple.pm
 t/multiplexer.t
 t/nested.t
 t/nofork-mux.t
