@@ -1,4 +1,5 @@
 Revision history for Test-Harness
+        - Stop bundling Test::More for testing
 
 3.35    2015-01-14
         - Fix prove --version to actually print the version (Leon Timmermans, #101216)
