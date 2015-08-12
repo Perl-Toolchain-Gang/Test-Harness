@@ -81,7 +81,7 @@ sub _read {
     my $line = $self->_peek;
 
     # Do we have a document header?
-    if ( $line =~ /^ --- (?: \s* (.+?) \s* )? $/x ) {
+    if ( $line =~ /^ --- (?: \s* (.+?)? \s* )? $/x ) {
         $self->_next;
 
         return $self->_read_scalar($1) if defined $1;    # Inline?
