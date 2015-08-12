@@ -1,4 +1,5 @@
 Revision history for Test-Harness
+        - Accept YAML with trailing whitespace in header (Maik Hentsche)
         - Stop bundling Test::More for testing
 
 3.35    2015-01-14
