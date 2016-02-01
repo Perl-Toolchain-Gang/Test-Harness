@@ -415,11 +415,13 @@ BEGIN {
             ],
             name => 'Regression: only_spaces'
         },
-        {   out => ['first','second'],
+        {   out => [{'first' => 1},{'second' => 2}],
             in  => [
                 '--- ',
-                '- first ',
-                '- second ',
+                '- ',
+                '  first: 1 ',
+                '- ',
+                '  second: 2 ',
                 '...'
             ],
             name => "Space after header for array",

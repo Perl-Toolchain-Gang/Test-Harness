@@ -206,7 +206,7 @@ sub _read_array {
             $line =~ s/-\s+//;
             push @$ar, $self->_read_hash( $line, $indent );
         }
-        elsif ( $line =~ /^ - \s* (.+?) \s* $/x ) {
+        elsif ( $line =~ /^ - \s* (\S.*?) \s* $/x ) {
             die "Unexpected start of YAMLish" if $line =~ /^---/;
             $self->_next;
             push @$ar, $self->_read_scalar($1);
