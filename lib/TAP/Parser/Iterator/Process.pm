@@ -21,6 +21,10 @@ Version 3.35
 
 our $VERSION = '3.35';
 
+our $can_fork;
+
+$can_fork = !! $Config{d_fork} unless defined $can_fork;
+
 =head1 SYNOPSIS
 
   use TAP::Parser::Iterator::Process;
@@ -90,7 +94,7 @@ Get the exit status for this iterator's process.
 }
 
 sub _use_open3 {
-    return unless $Config{d_fork} || IS_WIN32;
+    return unless $can_fork || IS_WIN32;
     for my $module (qw( IPC::Open3 IO::Select )) {
         eval "use $module";
         return if $@;

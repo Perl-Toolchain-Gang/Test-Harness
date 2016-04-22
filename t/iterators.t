@@ -80,7 +80,7 @@ my @schedule = (
 );
 
 sub _can_open3 {
-    return $Config{d_fork};
+    return $TAP::Parser::Iterator::Process::can_fork;
 }
 
 for my $test (@schedule) {

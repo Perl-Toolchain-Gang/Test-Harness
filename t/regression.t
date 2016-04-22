@@ -3196,7 +3196,7 @@ my %HANDLER_FOR = (
     FALSE,    sub { no warnings; !shift },
 );
 
-my $can_open3 = ( $Config{d_fork} || $IsWin32 ) ? 1 : 0;
+my $can_open3 = ( $TAP::Parser::Iterator::Process::can_fork || $IsWin32 ) ? 1 : 0;
 
 for my $hide_fork ( 0 .. $can_open3 ) {
     if ($hide_fork) {
