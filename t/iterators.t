@@ -9,6 +9,7 @@ use Test::More tests => 76;
 use File::Spec;
 use TAP::Parser;
 use TAP::Parser::Iterator::Array;
+use IO::Handle; #Harness doesn't always load IO::Handle anymore
 use Config;
 
 sub array_ref_from {

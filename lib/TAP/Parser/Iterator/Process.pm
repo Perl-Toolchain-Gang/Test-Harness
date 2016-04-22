@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Config;
-use IO::Handle;
+use Win32::APipe;
 
 use base 'TAP::Parser::Iterator';
 
@@ -119,65 +119,22 @@ sub _initialize {
       or die "Must supply a command to execute";
 
     $self->{command} = [@command];
+    $self->{buf}     = [];
+    $self->{partial} = '';
 
     # Private. Used to frig with chunk size during testing.
     my $chunk_size = delete $args->{_chunk_size} || 65536;
 
     my $merge = delete $args->{merge};
-    my ( $pid, $err, $sel );
 
     if ( my $setup = delete $args->{setup} ) {
         $setup->(@command);
     }
 
-    my $out = IO::Handle->new;
+    my $command = join( ' ', map { $_ =~ /\s/ ? qq{"$_"} : $_ } @command );
+    my $err = Win32::APipe::run($command, $self, $merge, $self->{pid});
+    die "Could not execute ($command): Win32 Err $err" if $err != 0; #0=ERROR_SUCCESS
 
-    if ( $self->_use_open3 ) {
-
-        # HOTPATCH {{{
-        my $xclose = \&IPC::Open3::xclose;
-        no warnings;
-        local *IPC::Open3::xclose = sub {
-            my $fh = shift;
-            no strict 'refs';
-            return if ( fileno($fh) == fileno(STDIN) );
-            $xclose->($fh);
-        };
-
-        # }}}
-
-        if (IS_WIN32) {
-            $err = $merge ? '' : '>&STDERR';
-            eval {
-                $pid = open3(
-                    '<&STDIN', $out, $merge ? '' : $err,
-                    @command
-                );
-            };
-            die "Could not execute (@command): $@" if $@;
-            if ( $] >= 5.006 ) {
-                binmode($out, ":crlf");
-            }
-        }
-        else {
-            $err = $merge ? '' : IO::Handle->new;
-            eval { $pid = open3( '<&STDIN', $out, $err, @command ); };
-            die "Could not execute (@command): $@" if $@;
-            $sel = $merge ? undef : IO::Select->new( $out, $err );
-        }
-    }
-    else {
-        $err = '';
-        my $command
-          = join( ' ', map { $_ =~ /\s/ ? qq{"$_"} : $_ } @command );
-        open( $out, "$command|" )
-          or die "Could not execute ($command): $!";
-    }
-
-    $self->{out}        = $out;
-    $self->{err}        = $err;
-    $self->{sel}        = $sel;
-    $self->{pid}        = $pid;
     $self->{exit}       = undef;
     $self->{chunk_size} = $chunk_size;
 
@@ -199,7 +156,6 @@ Upgrade the input stream to handle UTF8.
 sub handle_unicode {
     my $self = shift;
 
-    if ( $self->{sel} ) {
         if ( _get_unicode() ) {
 
             # Make sure our iterator has been constructed and...
@@ -212,12 +168,6 @@ sub handle_unicode {
                 return;
             };
         }
-    }
-    else {
-        if ( $] >= 5.008 ) {
-            eval 'binmode($self->{out}, ":utf8")';
-        }
-    }
 
 }
 
@@ -229,77 +179,75 @@ sub exit { shift->{exit} }
 sub _next {
     my $self = shift;
 
-    if ( my $out = $self->{out} ) {
-        if ( my $sel = $self->{sel} ) {
-            my $err        = $self->{err};
-            my @buf        = ();
-            my $partial    = '';                    # Partial line
-            my $chunk_size = $self->{chunk_size};
-            return sub {
-                return shift @buf if @buf;
+    return sub {
+        #non-blocking quick return of a line
+        return shift @{$self->{buf}} if @{$self->{buf}};
+        #sanity test against hang forever reading on a finished stream
+        return undef if $self->{done};
+        my $opaque;
 
-                READ:
-                while ( my @ready = $sel->can_read ) {
-                    for my $fh (@ready) {
-                        my $got = sysread $fh, my ($chunk), $chunk_size;
+    #a ->next() on any particular Iterator::Process object, pumps
+    #events/buffers/lines into ALL Iterator::Process objects until a line is
+    #availble for the particular Iterator::Process object
 
-                        if ( $got == 0 ) {
-                            $sel->remove($fh);
-                        }
-                        elsif ( $fh == $err ) {
-                            print STDERR $chunk;    # echo STDERR
-                        }
-                        else {
-                            $chunk   = $partial . $chunk;
-                            $partial = '';
+    #if we get random other Iterator::Process objects, we have to process their
+    #data buffers and queue it into @{$self->{buf}}, this loop turns the async
+    #IO with async reads completing in a random order, into sync IO for the
+    #caller, when the caller moves onto other Iterator::Process objects and
+    #calls ->next() on those other Iterator::Process objects, ->next() will be
+    #non-blocking since @{$self->{buf}} has elements
+        do {
+            my $chunk;
+            READ:
+            $opaque = Win32::APipe::next($chunk);
+            goto READ unless $opaque->add_chunk($chunk);
+        } while ($opaque != $self);
 
-                            # Make sure we have a complete line
-                            unless ( substr( $chunk, -1, 1 ) eq "\n" ) {
-                                my $nl = rindex $chunk, "\n";
-                                if ( $nl == -1 ) {
-                                    $partial = $chunk;
-                                    redo READ;
-                                }
-                                else {
-                                    $partial = substr( $chunk, $nl + 1 );
-                                    $chunk = substr( $chunk, 0, $nl );
-                                }
-                            }
+        return shift @{$self->{buf}}
+    };
+}
 
-                            push @buf, split /\n/, $chunk;
-                            return shift @buf if @buf;
-                        }
-                    }
-                }
+# returns true if atleast 1 line was added to @{$self->{buf}}, if false you
+# must add another chunk (do another async read) since there wasn't enough data
+# or the data happens to not have a newline in it upto this point
 
-                # Return partial last line
-                if ( length $partial ) {
-                    my $last = $partial;
-                    $partial = '';
-                    return $last;
-                }
+sub add_chunk {
+    my ($self, $chunk) = @_;
+    if(ref($chunk)) {
+        $self->{done} = 1;
+        #$block->{ExitCode} = 0xc0000005;
+        #always return the raw Win32 error code, even tho on unix this will be 0 if a "signal" ended the process
+        $self->{exit} = $chunk->{ExitCode}; #this might a negative Win32 STATUS_* code, like STATUS_ACCESS_VIOLATION
+        #do we set coredump bit and when?
+        $self->{wait} = Win32::APipe::status_to_sig($chunk->{ExitCode});
 
-                $self->_finish;
-                return;
-            };
+        if(! $self->{wait}) { #process probably naturally exited
+            $self->{wait} = $self->{exit} << 8; #signal zero is implicit here
         }
-        else {
-            return sub {
-                if ( defined( my $line = <$out> ) ) {
-                    chomp $line;
-                    return $line;
-                }
-                $self->_finish;
-                return;
-            };
+        if ( my $teardown = $self->{teardown} ) {
+            $teardown->();
         }
+        #this might be undef or a partial line before the proc abnormally exited
+        push @{$self->{buf}}, (length $self->{partial} ? $self->{partial} : undef);
+    } else {
+        $chunk   = $self->{partial} . $chunk;
+        $self->{partial} = '';
+
+        # Make sure we have a complete line
+        unless ( substr( $chunk, -1, 2 ) eq "\r\n" ) {
+            my $nl = rindex $chunk, "\r\n";
+            if ( $nl == -1 ) {
+                $self->{partial} = $chunk;
+                return 0;
+            }
+            else {
+                $self->{partial} = substr( $chunk, $nl + 2 );
+                $chunk = substr( $chunk, 0, $nl );
+            }
+        }
+        push @{$self->{buf}}, split /\r\n/, $chunk;
     }
-    else {
-        return sub {
-            $self->_finish;
-            return;
-        };
-    }
+    return 1;
 }
 
 sub next_raw {
@@ -357,8 +305,7 @@ handle based should return an empty list.
 =cut
 
 sub get_select_handles {
-    my $self = shift;
-    return grep $_, ( $self->{out}, $self->{err} );
+    return;
 }
 
 1;
