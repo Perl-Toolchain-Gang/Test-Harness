@@ -122,6 +122,9 @@ sub add_chunk {
     my ($self, $chunk) = @_;
     if(ref($chunk)) {
         $self->{done} = 1;
+        # Avoid circular refs
+        $self->{_next} = sub {return}
+          if $] >= 5.006;
         #$block->{ExitCode} = 0xc0000005;
         #always return the raw Win32 error code, even tho on unix this will be 0 if a "signal" ended the process
         $self->{exit} = $chunk->{ExitCode}; #this might a negative Win32 STATUS_* code, like STATUS_ACCESS_VIOLATION
