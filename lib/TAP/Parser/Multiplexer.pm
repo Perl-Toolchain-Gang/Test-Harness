@@ -61,6 +61,7 @@ sub _initialize {
     $self->{select} = IO::Select->new;
     $self->{avid}   = [];                # Parsers that can't select
     $self->{count}  = 0;
+    $self->{w32_count}  = 0;
     return $self;
 }
 
@@ -80,6 +81,7 @@ the next result.
 
 sub add {
     my ( $self, $parser, $stash ) = @_;
+    my $iterator;
 
     if ( SELECT_OK && ( my @handles = $parser->get_select_handles ) ) {
         my $sel = $self->{select};
@@ -93,6 +95,23 @@ sub add {
         }
 
         $self->{count}++;
+    }
+    elsif (IS_WIN32
+           && ($iterator = $parser->_iterator)->isa('TAP::Parser::Iterator::Process::Windows')) {
+        #By this point the Win32 proc was already started.
+        #When the parser obj is new()ed, the proc starts. No read events on a
+        #PP level have occured yet (there is an async read in progress tho)
+        $iterator->opaque([ $parser, $stash ]);
+        #Iterator::Process::Windows obj is now push-only, pulls are fatal
+        #Allowing reads on a async queue multiplexer registered iterater can
+        #result in some procs getting much more read/data poping off the queue
+        #than other procs leadings to stalls/blocks in other procs randomly.
+        #Also anti-hang "you can't next() when there is no work" die sometimes
+        #occurs if multiplexerd I::P::W obj executes a queue pop in
+        #I::P::W::next_raw() queue although that is fixable in theory with
+        #additional global state. So just never have 2 competing event loops.
+        $iterator->{disable_read} = 1;
+        $self->{w32_count}++;
     }
     else {
         push @{ $self->{avid} }, [ $parser, $stash ];
@@ -110,7 +129,7 @@ when their input is exhausted.
 
 sub parsers {
     my $self = shift;
-    return $self->{count} + scalar @{ $self->{avid} };
+    return $self->{count} + $self->{w32_count} + scalar @{ $self->{avid} };
 }
 
 sub _iter {
@@ -119,6 +138,7 @@ sub _iter {
     my $sel   = $self->{select};
     my $avid  = $self->{avid};
     my @ready = ();
+    my $iterator;
 
     return sub {
 
@@ -128,6 +148,36 @@ sub _iter {
             my $result = $parser->next;
             shift @$avid unless defined $result;
             return ( $parser, $stash, $result );
+        }
+        if ($self->{w32_count}) {
+            {
+                my $chunk; #either a string or a hash ref with end of stream info
+                #keep pulling TAP lines out of same iterator until iterator's
+                #buffer exhausted
+                unless($iterator) {
+                    $iterator = Win32::APipe::next($chunk);
+                    #not enough data, pretend we never saw it and wait for
+                    #another data block iterator
+                    undef($iterator), redo unless $iterator->add_chunk($chunk);
+                }
+                my ( $parser, $stash ) = @{$iterator->opaque};
+                #sanity test/assert, maybe remove one day
+                die 'atleast 1 line should already exist, the $parser->next() is non-blocking'
+                    if @{$iterator->{buf}} == 0 && !$iterator->{done};
+                my $result = $parser->next;
+
+                #nuke circ ref if end of stream
+                unless (defined $result){
+                    $iterator->opaque(undef);
+                    $self->{w32_count}--;
+                    undef($iterator);
+                }
+                #iterator is out of data, but not finished, needs another read
+                elsif (@{$iterator->{buf}} == 0) {
+                    undef($iterator);
+                }
+                return ( $parser, $stash, $result );
+            }
         }
 
         unless (@ready) {

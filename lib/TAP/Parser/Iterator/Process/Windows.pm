@@ -19,6 +19,10 @@ Version 3.35
 
 our $VERSION = '3.35';
 
+BEGIN {    # making accessors
+    __PACKAGE__->mk_methods('opaque');
+}
+
 =head1 DESCRIPTION
 
 This class implements an experimental process iterator for Windows.  It
@@ -91,6 +95,11 @@ sub _next {
         return shift @{$self->{buf}} if @{$self->{buf}};
         #sanity test against hang forever reading on a finished stream
         return undef if $self->{done};
+        if ($self->{disable_read}) {
+            warn "Multiplexered Iterator::Process::Windows read attempted, "
+                ."Multiplexer should be pushing data into the iterator";
+            exit 1; #no catching exceptions, this is a bug if executes
+        }
         my $opaque;
 
     #a ->next() on any particular Iterator::Process object, pumps
