@@ -37,6 +37,8 @@ lib/TAP/Parser/Grammar.pm
 lib/TAP/Parser/Iterator.pm
 lib/TAP/Parser/Iterator/Array.pm
 lib/TAP/Parser/Iterator/Process.pm
+lib/TAP/Parser/Iterator/Process/Unix.pm
+lib/TAP/Parser/Iterator/Process/Windows.pm
 lib/TAP/Parser/Iterator/Stream.pm
 lib/TAP/Parser/IteratorFactory.pm
 lib/TAP/Parser/Multiplexer.pm

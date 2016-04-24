@@ -66,8 +66,10 @@ sub lib_matcher {
 
 sub filter_lib {
     my $matcher = lib_matcher(LIBS);
+    #TAP::Parser::Iterator::Process::Windows
+    #is loadable only if it usable on a particular system, so dont test it
     return map { s{$matcher}{}; $_ }
-      grep {m{$matcher.+?\.pm$}} sort @_;
+      grep {m{$matcher(?!TAP/Parser/Iterator/Process/Windows).+?\.pm$}} sort @_;
 }
 
 sub mod_to_file {
