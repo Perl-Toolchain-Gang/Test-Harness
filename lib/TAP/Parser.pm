@@ -932,7 +932,7 @@ sub pragma {
 
     return $self->{pragma}->{$pragma} unless @_;
 
-    if ( my $state = shift ) {
+    if ( shift ) {
         $self->{pragma}->{$pragma} = 1;
     }
     else {
@@ -1038,8 +1038,7 @@ failed, any TODO tests unexpectedly succeeded, or any parse errors occurred.
 sub has_problems {
     my $self = shift;
     return
-         $self->failed
-      || $self->parse_errors
+         $self->{has_problems}
       || ( !$self->ignore_exit && ( $self->wait || $self->exit ) );
 }
 
@@ -1145,6 +1144,7 @@ sub parse_errors { @{ shift->{parse_errors} } }
 sub _add_error {
     my ( $self, $error ) = @_;
     push @{ $self->{parse_errors} } => $error;
+    $self->{has_problems} = 1;
     return $self;
 }
 
@@ -1239,8 +1239,10 @@ sub _make_state_table {
                 push @{ $self->{skipped} } => $number
                   if $test->has_skip;
 
-                push @{ $self->{ $test->is_ok ? 'passed' : 'failed' } } =>
-                  $number;
+                push @{ $self->{ $test->is_ok ?
+                                'passed'
+                                : (($self->{has_problems} = 1), 'failed') }
+                } => $number;
                 push @{
                     $self->{
                         $test->is_actual_ok
@@ -1520,12 +1522,13 @@ sub _finish {
     $self->is_good_plan(0) unless defined $self->is_good_plan;
 
     unless ( $self->parse_errors ) {
+        my $tests_run = $self->tests_run;
         # Optimise storage where possible
-        if ( $self->tests_run == @{$self->{passed}} ) {
-            $self->{passed} = $self->tests_run;
+        if ( $tests_run == @{$self->{passed}} ) {
+            $self->{passed} = $tests_run;
         }
-        if ( $self->tests_run == @{$self->{actual_passed}} ) {
-            $self->{actual_passed} = $self->tests_run;
+        if ( $tests_run == @{$self->{actual_passed}} ) {
+            $self->{actual_passed} = $tests_run;
         }
     }
 
