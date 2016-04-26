@@ -2,7 +2,6 @@ package TAP::Harness;
 
 use strict;
 use warnings;
-use Carp;
 
 use File::Spec;
 use File::Path;

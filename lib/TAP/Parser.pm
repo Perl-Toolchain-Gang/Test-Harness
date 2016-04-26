@@ -15,8 +15,6 @@ use TAP::Parser::SourceHandler::File       ();
 use TAP::Parser::SourceHandler::RawTAP     ();
 use TAP::Parser::SourceHandler::Handle     ();
 
-use Carp qw( confess );
-
 use base 'TAP::Base';
 
 =encoding utf8
@@ -1410,7 +1408,7 @@ sub _iter {
                 }
             }
             else {
-                confess("Unhandled token type: $type\n");
+                $self->_confess("Unhandled token type: $type\n");
             }
         }
         return $token;

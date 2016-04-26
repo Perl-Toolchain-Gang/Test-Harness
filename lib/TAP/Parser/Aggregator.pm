@@ -198,8 +198,7 @@ Among other times it records the start time for the test run.
 =cut
 
 sub start {
-    my $self = shift;
-    $self->{start_time} = Benchmark->new;
+    shift->{start_time} = Benchmark->new;
 }
 
 =head3 C<stop>
@@ -209,8 +208,7 @@ Call C<stop> immediately after adding all test results to the aggregator.
 =cut
 
 sub stop {
-    my $self = shift;
-    $self->{end_time} = Benchmark->new;
+    shift->{end_time} = Benchmark->new;
 }
 
 =head3 C<elapsed>
@@ -224,10 +222,8 @@ afterwards.
 
 sub elapsed {
     my $self = shift;
-
-    require Carp;
-    Carp::croak
-      q{Can't call elapsed without first calling start and then stop}
+    $self->_croak(
+      q{Can't call elapsed without first calling start and then stop})
       unless defined $self->{start_time} && defined $self->{end_time};
     return timediff( $self->{end_time}, $self->{start_time} );
 }
