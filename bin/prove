@@ -108,12 +108,12 @@ matching the pattern C<t/*.t>.
 
 =head2 Colored Test Output
 
-Colored test output using L<TAP::Formatter::Color> is the default, but 
-if output is not to a terminal, color is disabled. You can override this by 
+Colored test output using L<TAP::Formatter::Color> is the default, but
+if output is not to a terminal, color is disabled. You can override this by
 adding the C<--color> switch.
 
-Color support requires L<Term::ANSIColor> on Unix-like platforms and
-L<Win32::Console::ANSI> on windows. If the necessary module is not installed
+Color support requires L<Term::ANSIColor> and, on windows platforms, also
+L<Win32::Console::ANSI>. If the necessary module(s) are not installed
 colored output will not be available.
 
 =head2 Exit Code
