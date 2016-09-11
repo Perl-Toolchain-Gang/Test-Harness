@@ -113,7 +113,7 @@ if output is not to a terminal, color is disabled. You can override this by
 adding the C<--color> switch.
 
 Color support requires L<Term::ANSIColor> on Unix-like platforms and
-L<Win32::Console> on windows. If the necessary module is not installed
+L<Win32::Console::ANSI> on windows. If the necessary module is not installed
 colored output will not be available.
 
 =head2 Exit Code
