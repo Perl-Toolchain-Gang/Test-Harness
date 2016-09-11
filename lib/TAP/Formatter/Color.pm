@@ -55,7 +55,7 @@ in color.  Passing tests are printed in green.  Failing tests are in red.
 Skipped tests are blue on a white background and TODO tests are printed in
 white.
 
-If L<Term::ANSIColor> cannot be found (or L<Win32::Console::ANSI> if running
+If L<Term::ANSIColor> cannot be found (and L<Win32::Console::ANSI> if running
 under Windows) tests will be run without color.
 
 =head1 SYNOPSIS
