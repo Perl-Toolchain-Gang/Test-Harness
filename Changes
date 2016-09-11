@@ -6,6 +6,7 @@ Revision history for Test-Harness
           (Ævar Arnfjörð Bjarmason)
         - Avoid non-deterministic source handling, make a SourceHandler tie an
           error. (Michael Schwern, Leon Timmermans)
+        - Fix and simplify MSWin32 colorization (Roy Ivy III)
         - Spelling fixes (Brian Wightman)
 
 3.39    06-04-2017
