@@ -12,7 +12,7 @@ my $NO_COLOR;
 BEGIN {
     $NO_COLOR = 0;
 
-    eval 'use Term::ANSIColor';
+    eval 'require Term::ANSIColor';
     if ($@) {
         $NO_COLOR = $@;
     };
@@ -28,7 +28,7 @@ BEGIN {
     } else {
         *set_color = sub {
             my ( $self, $output, $color ) = @_;
-            $output->( color($color) );
+            $output->( Term::ANSIColor::color($color) );
         };
     }
 }
