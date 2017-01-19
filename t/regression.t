@@ -3306,6 +3306,11 @@ sub analyze_test {
           "$test/$count We should have a result for $desc";
         while ( my ( $method, $answer ) = each %$expected ) {
 
+            # Skip spurious warnings captured on old Strawberry Perls with
+            # newer CPAN::Meta::YAML
+            next if ref $result eq "TAP::Parser::Result::Unknown"
+                && $result->raw =~ m{CPAN::Meta::YAML found a duplicate key};
+
             if ( my $handler = $HANDLER_FOR{ $answer || '' } ) {    # yuck
                 ok $handler->( $result->$method() ),
                   "... and $method should return a reasonable value ($test/$count)";
