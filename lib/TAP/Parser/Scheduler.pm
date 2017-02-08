@@ -87,7 +87,7 @@ Here are some examples:
                ],
     }
 
-    # Run some  startup tests in sequence, then some parallel tests than some
+    # Run some  startup tests in sequence, then some parallel tests then some
     # teardown tests in sequence.
     {
         seq => [
