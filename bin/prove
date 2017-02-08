@@ -344,7 +344,7 @@ C<PERL5LIB> is honoured even when prove is run in taint mode.
 
 =head1 FORMATTERS
 
-You can load a custom L<TAP::Parser::Formatter>:
+You can load a custom L<TAP::Formatter::Base>:
 
   prove --formatter MyFormatter
 
