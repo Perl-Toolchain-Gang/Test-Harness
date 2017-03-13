@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.38    13-03-2017
+        - Released 3.37_01 without changes
+
 3.37_01
         - Set PERL_USE_UNSAFE_INC when running tests using Test::Harness (Leon Timmermans)
         - Avoid loading optional modules from . in prove
