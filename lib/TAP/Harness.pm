@@ -544,6 +544,7 @@ Returns a L<TAP::Parser::Aggregator> containing the test results.
 sub runtests {
     my ( $self, @tests ) = @_;
 
+    local $ENV{PERL_USE_UNSAFE_INC} = 1 if not exists $ENV{PERL_USE_UNSAFE_INC};
     my $aggregate = $self->_construct( $self->aggregator_class );
 
     $self->_make_callback( 'before_runtests', $aggregate );
