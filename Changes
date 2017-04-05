@@ -1,5 +1,6 @@
 Revision history for Test-Harness
 
+3.39    06-04-2017
         - Make tests pass when PERL_USE_UNSAFE_INC=0
 
 3.38    13-03-2017
