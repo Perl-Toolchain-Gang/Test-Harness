@@ -250,6 +250,8 @@ sub elapsed_timestr {
 =head3 C<all_passed>
 
 Return true if all the tests passed and no parse errors were detected.
+Note that this method will return false if no tests were run, such as
+when all of them were skipped.
 
 =cut
 
