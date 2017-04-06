@@ -279,7 +279,7 @@ sub _help {
 sub _color_default {
     my $self = shift;
 
-    return -t STDOUT && !$ENV{HARNESS_NOTTY} && !IS_WIN32;
+    return -t STDOUT && !$ENV{HARNESS_NOTTY};
 }
 
 sub _get_args {
