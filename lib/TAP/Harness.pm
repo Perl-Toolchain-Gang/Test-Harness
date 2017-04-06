@@ -58,7 +58,7 @@ BEGIN {
 
     @FORMATTER_ARGS = qw(
       directives verbosity timer failures comments errors stdout color
-      show_count normalize
+      show_count normalize ruler
     );
 
     %VALIDATION_FOR = (
@@ -325,6 +325,10 @@ status from test scripts.
 The maximum number of parallel tests to run at any time.  Which tests
 can be run in parallel is controlled by C<rules>.  The default is to
 run only one test at a time.
+
+=item * C<ruler>
+
+Don't show the progress ruler when running parallel test jobs.
 
 =item * C<rules>
 

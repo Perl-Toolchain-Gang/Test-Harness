@@ -48,6 +48,7 @@ sub open_test {
             formatter  => $self,
             parser     => $parser,
             show_count => $self->show_count,
+            ruler      => $self->ruler,
         }
     );
 

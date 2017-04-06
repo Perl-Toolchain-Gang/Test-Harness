@@ -40,6 +40,9 @@ Boolean options:
  -m,  --merge           Merge test scripts' STDERR with their STDOUT.
  -r,  --recurse         Recursively descend into directories.
       --reverse         Run the tests in reverse order.
+      --ruler           Show the ruler when running multiple jobs
+                        (default)
+      --noruler         Disable the ruler when runing multiple jobs
  -q,  --quiet           Suppress some test output while running tests.
  -Q,  --QUIET           Only print summary results.
  -p,  --parse           Show full list of TAP parse errors, if any.

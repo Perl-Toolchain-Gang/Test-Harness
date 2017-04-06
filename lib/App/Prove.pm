@@ -58,7 +58,7 @@ BEGIN {
       really_quiet recurse backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
       state_class test_args state dry extensions ignore_exit rules state_manager
-      normalize sources tapversion trap
+      normalize sources tapversion trap ruler
     );
     __PACKAGE__->mk_methods(@ATTR);
 }
@@ -205,6 +205,7 @@ sub process_args {
             'color!'     => \$self->{color},
             'colour!'    => \$self->{color},
             'count!'     => \$self->{show_count},
+            'ruler!'     => \$self->{ruler},
             'c'          => \$self->{color},
             'D|dry'      => \$self->{dry},
             'ext=s@'     => sub {
@@ -297,6 +298,13 @@ sub _get_args {
     }
     else {
         $args{show_count} = $self->show_count;
+    }
+
+    if ( !defined $self->ruler ) {
+        $args{ruler} = 1;
+    }
+    else {
+        $args{ruler} = $self->ruler;
     }
 
     if ( $self->archive ) {
@@ -706,6 +714,8 @@ calling C<run>.
 =item C<recurse>
 
 =item C<rules>
+
+=item C<ruler>
 
 =item C<show_count>
 
