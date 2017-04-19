@@ -4,6 +4,7 @@
 # NOTE maybe a good candidate for xt/author or something.
 
 BEGIN {
+    chdir 'cpan/Test-Harness' unless -e 't/lib/NoFork.pm';
     use lib 't/lib';
 }
 
@@ -15,7 +16,8 @@ use Test::More (
     $Config{d_fork}
     ? 'no_plan'
     : ( 'skip_all' => 'your system already has no fork' )
-);
+  );
+
 use IO::c55Capture;    # for util
 
 use TAP::Harness;

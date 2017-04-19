@@ -355,7 +355,8 @@ sub test_handler {
 
         SKIP:
         {
-            %int::; # init the coretype if missing
+            no warnings 'void';
+            %int:: unless %int::; # init the coretype if missing
             my int $planned = 1;
             $planned += 1 + scalar @{ $test->{output} } if $test->{output};
             skip "$test->{skip_reason}", $planned if $test->{skip};
