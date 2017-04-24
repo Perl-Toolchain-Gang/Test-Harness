@@ -90,6 +90,16 @@ sub _finish {
     close delete $self->{fh};
 }
 
+sub get_select_handles {
+    my $self = shift;
+
+    # return our handle in case it's a socket or pipe (select()-able)
+    return ( $self->{fh}, )
+        if (-S $self->{fh} || -p $self->{fh});
+
+    return;
+}
+
 1;
 
 =head1 ATTRIBUTION
