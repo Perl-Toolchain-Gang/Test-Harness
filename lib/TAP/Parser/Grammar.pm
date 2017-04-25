@@ -178,7 +178,7 @@ my %language_for;
     my %v13 = (
         %v12,
         plan => {
-            syntax  => qr/^1\.\.(\d+)(?:\s*#\s*SKIP\b(.*))?\z/i,
+            syntax  => qr/^1\.\.(\d+)\s*(?:\s*#\s*SKIP\b(.*))?\z/i,
             handler => sub {
                 my ( $self, $line ) = @_;
                 my ( $tests_planned, $explanation ) = ( $1, $2 );
