@@ -2,6 +2,8 @@ Revision history for Test-Harness
 
         - Return handle for pipes and sockets #58 (Erik Huelsmann)
         - TAP v13 plan allows trailing whitespace (Steffen Schwigon)
+        - prove: add a --statefile=<path> option to customize the .prove file
+          (Ævar Arnfjörð Bjarmason)
         - Spelling fixes (Brian Wightman)
 
 3.39    06-04-2017
