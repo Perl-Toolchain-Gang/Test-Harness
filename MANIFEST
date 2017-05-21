@@ -209,6 +209,7 @@ t/source_tests/source.sh
 t/source_tests/source.t
 t/source_tests/source.tap
 t/source_tests/source_args.sh
+t/source_tests/test.tap
 t/spool.t
 t/state.t
 t/state_results.t

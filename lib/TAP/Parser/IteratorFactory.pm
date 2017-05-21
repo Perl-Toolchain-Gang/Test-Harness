@@ -269,6 +269,15 @@ sub detect_source {
           keys %handlers
     );
 
+    # Check for a tie.
+    if( @handlers > 1 &&
+        $handlers{$handlers[0]} == $handlers{$handlers[1]}
+    ) {
+        my $filename = $source->meta->{file}{basename};
+        die("There is a tie between $handlers[0] and $handlers[1].\n".
+            "Both voted $handlers{$handlers[0]} on $filename.\n");
+    }
+
     # this is really useful for debugging handlers:
     if ( $ENV{TAP_HARNESS_SOURCE_FACTORY_VOTES} ) {
         warn(
