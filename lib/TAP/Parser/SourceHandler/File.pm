@@ -71,7 +71,8 @@ sub can_handle {
     return 0.9 if $file->{lc_ext} eq '.tap';
 
     if ( my $exts = $config->{extensions} ) {
-        return 0.9 if grep { lc($_) eq $file->{lc_ext} } @$exts;
+        my @exts = ref $exts eq 'ARRAY' ? @$exts : $exts;
+        return 0.9 if grep { lc($_) eq $file->{lc_ext} } @exts;
     }
 
     return 0;
