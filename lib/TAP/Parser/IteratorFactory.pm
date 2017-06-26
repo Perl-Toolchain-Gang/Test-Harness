@@ -264,7 +264,6 @@ sub detect_source {
 
     # if multiple handlers can handle it, choose the most confident one
     my @handlers = (
-        map    {$_}
           sort { $handlers{$a} cmp $handlers{$b} }
           keys %handlers
     );
