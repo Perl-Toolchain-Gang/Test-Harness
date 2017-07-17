@@ -4,6 +4,8 @@ Revision history for Test-Harness
         - TAP v13 plan allows trailing whitespace (Steffen Schwigon)
         - prove: add a --statefile=<path> option to customize the .prove file
           (Ævar Arnfjörð Bjarmason)
+        - Avoid non-deterministic source handling, make a SourceHandler tie an
+          error. (Michael Schwern, Leon Timmermans)
         - Spelling fixes (Brian Wightman)
 
 3.39    06-04-2017
