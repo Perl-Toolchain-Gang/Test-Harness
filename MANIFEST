@@ -66,6 +66,7 @@ lib/Test/Harness.pm
 Makefile.PL
 MANIFEST
 MANIFEST.CUMMULATIVE
+META.json
 META.yml
 perlcriticrc
 README
@@ -74,8 +75,8 @@ t/aggregator.t
 t/bailout.t
 t/base.t
 t/callbacks.t
-t/compat/env_opts.t
 t/compat/env.t
+t/compat/env_opts.t
 t/compat/failure.t
 t/compat/inc-propagation.t
 t/compat/inc_taint.t
@@ -89,6 +90,7 @@ t/console.t
 t/data/catme.1
 t/data/proverc
 t/data/sample.yml
+t/env_opts.t
 t/errors.t
 t/file.t
 t/glob-to-regexp.t
@@ -134,6 +136,7 @@ t/proverun.t
 t/proveversion.t
 t/regression.t
 t/results.t
+t/rulesfile.t
 t/sample-tests/bailout
 t/sample-tests/bignum
 t/sample-tests/bignum_many
@@ -227,4 +230,3 @@ xt/author/pod.t
 xt/author/stdin.t
 xt/perls/harness_perl.t
 xt/perls/sample-tests/perl_version
-META.json

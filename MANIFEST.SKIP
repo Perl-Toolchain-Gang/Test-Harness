@@ -1,4 +1,5 @@
 \.tmproj$
+^Test-Harness-*/*
 \.tar\.gz$
 \B\.svn\b
 \B\.git\b
@@ -17,6 +18,8 @@
 ^Build$
 ^blib/
 ^pm_to_blib$
+^MYMETA.yml$
+^MYMETA.json$
 
 # Temp, old and emacs backup files.
 ~$
