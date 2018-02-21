@@ -53,7 +53,7 @@ Create an iterator.  Expects one argument containing a hashref of the form:
    setup    => $callback_to_setup_command
    teardown => $callback_to_teardown_command
 
-Tries to uses L<IPC::Open3> & L<IO::Select> to communicate with the spawned
+Tries to uses L<IPC::Open3> to communicate with the spawned
 process if they are available.  Falls back onto C<open()>.
 
 =head2 Instance Methods
@@ -125,7 +125,8 @@ sub _initialize {
     my $chunk_size = delete $args->{_chunk_size} || 65536;
 
     my $merge = delete $args->{merge};
-    my ( $pid, $err, $sel );
+    my $err = $merge ? '' : '>&STDERR';
+    my $pid;
 
     if ( my $setup = delete $args->{setup} ) {
         $setup->(@command);
@@ -147,24 +148,10 @@ sub _initialize {
 
         # }}}
 
+        eval { $pid = open3( '<&STDIN', $out, $err, @command ); }
+          or die "Could not execute (@command): $@";
         if ($IS_WIN32) {
-            $err = $merge ? '' : '>&STDERR';
-            eval {
-                $pid = open3(
-                    '<&STDIN', $out, $merge ? '' : $err,
-                    @command
-                );
-            };
-            die "Could not execute (@command): $@" if $@;
-            if ( $] >= 5.006 ) {
-                binmode($out, ":crlf");
-            }
-        }
-        else {
-            $err = $merge ? '' : IO::Handle->new;
-            eval { $pid = open3( '<&STDIN', $out, $err, @command ); };
-            die "Could not execute (@command): $@" if $@;
-            $sel = $merge ? undef : IO::Select->new( $out, $err );
+            binmode($out, ":crlf");
         }
     }
     else {
@@ -176,8 +163,6 @@ sub _initialize {
     }
 
     $self->{out}        = $out;
-    $self->{err}        = $err;
-    $self->{sel}        = $sel;
     $self->{pid}        = $pid;
     $self->{exit}       = undef;
     $self->{chunk_size} = $chunk_size;
@@ -200,26 +185,9 @@ Upgrade the input stream to handle UTF8.
 sub handle_unicode {
     my $self = shift;
 
-    if ( $self->{sel} ) {
-        if ( _get_unicode() ) {
-
-            # Make sure our iterator has been constructed and...
-            my $next = $self->{_next} ||= $self->_next;
-
-            # ...wrap it to do UTF8 casting
-            $self->{_next} = sub {
-                my $line = $next->();
-                return decode_utf8($line) if defined $line;
-                return;
-            };
-        }
+    if ( $] >= 5.008 ) {
+        eval 'binmode($self->{out}, ":utf8")';
     }
-    else {
-        if ( $] >= 5.008 ) {
-            eval 'binmode($self->{out}, ":utf8")';
-        }
-    }
-
 }
 
 ##############################################################################
@@ -231,69 +199,14 @@ sub _next {
     my $self = shift;
 
     if ( my $out = $self->{out} ) {
-        if ( my $sel = $self->{sel} ) {
-            my $err        = $self->{err};
-            my @buf        = ();
-            my $partial    = '';                    # Partial line
-            my $chunk_size = $self->{chunk_size};
-            return sub {
-                return shift @buf if @buf;
-
-                READ:
-                while ( my @ready = $sel->can_read ) {
-                    for my $fh (@ready) {
-                        my $got = sysread $fh, my ($chunk), $chunk_size;
-
-                        if ( $got == 0 ) {
-                            $sel->remove($fh);
-                        }
-                        elsif ( $fh == $err ) {
-                            print STDERR $chunk;    # echo STDERR
-                        }
-                        else {
-                            $chunk   = $partial . $chunk;
-                            $partial = '';
-
-                            # Make sure we have a complete line
-                            unless ( substr( $chunk, -1, 1 ) eq "\n" ) {
-                                my $nl = rindex $chunk, "\n";
-                                if ( $nl == -1 ) {
-                                    $partial = $chunk;
-                                    redo READ;
-                                }
-                                else {
-                                    $partial = substr( $chunk, $nl + 1 );
-                                    $chunk = substr( $chunk, 0, $nl );
-                                }
-                            }
-
-                            push @buf, split /\n/, $chunk;
-                            return shift @buf if @buf;
-                        }
-                    }
-                }
-
-                # Return partial last line
-                if ( length $partial ) {
-                    my $last = $partial;
-                    $partial = '';
-                    return $last;
-                }
-
-                $self->_finish;
-                return;
-            };
-        }
-        else {
-            return sub {
-                if ( defined( my $line = <$out> ) ) {
-                    chomp $line;
-                    return $line;
-                }
-                $self->_finish;
-                return;
-            };
-        }
+        return sub {
+            if ( defined( my $line = <$out> ) ) {
+                chomp $line;
+                return $line;
+            }
+            $self->_finish;
+            return;
+        };
     }
     else {
         return sub {
@@ -326,14 +239,7 @@ sub _finish {
 
     ( delete $self->{out} )->close if $self->{out};
 
-    # If we have an IO::Select we also have an error handle to close.
-    if ( $self->{sel} ) {
-        ( delete $self->{err} )->close;
-        delete $self->{sel};
-    }
-    else {
-        $status = $?;
-    }
+    $status = $?;
 
     # Sometimes we get -1 on Windows. Presumably that means status not
     # available.
@@ -359,7 +265,7 @@ handle based should return an empty list.
 
 sub get_select_handles {
     my $self = shift;
-    return grep $_, ( $self->{out}, $self->{err} );
+    return grep $_, $self->{out};
 }
 
 1;

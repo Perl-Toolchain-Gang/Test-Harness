@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Simplify readline logic in T::H::Iterator::Process
+
 3.42    19-03-2018
         - Enable rulesfile.t to run in core
 

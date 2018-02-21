@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib 't/lib';
 
-use Test::More tests => 76;
+use Test::More tests => 74;
 
 use File::Spec;
 use TAP::Parser;
@@ -201,9 +201,6 @@ SKIP: {
             merge => 1,
         }
     );
-
-    is $parser->{err}, '',    'confirm we set err to empty string';
-    is $parser->{sel}, undef, '...and selector to undef';
 
     # And then we read from the parser to sidestep the Mac OS / open3
     # bug which frequently throws an error here otherwise.

@@ -45,7 +45,6 @@ my $mod = 'TAP::Parser::Iterator::Process';
 
 {                                # and make sure we can run a test
     my $capture = IO::c55Capture->new_handle;
-    local *STDERR;
     my $harness = TAP::Harness->new(
         {   verbosity => -2,
             switches  => [ @libs, "-MNoFork" ],
