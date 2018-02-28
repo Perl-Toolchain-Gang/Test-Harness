@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.41    27-02-2018
+        - Released 3.40_01 without code modifications
+
 3.40_01 23-07-2017
         - Return handle for pipes and sockets #58 (Erik Huelsmann)
         - TAP v13 plan allows trailing whitespace (Steffen Schwigon)
