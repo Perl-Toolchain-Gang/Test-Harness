@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Enable rulesfile.t to run in core
+
 3.41    27-02-2018
         - Released 3.40_01 without code modifications
 

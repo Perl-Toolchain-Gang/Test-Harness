@@ -11,6 +11,10 @@ use Test::More;
 use File::Path qw/mkpath rmtree/;
 use File::Spec::Functions qw/catdir catfile rel2abs/;
 
+for my $path (@INC) {
+       $path = rel2abs($path);
+}
+
 if ( eval { require CPAN::Meta::YAML; 1 } ) {
     plan tests => 4;
 }
