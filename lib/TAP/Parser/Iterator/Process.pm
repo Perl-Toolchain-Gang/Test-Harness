@@ -169,8 +169,10 @@ sub _initialize {
     }
     else {
         $err = '';
+        my $exec = shift @command;
+        $exec = qq{"$exec"} if $exec =~ /\s/ and -x $exec;
         my $command
-          = join( ' ', map { $_ =~ /\s/ ? qq{"$_"} : $_ } @command );
+          = join( ' ', $exec, map { $_ =~ /\s/ ? qq{"$_"} : $_ } @command );
         open( $out, "$command|" )
           or die "Could not execute ($command): $!";
     }
