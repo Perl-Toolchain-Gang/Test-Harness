@@ -288,6 +288,7 @@ sub _next {
         }
         else {
             return sub {
+                local $/ = "\n"; # to ensure lines
                 if ( defined( my $line = <$out> ) ) {
                     chomp $line;
                     return $line;
