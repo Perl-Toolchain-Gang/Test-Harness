@@ -38,4 +38,4 @@ install:
 script:
   - perl Makefile.PL
   - make test
-  - make disttest
+  - if perl -MExtUtils::MakeMaker\ 6.48 -e0  2>/dev/null;  then make disttest; fi
