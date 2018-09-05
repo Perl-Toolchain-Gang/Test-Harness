@@ -396,7 +396,7 @@ Please check individual plugin documentation for more details.
 
 For an up-to-date list of plugins available, please check CPAN:
 
-L<http://search.cpan.org/search?query=App%3A%3AProve+Plugin>
+L<https://metacpan.org/search?q=App%3A%3AProve+Plugin>
 
 =head2 Writing Plugins
 
