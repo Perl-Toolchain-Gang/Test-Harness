@@ -1458,6 +1458,39 @@ BEGIN {    # START PLAN
         #     ],
         # },
 
+
+        # STDIN
+        {   name => 'STDIN (file names)',
+            stdin => "uno\ndos\ntres\n",
+            args => {
+                argv => ['-'],
+            },
+            expect => {
+                argv => ['-'],
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    'uno', 'dos', 'tres'
+                ]
+            ],
+        },
+        {   name => 'STDIN (raw TAP)',
+            stdin => "# comment\n1..1\nok\n",
+            args => {
+                argv => ['-'],
+            },
+            expect => {
+                argv => ['-'],
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    ["# comment\n1..1\nok\n", '*STDIN'],
+                ]
+            ],
+        },
+
     );
 
     # END SCHEDULE
@@ -1536,6 +1569,9 @@ for my $test (@SCHEDULE) {
         }
 
         if ( my $runlog = $test->{runlog} ) {
+            local *STDIN;
+            open STDIN, '<', \$test->{stdin} or die "No open STDIN: $!"
+                if $test->{stdin};
             eval { $app->run };
             if ( my $err_pattern = $test->{run_error} ) {
                 like $@, $err_pattern, "$name: expected error OK";

@@ -388,8 +388,16 @@ sub _get_raw_tests {
 
     for my $arg (@argv) {
         if ( '-' eq $arg ) {
-            push @argv => <STDIN>;
-            chomp(@argv);
+            local $/;
+            my $in = <STDIN>;
+            if ($in =~ /\d\.\.\d/) {
+                # Raw TAP output.  TAP::Parser::SourceHandler::RawTAP
+                # would vote this 0.9.
+                push @tests => [$in, '*STDIN'];
+            } else {
+                # List of tests.
+                push @argv => split /\n/, $in;
+            }
             next;
         }
 

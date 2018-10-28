@@ -103,6 +103,16 @@ file, you can add them to your tests by using a '-':
 
 See the C<README> in the C<examples> directory of this distribution.
 
+If you have raw TAP output (matching C<qr/\d\.\.\d/>) in a file, you
+can likewise add them to your tests by using a '-':
+
+ prove - < my_raw_tap_output.txt
+
+Or from a command:
+
+ ruby test.rb | prove -
+
+
 =head2 Default Test Directory
 
 If no files or directories are supplied, C<prove> looks for all files
