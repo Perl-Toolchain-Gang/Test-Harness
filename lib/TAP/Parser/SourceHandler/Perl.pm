@@ -77,7 +77,9 @@ sub can_handle {
     return 0 unless $meta->{is_file};
     my $file = $meta->{file};
 
-    if ( my $shebang = $file->{shebang} ) {
+    my $shebang = $file->{shebang} || '';
+
+    if ( $shebang =~ /^#!/ ) {
         return 0.9 if $shebang =~ /^#!.*\bperl/;
 
         # We favour Perl as the interpreter for any shebang to preserve
