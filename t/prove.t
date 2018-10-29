@@ -1475,8 +1475,8 @@ BEGIN {    # START PLAN
                 ]
             ],
         },
-        {   name => 'STDIN (raw TAP)',
-            stdin => "# comment\n1..1\nok\n",
+        {   name => 'STDIN (raw TAP - plan)',
+            stdin => "\n1..4 # Skipped: Win32 not supported\n",
             args => {
                 argv => ['-'],
             },
@@ -1486,7 +1486,52 @@ BEGIN {    # START PLAN
             runlog => [
                 [   '_runtests',
                     { verbosity => 0, show_count => 1 },
-                    ["# comment\n1..1\nok\n", '*STDIN'],
+                    ["\n1..4 # Skipped: Win32 not supported\n", '*STDIN'],
+                ]
+            ],
+        },
+        {   name => 'STDIN (raw TAP - ok)',
+            stdin => "\nok 1\n",
+            args => {
+                argv => ['-'],
+            },
+            expect => {
+                argv => ['-'],
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    ["\nok 1\n", '*STDIN'],
+                ]
+            ],
+        },
+        {   name => 'STDIN (raw TAP - not ok)',
+            stdin => "\nnot ok\n",
+            args => {
+                argv => ['-'],
+            },
+            expect => {
+                argv => ['-'],
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    ["\nnot ok\n", '*STDIN'],
+                ]
+            ],
+        },
+        {   name => 'STDIN (weird file names)',
+            stdin => "1..2.t\nok.t\nnot ok.t\n",
+            args => {
+                argv => ['-'],
+            },
+            expect => {
+                argv => ['-'],
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    '1..2.t', 'ok.t', 'not ok.t'
                 ]
             ],
         },

@@ -390,9 +390,8 @@ sub _get_raw_tests {
         if ( '-' eq $arg ) {
             local $/;
             my $in = <STDIN>;
-            if ($in =~ /\d\.\.\d/) {
-                # Raw TAP output.  TAP::Parser::SourceHandler::RawTAP
-                # would vote this 0.9.
+            if ($in =~ /^(?:1\.\.\d|ok|not ok)\b(?!\S)/m) {
+                # Raw TAP output.
                 push @tests => [$in, '*STDIN'];
             } else {
                 # List of tests.
