@@ -1475,8 +1475,9 @@ BEGIN {    # START PLAN
                 ]
             ],
         },
-        {   name => 'STDIN (raw TAP - plan)',
-            stdin => "\n1..4 # Skipped: Win32 not supported\n",
+        (map +{
+            name => "STDIN (file - $_)",
+            stdin => "$_\ndos\ntres\n",
             args => {
                 argv => ['-'],
             },
@@ -1486,12 +1487,23 @@ BEGIN {    # START PLAN
             runlog => [
                 [   '_runtests',
                     { verbosity => 0, show_count => 1 },
-                    ["\n1..4 # Skipped: Win32 not supported\n", '*STDIN'],
+                    $_, 'dos', 'tres',
                 ]
             ],
-        },
-        {   name => 'STDIN (raw TAP - ok)',
-            stdin => "\nok 1\n",
+        } => split /\n/, <<'FILES'
+1..2.t
+1..2a
+ok.t
+okay
+OK
+not ok.t
+not oklahoma
+NOT OK
+FILES
+        ),
+        (map +{
+            name => "STDIN (TAP - $_)",
+            stdin => "\n$_\n",
             args => {
                 argv => ['-'],
             },
@@ -1501,12 +1513,29 @@ BEGIN {    # START PLAN
             runlog => [
                 [   '_runtests',
                     { verbosity => 0, show_count => 1 },
-                    ["\nok 1\n", '*STDIN'],
+                    ["\n$_\n", '*STDIN'],
                 ]
             ],
-        },
-        {   name => 'STDIN (raw TAP - not ok)',
-            stdin => "\nnot ok\n",
+        } => split /\n/, <<'TAP'
+1..4
+1..4 # Skipped: Win32 not supported
+ok
+ok 2
+not ok
+not ok 3
+# comment
+    1..4
+    1..4 # Skipped: Win32 not supported
+    ok
+    ok 2
+    not ok
+    not ok 3
+    # comment
+TAP
+        ),
+        {
+            name => "STDIN (TAP - TAP version 13)",
+            stdin => "TAP version 13\n",
             args => {
                 argv => ['-'],
             },
@@ -1516,22 +1545,7 @@ BEGIN {    # START PLAN
             runlog => [
                 [   '_runtests',
                     { verbosity => 0, show_count => 1 },
-                    ["\nnot ok\n", '*STDIN'],
-                ]
-            ],
-        },
-        {   name => 'STDIN (weird file names)',
-            stdin => "1..2.t\nok.t\nnot ok.t\n",
-            args => {
-                argv => ['-'],
-            },
-            expect => {
-                argv => ['-'],
-            },
-            runlog => [
-                [   '_runtests',
-                    { verbosity => 0, show_count => 1 },
-                    '1..2.t', 'ok.t', 'not ok.t'
+                    ["TAP version 13\n", '*STDIN'],
                 ]
             ],
         },

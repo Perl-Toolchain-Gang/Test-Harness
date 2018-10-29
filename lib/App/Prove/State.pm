@@ -390,7 +390,24 @@ sub _get_raw_tests {
         if ( '-' eq $arg ) {
             local $/;
             my $in = <STDIN>;
-            if ($in =~ /^(?:1\.\.\d|ok|not ok)\b(?!\S)/m) {
+            if ($in =~ /
+                \A                   # Beginning of first line
+                TAP\s+version\s+\d+  # TAP version line
+                |
+                ^                    # Beginning of any line
+                \s*                  # Indented subtests
+                (?:
+                    [#]              # A comment
+                    |
+                    (?:
+                        1\.\.\d |    # A plan line
+                        ok |         # A test line - pass
+                        not\s+ok     # A test line - fail
+                    )
+                    \b               # End of word or number
+                    (?!\S)           # Space if anything else on line
+                )
+            /xm) {
                 # Raw TAP output.
                 push @tests => [$in, '*STDIN'];
             } else {
