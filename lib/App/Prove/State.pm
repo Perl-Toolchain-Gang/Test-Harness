@@ -400,7 +400,7 @@ sub _get_raw_tests {
                     [#]              # A comment
                     |
                     (?:
-                        1\.\.\d |    # A plan line
+                        1\.\.\d+ |   # A plan line
                         ok |         # A test line - pass
                         not\s+ok     # A test line - fail
                     )

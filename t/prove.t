@@ -1517,7 +1517,7 @@ FILES
                 ]
             ],
         } => split /\n/, <<'TAP'
-1..4
+1..42
 1..4 # Skipped: Win32 not supported
 ok
 ok 2
