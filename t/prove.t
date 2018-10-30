@@ -84,7 +84,7 @@ BEGIN {    # START PLAN
     @ATTR = qw(
       archive argv blib color directives exec extensions failures
       formatter harness includes lib merge parse quiet really_quiet
-      recurse backwards shuffle taint_fail taint_warn verbose
+      recurse stdin backwards shuffle taint_fail taint_warn verbose
       warnings_fail warnings_warn
     );
 
@@ -116,8 +116,9 @@ BEGIN {    # START PLAN
         },
         {   name => 'Set all options via constructor',
             args => {
-                archive       => 1,
+                archive       => 0,
                 argv          => [qw(one two three)],
+                backwards     => 1,
                 blib          => 2,
                 color         => 3,
                 directives    => 4,
@@ -132,8 +133,8 @@ BEGIN {    # START PLAN
                 quiet         => 14,
                 really_quiet  => 15,
                 recurse       => 16,
-                backwards     => 17,
-                shuffle       => 18,
+                shuffle       => 17,
+                stdin         => 18,
                 taint_fail    => 19,
                 taint_warn    => 20,
                 verbose       => 21,
@@ -141,8 +142,9 @@ BEGIN {    # START PLAN
                 warnings_warn => 23,
             },
             expect => {
-                archive       => 1,
+                archive       => 0,
                 argv          => [qw(one two three)],
+                backwards     => 1,
                 blib          => 2,
                 color         => 3,
                 directives    => 4,
@@ -157,8 +159,8 @@ BEGIN {    # START PLAN
                 quiet         => 14,
                 really_quiet  => 15,
                 recurse       => 16,
-                backwards     => 17,
-                shuffle       => 18,
+                shuffle       => 17,
+                stdin         => 18,
                 taint_fail    => 19,
                 taint_warn    => 20,
                 verbose       => 21,
@@ -1549,6 +1551,48 @@ TAP
                 ]
             ],
         },
+        (map +{
+            name => 'Switch --stdin=list',
+            stdin => $_,
+            switches => [ '--stdin=list', '-' ],
+            expect => {
+                stdin => 'list',
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    split /\n/
+                ]
+            ],
+        } => <<'NOT_TAP'
+TAP version 13
+1..4
+# comment
+ok 1
+ok 2
+not ok 3
+not ok 4
+NOT_TAP
+        ),
+        (map +{
+            name => 'Switch --stdin=tap',
+            stdin => $_,
+            switches => [ '--stdin=tap', '-' ],
+            expect => {
+                stdin => 'tap',
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    [$_, '*STDIN'],
+                ]
+            ],
+        } => <<'NOT_LIST'
+alpha.t
+beta.t
+charlie.t
+NOT_LIST
+        ),
 
     );
 

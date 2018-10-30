@@ -313,10 +313,12 @@ Given a list of args get the names of tests that should run
 =cut
 
 sub get_tests {
-    my $self    = shift;
-    my $recurse = shift;
-    my @argv    = @_;
+    my $self = shift;
+    my $app  = shift;
+    my @argv = @_;
     my %seen;
+
+    my $recurse = ref $app ? $app->recurse : $app;
 
     my @selected = $self->_query;
 
@@ -326,7 +328,7 @@ sub get_tests {
           unless -d $argv[0];
     }
 
-    push @selected, $self->_get_raw_tests( $recurse, @argv ) if @argv;
+    push @selected, $self->_get_raw_tests( $app, @argv ) if @argv;
     return grep { !$seen{$_}++ } @selected;
 }
 
@@ -374,10 +376,13 @@ sub _query_clause {
 }
 
 sub _get_raw_tests {
-    my $self    = shift;
-    my $recurse = shift;
-    my @argv    = @_;
+    my $self = shift;
+    my $app  = shift;
+    my @argv = @_;
     my @tests;
+
+    my $recurse = ref $app ? $app->recurse : $app;
+    my $stdin   = ref $app && $app->stdin || '';
 
     # Do globbing on Win32.
     if (NEED_GLOB) {
@@ -390,24 +395,27 @@ sub _get_raw_tests {
         if ( '-' eq $arg ) {
             local $/;
             my $in = <STDIN>;
-            if ($in =~ /
-                \A                   # Beginning of first line
-                TAP\s+version\s+\d+  # TAP version line
-                |
-                ^                    # Beginning of any line
-                \s*                  # Indented subtests
-                (?:
-                    [#]              # A comment
+            if (
+                $stdin eq 'tap'
+                or !$stdin && $in =~ /
+                    \A                   # Beginning of first line
+                    TAP\s+version\s+\d+  # TAP version line
                     |
+                    ^                    # Beginning of any line
+                    \s*                  # Indented subtests
                     (?:
-                        1\.\.\d+ |   # A plan line
-                        ok |         # A test line - pass
-                        not\s+ok     # A test line - fail
+                        [#]              # A comment
+                        |
+                        (?:
+                            1\.\.\d+ |   # A plan line
+                            ok |         # A test line - pass
+                            not\s+ok     # A test line - fail
+                        )
+                        \b               # End of word or number
+                        (?!\S)           # Space if anything else on line
                     )
-                    \b               # End of word or number
-                    (?!\S)           # Space if anything else on line
-                )
-            /xm) {
+                /xm
+            ) {
                 # Raw TAP output.
                 push @tests => [$in, '*STDIN'];
             } else {
