@@ -85,10 +85,10 @@ sub close_test {
         $self->_output_test_failure($parser);
     }
     else {
-        my $time_report = $self->time_report($formatter, $parser);
-        $formatter->_output( $pretty
-              . ( $self->{results} ? "\n" . $self->{results} : "" )
-              . $self->_make_ok_line($time_report) );
+        my $time_report = $self->time_report( $formatter, $parser );
+        $formatter->_output(
+            $pretty . ( $self->{results} ? "\n" . $self->{results} : "" ) );
+        $formatter->_output_success( $self->_make_ok_line($time_report) );
     }
 }
 
