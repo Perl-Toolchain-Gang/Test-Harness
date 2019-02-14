@@ -186,7 +186,7 @@ sub _closures {
             }
             else {
                 my $time_report = $self->time_report($formatter, $parser);
-                $formatter->_output( $self->_make_ok_line($time_report) );
+                $formatter->_output_success( $self->_make_ok_line($time_report) );
             }
         },
     };
