@@ -23,7 +23,7 @@ prove - Run tests through a TAP harness.
 
 Boolean options:
 
- -v,  --verbose         Print all test lines.
+ -v,  --verbose         Print all test lines.  Also sets TEST_VERBOSE
  -l,  --lib             Add 'lib' to the path for your tests (-Ilib).
  -b,  --blib            Add 'blib/lib' and 'blib/arch' to the path for
                         your tests
