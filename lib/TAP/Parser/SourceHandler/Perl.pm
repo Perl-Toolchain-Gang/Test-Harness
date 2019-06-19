@@ -62,7 +62,7 @@ won't need to use this module directly.
 Only votes if $source looks like a file.  Casts the following votes:
 
   0.9  if it has a shebang ala "#!...perl"
-  0.75 if it has any shebang
+  0.3  if it has any shebang
   0.8  if it's a .t file
   0.9  if it's a .pl file
   0.75 if it's in a 't' directory
