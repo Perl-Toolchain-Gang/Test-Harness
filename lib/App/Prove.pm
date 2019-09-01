@@ -163,6 +163,10 @@ sub process_args {
     my @rc = RC_FILE;
     unshift @rc, glob '~/' . RC_FILE if IS_UNIXY;
 
+    # Everything after the arisdottle '::' gets passed as args to
+    # test programs - even their own --rc/--norc
+    $self->_extract_test_arguments( \@_ );
+
     # Preprocess meta-args.
     my @args;
     while ( defined( my $arg = shift ) ) {
@@ -181,10 +185,6 @@ sub process_args {
             push @args, $arg;
         }
     }
-
-    # Everything after the arisdottle '::' gets passed as args to
-    # test programs.
-    $self->_extract_test_arguments( \@args );
 
     # Grab options from RC files
     $self->add_rc_file($_) for grep -f, @rc;
