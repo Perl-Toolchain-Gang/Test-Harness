@@ -136,6 +136,16 @@ sub add_rc_file {
     close RC;
 }
 
+sub _extract_test_arguments {
+    my ($self, $args) = @_;
+
+    if ( defined( my $stop_at = _first_pos( '::', @$args ) ) ) {
+        my @test_args = splice @$args, $stop_at;
+        shift @test_args;
+        $self->{test_args} = \@test_args;
+    }
+}
+
 =head3 C<process_args>
 
     $prove->process_args(@args);
@@ -174,11 +184,7 @@ sub process_args {
 
     # Everything after the arisdottle '::' gets passed as args to
     # test programs.
-    if ( defined( my $stop_at = _first_pos( '::', @args ) ) ) {
-        my @test_args = splice @args, $stop_at;
-        shift @test_args;
-        $self->{test_args} = \@test_args;
-    }
+    $self->_extract_test_arguments( \@args );
 
     # Grab options from RC files
     $self->add_rc_file($_) for grep -f, @rc;
