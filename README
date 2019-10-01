@@ -9,13 +9,6 @@ To install Test::Harness using ExtUtils::MakeMaker do:
     make test
     make install
 
-To use Module::Build (preferred) do:
-
-    perl NotBuild.PL
-    ./Build
-    ./Build test
-    ./Build install
-
 This will install Test::Harness and the "prove" program. Type
 
     prove --help
