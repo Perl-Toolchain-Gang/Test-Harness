@@ -627,6 +627,10 @@ sub _aggregate_parallel {
 
             my ( $parser, $session ) = $self->make_parser($job);
             $mux->add( $parser, [ $session, $job ] );
+
+            # The job has started: begin the timers
+            $parser->start_time( $parser->get_time );
+            $parser->start_times( $parser->get_times );
         }
 
         if ( my ( $parser, $stash, $result ) = $mux->next ) {
