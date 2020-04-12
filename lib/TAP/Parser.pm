@@ -1384,8 +1384,8 @@ sub _iter {
     my $state       = 'INIT';
     my $state_table = $self->_make_state_table;
 
-    $self->start_time( $self->get_time );
-    $self->start_times( $self->get_times );
+    $self->start_time( $self->get_time ) unless $self->{start_time};
+    $self->start_times( $self->get_times ) unless $self->{start_times};
 
     # Make next_state closure
     my $next_state = sub {
