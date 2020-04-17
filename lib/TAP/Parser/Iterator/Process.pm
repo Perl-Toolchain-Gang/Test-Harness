@@ -249,6 +249,10 @@ sub _next {
                         }
                         elsif ( $fh == $err ) {
                             print STDERR $chunk;    # echo STDERR
+
+                            # Return to avoid blocking other tests (when
+                            # running in parallel).
+                            return '';
                         }
                         else {
                             $chunk   = $partial . $chunk;
