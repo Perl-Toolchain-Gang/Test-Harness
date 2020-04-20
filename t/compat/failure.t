@@ -48,6 +48,7 @@ sub _runtests {
     local $ENV{HARNESS_VERBOSE}            = 0;
     local $ENV{HARNESS_DEBUG}              = 0;
     local $ENV{HARNESS_TIMER}              = 0;
+    local $ENV{HARNESS_SUBCLASS};
 
     local $Test::Harness::Verbose = -9;
 
