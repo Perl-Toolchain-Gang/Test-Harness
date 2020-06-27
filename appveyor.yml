@@ -1,0 +1,15 @@
+version: 1.0.{build}
+skip_tags: true
+clone_depth: 1
+init:
+  - git config --global core.autocrlf input
+# Mingw and Cygwin now builtin: http://www.appveyor.com/updates/2015/05/30
+#os: MinGW
+
+install:
+  - perl -V
+  - C:\MinGW\bin\mingw32-make -v
+  - echo %PATH%
+build_script:
+#do not let gmake find sh.exe (usually part of git for windows) in %PATH%
+- set PATH=C:\windows\system32;C:\Perl\site\bin;C:\Perl\bin;C:\windows;C:\MinGW\bin; && set ACTIVEPERL_CONFIG_DISABLE=1 && perl Makefile.PL MAKE=gmake && mingw32-make test
