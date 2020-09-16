@@ -9,6 +9,7 @@ use Test::More tests => 76;
 use File::Spec;
 use TAP::Parser;
 use TAP::Parser::Iterator::Array;
+use IO::Handle; #Harness doesn't always load IO::Handle anymore
 use Config;
 
 sub array_ref_from {
@@ -79,7 +80,7 @@ my @schedule = (
 );
 
 sub _can_open3 {
-    return $Config{d_fork};
+    return $TAP::Parser::Iterator::Process::can_fork;
 }
 
 for my $test (@schedule) {
@@ -155,16 +156,20 @@ for my $test (@schedule) {
 
 {
 
+    my $iterator;
     # coverage test for VMS case
 
-    my $iterator = make_iterator(
-        [   'not ',
-            'ok 1 - I hate VMS',
-        ]
-    );
+    SKIP : {
+        skip('Not VMS', 1) if $^O ne 'VMS';
+        $iterator = make_iterator(
+            [   'not ',
+                'ok 1 - I hate VMS',
+            ]
+        );
 
-    is $iterator->next, 'not ok 1 - I hate VMS',
-      'coverage of VMS line-splitting case';
+        is $iterator->next, 'not ok 1 - I hate VMS',
+          'coverage of VMS line-splitting case';
+    }
 
     # coverage test for VMS case - nothing after 'not'
 

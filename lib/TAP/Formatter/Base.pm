@@ -396,9 +396,7 @@ sub _summary_test_header {
 }
 
 sub _output {
-    my $self = shift;
-
-    print { $self->stdout } @_;
+    print { shift->stdout } @_;
 }
 
 sub _failure_output {

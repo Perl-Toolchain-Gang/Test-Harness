@@ -50,9 +50,7 @@ L</_initialize> method.  Returns a new object.
 =cut
 
 sub new {
-    my $class = shift;
-    my $self = bless {}, $class;
-    return $self->_initialize(@_);
+    return bless({}, shift)->_initialize(@_);
 }
 
 =head2 Instance Methods
@@ -84,7 +82,7 @@ May also be called as a I<class> method.
 =cut
 
 sub _croak {
-    my $proto = shift;
+    shift;
     require Carp;
     Carp::croak(@_);
     return;
@@ -103,7 +101,7 @@ May also be called as a I<class> method.
 =cut
 
 sub _confess {
-    my $proto = shift;
+    shift;
     require Carp;
     Carp::confess(@_);
     return;

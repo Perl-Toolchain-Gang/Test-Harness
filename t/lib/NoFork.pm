@@ -3,8 +3,8 @@ package NoFork;
 BEGIN {
     *CORE::GLOBAL::fork = sub { die "you should not fork" };
 }
-use Config;
-tied(%Config)->{d_fork} = 0;    # blatant lie
+
+$TAP::Parser::Iterator::Process::can_fork = 0;
 
 =begin TEST
 

@@ -15,8 +15,6 @@ use TAP::Parser::SourceHandler::File       ();
 use TAP::Parser::SourceHandler::RawTAP     ();
 use TAP::Parser::SourceHandler::Handle     ();
 
-use Carp qw( confess );
-
 use base 'TAP::Base';
 
 =encoding utf8
@@ -932,7 +930,7 @@ sub pragma {
 
     return $self->{pragma}->{$pragma} unless @_;
 
-    if ( my $state = shift ) {
+    if ( shift ) {
         $self->{pragma}->{$pragma} = 1;
     }
     else {
@@ -1038,8 +1036,7 @@ failed, any TODO tests unexpectedly succeeded, or any parse errors occurred.
 sub has_problems {
     my $self = shift;
     return
-         $self->failed
-      || $self->parse_errors
+         $self->{has_problems}
       || ( !$self->ignore_exit && ( $self->wait || $self->exit ) );
 }
 
@@ -1145,6 +1142,7 @@ sub parse_errors { @{ shift->{parse_errors} } }
 sub _add_error {
     my ( $self, $error ) = @_;
     push @{ $self->{parse_errors} } => $error;
+    $self->{has_problems} = 1;
     return $self;
 }
 
@@ -1239,8 +1237,10 @@ sub _make_state_table {
                 push @{ $self->{skipped} } => $number
                   if $test->has_skip;
 
-                push @{ $self->{ $test->is_ok ? 'passed' : 'failed' } } =>
-                  $number;
+                push @{ $self->{ $test->is_ok ?
+                                'passed'
+                                : (($self->{has_problems} = 1), 'failed') }
+                } => $number;
                 push @{
                     $self->{
                         $test->is_actual_ok
@@ -1340,9 +1340,9 @@ sub _make_state_table {
         my $st = { %state_globals, %{ $states{$name} } };
 
         # Add defaults
-        for my $next ( sort keys %{$st} ) {
+        for my $next ( keys %$st ) {
             if ( my $default = $state_defaults{$next} ) {
-                for my $def ( sort keys %{$default} ) {
+                for my $def ( keys %$default ) {
                     $st->{$next}->{$def} ||= $default->{$def};
                 }
             }
@@ -1408,7 +1408,7 @@ sub _iter {
                 }
             }
             else {
-                confess("Unhandled token type: $type\n");
+                $self->_confess("Unhandled token type: $type\n");
             }
         }
         return $token;
@@ -1520,12 +1520,13 @@ sub _finish {
     $self->is_good_plan(0) unless defined $self->is_good_plan;
 
     unless ( $self->parse_errors ) {
+        my $tests_run = $self->tests_run;
         # Optimise storage where possible
-        if ( $self->tests_run == @{$self->{passed}} ) {
-            $self->{passed} = $self->tests_run;
+        if ( $tests_run == @{$self->{passed}} ) {
+            $self->{passed} = $tests_run;
         }
-        if ( $self->tests_run == @{$self->{actual_passed}} ) {
-            $self->{actual_passed} = $self->tests_run;
+        if ( $tests_run == @{$self->{actual_passed}} ) {
+            $self->{actual_passed} = $tests_run;
         }
     }
 

@@ -3,7 +3,6 @@ package TAP::Parser::Scheduler;
 use strict;
 use warnings;
 
-use Carp;
 use TAP::Parser::Scheduler::Job;
 use TAP::Parser::Scheduler::Spinner;
 
@@ -129,13 +128,13 @@ We implement our own glob-style pattern matching. Here are the patterns it suppo
 sub new {
     my $class = shift;
 
-    croak "Need a number of key, value pairs" if @_ % 2;
+    TAP::Object->_croak("Need a number of key, value pairs") if @_ % 2;
 
     my %args  = @_;
-    my $tests = delete $args{tests} || croak "Need a 'tests' argument";
+    my $tests = delete $args{tests} || TAP::Object->_croak("Need a 'tests' argument");
     my $rules = delete $args{rules} || { par => '**' };
 
-    croak "Unknown arg(s): ", join ', ', sort keys %args
+    TAP::Object->_croak("Unknown arg(s): ", join ', ', sort keys %args)
       if keys %args;
 
     # Turn any simple names into a name, description pair. TODO: Maybe
@@ -176,11 +175,11 @@ sub _set_rules {
 
 sub _rule_clause {
     my ( $self, $rule, $tests ) = @_;
-    croak 'Rule clause must be a hash'
+    $self->_croak('Rule clause must be a hash')
       unless 'HASH' eq ref $rule;
 
     my @type = keys %$rule;
-    croak 'Rule clause must have exactly one key'
+    $self->_croak('Rule clause must have exactly one key')
       unless @type == 1;
 
     my %handlers = (
@@ -191,7 +190,7 @@ sub _rule_clause {
     );
 
     my $handler = $handlers{ $type[0] }
-      || croak 'Unknown scheduler type: ', $type[0];
+      || $self->_croak('Unknown scheduler type: ', $type[0]);
     my $val = $rule->{ $type[0] };
 
     return $handler->(

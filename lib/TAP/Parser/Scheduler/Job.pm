@@ -2,7 +2,6 @@ package TAP::Parser::Scheduler::Job;
 
 use strict;
 use warnings;
-use Carp;
 
 =head1 NAME
 

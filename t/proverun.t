@@ -107,8 +107,8 @@ package main;
       };
 
     # Patch TAP::Formatter::Console;
-    my $orig_output = \&TAP::Formatter::Console::_output;
-    *TAP::Formatter::Console::_output = sub {
+    my $orig_output = \&TAP::Formatter::Base::_output;
+    *TAP::Formatter::Base::_output = sub {
 
         # push @call_log, [ '_output', @_ ];
     };

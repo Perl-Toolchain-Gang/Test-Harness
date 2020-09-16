@@ -10,9 +10,9 @@ BEGIN {
 use strict;
 use warnings;
 
-use Config;
+use TAP::Parser::Iterator::Process;
 use Test::More (
-    $Config{d_fork}
+    $TAP::Parser::Iterator::Process::can_fork
     ? 'no_plan'
     : ( 'skip_all' => 'your system already has no fork' )
 );

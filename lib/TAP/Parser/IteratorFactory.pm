@@ -3,7 +3,6 @@ package TAP::Parser::IteratorFactory;
 use strict;
 use warnings;
 
-use Carp qw( confess );
 use File::Basename qw( fileparse );
 
 use base 'TAP::Object';
@@ -71,7 +70,7 @@ List of handlers that have been registered.
 sub register_handler {
     my ( $class, $dclass ) = @_;
 
-    confess("$dclass must implement can_handle & make_iterator methods!")
+    TAP::Object->_confess("$dclass must implement can_handle & make_iterator methods!")
       unless UNIVERSAL::can( $dclass, 'can_handle' )
           && UNIVERSAL::can( $dclass, 'make_iterator' );
 
@@ -240,7 +239,7 @@ Ties are handled by choosing the first handler.
 sub detect_source {
     my ( $self, $source ) = @_;
 
-    confess('no raw source ref defined!') unless defined $source->raw;
+    $self->_confess('no raw source ref defined!') unless defined $source->raw;
 
     # find a list of handlers that can handle this source:
     my %confidence_for;
@@ -253,7 +252,7 @@ sub detect_source {
     if ( !%confidence_for ) {
         # error: can't detect source
         my $raw_source_short = substr( ${ $source->raw }, 0, 50 );
-        confess("Cannot detect source of '$raw_source_short'!");
+        $self->_confess("Cannot detect source of '$raw_source_short'!");
         return;
     }
 
