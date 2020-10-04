@@ -550,7 +550,7 @@ C<file.tgz>
 =item C<< fPackage-With-Dashes >>
 
 Set the formatter_class of the harness being run. Since the C<HARNESS_OPTIONS>
-is seperated by C<:>, we use C<-> instead.
+is separated by C<:>, we use C<-> instead.
 
 =back
 
