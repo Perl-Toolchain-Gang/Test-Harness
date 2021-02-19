@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use IO::Select;
+use Errno;
 
 use base 'TAP::Object';
 
@@ -130,9 +131,10 @@ sub _iter {
             return ( $parser, $stash, $result );
         }
 
-        unless (@ready) {
+        until (@ready) {
             return unless $sel->count;
             @ready = $sel->can_read;
+            last if @ready || $! != Errno::EINTR;
         }
 
         my ( $h, $parser, $stash, @handles ) = @{ shift @ready };
