@@ -14,7 +14,7 @@ testers, documenters.)
 
 If you are looking for more information on how to I<use> TAP::Harness,
 you probably want
-L<http://testanything.org/testing-with-tap/perl/tap::parser-cookbook.html>
+L<http://testanything.org/testing-with-tap/perl/tap-parser-cookbook.html>
 instead.
 
 =head1 Getting Started
