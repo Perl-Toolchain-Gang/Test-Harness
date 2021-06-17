@@ -7,7 +7,7 @@ use base 'TAP::Object';
 
 our $VERSION = '3.42';
 
-my $ESCAPE_CHAR = qr{ [ \x00-\x1f \" ] }x;
+my $ESCAPE_CHAR = qr{ [ [:cntrl:] \" ] }x;
 my $ESCAPE_KEY  = qr{ (?: ^\W ) | $ESCAPE_CHAR }x;
 
 my @UNPRINTABLE;
@@ -80,7 +80,7 @@ sub _enc_scalar {
     if ( $val =~ /$rule/ ) {
         $val =~ s/\\/\\\\/g;
         $val =~ s/"/\\"/g;
-        $val =~ s/ ( [\x00-\x1f] ) / '\\' . $UNPRINTABLE[ ord($1) ] /gex;
+        $val =~ s/ ( [[:cntrl:]] ) / '\\' . $UNPRINTABLE[ ord($1) ] /gex;
         return qq{"$val"};
     }
 

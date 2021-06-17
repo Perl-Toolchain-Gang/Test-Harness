@@ -12,9 +12,9 @@ our $VERSION = '3.42';
 
 # Printable characters for escapes
 my %UNESCAPES = (
-    z => "\x00", a => "\x07", t    => "\x09",
-    n => "\x0a", v => "\x0b", f    => "\x0c",
-    r => "\x0d", e => "\x1b", '\\' => '\\',
+    z => "\x00", a => "\a",  t    => "\t",
+    n => "\n",   v => "\cK", f    => "\f",
+    r => "\r",   e => "\e",  '\\' => '\\',
 );
 
 my $QQ_STRING    = qr{ " (?:\\. | [^"])* " }x;
