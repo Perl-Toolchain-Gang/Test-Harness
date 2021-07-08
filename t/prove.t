@@ -1435,7 +1435,7 @@ for my $test (@SCHEDULE) {
 
     SKIP:
     {
-        skip $test->{skip_reason}, $test->{_planned} if $test->{skip};
+        skip "$test->{skip_reason}", int($test->{_planned}) if $test->{skip};
 
         local $ENV{HARNESS_TIMER};
 
