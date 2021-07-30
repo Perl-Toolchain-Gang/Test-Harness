@@ -1,5 +1,11 @@
 Revision history for Test-Harness
 
+3.43_03 30-07-2021
+        - Move timer initialization
+        - Fix YAMLish behaviour with empty values
+        - fix eintr error handling in TAP::Parser::Multiplexer
+        - Parse out signal name & core dump.
+
 3.43_02 25-03-2020
         - Let the aggregator finish gracefully after bailout
         - Make prove respect HARNESS_VERBOSE if no verbosity flags are passed

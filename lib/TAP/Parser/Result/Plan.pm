@@ -11,11 +11,11 @@ TAP::Parser::Result::Plan - Plan result token.
 
 =head1 VERSION
 
-Version 3.43_02
+Version 3.43_03
 
 =cut
 
-our $VERSION = '3.43_02';
+our $VERSION = '3.43_03';
 
 =head1 DESCRIPTION
 

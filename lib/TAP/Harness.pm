@@ -16,11 +16,11 @@ TAP::Harness - Run test scripts with statistics
 
 =head1 VERSION
 
-Version 3.43_02
+Version 3.43_03
 
 =cut
 
-our $VERSION = '3.43_02';
+our $VERSION = '3.43_03';
 
 $ENV{HARNESS_ACTIVE}  = 1;
 $ENV{HARNESS_VERSION} = $VERSION;
