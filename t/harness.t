@@ -532,8 +532,7 @@ for my $test_args ( get_arg_sets() ) {
 
         my $out_str = join q<>, @output;
 
-        my $sigsegv = POSIX->can('SIGSEGV')->();
-        like( $out_str, qr<$sigsegv.+SEGV>, 'SIGSEGV is parsed out' );
+        like( $out_str, qr<SEGV>, 'SIGSEGV is parsed out' );
     }
 
     #XXXX
