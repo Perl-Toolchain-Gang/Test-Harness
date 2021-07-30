@@ -142,6 +142,14 @@ sub next {
 
 sub delete_spool {}
 
+sub get_time { 0 }
+
+sub get_times { 0 }
+
+sub start_time {}
+
+sub start_times {}
+
 1;
 
 package My::Job;
