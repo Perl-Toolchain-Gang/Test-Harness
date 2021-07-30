@@ -1,5 +1,9 @@
 Revision history for Test-Harness
 
+3.43_02 25-03-2020
+        - Let the aggregator finish gracefully after bailout
+        - Make prove respect HARNESS_VERBOSE if no verbosity flags are passed
+
 3.42    19-03-2018
         - Enable rulesfile.t to run in core
 
