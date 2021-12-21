@@ -7,6 +7,11 @@ use base 'TAP::Object';
 
 our $VERSION = '3.43_03';
 
+                             # No EBCDIC support on early perls
+*to_native = (ord "A" == 65 || $] < 5.008)
+             ? sub { return shift }
+             : sub { utf8::unicode_to_native(shift) };
+
 # TODO:
 #   Handle blessed object syntax
 
@@ -118,7 +123,8 @@ sub _read_qq {
 
     $str =~ s/\\"/"/gx;
     $str =~ s/ \\ ( [tartan\\favez] | x([0-9a-fA-F]{2}) ) 
-                 / (length($1) > 1) ? pack("H2", $2) : $UNESCAPES{$1} /gex;
+                 / (length($1) > 1) ? pack("H2", to_native($2))
+                                    : $UNESCAPES{$1} /gex;
     return $str;
 }
 

@@ -7,11 +7,16 @@ use base 'TAP::Object';
 
 our $VERSION = '3.43_03';
 
+                             # No EBCDIC support on early perls
+*from_native = (ord "A" == 65 || $] < 5.008)
+             ? sub { return shift }
+             : sub { utf8::native_to_unicode(shift) };
+
 my $ESCAPE_CHAR = qr{ [ [:cntrl:] \" ] }x;
 my $ESCAPE_KEY  = qr{ (?: ^\W ) | $ESCAPE_CHAR }x;
 
 my @UNPRINTABLE;
-$UNPRINTABLE[$_] = sprintf("x%02x", $_) for 0 .. ord(" ") - 1;
+$UNPRINTABLE[$_] = sprintf("x%02x", from_native($_)) for 0 .. ord(" ") - 1;
 $UNPRINTABLE[ord "\0"] = 'z';
 $UNPRINTABLE[ord "\a"] = 'a';
 $UNPRINTABLE[ord "\t"] = 't';
