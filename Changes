@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.43_04 22-01-2022
+        - Remove ASCII-isms to better work on EBCDIC
+
 3.43_03 30-07-2021
         - Move timer initialization
         - Fix YAMLish behaviour with empty values
