@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Fix failing SEGV test on Windows
+
 3.43_04 22-01-2022
         - Remove ASCII-isms to better work on EBCDIC
 

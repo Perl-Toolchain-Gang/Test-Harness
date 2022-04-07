@@ -525,7 +525,7 @@ for my $test_args ( get_arg_sets() ) {
     is_deeply \@output, \@expected, '... and the output should be correct';
 
     {
-        skip "No SIGSEGV on $^O", 1 if $Config::Config{'sig_name'} !~ m/SEGV/;
+        skip "No SIGSEGV on $^O", 1 if $^O eq 'MSWin32' or $Config::Config{'sig_name'} !~ m/SEGV/;
 
         @output = ();
         _runtests( $harness_failures, "$sample_tests/segfault" );
