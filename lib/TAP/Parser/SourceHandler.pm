@@ -12,11 +12,11 @@ TAP::Parser::SourceHandler - Base class for different TAP source handlers
 
 =head1 VERSION
 
-Version 3.43_04
+Version 3.43_05
 
 =cut
 
-our $VERSION = '3.43_04';
+our $VERSION = '3.43_05';
 
 =head1 SYNOPSIS
 
