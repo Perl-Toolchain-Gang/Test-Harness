@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Fix skipping SEGV test
+
 3.43_05  07-04-2022
         - Fix failing SEGV test on Windows
 

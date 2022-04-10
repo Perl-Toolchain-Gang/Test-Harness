@@ -524,7 +524,7 @@ for my $test_args ( get_arg_sets() ) {
     $expected_summary = qr/^Files=1, Tests=2, +\d+ wallclock secs/;
     is_deeply \@output, \@expected, '... and the output should be correct';
 
-    {
+    SKIP: {
         skip "No SIGSEGV on $^O", 1 if $^O eq 'MSWin32' or $Config::Config{'sig_name'} !~ m/SEGV/;
 
         @output = ();
