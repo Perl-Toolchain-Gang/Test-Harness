@@ -10,11 +10,11 @@ TAP::Parser::Scheduler::Job - A single testing job.
 
 =head1 VERSION
 
-Version 3.43_05
+Version 3.43_06
 
 =cut
 
-our $VERSION = '3.43_05';
+our $VERSION = '3.43_06';
 
 =head1 SYNOPSIS
 
