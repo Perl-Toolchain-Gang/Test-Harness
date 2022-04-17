@@ -58,11 +58,11 @@ TAP::Formatter::Base - Base class for harness output delegates
 
 =head1 VERSION
 
-Version 3.43_06
+Version 3.44
 
 =cut
 
-our $VERSION = '3.43_06';
+our $VERSION = '3.44';
 
 =head1 DESCRIPTION
 

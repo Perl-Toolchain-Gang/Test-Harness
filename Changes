@@ -1,5 +1,8 @@
 Revision history for Test-Harness
 
+3.44     17-04-2022
+        - Release 3.43_06 as non-dev
+
 3.43_06  11-04-2022
         - Fix skipping SEGV test
 
