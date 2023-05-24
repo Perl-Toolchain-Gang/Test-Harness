@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Avoid using Errno::EINTR directly for platforms without it
+
 3.45_01  28-04-2023
         - Color the "ok"s as well.
         - Skip symlink tests on msys2
