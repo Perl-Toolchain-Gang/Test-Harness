@@ -43,3 +43,4 @@
 ^Session\.vim$
 ^MYMETA.yml$
 ^packaging/
+^.github/
