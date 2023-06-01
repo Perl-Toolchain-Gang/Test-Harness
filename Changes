@@ -1,5 +1,6 @@
 Revision history for Test-Harness
 
+3.45_02  2023-06-01
         - Avoid using Errno::EINTR directly for platforms without it
 
 3.45_01  28-04-2023

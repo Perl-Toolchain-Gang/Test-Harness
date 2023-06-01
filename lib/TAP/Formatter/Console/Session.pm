@@ -26,11 +26,11 @@ TAP::Formatter::Console::Session - Harness output delegate for default console o
 
 =head1 VERSION
 
-Version 3.45_01
+Version 3.45_02
 
 =cut
 
-our $VERSION = '3.45_01';
+our $VERSION = '3.45_02';
 
 =head1 DESCRIPTION
 

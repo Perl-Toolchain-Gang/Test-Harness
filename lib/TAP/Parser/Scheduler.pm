@@ -13,11 +13,11 @@ TAP::Parser::Scheduler - Schedule tests during parallel testing
 
 =head1 VERSION
 
-Version 3.45_01
+Version 3.45_02
 
 =cut
 
-our $VERSION = '3.45_01';
+our $VERSION = '3.45_02';
 
 =head1 SYNOPSIS
 
