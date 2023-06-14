@@ -535,6 +535,10 @@ for my $test_args ( get_arg_sets() ) {
     SKIP: {
         skip "No SIGSEGV on $^O", 1 if $^O eq 'MSWin32' or $Config::Config{'sig_name'} !~ m/SEGV/;
 
+        # some people -Dcc="somecc -fsanitize=..." or -Doptimize="-fsanitize=..."
+        skip "ASAN doesn't passthrough SEGV", 1
+          if "$Config{cc} $Config{ccflags} $Config{optimize}" =~ /-fsanitize\b/;
+
         @output = ();
         _runtests( $harness_failures, "$sample_tests/segfault" );
 
