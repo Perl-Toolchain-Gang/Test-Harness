@@ -1,5 +1,13 @@
 Revision history for Test-Harness
 
+3.46  2023-07-30
+        - Color the "ok"s as well.
+        - Skip symlink tests on msys2
+        - Use use absolute path for executable tests
+        - Space-quote executable if has spaces
+        - Avoid using Errno::EINTR directly for platforms without it
+        - stop calling import on App::Prove plugins
+
 3.45_02  2023-06-01
         - Avoid using Errno::EINTR directly for platforms without it
 
