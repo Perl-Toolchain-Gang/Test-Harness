@@ -57,7 +57,7 @@ sub create {
 	my $package = shift;
     my %input = %{ shift || {} };
 
-    my @libs         = @{ delete $input{libs}     || [] };
+    my @libs         = @{ delete $input{lib}      || [] };
     my @raw_switches = @{ delete $input{switches} || [] };
     my @opt
       = ( @raw_switches, shellwords( $ENV{HARNESS_PERL_SWITCHES} || '' ) );
