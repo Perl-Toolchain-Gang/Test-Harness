@@ -134,7 +134,7 @@ sub _iter {
         until (@ready) {
             return unless $sel->count;
             @ready = $sel->can_read;
-            last if @ready || $!{EINTR};
+            last if @ready || !$!{EINTR};
         }
 
         my ( $h, $parser, $stash, @handles ) = @{ shift @ready };

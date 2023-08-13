@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Add missing negation in EINTR check
+
 3.46  2023-07-30
         - Color the "ok"s as well.
         - Skip symlink tests on msys2
