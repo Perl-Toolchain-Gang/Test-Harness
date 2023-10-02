@@ -34,7 +34,7 @@ Version 3.47
 our $VERSION = '3.47';
 
 my $DEFAULT_TAP_VERSION = 12;
-my $MAX_TAP_VERSION     = 13;
+my $MAX_TAP_VERSION     = 14;
 
 $ENV{TAP_VERSION} = $MAX_TAP_VERSION;
 
