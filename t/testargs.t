@@ -23,7 +23,7 @@ my $test = File::Spec->catfile(
 
 my @test = ( [ perl => $test ], make_shell_test($test) );
 
-plan tests => @test * 8 + 5;
+plan tests => @test * 8 + 6;
 
 sub echo_ok {
     my ( $type, $options ) = ( shift, shift );
@@ -105,6 +105,16 @@ package main;
     my $log = $app->get_run_log;
     is_deeply $log->[0]->[0]->{test_args}, [ 'one', 'two', 'huh' ],
       "prove args match";
+}
+
+{
+    my $app = Test::Prove->new;
+
+    $app->process_args( '--norc', $test, '::', 'one', 'two', 'huh', '--rc' );
+    $app->run();
+    my $log = $app->get_run_log;
+    is_deeply $log->[0]->[0]->{test_args}, [ 'one', 'two', 'huh', '--rc' ],
+      "should not extract  --rc from test arguments";
 }
 
 sub bigness {
