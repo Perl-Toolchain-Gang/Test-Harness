@@ -1,0 +1,29 @@
+name: smoke-perltester
+
+on:
+  push:
+    branches:
+      - "*"
+    tags-ignore:
+      - "*"
+  pull_request:
+
+  # allow to trigger workflow manually
+  workflow_dispatch:
+
+  # once a month check if still runs (newer dependencies - perl, libraries, actions, ...)
+  schedule:
+    - cron: 0 0 1 * *
+
+env:
+  PERL_USE_UNSAFE_INC: 0
+  AUTHOR_TESTING: 1
+  AUTOMATED_TESTING: 1
+  RELEASE_TESTING: 1
+
+jobs:
+  simple-perltester-workflow:
+    uses: perl-actions/github-workflows/.github/workflows/simple-perltester-workflow.yml@main
+    with:
+      since-perl: 5.8
+
