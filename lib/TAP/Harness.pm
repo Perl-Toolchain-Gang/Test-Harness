@@ -558,8 +558,8 @@ sub runtests {
         my $bailout;
         eval { $self->aggregate_tests( $aggregate, @tests ); 1 }
             or do { $bailout = $@ || 'unknown_error' };
-        $finish->();
         die $bailout if defined $bailout;
+        $finish->();
     };
     $self->{bail_summary} = sub{
         print "\n";
