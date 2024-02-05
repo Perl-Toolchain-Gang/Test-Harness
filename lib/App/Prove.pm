@@ -151,7 +151,21 @@ sub process_args {
     my $self = shift;
 
     my @rc = RC_FILE;
-    unshift @rc, glob '~/' . RC_FILE if IS_UNIXY;
+
+    # look for the RC file in various locations:
+    # $ENV{USERPROFILE} for Windows
+    # ~ for Unix(ish)
+    # $ENV{HOME}
+    # $ENV{XDG_CONFIG_HOME}
+    unshift @rc,  grep { -f $_ }
+                  map  { "$_/" . RC_FILE }
+                  grep { defined && -d }
+                  (
+                   $ENV{XDG_CONFIG_HOME},
+                   $ENV{HOME},
+                   IS_WIN32 ? $ENV{USERPROFILE} : undef,
+                   IS_UNIXY ? '~' : undef,
+                  );
 
     # Preprocess meta-args.
     my @args;
