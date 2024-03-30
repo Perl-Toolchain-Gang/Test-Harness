@@ -92,7 +92,8 @@ sub can_handle {
     return 0.8 if $file->{lc_ext} eq '.t';    # vote higher than Executable
     return 0.9 if $file->{lc_ext} eq '.pl';
 
-    return 0.75 if $file->{dir} =~ /^t\b/;    # vote higher than Executable
+    my @dirs = File::Spec->splitdir($file->{dir});
+    return 0.75 if scalar(@dirs) && $dirs[0] eq 't';    # vote higher than Executable
 
     # backwards compat, always vote:
     return 0.25;
