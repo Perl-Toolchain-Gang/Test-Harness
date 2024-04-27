@@ -149,7 +149,6 @@ sub runtests {
 
     # Don't propagate to our children
     local $ENV{HARNESS_OPTIONS};
-    _apply_extra_INC($harness);
     my $aggregate = $harness->runtests(@tests);
 
     my $total  = $aggregate->total;
@@ -199,8 +198,7 @@ sub _new_harness {
         }
     }
 
-    # Do things the old way on VMS...
-    push @lib, _filtered_inc() if IS_VMS;
+    push @lib, _filtered_inc();
 
     # If $Verbose isn't numeric default to 1. This helps core.
     my $verbosity = ( $Verbose ? ( $Verbose !~ /\d/ ) ? 1 : $Verbose : 0 );
