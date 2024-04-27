@@ -1,5 +1,10 @@
 Revision history for Test-Harness
 
+3.49_01 2024-04-27
+        - Simplify runtests
+        - Tidy up core dump file
+        - Simplify injecting of @INC paths
+
 3.48 2023-10-02
         - Accept TAP version 14
 
