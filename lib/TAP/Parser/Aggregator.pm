@@ -181,6 +181,17 @@ sub _get_parsers {
     return wantarray ? @parsers : \@parsers;
 }
 
+sub total_files {
+    my $self = shift;
+    return scalar $self->parsers;
+}
+
+sub failed_files {
+    my $self = shift;
+    my $num_bad = grep { $_->has_problems } $self->parsers;
+    return $num_bad;
+}
+
 =head3 C<descriptions>
 
 Get an array of descriptions in the order in which they were added to
