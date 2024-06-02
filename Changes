@@ -5,14 +5,14 @@ Revision history for Test-Harness
         - Tidy up core dump file
         - Simplify injecting of @INC paths
 
-3.48 2023-10-02
+3.48    2023-10-02
         - Accept TAP version 14
 
-3.47 2023-08-13
+3.47    2023-08-13
         - Add missing negation in EINTR check
         - Fix HARNESS_PERL_SWITCHES=-I handling in TAP::Harness::Env
 
-3.46  2023-07-30
+3.46    2023-07-30
         - Color the "ok"s as well.
         - Skip symlink tests on msys2
         - Use use absolute path for executable tests
@@ -20,44 +20,44 @@ Revision history for Test-Harness
         - Avoid using Errno::EINTR directly for platforms without it
         - stop calling import on App::Prove plugins
 
-3.45_02  2023-06-01
+3.45_02 2023-06-01
         - Avoid using Errno::EINTR directly for platforms without it
 
-3.45_01  28-04-2023
+3.45_01 2023-04-28
         - Color the "ok"s as well.
         - Skip symlink tests on msys2
         - Use use absolute path for executable tests
         - Space-quote executable if has spaces
 
-3.44     17-04-2022
+3.44    2022-04-17
         - Release 3.43_06 as non-dev
 
-3.43_06  11-04-2022
+3.43_06 2022-04-11
         - Fix skipping SEGV test
 
-3.43_05  07-04-2022
+3.43_05 2022-04-07
         - Fix failing SEGV test on Windows
 
-3.43_04 22-01-2022
+3.43_04 2022-01-22
         - Remove ASCII-isms to better work on EBCDIC
 
-3.43_03 30-07-2021
+3.43_03 2021-07-30
         - Move timer initialization
         - Fix YAMLish behaviour with empty values
         - fix eintr error handling in TAP::Parser::Multiplexer
         - Parse out signal name & core dump.
 
-3.43_02 25-03-2020
+3.43_02 2020-03-25
         - Let the aggregator finish gracefully after bailout
         - Make prove respect HARNESS_VERBOSE if no verbosity flags are passed
 
-3.42    19-03-2018
+3.42    2018-03-19
         - Enable rulesfile.t to run in core
 
-3.41    27-02-2018
+3.41    2018-02-27
         - Released 3.40_01 without code modifications
 
-3.40_01 23-07-2017
+3.40_01 2017-07-23
         - Return handle for pipes and sockets #58 (Erik Huelsmann)
         - TAP v13 plan allows trailing whitespace (Steffen Schwigon)
         - prove: add a --statefile=<path> option to customize the .prove file
@@ -68,17 +68,17 @@ Revision history for Test-Harness
         - Fix file source handler to accept single extensions option (Tomoki Aonuma)
         - Spelling fixes (Brian Wightman)
 
-3.39    06-04-2017
+3.39    2017-04-06
         - Make tests pass when PERL_USE_UNSAFE_INC=0
 
-3.38    13-03-2017
+3.38    2017-03-13
         - Released 3.37_01 without changes
 
-3.37_01
+3.37_01 2017-01-31
         - Set PERL_USE_UNSAFE_INC when running tests using Test::Harness (Leon Timmermans)
         - Avoid loading optional modules from . in prove
 
-3.36    30-12-2015
+3.36    2015-12-30
         - Accept YAML with trailing whitespace in header (Maik Hentsche)
         - Stop bundling Test::More for testing
 
