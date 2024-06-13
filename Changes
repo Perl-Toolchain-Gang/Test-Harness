@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+        - Prevent double summary on bail-out
+
 3.49_01 2024-04-27
         - Simplify runtests
         - Tidy up core dump file
