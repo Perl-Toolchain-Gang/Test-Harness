@@ -609,7 +609,7 @@ sub _bailout {
     $job->finish;
 
     my $explanation = $result->explanation;
-    $self->{bail_summary}();
+    $self->{bail_summary}() if $self->{bail_summary};
     die "FAILED--Further testing stopped"
       . ( $explanation ? ": $explanation\n" : ".\n" );
 }

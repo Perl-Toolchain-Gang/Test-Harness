@@ -1,6 +1,7 @@
 Revision history for Test-Harness
 
         - Prevent double summary on bail-out
+        - Prevent bail_out summary when no handler for it is defined
 
 3.49_01 2024-04-27
         - Simplify runtests
