@@ -1,5 +1,13 @@
 Revision history for Test-Harness
 
+3.50    2024-08-13
+        - Simplify runtests for easier extension
+        - Prevent double summary on bail-out
+        - Prevent bail_out summary when no handler for it is defined
+        - Tidy up core dump file
+        - Simplify injecting of @INC paths
+        - Better check for t/ directory in Perl handler
+
 3.49_02 2024-06-13
         - Prevent double summary on bail-out
         - Prevent bail_out summary when no handler for it is defined
