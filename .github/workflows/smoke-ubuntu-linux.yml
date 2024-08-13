@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v1
       - name: perl -V
         run: perl -V
       - name: Makefile.PL
@@ -62,7 +62,7 @@ jobs:
       image: perl:${{ matrix.perl-version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v1
       - name: perl -V
         run: perl -V
       - name: Makefile.PL
