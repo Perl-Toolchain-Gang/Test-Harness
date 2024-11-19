@@ -75,7 +75,7 @@ BEGIN {    # START PLAN
     @ATTR = qw(
       archive argv blib color directives exec extensions failures
       formatter harness includes lib merge parse quiet really_quiet
-      recurse backwards shuffle taint_fail taint_warn verbose
+      recurse stdin backwards shuffle taint_fail taint_warn verbose
       warnings_fail warnings_warn
     );
 
@@ -107,8 +107,9 @@ BEGIN {    # START PLAN
         },
         {   name => 'Set all options via constructor',
             args => {
-                archive       => 1,
+                archive       => 0,
                 argv          => [qw(one two three)],
+                backwards     => 1,
                 blib          => 2,
                 color         => 3,
                 directives    => 4,
@@ -123,8 +124,8 @@ BEGIN {    # START PLAN
                 quiet         => 14,
                 really_quiet  => 15,
                 recurse       => 16,
-                backwards     => 17,
-                shuffle       => 18,
+                shuffle       => 17,
+                stdin         => 18,
                 taint_fail    => 19,
                 taint_warn    => 20,
                 verbose       => 21,
@@ -132,8 +133,9 @@ BEGIN {    # START PLAN
                 warnings_warn => 23,
             },
             expect => {
-                archive       => 1,
+                archive       => 0,
                 argv          => [qw(one two three)],
+                backwards     => 1,
                 blib          => 2,
                 color         => 3,
                 directives    => 4,
@@ -148,8 +150,8 @@ BEGIN {    # START PLAN
                 quiet         => 14,
                 really_quiet  => 15,
                 recurse       => 16,
-                backwards     => 17,
-                shuffle       => 18,
+                shuffle       => 17,
+                stdin         => 18,
                 taint_fail    => 19,
                 taint_warn    => 20,
                 verbose       => 21,
@@ -1395,6 +1397,140 @@ BEGIN {    # START PLAN
         #     ],
         # },
 
+
+        # STDIN
+        {   name => 'STDIN (file names)',
+            stdin => "uno\ndos\ntres\n",
+            args => {
+                argv => ['-'],
+            },
+            expect => {
+                argv => ['-'],
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    'uno', 'dos', 'tres'
+                ]
+            ],
+        },
+        (map +{
+            name => "STDIN (file - $_)",
+            stdin => "$_\ndos\ntres\n",
+            args => {
+                argv => ['-'],
+            },
+            expect => {
+                argv => ['-'],
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    $_, 'dos', 'tres',
+                ]
+            ],
+        } => split /\n/, <<'FILES'
+1..2.t
+1..2a
+ok.t
+okay
+OK
+not ok.t
+not oklahoma
+NOT OK
+FILES
+        ),
+        (map +{
+            name => "STDIN (TAP - $_)",
+            stdin => "\n$_\n",
+            args => {
+                argv => ['-'],
+            },
+            expect => {
+                argv => ['-'],
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    ["\n$_\n", '*STDIN'],
+                ]
+            ],
+        } => split /\n/, <<'TAP'
+1..42
+1..4 # Skipped: Win32 not supported
+ok
+ok 2
+not ok
+not ok 3
+# comment
+    1..4
+    1..4 # Skipped: Win32 not supported
+    ok
+    ok 2
+    not ok
+    not ok 3
+    # comment
+TAP
+        ),
+        {
+            name => "STDIN (TAP - TAP version 13)",
+            stdin => "TAP version 13\n",
+            args => {
+                argv => ['-'],
+            },
+            expect => {
+                argv => ['-'],
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    ["TAP version 13\n", '*STDIN'],
+                ]
+            ],
+        },
+        (map +{
+            name => 'Switch --stdin=list',
+            stdin => $_,
+            switches => [ '--stdin=list', '-' ],
+            expect => {
+                stdin => 'list',
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    split /\n/
+                ]
+            ],
+        } => <<'NOT_TAP'
+TAP version 13
+1..4
+# comment
+ok 1
+ok 2
+not ok 3
+not ok 4
+NOT_TAP
+        ),
+        (map +{
+            name => 'Switch --stdin=tap',
+            stdin => $_,
+            switches => [ '--stdin=tap', '-' ],
+            expect => {
+                stdin => 'tap',
+            },
+            runlog => [
+                [   '_runtests',
+                    { verbosity => 0, show_count => 1 },
+                    [$_, '*STDIN'],
+                ]
+            ],
+        } => <<'NOT_LIST'
+alpha.t
+beta.t
+charlie.t
+NOT_LIST
+        ),
+
     );
 
     # END SCHEDULE
@@ -1473,6 +1609,9 @@ for my $test (@SCHEDULE) {
         }
 
         if ( my $runlog = $test->{runlog} ) {
+            local *STDIN;
+            open STDIN, '<', \$test->{stdin} or die "No open STDIN: $!"
+                if $test->{stdin};
             eval { $app->run };
             if ( my $err_pattern = $test->{run_error} ) {
                 like $@, $err_pattern, "$name: expected error OK";

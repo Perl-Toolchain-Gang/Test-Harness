@@ -55,7 +55,7 @@ BEGIN {
     @ATTR = qw(
       archive argv blib show_count color directives exec failures comments
       formatter harness includes modules plugins jobs lib merge parse quiet
-      really_quiet recurse backwards shuffle taint_fail taint_warn timer
+      really_quiet recurse stdin backwards shuffle taint_fail taint_warn timer
       verbose warnings_fail warnings_warn show_help show_man show_version
       state_class test_args state dry extensions ignore_exit rules state_manager
       normalize sources tapversion trap
@@ -220,6 +220,7 @@ sub process_args {
             'source=s@'    => $self->{sources},
             'formatter=s'  => \$self->{formatter},
             'r|recurse'    => \$self->{recurse},
+            'stdin=s'      => \$self->{stdin},
             'reverse'      => \$self->{backwards},
             'p|parse'      => \$self->{parse},
             'q|quiet'      => \$self->{quiet},
@@ -518,7 +519,7 @@ sub _get_tests {
         $state->apply_switch(@$state_switch);
     }
 
-    my @tests = $state->get_tests( $self->recurse, @{ $self->argv } );
+    my @tests = $state->get_tests( $self, @{ $self->argv } );
 
     $self->_shuffle(@tests) if $self->shuffle;
     @tests = reverse @tests if $self->backwards;
@@ -721,6 +722,8 @@ calling C<run>.
 =item C<state>
 
 =item C<state_class>
+
+=item C<stdin>
 
 =item C<taint_fail>
 

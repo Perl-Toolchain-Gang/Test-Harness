@@ -75,6 +75,7 @@ Options that take arguments:
       --statefile=file  Use `file` instead of `.prove` for state
       --rc=rcfile       Process options from rcfile
       --rules           Rules for parallel vs sequential processing.
+      --stdin=list|tap  STDIN is list of tests or raw TAP output.
 
 =head1 NOTES
 
@@ -102,6 +103,24 @@ file, you can add them to your tests by using a '-':
  prove - < my_list_of_things_to_test.txt
 
 See the C<README> in the C<examples> directory of this distribution.
+
+If you have raw TAP output in a file, you can likewise add them to
+your tests by using a '-':
+
+ prove - < my_raw_tap_output.txt
+
+Or from a command:
+
+ ruby test.rb | prove -
+
+Use the C<--stdin> switch to explicitly set C<STDIN> to a list of
+tests:
+
+ prove --stdin=list - < my_list_of_things_to_test.txt
+
+Or raw TAP output:
+
+ ruby test.rb | prove --stdin=tap -
 
 =head2 Default Test Directory
 
