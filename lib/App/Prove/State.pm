@@ -448,9 +448,9 @@ sub observe_test {
     my $fail = scalar( $parser->failed ) + ( $parser->has_problems ? 1 : 0 );
     my $todo = scalar( $parser->todo );
     my $start_time = $parser->start_time;
-    my $end_time   = $parser->end_time,
+    my $end_time   = $parser->end_time;
 
-      my $test = $self->results->test($name);
+	my $test = $self->results->test($name);
 
     $test->sequence( $self->{seq}++ );
     $test->generation( $self->results->generation );

@@ -136,6 +136,16 @@ sub add_rc_file {
     close RC;
 }
 
+sub _extract_test_arguments {
+    my ($self, $args) = @_;
+
+    if ( defined( my $stop_at = _first_pos( '::', @$args ) ) ) {
+        my @test_args = splice @$args, $stop_at;
+        shift @test_args;
+        $self->{test_args} = \@test_args;
+    }
+}
+
 =head3 C<process_args>
 
     $prove->process_args(@args);
@@ -152,6 +162,10 @@ sub process_args {
 
     my @rc = RC_FILE;
     unshift @rc, glob '~/' . RC_FILE if IS_UNIXY;
+
+    # Everything after the arisdottle '::' gets passed as args to
+    # test programs - even their own --rc/--norc
+    $self->_extract_test_arguments( \@_ );
 
     # Preprocess meta-args.
     my @args;
@@ -170,14 +184,6 @@ sub process_args {
         else {
             push @args, $arg;
         }
-    }
-
-    # Everything after the arisdottle '::' gets passed as args to
-    # test programs.
-    if ( defined( my $stop_at = _first_pos( '::', @args ) ) ) {
-        my @test_args = splice @args, $stop_at;
-        shift @test_args;
-        $self->{test_args} = \@test_args;
     }
 
     # Grab options from RC files
