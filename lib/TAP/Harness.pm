@@ -494,7 +494,7 @@ Any keys for which the value is C<undef> will be ignored.
                warn "CPAN::Meta::YAML required to process $rulesfile" ;
                return;
             }
-            my $layer = $] lt "5.008" ? "" : ":encoding(UTF-8)";
+            my $layer = "$]" < "5.008" ? "" : ":encoding(UTF-8)";
             open my $fh, "<$layer", $rulesfile
                 or die "Couldn't open $rulesfile: $!";
             my $yaml_text = do { local $/; <$fh> };
