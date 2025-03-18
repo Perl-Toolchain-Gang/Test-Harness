@@ -3,7 +3,8 @@ package TAP::Harness::Env;
 use strict;
 use warnings;
 
-use constant IS_VMS => ( $^O eq 'VMS' );
+use TAP::Harness::Runtime qw (IS_VMS);
+
 use TAP::Object;
 use Text::ParseWords qw/shellwords/;
 

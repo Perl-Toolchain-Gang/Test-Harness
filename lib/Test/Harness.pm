@@ -5,10 +5,8 @@ use 5.006;
 use strict;
 use warnings;
 
-use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
-use constant IS_VMS => ( $^O eq 'VMS' );
-
 use TAP::Harness                     ();
+use TAP::Harness::Runtime            qw (HAS_TIME_HIRES IS_WIN32 IS_VMS);
 use TAP::Parser::Aggregator          ();
 use TAP::Parser::Source              ();
 use TAP::Parser::SourceHandler::Perl ();
@@ -20,10 +18,7 @@ use base 'Exporter';
 
 # $ML $Last_ML_Print
 
-BEGIN {
-    eval q{use Time::HiRes 'time'};
-    our $has_time_hires = !$@;
-}
+our $has_time_hires = HAS_TIME_HIRES;
 
 =head1 NAME
 

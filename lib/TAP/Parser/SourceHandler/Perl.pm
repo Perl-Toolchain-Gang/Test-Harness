@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use Config;
 
-use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
-use constant IS_VMS => ( $^O eq 'VMS' );
+use TAP::Harness::Runtime qw (IS_VMS IS_WIN32);
 
 use TAP::Parser::IteratorFactory           ();
 use TAP::Parser::Iterator::Process         ();

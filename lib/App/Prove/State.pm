@@ -10,13 +10,14 @@ use Carp;
 use App::Prove::State::Result;
 use TAP::Parser::YAMLish::Reader ();
 use TAP::Parser::YAMLish::Writer ();
+use TAP::Harness::Runtime qw (IS_WIN32);
+
 use base 'TAP::Base';
 
 BEGIN {
     __PACKAGE__->mk_methods('result_class');
 }
 
-use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
 use constant NEED_GLOB => IS_WIN32;
 
 =head1 NAME

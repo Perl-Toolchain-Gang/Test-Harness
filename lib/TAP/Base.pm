@@ -5,6 +5,8 @@ use warnings;
 
 use base 'TAP::Object';
 
+use TAP::Harness::Runtime qw (time HAS_TIME_HIRES);
+
 =head1 NAME
 
 TAP::Base - Base class that provides common functionality to L<TAP::Parser>
@@ -18,10 +20,7 @@ Version 3.51_01
 
 our $VERSION = '3.51_01';
 
-use constant GOT_TIME_HIRES => do {
-    eval 'use Time::HiRes qw(time);';
-    $@ ? 0 : 1;
-};
+use constant GOT_TIME_HIRES => HAS_TIME_HIRES;
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ use IO::Handle;
 
 use base 'TAP::Parser::Iterator';
 
-use constant IS_WIN32 => !!( $^O =~ /^(MS)?Win32$/ );
+use TAP::Harness::Runtime qw (IS_WIN32);
 
 =head1 NAME
 

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use TAP::Harness::Env;
+use TAP::Harness::Runtime qw (IS_UNIXY IS_VMS IS_WIN32);
 use Text::ParseWords qw(shellwords);
 use File::Spec;
 use Getopt::Long;
@@ -39,10 +40,6 @@ wrapper around an instance of this module.
     $app->run;
 
 =cut
-
-use constant IS_WIN32 => ( $^O =~ /^(MS)?Win32$/ );
-use constant IS_VMS => $^O eq 'VMS';
-use constant IS_UNIXY => !( IS_VMS || IS_WIN32 );
 
 use constant STATE_FILE => IS_UNIXY ? '.prove'   : '_prove';
 use constant RC_FILE    => IS_UNIXY ? '.proverc' : '_proverc';

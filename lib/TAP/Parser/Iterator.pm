@@ -5,6 +5,8 @@ use warnings;
 
 use base 'TAP::Object';
 
+use TAP::Harness::Runtime qw (IS_VMS);
+
 =head1 NAME
 
 TAP::Parser::Iterator - Base class for TAP source iterators
@@ -61,7 +63,7 @@ Iterate raw input without applying any fixes for quirky input syntax.
 
 =cut
 
-if ( $^O eq 'VMS' ) {
+if (IS_VMS) {
     eval <<'END' ;
 sub next {
     my $self = shift;
