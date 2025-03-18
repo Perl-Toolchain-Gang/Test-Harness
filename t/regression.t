@@ -7,6 +7,8 @@ BEGIN {
 use strict;
 use warnings;
 
+use TAP::Harness::Runtime qw (IS_VMS IS_WIN32);
+
 use Test::More 'no_plan';
 
 use File::Spec;
@@ -20,8 +22,8 @@ use constant NOT_ZERO => "__NOT_ZERO__";
 
 use TAP::Parser;
 
-my $IsVMS          = $^O eq 'VMS';
-my $IsWin32        = $^O eq 'MSWin32';
+my $IsVMS          = IS_VMS;
+my $IsWin32        = IS_WIN32;
 my $NoTaintSupport = exists($Config{taint_support}) && !$Config{taint_support};
 
 my $SAMPLE_TESTS = File::Spec->catdir(

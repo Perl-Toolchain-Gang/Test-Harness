@@ -8,6 +8,8 @@ use warnings;
 use lib 't/lib';
 use Config;
 
+use TAP::Harness::Runtime qw (IS_VMS);
+
 local
   $ENV{PERL5OPT};   # avoid any user-provided PERL5OPT from contaminating @INC
 
@@ -22,7 +24,7 @@ sub has_crazy_patch {
 }
 
 use Test::More (
-      $^O eq 'VMS' ? ( skip_all => 'VMS' )
+      IS_VMS ? ( skip_all => 'VMS' )
     : has_crazy_patch() ? ( skip_all => 'Incompatible @INC patch' )
     : exists $ENV{HARNESS_PERL_SWITCHES}
     ? ( skip_all => 'Someone messed with HARNESS_PERL_SWITCHES' )

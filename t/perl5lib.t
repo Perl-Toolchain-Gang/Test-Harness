@@ -8,6 +8,8 @@ use warnings;
 use lib 't/lib';
 use Config;
 
+use TAP::Harness::Runtime qw (IS_VMS);
+
 my $path_sep = $Config{path_sep};
 
 sub has_crazy_patch {
@@ -21,7 +23,7 @@ sub has_crazy_patch {
 }
 
 use Test::More (
-      $^O eq 'VMS' ? ( skip_all => 'VMS' )
+      IS_VMS ? ( skip_all => 'VMS' )
     : has_crazy_patch() ? ( skip_all => 'Incompatible @INC patch' )
     : ( tests => 1 )
 );

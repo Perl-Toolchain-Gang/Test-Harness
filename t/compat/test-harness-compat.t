@@ -10,6 +10,8 @@ use Config;
 
 # use lib 't/lib';
 
+use TAP::Harness::Runtime qw (IS_VMS);
+
 use Test::More;
 use File::Spec;
 use Test::Harness qw(execute_tests);
@@ -150,7 +152,7 @@ if ($NoTaintSupport) {
                     'name'   => "$TEST_DIR/too_many",
                     'wstat'  => '1024'
                 },
-                ( $^O eq 'VMS' ?
+                ( IS_VMS ?
                     ("$TEST_DIR/vms_nit" => {
                        'canon'  => 1,
                        'estat'  => '',
@@ -173,12 +175,12 @@ if ($NoTaintSupport) {
                 }
             },
             'totals' => {
-                'bad'         => ($NoTaintSupport ? 11 : 12)-($^O eq 'VMS' ? 0 : 1),
+                'bad'         => ($NoTaintSupport ? 11 : 12)-(IS_VMS ? 0 : 1),
                 'bonus'       => 1,
                 'files'       => ($NoTaintSupport ? 24 : 27),
-                'good'        => ($NoTaintSupport ? 13 : 15)+($^O eq 'VMS' ? 0 : 1),
+                'good'        => ($NoTaintSupport ? 13 : 15)+(IS_VMS ? 0 : 1),
                 'max'         => ($NoTaintSupport ? 72 : 76),
-                'ok'          => ($NoTaintSupport ? 75 : 78)+($^O eq 'VMS' ? 0 : 1),
+                'ok'          => ($NoTaintSupport ? 75 : 78)+(IS_VMS ? 0 : 1),
                 'skipped'     => 2,
                 'sub_skipped' => 2,
                 'tests'       => ($NoTaintSupport ? 24 : 27),
@@ -742,7 +744,7 @@ if ($NoTaintSupport) {
                 'todo'        => 0
             }
         },
-        ( $^O eq 'VMS' ?
+        ( IS_VMS ?
             ('vms_nit' => {
                 'failed' => {
                     "$TEST_DIR/vms_nit" => {
@@ -797,7 +799,7 @@ if ($NoTaintSupport) {
 
     sub vague_status {
         my $hash = shift;
-        return $hash unless $^O eq 'VMS';
+        return $hash unless IS_VMS;
 
         while ( my ( $file, $want ) = each %$hash ) {
             for (qw( estat wstat )) {

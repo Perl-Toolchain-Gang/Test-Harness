@@ -10,8 +10,9 @@ BEGIN {
     $hires = eval 'use Time::HiRes qw(sleep); 1';
 }
 
+use TAP::Harness::Runtime qw (IS_VMS);
 use Test::More (
-      $^O eq 'VMS' ? ( skip_all => 'VMS' )
+      IS_VMS ? ( skip_all => 'VMS' )
     : $hires ? ( tests => 9 * 3 )
     : ( skip_all => 'Need Time::HiRes' )
 );

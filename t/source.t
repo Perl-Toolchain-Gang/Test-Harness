@@ -7,6 +7,7 @@ BEGIN {
 use strict;
 use warnings;
 
+use TAP::Harness::Runtime qw (IS_VMS);
 use Test::More tests => 45;
 use File::Spec;
 
@@ -235,7 +236,7 @@ sub ct($) {
 # symlink test
 SKIP: {
     my $symlink_exists = eval { symlink( '', '' ); 1 };
-    $symlink_exists = 0 if $^O eq 'VMS'; # exists but not ready for prime time
+    $symlink_exists = 0 if IS_VMS; # exists but not ready for prime time
     $symlink_exists = 0 if $^O eq 'msys'; # exists but not ready for prime time
     skip 'symlink not supported on this platform', 9 unless $symlink_exists;
 

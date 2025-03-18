@@ -2,8 +2,10 @@
 
 use strict;
 use warnings;
+
+use TAP::Harness::Runtime qw (IS_VMS);
 use Test::More (
-    $^O eq 'VMS'
+    IS_VMS
     ? ( skip_all => 'VMS' )
     : ( tests => 4 )
 );

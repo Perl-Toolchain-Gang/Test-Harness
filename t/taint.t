@@ -8,7 +8,9 @@ BEGIN {
 
 use strict;
 use warnings;
-use Test::More ( $^O eq 'VMS' ? ( skip_all => 'VMS' ) : ( tests => 2 ) );
+
+use TAP::Harness::Runtime qw (IS_VMS);
+use Test::More ( IS_VMS ? ( skip_all => 'VMS' ) : ( tests => 2 ) );
 
 use Config;
 use TAP::Parser;

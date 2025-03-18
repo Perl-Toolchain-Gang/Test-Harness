@@ -16,8 +16,9 @@ use File::Spec;
 
 use TAP::Parser::Source;
 use TAP::Parser::SourceHandler;
+use TAP::Harness::Runtime qw (IS_WIN32);
 
-my $IS_WIN32 = ( $^O =~ /^(MS)?Win32$/ );
+my $IS_WIN32 = IS_WIN32;
 my $HAS_SH   = -x '/bin/sh';
 my $HAS_ECHO = -x '/bin/echo';
 
