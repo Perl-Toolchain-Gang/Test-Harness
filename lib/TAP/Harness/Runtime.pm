@@ -5,7 +5,7 @@ use warnings;
 
 use base q (Exporter);
 
-use constant HAS_TIME_HIRES => !! eval { use Time::HiRes qw (time); 1 };
+use constant HAS_TIME_HIRES => !! eval q { use Time::HiRes qw (time); 1 };
 use constant IS_VMS         => $^O eq q (VMS);
 use constant IS_WIN32       => ($^O =~ qr (^ (MS) Win32 $)x);
 use constant IS_UNIXY       => ! (IS_VMS || IS_WIN32);
