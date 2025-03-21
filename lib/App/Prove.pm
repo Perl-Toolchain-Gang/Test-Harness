@@ -372,13 +372,13 @@ sub _get_args {
         my @rules;
         for ( @{ $self->rules } ) {
             if (/^par=(.*)/) {
-                push @rules, $1;
+                push @rules, { par => $1 };
             }
             elsif (/^seq=(.*)/) {
                 push @rules, { seq => $1 };
             }
         }
-        $args{rules} = { par => [@rules] };
+        $args{rules} = { seq => [@rules] };
     }
     $args{harness_class} = $self->{harness_class} if $self->{harness_class};
 
