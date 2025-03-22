@@ -18,10 +18,7 @@ Version 3.51_01
 
 our $VERSION = '3.51_01';
 
-use constant GOT_TIME_HIRES => do {
-    eval 'use Time::HiRes qw(time);';
-    $@ ? 0 : 1;
-};
+use Time::HiRes qw(time);
 
 =head1 SYNOPSIS
 
@@ -107,19 +104,14 @@ sub _make_callback {
 
 =head3 C<get_time>
 
-Return the current time using Time::HiRes if available.
+Return the current time.
 
 =cut
 
 sub get_time { return time() }
 
-=head3 C<time_is_hires>
-
-Return true if the time returned by get_time is high resolution (i.e. if Time::HiRes is available).
-
-=cut
-
-sub time_is_hires { return GOT_TIME_HIRES }
+# kept for backwards compatability
+sub time_is_hires { return 1 }
 
 =head3 C<get_times>
 

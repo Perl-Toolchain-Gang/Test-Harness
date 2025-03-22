@@ -156,8 +156,7 @@ Set the verbosity level:
 
 =item * C<timer>
 
-Append run time for each test to output. Uses L<Time::HiRes> if
-available.
+Append run time for each test to output.
 
 =item * C<failures>
 

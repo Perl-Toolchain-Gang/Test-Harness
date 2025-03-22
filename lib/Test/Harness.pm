@@ -14,16 +14,14 @@ use TAP::Parser::Source              ();
 use TAP::Parser::SourceHandler::Perl ();
 
 use Text::ParseWords qw(shellwords);
+use Time::HiRes 'time';
 
 use Config;
 use base 'Exporter';
 
 # $ML $Last_ML_Print
 
-BEGIN {
-    eval q{use Time::HiRes 'time'};
-    our $has_time_hires = !$@;
-}
+our $has_time_hires = 1;
 
 =head1 NAME
 
