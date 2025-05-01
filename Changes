@@ -1,5 +1,7 @@
 Revision history for Test-Harness
 
+3.52    2025-05-03
+
 3.51_01 2025-01-17
         - Supports additional indicators on block scalars in YAML
         - fix string comparisons with $] to use numeric comparison instead
