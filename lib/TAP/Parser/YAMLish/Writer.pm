@@ -16,7 +16,9 @@ my $ESCAPE_CHAR = qr{ [ [:cntrl:] \" ] }x;
 my $ESCAPE_KEY  = qr{ (?: ^\W ) | $ESCAPE_CHAR }x;
 
 my @UNPRINTABLE;
-$UNPRINTABLE[$_] = sprintf("x%02x", from_native($_)) for 0 .. ord(" ") - 1;
+my $outlier_control = "\c?";
+$UNPRINTABLE[ ord $outlier_control ] = $outlier_control;
+$UNPRINTABLE[$_] = sprintf("x%02x", $_) for 0 .. ord(" ") - 1;
 $UNPRINTABLE[ord "\0"] = 'z';
 $UNPRINTABLE[ord "\a"] = 'a';
 $UNPRINTABLE[ord "\t"] = 't';
