@@ -403,7 +403,7 @@ sub _find_module {
 }
 
 sub _load_extension {
-    my ( $self, $name, @search ) = @_;
+    my ( $self, $cb, $name, @search ) = @_;
 
     my @args = ();
     if ( $name =~ /^(.*?)=(.*)/ ) {
@@ -412,9 +412,7 @@ sub _load_extension {
     }
 
     if ( my $class = $self->_find_module( $name, @search ) ) {
-        if ( $class->can('load') ) {
-            $class->load( { app_prove => $self, args => [@args] } );
-        }
+        $class->$cb(@args);
     }
     else {
         croak "Can't load module $name";
@@ -422,8 +420,8 @@ sub _load_extension {
 }
 
 sub _load_extensions {
-    my ( $self, $ext, @search ) = @_;
-    $self->_load_extension( $_, @search ) for @$ext;
+    my ( $self, $cb, $ext, @search ) = @_;
+    $self->_load_extension( $cb, $_, @search ) for @$ext;
 }
 
 sub _parse_source {
@@ -497,8 +495,16 @@ sub run {
     }
     else {
 
-        $self->_load_extensions( $self->modules );
-        $self->_load_extensions( $self->plugins, PLUGINS );
+        $self->_load_extensions( sub {
+            my ($ext, @args) = @_;
+            $ext->import(@args);
+        }, $self->modules );
+        $self->_load_extensions( sub {
+            my ($ext, @args) = @_;
+            if ( $ext->can('load') ) {
+                $ext->load( { app_prove => $self, args => [@args] } );
+            }
+        }, $self->plugins, PLUGINS );
 
         local $ENV{TEST_VERBOSE} = 1 if $self->verbose;
 
