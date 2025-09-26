@@ -9,6 +9,7 @@ use File::Spec;
 use Getopt::Long;
 use App::Prove::State;
 use Carp;
+use Errno qw(ENOENT);
 
 use base 'TAP::Object';
 
@@ -394,12 +395,15 @@ sub _find_module {
     for my $pfx (@search) {
         my $name = join( '::', $pfx, $class );
         eval "require $name";
-        return $name unless $@;
+        if ( $@ ) {
+            croak $@ unless $! == ENOENT;
+        } else {
+            return $name;
+        }
     }
 
     eval "require $class";
-    return $class unless $@;
-    return;
+    $@ ? croak $@ : return $class;
 }
 
 sub _load_extension {
@@ -411,13 +415,9 @@ sub _load_extension {
         @args = split( /,/, $2 );
     }
 
-    if ( my $class = $self->_find_module( $name, @search ) ) {
-        if ( $class->can('load') ) {
-            $class->load( { app_prove => $self, args => [@args] } );
-        }
-    }
-    else {
-        croak "Can't load module $name";
+    my $class = $self->_find_module( $name, @search );
+    if ( $class->can('load') ) {
+        $class->load( { app_prove => $self, args => [@args] } );
     }
 }
 
