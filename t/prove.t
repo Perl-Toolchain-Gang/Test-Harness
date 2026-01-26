@@ -53,6 +53,15 @@ sub mabs {
 }
 
 {
+    my @import_log = ();
+    sub test_log_import { push @import_log, [@_] }
+
+    sub get_import_log {
+        my @log = @import_log;
+        @import_log = ();
+        return @log;
+    }
+
     my @plugin_load_log = ();
     sub test_log_plugin_load { push @plugin_load_log, [@_] }
 
@@ -1112,11 +1121,44 @@ BEGIN {    # START PLAN
             },
             extra => sub {
                 my @loaded = get_plugin_load_log();
-                ok @loaded == 1 && $loaded[0][0] eq 'App::Prove::Plugin::Dummy',
-                  "Plugin loaded OK";
-                my $args = $loaded[0][1]{args};
-                is_deeply $args, [ 'cracking', 'cheese', 'gromit' ],
-                  "Plugin args OK";
+                is scalar @loaded, 1, 'Plugin->load called OK';
+
+                my ( $inv, @args ) = @{ shift @loaded };
+                is $inv, 'App::Prove::Plugin::Dummy', 'correct plugin passed';
+                is scalar @args, 1, 'one argument';
+                my $args = shift @args;
+
+                isa_ok(
+                    $args->{app_prove}, 'App::Prove',
+                    'app_prove object passed'
+                );
+                is_deeply(
+                    $args->{args}, [qw( cracking cheese gromit )],
+                    'expected args passed'
+                );
+            },
+            plan   => 5,
+            runlog => [
+                [   '_runtests',
+                    {   show_count => 1,
+                    },
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name     => 'Load plugin (args, no load method)',
+            switches => [ '-P', 'Dummy2=cracking,cheese,gromit', $dummy_test ],
+            args     => {
+                argv => [qw( one two three )],
+            },
+            expect => {
+                plugins => ['Dummy2'],
+            },
+            extra => sub {
+                my @import = get_import_log();
+
+                is scalar @import, 0, 'import not called';
             },
             plan   => 1,
             runlog => [
@@ -1151,31 +1193,26 @@ BEGIN {    # START PLAN
             ],
         },
 
-        {   name     => 'Load plugin (args + call load method)',
-            switches => [ '-P', 'Dummy2=fou,du,fafa', $dummy_test ],
+        {   name     => 'Load module',
+            switches => [ '-M', 'App::Prove::Plugin::Dummy2', $dummy_test ],
             args     => {
                 argv => [qw( one two three )],
             },
             expect => {
-                plugins => ['Dummy2'],
+                plugins => [],
             },
             extra => sub {
-                my @loaded = get_plugin_load_log();
-                is( scalar @loaded, 1, 'Plugin->load called OK' );
-                my ( $plugin_class, $args ) = @{ shift @loaded };
-                is( $plugin_class, 'App::Prove::Plugin::Dummy2',
-                    'plugin_class passed'
-                );
-                isa_ok(
-                    $args->{app_prove}, 'App::Prove',
-                    'app_prove object passed'
-                );
-                is_deeply(
-                    $args->{args}, [qw( fou du fafa )],
-                    'expected args passed'
-                );
+                my @import = get_import_log();
+
+                is scalar @import, 1, 'import called once';
+
+                my ($inv, @args) = @{ $import[0] };
+
+                is $inv, 'App::Prove::Plugin::Dummy2', 'Module loaded OK';
+
+                is scalar @args, 0, 'no extra args passed';
             },
-            plan   => 5,
+            plan   => 3,
             runlog => [
                 [   '_runtests',
                     {   show_count => 1,
@@ -1185,18 +1222,48 @@ BEGIN {    # START PLAN
             ],
         },
 
-        {   name     => 'Load module',
+        {   name     => 'Load module (args)',
+            switches => [ '-M', 'App::Prove::Plugin::Dummy2=cracking,cheese,gromit', $dummy_test ],
+            args     => {
+                argv => [qw( one two three )],
+            },
+            expect => {
+                plugins => [],
+            },
+            extra => sub {
+                my @import = get_import_log();
+
+                is scalar @import, 1, 'import called once';
+
+                my ($inv, @args) = @{ $import[0] };
+
+                is $inv, 'App::Prove::Plugin::Dummy2', 'Module loaded OK';
+
+                is_deeply \@args, [qw(cracking cheese gromit)],
+                  'correct args passed';
+            },
+            plan   => 3,
+            runlog => [
+                [   '_runtests',
+                    {   show_count => 1,
+                    },
+                    $dummy_test
+                ]
+            ],
+        },
+
+        {   name     => 'Load module (plugin)',
             switches => [ '-M', 'App::Prove::Plugin::Dummy', $dummy_test ],
             args     => {
                 argv => [qw( one two three )],
             },
             expect => {
-                plugins => ['Dummy'],
+                plugins => [],
             },
             extra => sub {
-                my @loaded = get_plugin_load_log();
-                ok @loaded == 1 && $loaded[0][0] eq 'App::Prove::Plugin::Dummy',
-                  "Plugin loaded OK";
+                my @load = get_plugin_load_log();
+
+                is scalar @load, 0, 'load not called';
             },
             plan   => 1,
             runlog => [
