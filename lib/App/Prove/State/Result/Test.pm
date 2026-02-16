@@ -113,8 +113,7 @@ TODO passed).
 
 =head3 C<run_time>
 
-The total time it took for the test to run, in seconds.  If C<Time::HiRes> is
-available, it will have finer granularity.
+The total time it took for the test to run, in seconds.
 
 =head3 C<num_todo>
 

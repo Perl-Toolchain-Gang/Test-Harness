@@ -141,7 +141,7 @@ Printing individual test results to STDOUT.
 
 =item * C<timer>
 
-Append run time for each test to output. Uses L<Time::HiRes> if available.
+Append run time for each test to output.
 
 =item * C<failures>
 
