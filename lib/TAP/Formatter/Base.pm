@@ -226,9 +226,17 @@ sub prepare {
 
 sub _format_now { strftime "[%H:%M:%S]", localtime }
 
+# Replace ASCII control characters with visible \x{HH} representations
+# to prevent terminal injection via filenames containing ANSI escape sequences.
+sub _sanitize_name {
+    my ( $self, $name ) = @_;
+    $name =~ s/([\x00-\x1f\x7f])/sprintf("\\x{%02x}", ord($1))/ge;
+    return $name;
+}
+
 sub _format_name {
     my ( $self, $test ) = @_;
-    my $name = $test;
+    my $name = $self->_sanitize_name($test);
     my $periods = '.' x ( $self->_longest + 2 - length $test );
     $periods = " $periods ";
 
@@ -383,6 +391,7 @@ sub _output_summary_failure {
 sub _summary_test_header {
     my ( $self, $test, $parser ) = @_;
     return if $self->_printed_summary_header;
+    my $display = $self->_sanitize_name($test);
     my $spaces = ' ' x ( $self->_longest - length $test );
     $spaces = ' ' unless $spaces;
     my $output = $self->_get_output_method($parser);
@@ -412,7 +421,7 @@ sub _summary_test_header {
     }
 
     $self->$output(
-        sprintf "$test$spaces(Wstat: %s Tests: %d Failed: %d)\n",
+        sprintf "$display$spaces(Wstat: %s Tests: %d Failed: %d)\n",
         $wait, $parser->tests_run, scalar $parser->failed
     );
     $self->_printed_summary_header(1);
