@@ -82,11 +82,26 @@ Options that take arguments:
 
 If F<~/.proverc> or F<./.proverc> exist they will be read and any
 options they contain processed before the command line options. Options
-in F<.proverc> are specified in the same way as command line options:
+in F<.proverc> are specified similarly to command line options, but
+there is an important difference: the shell is not involved in parsing
+F<.proverc>, so shell quoting does not apply. For example, on the
+command line you can write:
+
+    prove --rules='seq=t/finish.t'
+
+because the shell strips the quotes before passing the option to
+C<prove>. In F<.proverc>, you must omit those shell quotes:
+
+    # .proverc
+    --rules=seq=t/finish.t
+
+If an option value contains spaces, you can quote it with single or
+double quotes in F<.proverc>:
 
     # .proverc
     --state=hot,fast,save
     -j9
+    --rules="seq=t/a test.t"
 
 Additional option files may be specified with the C<--rc> option.
 Default option file processing is disabled by the C<--norc> option.
