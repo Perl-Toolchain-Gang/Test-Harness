@@ -955,7 +955,7 @@ from the parser.
 L<TAP::Parser::SourceHandler>s handle TAP I<input>.  You can configure them
 and load custom handlers using the C<sources> parameter to L</new>.
 
-L<TAP::Formatter>s handle TAP I<output>.  You can load custom formatters by
+L<TAP::Formatter::Base>s handle TAP I<output>.  You can load custom formatters by
 using the C<formatter_class> parameter to L</new>.  To configure a formatter,
 you currently need to instantiate it outside of L<TAP::Harness> and pass it in
 with the C<formatter> parameter to L</new>.  This I<may> be addressed by adding
@@ -1017,7 +1017,7 @@ configured using the C<sources> parameter to L</new>.
 
 =item Customize how TAP results are output from the parser
 
-To do this, you can either extend an existing L<TAP::Formatter>, or write your
+To do this, you can either extend an existing L<TAP::Formatter::Base>, or write your
 own.  Writing formatters are a bit more involved than writing a
 I<SourceHandler>, as you'll need to understand the L<TAP::Parser> API.  A
 good place to start is by understanding how L</aggregate_tests> works.

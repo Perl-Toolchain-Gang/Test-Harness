@@ -23,7 +23,7 @@ use base 'TAP::Base';
 
 =head1 NAME
 
-TAP::Parser - Parse L<TAP|Test::Harness::TAP> output
+TAP::Parser - Parse TAP output
 
 =head1 VERSION
 
