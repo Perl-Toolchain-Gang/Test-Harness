@@ -591,6 +591,26 @@ BEGIN {
             ],
             name => 'Regression: inline_nested_hash'
         },
+        {   name => 'Quoted hash keys',
+            in   => [
+                '---',
+                '  "quoted": Magic!',
+                '  "\n\t": newline, tab',
+                '...',
+            ],
+            out => {
+                quoted => 'Magic!',
+                "\n\t" => 'newline, tab',
+            },
+        },
+        {   name => 'Empty',
+            in   => [],
+            out  => undef,
+        },
+    );
+
+    if (ord "A" == 65) {
+        push @SCHEDULE,
         {   name => "Unprintables", # This is an ASCII centric test
             in   => [
                 "---",
@@ -630,24 +650,8 @@ BEGIN {
                 "\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357",
                 "\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377"
             ],
-        },
-        {   name => 'Quoted hash keys',
-            in   => [
-                '---',
-                '  "quoted": Magic!',
-                '  "\n\t": newline, tab',
-                '...',
-            ],
-            out => {
-                quoted => 'Magic!',
-                "\n\t" => 'newline, tab',
-            },
-        },
-        {   name => 'Empty',
-            in   => [],
-            out  => undef,
-        },
-    );
+        };
+    }
 
     plan tests => @SCHEDULE * 5;
 }
